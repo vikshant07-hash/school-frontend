@@ -263,53 +263,7 @@ fetch("https://gsssshilla.onrender.com/verify-admin", {
   window.location.replace("login.html");
 });
 
-const menuToggle = document.getElementById("menuToggle");
-const navLinks = document.getElementById("navLinks");
 
-menuToggle.addEventListener("click", () => {
-
-    navLinks.classList.toggle("active");
-
-    menuToggle.innerHTML =
-    navLinks.classList.contains("active")
-    ? "✕"
-    : "☰";
-
-});
-
-function logout(){
-
-    const navLinks = document.getElementById("navLinks");
-    const menuToggle = document.getElementById("menuToggle");
-
-    navLinks.classList.remove("active");
-
-    if(menuToggle){
-        menuToggle.innerHTML = "☰";
-    }
-
-    Swal.fire({
-        title: "Logout?",
-        text: "Do you really want to logout from Admin Panel?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#D4AF37",
-        cancelButtonColor: "#123A7A",
-        confirmButtonText: "Yes, Logout",
-        cancelButtonText: "Cancel"
-    }).then((result) => {
-
-        if(result.isConfirmed){
-
-            localStorage.removeItem("token");
-            sessionStorage.clear();
-
-            window.location.replace("login.html");
-        }
-
-    });
-
-}
 
     const API = "https://gsssshilla.onrender.com/recent";
 
@@ -350,11 +304,15 @@ function logout(){
         const file = document.getElementById("file").files[0];
         if (file) formData.append("file", file);
 
-        await fetch("https://gsssshilla.onrender.com/admin/recent/add", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
-            body: formData
-        });
+        await fetch(
+"https://gsssshilla.onrender.com/recent",
+{
+  method:"POST",
+  headers:{
+    Authorization:`Bearer ${token}`
+  },
+  body:formData
+});
 
         alert("Update Added");
         e.target.reset();
@@ -364,10 +322,14 @@ function logout(){
     // Delete Function
     async function deleteUpdate(id) {
         if (!confirm("Delete this update?")) return;
-        await fetch(`https://gsssshilla.onrender.com/admin/recent/delete/${id}`, {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        await fetch(
+`https://gsssshilla.onrender.com/recent/${id}`,
+{
+  method:"DELETE",
+  headers:{
+    Authorization:`Bearer ${token}`
+  }
+});
         loadUpdates();
     }
 
