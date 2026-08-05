@@ -3,56 +3,472 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recent Updates</title>
+    <title>Recent Updates - School</title>
     <style>
+        /* ============================================
+           RESET & BASE
+        ============================================ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; }
-        .header { background: linear-gradient(135deg, #1a2332, #2a3a5a); color: white; padding: 30px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
-        .header h1 { font-size: 2rem; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* ============================================
+           HEADER
+        ============================================ */
+        .header {
+            background: linear-gradient(135deg, #1a2332, #2a3a5a);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
         .header h1 span { color: #facc15; }
-        .header p { color: #94a3b8; margin-top: 8px; }
-        .updates-wrapper { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); max-height: 600px; overflow-y: auto; }
-        .update-card { background: #f8fafc; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; border-left: 4px solid #3b82f6; transition: all 0.3s; }
-        .update-card:hover { transform: translateX(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-        .update-card .title { font-size: 1rem; font-weight: 600; color: #1a2332; cursor: pointer; }
+        .header p {
+            color: #94a3b8;
+            margin-top: 8px;
+            font-size: 1rem;
+        }
+
+        /* ============================================
+           UPDATES BOX
+        ============================================ */
+        .updates-box {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        /* ============================================
+           CONTROLS - TOP
+        ============================================ */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .controls .info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .controls .info .count {
+            background: #eff6ff;
+            color: #3b82f6;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .controls .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .controls .actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-pause {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+        .btn-pause:hover {
+            background: #fecaca;
+        }
+        .btn-pause.paused {
+            background: #dcfce7;
+            color: #22c55e;
+        }
+
+        .btn-scroll {
+            background: #eff6ff;
+            color: #3b82f6;
+        }
+        .btn-scroll:hover {
+            background: #dbeafe;
+        }
+
+        /* ============================================
+           SCROLLING WRAPPER
+        ============================================ */
+        .scrolling-wrapper {
+            max-height: 550px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            padding-right: 8px;
+            position: relative;
+        }
+
+        /* Custom Scrollbar */
+        .scrolling-wrapper::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scrolling-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .scrolling-wrapper::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .scrolling-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* ============================================
+           UPDATE CARD
+        ============================================ */
+        .update-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            border-left: 4px solid #3b82f6;
+            transition: all 0.3s ease;
+            animation: slideIn 0.4s ease forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .update-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .update-card:hover {
+            transform: translateX(5px);
+            background: #ffffff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        /* Card Header */
+        .update-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .update-card .title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #1a2332;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
         .update-card .title:hover { color: #3b82f6; }
-        .update-card .badge { display: inline-block; padding: 2px 12px; border-radius: 20px; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; }
-        .update-card .badge.new { background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5; }
-        .update-card .badge.old { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
-        .update-card .description { color: #4b5563; font-size: 0.9rem; margin: 8px 0 10px; }
-        .update-card .meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #6b7280; padding-top: 10px; border-top: 1px solid #e5e7eb; margin-top: 10px; }
-        .update-card .meta .category { display: inline-block; padding: 2px 10px; border-radius: 12px; background: #eff6ff; color: #3b82f6; font-size: 0.65rem; text-transform: capitalize; }
-        .loading-state { text-align: center; padding: 40px; color: #6b7280; }
-        .loading-state .spinner { width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
-        .empty-state { text-align: center; padding: 40px; color: #6b7280; }
+
+        .update-card .badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+            animation: pulse 2s infinite;
+        }
+        .update-card .badge.new {
+            background: #fef2f2;
+            color: #ef4444;
+            border: 1px solid #fca5a5;
+        }
+        .update-card .badge.old {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 1px solid #e5e7eb;
+            animation: none;
+        }
+
+        /* Description */
+        .update-card .description {
+            color: #4b5563;
+            font-size: 0.95rem;
+            margin: 8px 0 10px;
+            line-height: 1.6;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+        .update-card .description.expanded {
+            -webkit-line-clamp: unset;
+            display: block;
+        }
+
+        .update-card .read-more {
+            color: #3b82f6;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        .update-card .read-more:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+
+        /* Attachment */
+        .update-card .attachment {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 14px;
+            background: #eff6ff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #3b82f6;
+            border: none;
+            transition: all 0.2s;
+            margin-top: 6px;
+        }
+        .update-card .attachment:hover {
+            background: #dbeafe;
+        }
+
+        .update-card .attachment .file-size {
+            color: #6b7280;
+            font-size: 0.7rem;
+        }
+
+        /* Meta */
+        .update-card .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: #6b7280;
+            padding-top: 10px;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 10px;
+        }
+
+        .update-card .meta .date {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .update-card .meta .category {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            background: #eff6ff;
+            color: #3b82f6;
+            font-size: 0.65rem;
+            text-transform: capitalize;
+            font-weight: 500;
+        }
+
+        /* ============================================
+           LOADING / EMPTY
+        ============================================ */
+        .loading-state {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+        .loading-state .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
         .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .attachment-link { color: #3b82f6; cursor: pointer; font-size: 0.8rem; font-weight: 500; padding: 3px 12px; border-radius: 6px; background: #eff6ff; border: none; }
-        .attachment-link:hover { background: #dbeafe; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-        .modal-content { position: relative; background: white; margin: 5% auto; padding: 30px; width: 90%; max-width: 700px; max-height: 90vh; border-radius: 12px; overflow-y: auto; }
-        .modal-content .close { position: absolute; top: 15px; right: 25px; font-size: 2rem; font-weight: bold; color: #6b7280; cursor: pointer; }
-        .modal-content img { max-width: 100%; border-radius: 8px; }
-        @media (max-width: 600px) { .header h1 { font-size: 1.3rem; } .update-card { padding: 12px 14px; } }
+
+        /* ============================================
+           MODAL
+        ============================================ */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            position: relative;
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            border-radius: 16px;
+            overflow-y: auto;
+            animation: slideDown 0.3s;
+        }
+
+        .modal-content .close {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #6b7280;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-content .close:hover { color: #1a2332; }
+
+        .modal-content img,
+        .modal-content video,
+        .modal-content audio {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        .modal-content .file-preview {
+            text-align: center;
+            padding: 20px;
+        }
+        .modal-content .file-preview .file-icon-big {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+
+        /* ============================================
+           ANIMATIONS
+        ============================================ */
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* ============================================
+           RESPONSIVE
+        ============================================ */
+        @media (max-width: 600px) {
+            body { padding: 12px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 1.3rem; }
+            .update-card { padding: 14px 16px; }
+            .update-card .title { font-size: 0.95rem; }
+            .controls { flex-direction: column; align-items: stretch; }
+            .controls .actions { justify-content: center; }
+            .modal-content { padding: 20px; margin: 10% auto; width: 95%; }
+        }
     </style>
 </head>
 <body>
+
     <div class="container">
+
+        <!-- ===== HEADER ===== -->
         <div class="header">
             <h1>📢 <span>Recent</span> Updates</h1>
-            <p>Stay updated with latest news and announcements</p>
+            <p>Stay updated with latest news & announcements from school</p>
         </div>
-        <div class="updates-wrapper" id="updatesWrapper">
-            <div id="updatesContainer">
-                <div class="loading-state">
-                    <div class="spinner"></div>
-                    <p>Loading updates...</p>
+
+        <!-- ===== UPDATES BOX ===== -->
+        <div class="updates-box">
+
+            <!-- Controls -->
+            <div class="controls">
+                <div class="info">
+                    <span>📋 Updates</span>
+                    <span class="count" id="updateCount">0</span>
+                    <span id="scrollStatus" style="font-size:0.8rem;color:#94a3b8;">⏸️ Paused</span>
+                </div>
+                <div class="actions">
+                    <button class="btn-pause" id="pauseBtn" onclick="togglePause()">⏸️ Pause</button>
+                    <button class="btn-scroll" onclick="scrollToTop()">⬆️ Top</button>
+                    <button class="btn-scroll" onclick="scrollToBottom()">⬇️ Bottom</button>
                 </div>
             </div>
+
+            <!-- Scrolling Wrapper -->
+            <div class="scrolling-wrapper" id="scrollingWrapper">
+                <div id="updatesContainer">
+                    <div class="loading-state">
+                        <div class="spinner"></div>
+                        <p>Loading updates...</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
+
     </div>
 
+    <!-- ===== FILE PREVIEW MODAL ===== -->
     <div id="fileModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
@@ -61,58 +477,58 @@
     </div>
 
     <script>
-        // ============================================
+        // ============================================================
         // CONFIGURATION
-        // ============================================
+        // ============================================================
         const API_URL = 'https://gsssshilla.onrender.com';
+        const SCROLL_INTERVAL = 40; // ms between scroll steps
+        const SCROLL_STEP = 0.6; // pixels per step
 
-        // ============================================
+        // ============================================================
+        // STATE
+        // ============================================================
+        let isPaused = false;
+        let scrollInterval = null;
+        let updates = [];
+        let currentScrollTop = 0;
+
+        // ============================================================
+        // DOM REFS
+        // ============================================================
+        const wrapper = document.getElementById('scrollingWrapper');
+        const container = document.getElementById('updatesContainer');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const scrollStatus = document.getElementById('scrollStatus');
+        const updateCount = document.getElementById('updateCount');
+
+        // ============================================================
         // LOAD UPDATES
-        // ============================================
+        // ============================================================
         async function loadUpdates() {
-            const container = document.getElementById('updatesContainer');
-
             try {
-                console.log('🔄 Fetching updates from:', `${API_URL}/recent/public?limit=20`);
-                
-                const response = await fetch(`${API_URL}/recent/public?limit=20`);
-                console.log('📡 Response status:', response.status);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
+                const response = await fetch(`${API_URL}/recent-public?t=${Date.now()}`);
                 const data = await response.json();
-                console.log('📦 Data received:', data);
 
-                if (data.success) {
-                    if (data.data && data.data.length > 0) {
-                        renderUpdates(data.data);
-                        console.log('✅ Updates rendered successfully');
-                    } else {
-                        container.innerHTML = `
-                            <div class="empty-state">
-                                <div class="icon">📭</div>
-                                <p>No updates available</p>
-                                <p style="font-size:0.85rem;color:#6b7280;">Add updates from admin panel</p>
-                            </div>
-                        `;
-                    }
+                if (data.success && data.data) {
+                    updates = data.data;
+                    updateCount.textContent = updates.length;
+                    renderUpdates(updates);
+                    startAutoScroll();
                 } else {
                     container.innerHTML = `
                         <div class="empty-state">
-                            <div class="icon">❌</div>
-                            <p>Failed to load updates</p>
-                            <p style="font-size:0.85rem;color:#ef4444;">${data.message || 'Please try again'}</p>
+                            <div class="icon">📭</div>
+                            <p>No updates available</p>
+                            <p style="font-size:0.85rem;color:#6b7280;">Check back later for new updates</p>
                         </div>
                     `;
                 }
             } catch (error) {
-                console.error('❌ Error loading updates:', error);
+                console.error('Error loading updates:', error);
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="icon">⚠️</div>
-                        <p>Network error. Please refresh.</p>
+                        <p>Failed to load updates</p>
                         <p style="font-size:0.85rem;color:#6b7280;">${error.message}</p>
                         <button onclick="loadUpdates()" style="margin-top:12px;padding:8px 20px;background:#3b82f6;color:white;border:none;border-radius:6px;cursor:pointer;">🔄 Retry</button>
                     </div>
@@ -120,53 +536,164 @@
             }
         }
 
-        // ============================================
+        // ============================================================
         // RENDER UPDATES
-        // ============================================
+        // ============================================================
         function renderUpdates(updates) {
-            const container = document.getElementById('updatesContainer');
-            
+            if (!updates || updates.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📭</div>
+                        <p>No updates available</p>
+                    </div>
+                `;
+                return;
+            }
+
             let html = '';
             updates.forEach((update, index) => {
                 const isNew = update.is_new === 1 || update.is_new_dynamic === 1;
-                const formattedDate = formatDate(update.created_at);
+                const date = formatDate(update.created_at);
                 const hasFile = update.file_url ? true : false;
-                
+                const fileSize = update.file_size ? formatFileSize(update.file_size) : '';
+                const fileIcon = getFileIcon(update.file_type);
+                const description = update.description || '';
+                const isLong = description.length > 120;
+
                 html += `
-                    <div class="update-card">
-                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">
+                    <div class="update-card" style="animation-delay: ${index * 0.05}s">
+                        <div class="card-header">
                             <div class="title" onclick="openFile('${update.id}', '${update.file_url || ''}', '${update.file_type || ''}', '${escapeHtml(update.title)}')">
-                                ${update.title}
+                                ${hasFile ? '📎' : '📄'} ${escapeHtml(update.title)}
                             </div>
                             <span class="badge ${isNew ? 'new' : 'old'}">
                                 ${isNew ? '🆕 NEW' : '📌'}
                             </span>
                         </div>
-                        
-                        ${update.description ? `<div class="description">${escapeHtml(update.description)}</div>` : ''}
-                        
-                        ${hasFile ? `
-                            <div style="margin-top: 6px;">
-                                <button class="attachment-link" onclick="openFile('${update.id}', '${update.file_url}', '${update.file_type}', '${escapeHtml(update.title)}')">
-                                    📎 View Attachment
-                                </button>
+
+                        ${description ? `
+                            <div class="description" id="desc-${update.id}">
+                                ${escapeHtml(description.substring(0, 120))}${isLong ? '...' : ''}
                             </div>
+                            ${isLong ? `<button class="read-more" onclick="toggleReadMore(${update.id})">Read more</button>` : ''}
                         ` : ''}
-                        
+
+                        ${hasFile ? `
+                            <button class="attachment" onclick="openFile('${update.id}', '${update.file_url}', '${update.file_type}', '${escapeHtml(update.title)}')">
+                                ${fileIcon} View Attachment
+                                ${fileSize ? `<span class="file-size">(${fileSize})</span>` : ''}
+                            </button>
+                        ` : ''}
+
                         <div class="meta">
-                            <span>📅 ${formattedDate}</span>
+                            <span class="date">📅 ${date}</span>
                             <span class="category">${escapeHtml(update.category || 'general')}</span>
                         </div>
                     </div>
                 `;
             });
-            
+
             container.innerHTML = html;
         }
 
-        // ============================================
-        // OPEN FILE
-        // ============================================
+        // ============================================================
+        // READ MORE TOGGLE
+        // ============================================================
+        function toggleReadMore(id) {
+            const desc = document.getElementById(`desc-${id}`);
+            if (!desc) return;
+
+            const fullText = updates.find(u => u.id === id)?.description || '';
+            const isExpanded = desc.classList.contains('expanded');
+
+            if (isExpanded) {
+                desc.classList.remove('expanded');
+                desc.textContent = escapeHtml(fullText.substring(0, 120)) + '...';
+                desc.nextElementSibling.textContent = 'Read more';
+            } else {
+                desc.classList.add('expanded');
+                desc.textContent = escapeHtml(fullText);
+                desc.nextElementSibling.textContent = 'Read less';
+            }
+        }
+
+        // ============================================================
+        // AUTO SCROLL
+        // ============================================================
+        function startAutoScroll() {
+            stopAutoScroll();
+
+            // Check if content is taller than container
+            if (wrapper.scrollHeight <= wrapper.clientHeight) {
+                scrollStatus.textContent = '✅ All visible';
+                return;
+            }
+
+            scrollStatus.textContent = '▶️ Scrolling...';
+            isPaused = false;
+            pauseBtn.textContent = '⏸️ Pause';
+            pauseBtn.classList.remove('paused');
+            currentScrollTop = 0;
+
+            scrollInterval = setInterval(() => {
+                if (!isPaused) {
+                    currentScrollTop += SCROLL_STEP;
+                    if (currentScrollTop >= wrapper.scrollHeight - wrapper.clientHeight) {
+                        currentScrollTop = 0;
+                    }
+                    wrapper.scrollTop = currentScrollTop;
+                }
+            }, SCROLL_INTERVAL);
+        }
+
+        function stopAutoScroll() {
+            if (scrollInterval) {
+                clearInterval(scrollInterval);
+                scrollInterval = null;
+            }
+        }
+
+        // ============================================================
+        // PAUSE / RESUME
+        // ============================================================
+        function togglePause() {
+            isPaused = !isPaused;
+            if (isPaused) {
+                pauseBtn.textContent = '▶️ Resume';
+                pauseBtn.classList.add('paused');
+                scrollStatus.textContent = '⏸️ Paused';
+                // Show scrollbar when paused
+                wrapper.style.overflowY = 'auto';
+            } else {
+                pauseBtn.textContent = '⏸️ Pause';
+                pauseBtn.classList.remove('paused');
+                scrollStatus.textContent = '▶️ Scrolling...';
+                // Auto-hide scrollbar when scrolling
+                wrapper.style.overflowY = 'auto';
+                // If at bottom, reset to top
+                if (wrapper.scrollTop + wrapper.clientHeight >= wrapper.scrollHeight - 2) {
+                    currentScrollTop = 0;
+                    wrapper.scrollTop = 0;
+                }
+            }
+        }
+
+        // ============================================================
+        // SCROLL CONTROLS
+        // ============================================================
+        function scrollToTop() {
+            wrapper.scrollTo({ top: 0, behavior: 'smooth' });
+            currentScrollTop = 0;
+        }
+
+        function scrollToBottom() {
+            wrapper.scrollTo({ top: wrapper.scrollHeight, behavior: 'smooth' });
+            currentScrollTop = wrapper.scrollHeight - wrapper.clientHeight;
+        }
+
+        // ============================================================
+        // OPEN FILE - MODAL
+        // ============================================================
         function openFile(id, fileUrl, fileType, title) {
             const modal = document.getElementById('fileModal');
             const modalBody = document.getElementById('modalBody');
@@ -185,7 +712,7 @@
 
             let preview = '';
             if (fileType && fileType.startsWith('image/')) {
-                preview = `<img src="${fileUrl}" style="max-width:100%;border-radius:8px;max-height:60vh;">`;
+                preview = `<img src="${fileUrl}" style="max-width:100%;border-radius:8px;max-height:60vh;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23f3f4f6%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%236b7280%22%3EImage%20not%20found%3C/text%3E%3C/svg%3E'">`;
             } else if (fileType && fileType.startsWith('video/')) {
                 preview = `<video controls style="max-width:100%;max-height:60vh;"><source src="${fileUrl}" type="${fileType}"></video>`;
             } else if (fileType && fileType.startsWith('audio/')) {
@@ -197,7 +724,7 @@
                     <div style="text-align:center;padding:20px;">
                         <div style="font-size:4rem;">📎</div>
                         <p style="margin:12px 0;color:#4b5563;">${fileType || 'File'}</p>
-                        <a href="${fileUrl}" download class="attachment-link" style="padding:8px 20px;background:#3b82f6;color:white;border-radius:6px;text-decoration:none;display:inline-block;">📥 Download</a>
+                        <a href="${fileUrl}" download class="btn" style="padding:8px 20px;background:#3b82f6;color:white;border-radius:6px;text-decoration:none;display:inline-block;">📥 Download</a>
                     </div>
                 `;
             }
@@ -205,28 +732,40 @@
             modalBody.innerHTML = `
                 <h3 style="margin-bottom:16px;">${title}</h3>
                 <div class="file-preview">${preview}</div>
-                <div style="margin-top:12px;padding:12px;background:#f8fafc;border-radius:8px;">
+                <div style="margin-top:12px;padding:12px;background:#f8fafc;border-radius:8px;display:flex;gap:12px;flex-wrap:wrap;">
                     <a href="${fileUrl}" target="_blank" style="color:#3b82f6;text-decoration:none;">🔗 Open in new tab</a>
+                    <a href="${fileUrl}" download style="color:#3b82f6;text-decoration:none;">📥 Download</a>
                 </div>
             `;
+
             modal.style.display = 'block';
         }
 
-        function closeModal() { document.getElementById('fileModal').style.display = 'none'; }
-        window.onclick = function(e) { if (e.target === document.getElementById('fileModal')) closeModal(); }
+        function closeModal() {
+            document.getElementById('fileModal').style.display = 'none';
+        }
 
-        // ============================================
-        // HELPERS
-        // ============================================
+        window.onclick = function(e) {
+            if (e.target === document.getElementById('fileModal')) closeModal();
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ============================================================
+        // HELPER FUNCTIONS
+        // ============================================================
         function formatDate(dateString) {
             if (!dateString) return 'N/A';
             const date = new Date(dateString);
             const now = new Date();
             const diff = now - date;
+
             if (diff < 60000) return 'Just now';
             if (diff < 3600000) return `${Math.floor(diff / 60000)} min ago`;
             if (diff < 86400000) return `${Math.floor(diff / 3600000)} hours ago`;
             if (diff < 172800000) return 'Yesterday';
+
             return date.toLocaleString('en-IN', {
                 day: '2-digit',
                 month: 'short',
@@ -237,6 +776,22 @@
             });
         }
 
+        function formatFileSize(bytes) {
+            if (!bytes) return '';
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        function getFileIcon(mimeType) {
+            if (!mimeType) return '📄';
+            if (mimeType.startsWith('image/')) return '🖼️';
+            if (mimeType === 'application/pdf') return '📄';
+            if (mimeType.startsWith('audio/')) return '🎵';
+            if (mimeType.startsWith('video/')) return '🎬';
+            return '📎';
+        }
+
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
@@ -244,16 +799,22 @@
             return div.innerHTML;
         }
 
-        // ============================================
+        // ============================================================
+        // AUTO REFRESH
+        // ============================================================
+        setInterval(() => {
+            loadUpdates();
+        }, 300000); // 5 minutes
+
+        // ============================================================
         // INIT
-        // ============================================
+        // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Public Page Loaded');
             console.log('📡 API_URL:', API_URL);
             loadUpdates();
         });
-
-        setInterval(loadUpdates, 300000);
     </script>
+
 </body>
 </html>
