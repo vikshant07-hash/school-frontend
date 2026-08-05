@@ -319,3 +319,225 @@
         }
 
         function getFileIcon(mimeType) {
+            if (!mimeType) return '📄';
+            if (mimeType.startsWith('image/')) return '🖼️';
+            if (mimeType === 'application/pdf') return '📄';
+            if (mimeType.startsWith('audio/')) return '🎵';
+            if (mimeType.startsWith('video/')) return '🎬';
+            return '📎';
+        }
+
+        // ============================================================
+        // ADD / UPDATE FORM
+        // ============================================================
+        document.getElementById('updateForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('updateId').value;
+            const title = document.getElementById('title').value.trim();
+            
+            if (!title) {
+                showToast('Please enter a title', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('category', document.getElementById('category').value);
+            formData.append('isNew', document.getElementById('isNew').value);
+            formData.append('link', document.getElementById('link').value);
+
+            const fileInput = document.getElementById('file');
+            if (fileInput.files && fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
+            }
+
+            // ✅ NEW URL
+            const url = id ? `${API_URL}/recent-admin-update/${id}` : `${API_URL}/recent-admin-add`;
+            
+            document.getElementById('submitBtn').textContent = '⏳ Saving...';
+            document.getElementById('submitBtn').disabled = true;
+
+            fetch(url, { 
+                method: id ? 'PUT' : 'POST',
+                body: formData 
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    resetForm();
+                    loadUpdates();
+                } else {
+                    showToast('Error: ' + data.message, 'error');
+                }
+            })
+            .catch(err => {
+                showToast('Error: ' + err.message, 'error');
+            })
+            .finally(() => {
+                document.getElementById('submitBtn').textContent = id ? '💾 Update' : '➕ Add Update';
+                document.getElementById('submitBtn').disabled = false;
+            });
+        });
+
+        // ============================================================
+        // EDIT UPDATE
+        // ============================================================
+        function editUpdate(id) {
+            fetch(`${API_URL}/recent/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const item = data.data;
+                        document.getElementById('updateId').value = item.id;
+                        document.getElementById('title').value = item.title;
+                        document.getElementById('description').value = item.description || '';
+                        document.getElementById('category').value = item.category || 'general';
+                        document.getElementById('isNew').value = item.is_new ? 1 : 0;
+                        document.getElementById('link').value = item.link || '';
+                        document.getElementById('formTitle').textContent = '✏️ Edit Update';
+                        document.getElementById('submitBtn').textContent = '💾 Update';
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        showToast('Edit mode: Update and save', 'info');
+                    }
+                })
+                .catch(err => showToast('Error: ' + err.message, 'error'));
+        }
+
+        // ============================================================
+        // DELETE UPDATE
+        // ============================================================
+        function deleteUpdate(id) {
+            if (!confirm('Delete this update?')) return;
+            
+            // ✅ NEW URL
+            fetch(`${API_URL}/recent-admin-delete/${id}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message, 'success');
+                        loadUpdates();
+                    } else {
+                        showToast('Error: ' + data.message, 'error');
+                    }
+                })
+                .catch(err => showToast('Error: ' + err.message, 'error'));
+        }
+
+        // ============================================================
+        // BULK DELETE
+        // ============================================================
+        function bulkDelete() {
+            if (selectedIds.length === 0) {
+                showToast('Select at least one update', 'error');
+                return;
+            }
+            if (!confirm(`Delete ${selectedIds.length} updates?`)) return;
+            
+            fetch(`${API_URL}/recent-admin-bulk-delete`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids: selectedIds })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    selectedIds = [];
+                    document.getElementById('selectAll').checked = false;
+                    loadUpdates();
+                }
+            })
+            .catch(err => showToast('Error: ' + err.message, 'error'));
+        }
+
+        // ============================================================
+        // SELECT ALL
+        // ============================================================
+        function selectAllRows() {
+            const checked = document.getElementById('selectAll').checked;
+            document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = checked);
+            updateSelected();
+        }
+
+        function updateSelected() {
+            selectedIds = [];
+            document.querySelectorAll('.row-checkbox:checked').forEach(cb => {
+                selectedIds.push(parseInt(cb.value));
+            });
+        }
+
+        // ============================================================
+        // VIEW FILE
+        // ============================================================
+        function viewFile(id, fileUrl, fileType, title) {
+            const modal = document.getElementById('fileModal');
+            const modalBody = document.getElementById('modalBody');
+
+            if (!fileUrl) {
+                modalBody.innerHTML = `<div style="text-align:center;padding:40px;"><h3>${title}</h3><p>No attachment</p></div>`;
+                modal.style.display = 'block';
+                return;
+            }
+
+            let preview = '';
+            if (fileType && fileType.startsWith('image/')) {
+                preview = `<img src="${fileUrl}" style="max-width:100%;border-radius:8px;max-height:60vh;">`;
+            } else if (fileType && fileType.startsWith('video/')) {
+                preview = `<video controls style="max-width:100%;max-height:60vh;"><source src="${fileUrl}" type="${fileType}"></video>`;
+            } else if (fileType && fileType.startsWith('audio/')) {
+                preview = `<audio controls style="width:100%;"><source src="${fileUrl}" type="${fileType}"></audio>`;
+            } else if (fileType === 'application/pdf') {
+                preview = `<iframe src="${fileUrl}" style="width:100%;height:500px;border:none;"></iframe>`;
+            } else {
+                preview = `<div style="text-align:center;padding:20px;"><a href="${fileUrl}" download class="btn btn-primary">📥 Download</a></div>`;
+            }
+
+            modalBody.innerHTML = `<h3>${title}</h3><div class="file-preview">${preview}</div>`;
+            modal.style.display = 'block';
+        }
+
+        function closeModal() { document.getElementById('fileModal').style.display = 'none'; }
+        window.onclick = function(e) { if (e.target === document.getElementById('fileModal')) closeModal(); }
+
+        // ============================================================
+        // RESET FORM
+        // ============================================================
+        function resetForm() {
+            document.getElementById('updateForm').reset();
+            document.getElementById('updateId').value = '';
+            document.getElementById('formTitle').textContent = '➕ Add New Update';
+            document.getElementById('submitBtn').textContent = '➕ Add Update';
+            document.getElementById('category').value = 'general';
+            document.getElementById('isNew').value = '1';
+            document.getElementById('currentFile').style.display = 'none';
+            document.getElementById('file').value = '';
+        }
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Admin Panel Loaded');
+            console.log('📡 API_URL:', API_URL);
+            showToast('Admin Panel Ready', 'info');
+            loadUpdates();
+        });
+
+        // Auto refresh every 30 seconds
+        setInterval(loadUpdates, 30000);
+    </script>
+</body>
+</html>
