@@ -9,7 +9,7 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; padding: 20px; }
         .container { max-width: 1400px; margin: 0 auto; }
         .header { background: white; padding: 15px 25px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-        .header h1 { font-size: 1.4rem; }
+        .header h1 { font-size: 1.4rem; color: #1a2332; }
         .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .stat-card { background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
         .stat-card .icon { font-size: 2rem; }
@@ -18,7 +18,7 @@
         .form-card { background: white; padding: 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #4b5563; }
         .form-control { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.95rem; }
         .form-control:focus { outline: none; border-color: #3b82f6; }
         .form-actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
@@ -193,18 +193,18 @@
     </div>
 
     <script>
-        // ============================================
-        // ✅ CONFIGURATION - YAHAN CHANGE KAREIN
-        // ============================================
+        // ============================================================
+        // ✅ CONFIGURATION
+        // ============================================================
         const API_URL = 'https://gsssshilla.onrender.com';
         
         let currentPage = 1;
         let totalPages = 1;
         let selectedIds = [];
 
-        // ============================================
+        // ============================================================
         // TOAST NOTIFICATION
-        // ============================================
+        // ============================================================
         function showToast(message, type = 'success') {
             const existing = document.querySelector('.toast');
             if (existing) existing.remove();
@@ -215,10 +215,14 @@
             setTimeout(() => toast.remove(), 4000);
         }
 
-        // ============================================
-        // ✅ LOAD UPDATES - FIXED URL
-        // ============================================
+        // ============================================================
+        // LOAD UPDATES
+        // ============================================================
         function loadUpdates() {
+            const search = document.getElementById('searchInput').value;
+            const category = document.getElementById('categoryFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
             // ✅ NEW URL - Direct server route
             const url = `${API_URL}/recent-admin-all`;
             
@@ -256,9 +260,9 @@
                 });
         }
 
-        // ============================================
+        // ============================================================
         // RENDER TABLE
-        // ============================================
+        // ============================================================
         function renderTable(updates) {
             const tbody = document.getElementById('updatesTableBody');
 
@@ -270,9 +274,11 @@
             let html = '';
             updates.forEach((item, index) => {
                 const num = index + 1;
+                const date = formatDateTime(item.created_at);
                 const isNew = item.is_new ? 'badge-new' : 'badge-old';
                 const isNewText = item.is_new ? '🆕 New' : '📌 Old';
-                const date = formatDateTime(item.created_at);
+                const fileIcon = item.file_type ? getFileIcon(item.file_type) : '📄';
+                const fileType = item.file_type || 'No File';
                 
                 html += `
                     <tr>
@@ -280,7 +286,7 @@
                         <td>${num}</td>
                         <td><strong>${escapeHtml(item.title)}</strong></td>
                         <td><span class="badge-category">${item.category || 'general'}</span></td>
-                        <td>📄 ${item.file_type || 'No File'}</td>
+                        <td>${fileIcon} ${fileType}</td>
                         <td><span class="badge ${isNew}">${isNewText}</span></td>
                         <td style="font-size:0.8rem;">${date}</td>
                         <td>
@@ -296,9 +302,9 @@
             tbody.innerHTML = html;
         }
 
-        // ============================================
+        // ============================================================
         // HELPER: formatDateTime
-        // ============================================
+        // ============================================================
         function formatDateTime(dateString) {
             if (!dateString) return '-';
             const date = new Date(dateString);
@@ -312,215 +318,4 @@
             });
         }
 
-        // ============================================
-        // ADD / UPDATE FORM
-        // ============================================
-        document.getElementById('updateForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const id = document.getElementById('updateId').value;
-            const title = document.getElementById('title').value.trim();
-            
-            if (!title) {
-                showToast('Please enter a title', 'error');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('title', title);
-            formData.append('description', document.getElementById('description').value);
-            formData.append('category', document.getElementById('category').value);
-            formData.append('isNew', document.getElementById('isNew').value);
-            formData.append('link', document.getElementById('link').value);
-
-            const fileInput = document.getElementById('file');
-            if (fileInput.files && fileInput.files.length > 0) {
-                formData.append('file', fileInput.files[0]);
-            }
-
-            const url = id ? `${API_URL}/recent/admin/update/${id}` : `${API_URL}/recent/admin/add`;
-            
-            document.getElementById('submitBtn').textContent = '⏳ Saving...';
-            document.getElementById('submitBtn').disabled = true;
-
-            fetch(url, { 
-                method: 'POST', 
-                body: formData 
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    showToast(data.message, 'success');
-                    resetForm();
-                    loadUpdates();
-                } else {
-                    showToast('Error: ' + data.message, 'error');
-                }
-            })
-            .catch(err => {
-                showToast('Error: ' + err.message, 'error');
-            })
-            .finally(() => {
-                document.getElementById('submitBtn').textContent = id ? '💾 Update' : '➕ Add Update';
-                document.getElementById('submitBtn').disabled = false;
-            });
-        });
-
-        // ============================================
-        // EDIT UPDATE
-        // ============================================
-        function editUpdate(id) {
-            fetch(`${API_URL}/recent/${id}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        const item = data.data;
-                        document.getElementById('updateId').value = item.id;
-                        document.getElementById('title').value = item.title;
-                        document.getElementById('description').value = item.description || '';
-                        document.getElementById('category').value = item.category || 'general';
-                        document.getElementById('isNew').value = item.is_new ? 1 : 0;
-                        document.getElementById('link').value = item.link || '';
-                        document.getElementById('formTitle').textContent = '✏️ Edit Update';
-                        document.getElementById('submitBtn').textContent = '💾 Update';
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                        showToast('Edit mode: Update and save', 'info');
-                    }
-                })
-                .catch(err => showToast('Error: ' + err.message, 'error'));
-        }
-
-        // ============================================
-        // DELETE UPDATE
-        // ============================================
-        function deleteUpdate(id) {
-            if (!confirm('Delete this update?')) return;
-            
-            fetch(`${API_URL}/recent/admin/delete/${id}`, { method: 'DELETE' })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast(data.message, 'success');
-                        loadUpdates();
-                    } else {
-                        showToast('Error: ' + data.message, 'error');
-                    }
-                })
-                .catch(err => showToast('Error: ' + err.message, 'error'));
-        }
-
-        // ============================================
-        // SELECT ALL
-        // ============================================
-        function selectAllRows() {
-            const checked = document.getElementById('selectAll').checked;
-            document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = checked);
-            updateSelected();
-        }
-
-        function updateSelected() {
-            selectedIds = [];
-            document.querySelectorAll('.row-checkbox:checked').forEach(cb => {
-                selectedIds.push(parseInt(cb.value));
-            });
-        }
-
-        // ============================================
-        // BULK DELETE
-        // ============================================
-        function bulkDelete() {
-            if (selectedIds.length === 0) {
-                showToast('Select at least one update', 'error');
-                return;
-            }
-            if (!confirm(`Delete ${selectedIds.length} updates?`)) return;
-            
-            fetch(`${API_URL}/recent/admin/bulk-delete`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ids: selectedIds })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    showToast(data.message, 'success');
-                    selectedIds = [];
-                    document.getElementById('selectAll').checked = false;
-                    loadUpdates();
-                }
-            })
-            .catch(err => showToast('Error: ' + err.message, 'error'));
-        }
-
-        // ============================================
-        // VIEW FILE
-        // ============================================
-        function viewFile(id, fileUrl, fileType, title) {
-            const modal = document.getElementById('fileModal');
-            const modalBody = document.getElementById('modalBody');
-
-            if (!fileUrl) {
-                modalBody.innerHTML = `<div style="text-align:center;padding:40px;"><h3>${title}</h3><p>No attachment</p></div>`;
-                modal.style.display = 'block';
-                return;
-            }
-
-            let preview = '';
-            if (fileType && fileType.startsWith('image/')) {
-                preview = `<img src="${fileUrl}" style="max-width:100%;border-radius:8px;max-height:60vh;">`;
-            } else if (fileType && fileType.startsWith('video/')) {
-                preview = `<video controls style="max-width:100%;max-height:60vh;"><source src="${fileUrl}" type="${fileType}"></video>`;
-            } else if (fileType && fileType.startsWith('audio/')) {
-                preview = `<audio controls style="width:100%;"><source src="${fileUrl}" type="${fileType}"></audio>`;
-            } else if (fileType === 'application/pdf') {
-                preview = `<iframe src="${fileUrl}" style="width:100%;height:500px;border:none;"></iframe>`;
-            } else {
-                preview = `<div style="text-align:center;padding:20px;"><a href="${fileUrl}" download class="btn btn-primary">📥 Download</a></div>`;
-            }
-
-            modalBody.innerHTML = `<h3>${title}</h3><div class="file-preview">${preview}</div>`;
-            modal.style.display = 'block';
-        }
-
-        function closeModal() { document.getElementById('fileModal').style.display = 'none'; }
-        window.onclick = function(e) { if (e.target === document.getElementById('fileModal')) closeModal(); }
-
-        // ============================================
-        // RESET FORM
-        // ============================================
-        function resetForm() {
-            document.getElementById('updateForm').reset();
-            document.getElementById('updateId').value = '';
-            document.getElementById('formTitle').textContent = '➕ Add New Update';
-            document.getElementById('submitBtn').textContent = '➕ Add Update';
-            document.getElementById('category').value = 'general';
-            document.getElementById('isNew').value = '1';
-            document.getElementById('currentFile').style.display = 'none';
-            document.getElementById('file').value = '';
-        }
-
-        // ============================================
-        // HELPERS
-        // ============================================
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // ============================================
-        // INIT
-        // ============================================
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Admin Panel Loaded');
-            console.log('📡 API_URL:', API_URL);
-            showToast('Admin Panel Ready', 'info');
-            loadUpdates();
-        });
-
-        // Auto refresh every 30 seconds
-        setInterval(loadUpdates, 30000);
-    </script>
-</body>
-</html>
+        function getFileIcon(mimeType) {
