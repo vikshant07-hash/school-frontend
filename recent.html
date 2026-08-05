@@ -1,288 +1,741 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Recent Updates - School</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet"/>
+
     <style>
+        /* ============================================================
+           CSS VARIABLES
+           ============================================================ */
+        :root {
+            --primary: #1a3a6b;
+            --primary-light: #2a5a9b;
+            --primary-dark: #0f2a4b;
+            --gold: #d4a843;
+            --gold-light: #f0d68a;
+            --bg: #f0f2f6;
+            --card-bg: #ffffff;
+            --text-primary: #1a2332;
+            --text-secondary: #3d4a5c;
+            --text-muted: #7a879a;
+            --border: #dce1e8;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 6px 28px rgba(26, 58, 107, 0.10);
+            --radius: 8px;
+            --transition: 0.25s ease;
+        }
+
+        /* ============================================================
+           RESET
+           ============================================================ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            background: #f0f2f5; 
-            color: #1a2332;
-        }
-        
-        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
-        
-        /* Header */
-        .header {
-            text-align: center;
-            padding: 30px 20px;
-            background: linear-gradient(135deg, #1a2332, #2a3a5a);
-            color: white;
-            border-radius: 12px;
-            margin-bottom: 30px;
-        }
-        .header h1 { font-size: 2rem; margin-bottom: 8px; }
-        .header h1 span { color: #facc15; }
-        .header p { color: #94a3b8; font-size: 1rem; }
-        
-        /* Updates Container with Scroll */
-        .updates-wrapper {
-            background: white;
-            border-radius: 12px;
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            max-height: 600px;
-            overflow-y: auto;
-            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
         }
-        
-        .updates-wrapper::-webkit-scrollbar { width: 6px; }
-        .updates-wrapper::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        .updates-wrapper::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
-        .updates-wrapper::-webkit-scrollbar-thumb:hover { background: #555; }
-        
-        /* Update Card */
-        .update-card {
-            background: white;
-            border-radius: 10px;
-            padding: 18px 22px;
-            margin-bottom: 12px;
-            border-left: 4px solid #3b82f6;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-            transition: all 0.3s ease;
-            animation: slideIn 0.5s ease forwards;
-            opacity: 0;
-            transform: translateY(15px);
+
+        /* ============================================================
+           MAIN WRAPPER
+           ============================================================ */
+        .container {
+            width: 100%;
+            max-width: 860px;
+            margin: 0 auto;
         }
-        .update-card:last-child { margin-bottom: 0; }
-        .update-card:hover { 
-            transform: translateX(5px); 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-        }
-        
-        .update-card .update-header {
+
+        /* ============================================================
+           HEADER
+           ============================================================ */
+        .header {
+            background: var(--primary);
+            padding: 16px 24px;
+            border-radius: var(--radius) var(--radius) 0 0;
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            gap: 10px;
+            align-items: center;
             flex-wrap: wrap;
+            gap: 10px;
+            border-bottom: 3px solid var(--gold);
         }
-        .update-card .title {
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: #1a2332;
-            cursor: pointer;
-            flex: 1;
+
+        .header-left {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
         }
-        .update-card .title:hover { color: #3b82f6; }
-        .update-card .title .file-icon { font-size: 1.1rem; }
-        
-        .update-card .badge {
-            display: inline-block;
-            padding: 2px 12px;
-            border-radius: 20px;
-            font-size: 0.6rem;
-            font-weight: 700;
+
+        .header-icon {
+            width: 38px;
+            height: 38px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--gold);
+        }
+
+        .header-text h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 0.02em;
+        }
+        .header-text h1 span { color: var(--gold); }
+        .header-text p {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 1px;
+        }
+
+        .header-badge {
+            background: var(--gold);
+            color: var(--primary-dark);
+            padding: 3px 16px;
+            border-radius: 30px;
+            font-size: 0.62rem;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            flex-shrink: 0;
-            animation: pulse 2s infinite;
-        }
-        .update-card .badge.new {
-            background: #fef2f2;
-            color: #ef4444;
-            border: 1px solid #fca5a5;
-        }
-        .update-card .badge.old {
-            background: #f3f4f6;
-            color: #6b7280;
-            border: 1px solid #e5e7eb;
-            animation: none;
-        }
-        
-        .update-card .description {
-            color: #4b5563;
-            font-size: 0.9rem;
-            margin: 8px 0 12px;
-            line-height: 1.5;
-        }
-        
-        .update-card .attachment-link {
-            display: inline-flex;
+            letter-spacing: 0.04em;
+            display: flex;
             align-items: center;
             gap: 6px;
-            color: #3b82f6;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 500;
-            padding: 3px 12px;
-            border-radius: 6px;
-            background: #eff6ff;
-            transition: all 0.2s;
-            border: none;
         }
-        .update-card .attachment-link:hover { background: #dbeafe; }
-        
-        .update-card .meta {
+
+        .header-badge .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulse-dot 1.8s infinite;
+        }
+
+        /* ============================================================
+           MAIN BOX
+           ============================================================ */
+        .updates-box {
+            background: var(--card-bg);
+            border-radius: 0 0 var(--radius) var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-top: none;
+            transition: box-shadow var(--transition);
+        }
+        .updates-box:hover { box-shadow: var(--shadow-hover); }
+
+        /* ============================================================
+           CONTROLS BAR
+           ============================================================ */
+        .controls {
+            padding: 8px 20px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 8px;
-            font-size: 0.75rem;
-            color: #6b7280;
-            padding-top: 10px;
-            border-top: 1px solid #f3f4f6;
-            margin-top: 10px;
         }
-        .update-card .meta .date { display: flex; align-items: center; gap: 4px; }
-        .update-card .meta .category {
+
+        .controls-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .controls-left .count {
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.62rem;
+            font-weight: 600;
+            padding: 1px 12px;
+            border-radius: 30px;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .controls-left .status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .controls-left .status .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #22c55e;
             display: inline-block;
-            padding: 2px 10px;
-            border-radius: 12px;
-            background: #eff6ff;
-            color: #3b82f6;
-            font-size: 0.65rem;
-            text-transform: capitalize;
+            transition: background var(--transition);
+        }
+        .controls-left .status .dot.paused { background: #f87171; }
+
+        .controls-right {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 4px 14px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.7rem;
             font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition);
+            background: #fff;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
-        
-        .empty-state { 
-            text-align: center; 
-            padding: 40px; 
-            color: #6b7280; 
+
+        .btn:hover { background: var(--bg); border-color: #c0c8d4; }
+
+        .btn-pause {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #dc2626;
         }
-        .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
-        
-        /* Animations */
-        @keyframes slideIn {
-            to { opacity: 1; transform: translateY(0); }
+        .btn-pause:hover { background: #fecaca; }
+        .btn-pause.active {
+            background: #dcfce7;
+            border-color: #86efac;
+            color: #16a34a;
         }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        .btn-pause.active:hover { background: #86efac; }
+
+        .btn-icon { padding: 4px 10px; font-size: 0.7rem; }
+
+        /* ============================================================
+           SCROLLING WRAPPER
+           ============================================================ */
+        .scrolling-wrapper {
+            max-height: 560px;
+            overflow-y: auto;
+            padding: 4px 12px 12px 12px;
+            scroll-behavior: smooth;
         }
-        
-        /* Modal */
+
+        .scrolling-wrapper::-webkit-scrollbar { width: 5px; }
+        .scrolling-wrapper::-webkit-scrollbar-track { background: #f1f3f6; border-radius: 10px; }
+        .scrolling-wrapper::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .scrolling-wrapper::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .scrolling-wrapper { scrollbar-width: thin; scrollbar-color: #cbd5e1 #f1f3f6; }
+
+        /* ============================================================
+           UNIQUE TABLE-LAYOUT
+           ============================================================ */
+        .update-item {
+            display: grid;
+            grid-template-columns: 130px 1fr 1fr 110px;
+            gap: 12px;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f2f5;
+            align-items: center;
+            transition: background var(--transition);
+            animation: fadeIn 0.3s ease forwards;
+            opacity: 0;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            margin-bottom: 1px;
+        }
+
+        .update-item:last-child { border-bottom: none; }
+
+        .update-item:hover {
+            background: #f8fafc;
+            border-left: 3px solid var(--gold);
+        }
+
+        /* ---- DATE ---- */
+        .update-item .col-date {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .update-item .col-date .badge-new {
+            display: inline-block;
+            background: #dcfce7;
+            color: #16a34a;
+            font-size: 0.5rem;
+            font-weight: 700;
+            padding: 1px 8px;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+
+        /* ---- TITLE ---- */
+        .update-item .col-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: default;
+        }
+
+        .update-item .col-title .file-icon {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        /* ---- DESCRIPTION ---- */
+        .update-item .col-desc {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .update-item .col-desc.expanded {
+            -webkit-line-clamp: unset;
+            display: block;
+        }
+
+        .update-item .col-desc .read-more {
+            background: none;
+            border: none;
+            color: var(--primary-light);
+            font-size: 0.7rem;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 0;
+            font-family: inherit;
+            margin-left: 4px;
+            transition: color var(--transition);
+        }
+        .update-item .col-desc .read-more:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        /* ---- FILE ---- */
+        .update-item .col-file {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            justify-content: flex-end;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .update-item .col-file .file-btn {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 10px;
+            font-size: 0.68rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #fff;
+        }
+
+        .update-item .col-file .file-btn:hover {
+            background: var(--bg);
+            border-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .update-item .col-file .file-btn .size {
+            color: var(--text-muted);
+            font-size: 0.58rem;
+        }
+
+        /* ============================================================
+           LOADING / EMPTY
+           ============================================================ */
+        .loading-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-muted);
+        }
+        .loading-state .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state .icon { font-size: 2.6rem; margin-bottom: 10px; opacity: 0.5; }
+
+        /* ============================================================
+           MODAL
+           ============================================================ */
         .modal {
             display: none;
             position: fixed;
+            inset: 0;
             z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            animation: fadeIn 0.3s;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            animation: fadeIn 0.2s ease;
+            padding: 20px;
         }
+
         .modal-content {
             position: relative;
-            background: white;
-            margin: 5% auto;
-            padding: 30px;
-            width: 90%;
-            max-width: 700px;
+            background: var(--card-bg);
+            margin: 6% auto;
+            padding: 28px 32px;
+            width: 100%;
+            max-width: 640px;
             max-height: 90vh;
-            border-radius: 12px;
+            border-radius: var(--radius);
             overflow-y: auto;
-            animation: slideDown 0.3s;
+            animation: scaleIn 0.25s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--border);
         }
+
         .modal-content .close {
             position: absolute;
-            top: 15px;
-            right: 25px;
-            font-size: 2rem;
-            font-weight: bold;
-            color: #6b7280;
+            top: 14px;
+            right: 18px;
+            font-size: 1.6rem;
+            font-weight: 300;
+            color: var(--text-muted);
             cursor: pointer;
-            transition: color 0.2s;
+            transition: color var(--transition);
+            background: none;
+            border: none;
+            line-height: 1;
         }
-        .modal-content .close:hover { color: #1a2332; }
-        .modal-content img, .modal-content video, .modal-content audio { max-width: 100%; border-radius: 8px; }
-        .modal-content .file-preview { text-align: center; padding: 20px; }
-        .modal-content .file-preview .file-icon-big { font-size: 4rem; margin-bottom: 16px; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        /* Responsive */
-        @media (max-width: 600px) {
-            .container { padding: 10px; }
-            .header { padding: 20px 15px; }
-            .header h1 { font-size: 1.3rem; }
-            .update-card { padding: 14px 16px; }
-            .update-card .title { font-size: 0.95rem; }
-            .update-card .description { font-size: 0.85rem; }
-            .update-card .meta { font-size: 0.7rem; }
-            .modal-content { padding: 20px; margin: 10% auto; width: 95%; }
+        .modal-content .close:hover { color: var(--text-primary); }
+
+        .modal-content h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 14px;
+            color: var(--text-primary);
+            padding-right: 32px;
+        }
+
+        .modal-content .file-preview { text-align: center; padding: 8px 0; }
+        .modal-content img { max-width: 100%; max-height: 55vh; border-radius: 4px; object-fit: contain; }
+        .modal-content video,
+        .modal-content audio { max-width: 100%; border-radius: 4px; }
+
+        .modal-content .file-actions {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .modal-content .file-actions a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: color var(--transition);
+        }
+        .modal-content .file-actions a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        /* ============================================================
+           ANIMATIONS
+           ============================================================ */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.96) translateY(8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* ============================================================
+           RESPONSIVE — MOBILE FIRST
+           ============================================================ */
+        @media (max-width: 768px) {
+            .update-item {
+                grid-template-columns: 1fr;
+                gap: 3px;
+                padding: 12px 14px;
+                border-left: 3px solid transparent;
+            }
+
+            .update-item:hover {
+                border-left: 3px solid var(--gold);
+            }
+
+            .update-item .col-date {
+                font-size: 0.7rem;
+                order: 1;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .update-item .col-title {
+                font-size: 0.92rem;
+                order: 2;
+            }
+
+            .update-item .col-desc {
+                font-size: 0.84rem;
+                -webkit-line-clamp: 2;
+                order: 3;
+                padding: 2px 0;
+            }
+
+            .update-item .col-file {
+                justify-content: flex-start;
+                order: 4;
+                margin-top: 2px;
+            }
+
+            .update-item .col-file .file-btn {
+                font-size: 0.68rem;
+                padding: 2px 12px;
+            }
+
+            .controls {
+                padding: 8px 14px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .controls-left {
+                justify-content: space-between;
+            }
+
+            .controls-right {
+                justify-content: flex-start;
+            }
+
+            .scrolling-wrapper {
+                max-height: 440px;
+                padding: 4px 8px 10px 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+
+            .header {
+                padding: 12px 14px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-text h1 { font-size: 0.95rem; }
+            .header-text p { font-size: 0.7rem; }
+
+            .controls-left { font-size: 0.7rem; }
+            .controls-right .btn { font-size: 0.6rem; padding: 3px 10px; }
+
+            .update-item {
+                padding: 10px 12px;
+                gap: 2px;
+            }
+
+            .update-item .col-title { font-size: 0.85rem; }
+            .update-item .col-desc { font-size: 0.78rem; }
+            .update-item .col-date { font-size: 0.65rem; }
+
+            .modal-content { padding: 16px; margin: 10% auto; }
+
+            .header-badge { font-size: 0.55rem; padding: 2px 12px; }
+        }
+
+        @media (max-width: 360px) {
+            .update-item .col-title { font-size: 0.78rem; }
+            .update-item .col-desc { font-size: 0.72rem; }
+            .update-item .col-file .file-btn { font-size: 0.6rem; padding: 1px 8px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>📢 <span>Recent</span> Updates</h1>
-            <p>Stay updated with latest news and announcements from school</p>
-        </div>
 
-        <!-- Updates Scroll Box -->
-        <div class="updates-wrapper" id="updatesWrapper">
-            <div id="updatesContainer">
-                <div class="empty-state">
-                    <div class="icon">🔄</div>
-                    <p>Loading updates...</p>
+    <div class="container">
+
+        <!-- ===== HEADER ===== -->
+        <header class="header">
+            <div class="header-left">
+                <div class="header-icon">🏛️</div>
+                <div class="header-text">
+                    <h1>📢 <span>Recent</span> Updates</h1>
+                    <p>Govt. Sr. Sec. School, Shilla</p>
                 </div>
             </div>
-        </div>
+            <div class="header-badge">
+                <span class="dot"></span>
+                <span>Live</span>
+            </div>
+        </header>
+
+        <!-- ===== UPDATES BOX ===== -->
+        <section class="updates-box">
+
+            <!-- Controls -->
+            <div class="controls">
+                <div class="controls-left">
+                    <span class="count" id="updateCount">0</span>
+                    <span class="status">
+                        <span class="dot" id="statusDot"></span>
+                        <span id="statusText">Loading...</span>
+                    </span>
+                </div>
+                <div class="controls-right">
+                    <button class="btn btn-pause" id="pauseBtn" onclick="togglePause()">
+                        <span id="pauseIcon">⏸️</span> <span id="pauseLabel">Pause</span>
+                    </button>
+                    <button class="btn btn-icon" onclick="scrollTop()" title="Top">⬆</button>
+                    <button class="btn btn-icon" onclick="scrollBottom()" title="Bottom">⬇</button>
+                </div>
+            </div>
+
+            <!-- Scrolling Wrapper -->
+            <div class="scrolling-wrapper" id="scrollingWrapper">
+                <div id="updatesContainer">
+                    <div class="loading-state">
+                        <div class="spinner"></div>
+                        <p>Loading updates...</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
     </div>
 
-    <!-- File Preview Modal -->
+    <!-- ===== FILE MODAL ===== -->
     <div id="fileModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
+            <button class="close" onclick="closeModal()">&times;</button>
             <div id="modalBody"></div>
         </div>
     </div>
 
     <script>
         // ============================================================
-        // ==================== CONFIGURATION ====================
+        // CONFIG
         // ============================================================
-        const API_URL = 'https://your-backend-url.com'; // Change this
+        const API_URL = 'https://gsssshilla.onrender.com';
+        const SCROLL_STEP = 0.65;
+        const SCROLL_INTERVAL = 40;
 
         // ============================================================
-        // ==================== LOAD UPDATES ====================
+        // STATE
+        // ============================================================
+        let isPaused = false;
+        let timer = null;
+        let updates = [];
+        let pos = 0;
+
+        // ============================================================
+        // DOM REFS
+        // ============================================================
+        const wrapper = document.getElementById('scrollingWrapper');
+        const container = document.getElementById('updatesContainer');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const pauseIcon = document.getElementById('pauseIcon');
+        const pauseLabel = document.getElementById('pauseLabel');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const updateCount = document.getElementById('updateCount');
+
+        // ============================================================
+        // FETCH UPDATES
         // ============================================================
         async function loadUpdates() {
             try {
-                const response = await fetch(`${API_URL}/recent/public?limit=20`);
-                const data = await response.json();
+                const res = await fetch(`${API_URL}/recent-public?t=${Date.now()}`);
+                const data = await res.json();
 
-                if (data.success) {
-                    renderUpdates(data.data);
-                    initAutoScroll();
+                if (data.success && data.data) {
+                    updates = data.data;
+                    updateCount.textContent = updates.length;
+                    render(updates);
+                    startScroll();
+                    statusText.textContent = 'Scrolling';
+                    statusDot.className = 'dot';
                 } else {
-                    showError('Failed to load updates');
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">📭</div>
+                            <p>No updates available</p>
+                        </div>
+                    `;
+                    statusText.textContent = 'No updates';
+                    statusDot.className = 'dot paused';
                 }
-            } catch (error) {
-                console.error('Error loading updates:', error);
-                showError('Network error. Please try again.');
+            } catch (err) {
+                console.error('Load error:', err);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">⚠️</div>
+                        <p>Failed to load updates</p>
+                        <p style="font-size:0.85rem;color:var(--text-muted);">${err.message}</p>
+                        <button onclick="loadUpdates()" style="margin-top:12px;padding:6px 20px;background:var(--primary);color:#fff;border:none;border-radius:4px;font-family:inherit;font-weight:500;cursor:pointer;">Retry</button>
+                    </div>
+                `;
+                statusText.textContent = 'Error';
+                statusDot.className = 'dot paused';
             }
         }
 
         // ============================================================
-        // ==================== RENDER UPDATES ====================
+        // RENDER — TABLE LAYOUT
         // ============================================================
-        function renderUpdates(updates) {
-            const container = document.getElementById('updatesContainer');
-            
-            if (!updates || updates.length === 0) {
+        function render(items) {
+            if (!items || items.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="icon">📭</div>
@@ -293,79 +746,155 @@
             }
 
             let html = '';
-            updates.forEach((update, index) => {
-                const isNew = update.is_new === 1 || update.is_new_dynamic === 1;
-                const fileIcon = update.file_icon || '📄';
-                const formattedDate = formatDate(update.created_at);
-                
+            items.forEach((item, i) => {
+                const isNew = item.is_new === 1 || item.is_new_dynamic === 1;
+                // ✅ DATE — full format, not hours ago
+                const date = formatDateFull(item.created_at);
+                const hasFile = !!item.file_url;
+                const size = item.file_size ? formatSize(item.file_size) : '';
+                const icon = getFileIcon(item.file_type);
+                const desc = item.description || '';
+                const isLong = desc.length > 100;
+
                 html += `
-                    <div class="update-card" style="animation-delay: ${index * 0.08}s">
-                        <div class="update-header">
-                            <div class="title" onclick="openFile('${update.id}', '${update.file_url || ''}', '${update.file_type || ''}', '${update.title}')">
-                                <span class="file-icon">${fileIcon}</span>
-                                ${update.title}
-                            </div>
-                            <span class="badge ${isNew ? 'new' : 'old'}">
-                                ${isNew ? '🆕 NEW' : '📌'}
-                            </span>
+                    <div class="update-item" style="animation-delay: ${i * 0.04}s">
+                        <!-- DATE -->
+                        <div class="col-date">
+                            ${date}
+                            ${isNew ? '<span class="badge-new">New</span>' : ''}
                         </div>
-                        
-                        ${update.description ? `<div class="description">${update.description}</div>` : ''}
-                        
-                        ${update.file_url ? `
-                            <div style="margin-top: 6px;">
-                                <button class="attachment-link" onclick="openFile('${update.id}', '${update.file_url}', '${update.file_type}', '${update.title}')">
-                                    📎 View Attachment
+
+                        <!-- TITLE -->
+                        <div class="col-title">
+                            ${hasFile ? `<span class="file-icon">${icon}</span>` : ''}
+                            ${escapeHtml(item.title)}
+                        </div>
+
+                        <!-- DESCRIPTION -->
+                        <div class="col-desc" id="desc-${item.id}" onclick="toggleReadMore(${item.id})">
+                            ${escapeHtml(desc.substring(0, 100))}${isLong ? '...' : ''}
+                            ${isLong ? `<span class="read-more">Read more</span>` : ''}
+                        </div>
+
+                        <!-- FILE -->
+                        <div class="col-file">
+                            ${hasFile ? `
+                                <button class="file-btn" onclick="openFile('${item.id}','${item.file_url}','${item.file_type}','${escapeHtml(item.title)}')">
+                                    ${icon} ${size ? `<span class="size">${size}</span>` : '📎'}
                                 </button>
-                            </div>
-                        ` : ''}
-                        
-                        <div class="meta">
-                            <span class="date">📅 ${formattedDate}</span>
-                            <span class="category">${update.category || 'general'}</span>
+                            ` : ''}
                         </div>
                     </div>
                 `;
             });
-            
+
             container.innerHTML = html;
         }
 
         // ============================================================
-        // ==================== AUTO SCROLL ====================
+        // READ MORE
         // ============================================================
-        function initAutoScroll() {
-            const wrapper = document.getElementById('updatesWrapper');
-            if (!wrapper) return;
-            
-            // Auto scroll only if content is taller than container
-            if (wrapper.scrollHeight > wrapper.clientHeight) {
-                let scrollAmount = 0;
-                const scrollStep = 0.8;
-                
-                setInterval(() => {
-                    scrollAmount += scrollStep;
-                    if (scrollAmount >= wrapper.scrollHeight - wrapper.clientHeight) {
-                        scrollAmount = 0;
-                    }
-                    wrapper.scrollTop = scrollAmount;
-                }, 50);
+        function toggleReadMore(id) {
+            const el = document.getElementById(`desc-${id}`);
+            if (!el) return;
+
+            const full = updates.find(u => u.id === id)?.description || '';
+            const isExpanded = el.classList.contains('expanded');
+
+            if (isExpanded) {
+                el.classList.remove('expanded');
+                el.innerHTML = escapeHtml(full.substring(0, 100)) + '... <span class="read-more">Read more</span>';
+            } else {
+                el.classList.add('expanded');
+                el.innerHTML = escapeHtml(full) + ' <span class="read-more">Read less</span>';
             }
         }
 
         // ============================================================
-        // ==================== OPEN FILE ====================
+        // SCROLL
         // ============================================================
-        function openFile(id, fileUrl, fileType, title) {
+        function startScroll() {
+            stopScroll();
+            if (wrapper.scrollHeight <= wrapper.clientHeight) {
+                statusText.textContent = 'All visible';
+                return;
+            }
+
+            isPaused = false;
+            updateUI();
+            pos = 0;
+
+            timer = setInterval(() => {
+                if (!isPaused) {
+                    pos += SCROLL_STEP;
+                    if (pos >= wrapper.scrollHeight - wrapper.clientHeight) {
+                        pos = 0;
+                    }
+                    wrapper.scrollTop = pos;
+                }
+            }, SCROLL_INTERVAL);
+        }
+
+        function stopScroll() {
+            if (timer) { clearInterval(timer);
+                timer = null; }
+        }
+
+        // ============================================================
+        // PAUSE
+        // ============================================================
+        function togglePause() {
+            isPaused = !isPaused;
+            updateUI();
+
+            if (!isPaused && wrapper.scrollTop + wrapper.clientHeight >= wrapper.scrollHeight - 2) {
+                pos = 0;
+                wrapper.scrollTop = 0;
+            }
+        }
+
+        function updateUI() {
+            if (isPaused) {
+                pauseIcon.textContent = '▶️';
+                pauseLabel.textContent = 'Resume';
+                pauseBtn.classList.add('active');
+                statusText.textContent = 'Paused';
+                statusDot.className = 'dot paused';
+            } else {
+                pauseIcon.textContent = '⏸️';
+                pauseLabel.textContent = 'Pause';
+                pauseBtn.classList.remove('active');
+                statusText.textContent = 'Scrolling';
+                statusDot.className = 'dot';
+            }
+        }
+
+        // ============================================================
+        // SCROLL CONTROLS
+        // ============================================================
+        function scrollTop() {
+            wrapper.scrollTo({ top: 0, behavior: 'smooth' });
+            pos = 0;
+        }
+
+        function scrollBottom() {
+            wrapper.scrollTo({ top: wrapper.scrollHeight, behavior: 'smooth' });
+            pos = wrapper.scrollHeight - wrapper.clientHeight;
+        }
+
+        // ============================================================
+        // MODAL
+        // ============================================================
+        function openFile(id, url, type, title) {
             const modal = document.getElementById('fileModal');
-            const modalBody = document.getElementById('modalBody');
-            
-            if (!fileUrl) {
-                modalBody.innerHTML = `
-                    <div style="text-align:center;padding:40px;">
-                        <div style="font-size:4rem;margin-bottom:16px;">📄</div>
+            const body = document.getElementById('modalBody');
+
+            if (!url) {
+                body.innerHTML = `
+                    <div style="text-align:center;padding:20px 0;">
+                        <div style="font-size:2.8rem;margin-bottom:6px;">📄</div>
                         <h3>${title}</h3>
-                        <p style="color:#6b7280;margin-top:8px;">No attachment available</p>
+                        <p style="color:var(--text-muted);">No attachment</p>
                     </div>
                 `;
                 modal.style.display = 'block';
@@ -373,60 +902,51 @@
             }
 
             let preview = '';
-            if (fileType && fileType.startsWith('image/')) {
-                preview = `<img src="${fileUrl}" alt="${title}" style="max-width:100%;border-radius:8px;max-height:60vh;">`;
-            } else if (fileType && fileType.startsWith('video/')) {
-                preview = `<video controls style="max-width:100%;max-height:60vh;"><source src="${fileUrl}" type="${fileType}"></video>`;
-            } else if (fileType && fileType.startsWith('audio/')) {
-                preview = `<audio controls style="width:100%;"><source src="${fileUrl}" type="${fileType}"></audio>`;
-            } else if (fileType === 'application/pdf') {
-                preview = `<iframe src="${fileUrl}" style="width:100%;height:500px;border:none;"></iframe>`;
+            if (type?.startsWith('image/')) {
+                preview = `<img src="${url}" alt="${title}" style="max-width:100%;max-height:55vh;border-radius:4px;" />`;
+            } else if (type?.startsWith('video/')) {
+                preview = `<video controls style="max-width:100%;max-height:55vh;border-radius:4px;"><source src="${url}" type="${type}"></video>`;
+            } else if (type?.startsWith('audio/')) {
+                preview = `<audio controls style="width:100%;"><source src="${url}" type="${type}"></audio>`;
+            } else if (type === 'application/pdf') {
+                preview = `<iframe src="${url}" style="width:100%;height:420px;border:none;border-radius:4px;"></iframe>`;
             } else {
                 preview = `
-                    <div style="text-align:center;padding:20px;">
-                        <div style="font-size:4rem;">📎</div>
-                        <p style="margin:12px 0;color:#4b5563;">${fileType || 'File'}</p>
-                        <a href="${fileUrl}" download class="attachment-link" style="padding:8px 20px;background:#3b82f6;color:white;border-radius:6px;text-decoration:none;">📥 Download File</a>
+                    <div style="text-align:center;padding:16px 0;">
+                        <div style="font-size:3rem;margin-bottom:6px;">📎</div>
+                        <p style="color:var(--text-secondary);margin-bottom:8px;">${type || 'File'}</p>
+                        <a href="${url}" download style="padding:6px 20px;background:var(--primary);color:#fff;border-radius:4px;text-decoration:none;font-weight:500;">Download</a>
                     </div>
                 `;
             }
 
-            modalBody.innerHTML = `
-                <h3 style="margin-bottom:16px;">${title}</h3>
+            body.innerHTML = `
+                <h3>${title}</h3>
                 <div class="file-preview">${preview}</div>
-                <div style="margin-top:12px;padding:12px;background:#f8fafc;border-radius:8px;">
-                    <a href="${fileUrl}" target="_blank" style="color:#3b82f6;text-decoration:none;">🔗 Open in new tab</a>
+                <div class="file-actions">
+                    <a href="${url}" target="_blank">🔗 Open</a>
+                    <a href="${url}" download>📥 Download</a>
                 </div>
             `;
+
             modal.style.display = 'block';
         }
 
-        // ============================================================
-        // ==================== MODAL ====================
-        // ============================================================
         function closeModal() {
             document.getElementById('fileModal').style.display = 'none';
         }
-        window.onclick = function(event) {
-            if (event.target === document.getElementById('fileModal')) {
-                closeModal();
-            }
-        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+        window.addEventListener('click', (e) => { if (e.target === document.getElementById('fileModal')) closeModal(); });
 
         // ============================================================
-        // ==================== HELPERS ====================
+        // HELPERS
         // ============================================================
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const now = new Date();
-            const diff = now - date;
-            
-            if (diff < 60000) return 'Just now';
-            if (diff < 3600000) return `${Math.floor(diff / 60000)} min ago`;
-            if (diff < 86400000) return `${Math.floor(diff / 3600000)} hours ago`;
-            if (diff < 172800000) return 'Yesterday';
-            
-            return date.toLocaleString('en-IN', {
+        // ✅ FULL DATE FORMAT — not hours ago
+        function formatDateFull(ts) {
+            if (!ts) return 'N/A';
+            const d = new Date(ts);
+            return d.toLocaleString('en-IN', {
                 day: '2-digit',
                 month: 'short',
                 year: 'numeric',
@@ -436,22 +956,43 @@
             });
         }
 
-        function showError(message) {
-            document.getElementById('updatesContainer').innerHTML = `
-                <div class="empty-state">
-                    <div class="icon">❌</div>
-                    <p style="color:#ef4444;">${message}</p>
-                </div>
-            `;
+        function formatSize(bytes) {
+            if (!bytes) return '';
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        function getFileIcon(mime) {
+            if (!mime) return '📄';
+            if (mime.startsWith('image/')) return '🖼️';
+            if (mime === 'application/pdf') return '📄';
+            if (mime.startsWith('audio/')) return '🎵';
+            if (mime.startsWith('video/')) return '🎬';
+            return '📎';
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         // ============================================================
-        // ==================== INIT ====================
+        // AUTO REFRESH (5 min)
         // ============================================================
-        document.addEventListener('DOMContentLoaded', loadUpdates);
-
-        // Refresh every 5 minutes
         setInterval(loadUpdates, 300000);
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🏛️ Govt-Style Updates Loaded');
+            console.log('📡 API:', API_URL);
+            loadUpdates();
+        });
     </script>
+
 </body>
 </html>
