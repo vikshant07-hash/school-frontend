@@ -55,11 +55,6 @@
             flex-wrap: wrap;
         }
 
-        .header .admin-info span {
-            font-size: 0.95rem;
-            color: #4b5563;
-        }
-
         /* ============================================
            BUTTONS
            ============================================ */
@@ -446,11 +441,6 @@
             padding: 20px;
         }
 
-        .modal-content .file-preview .file-icon-big {
-            font-size: 4rem;
-            margin-bottom: 16px;
-        }
-
         /* ============================================
            ANIMATIONS
            ============================================ */
@@ -487,11 +477,6 @@
                 flex-direction: column;
                 align-items: stretch;
                 text-align: center;
-            }
-
-            .header .admin-info {
-                justify-content: center;
-                flex-wrap: wrap;
             }
 
             .form-row {
@@ -536,6 +521,45 @@
             .action-buttons .btn-sm {
                 font-size: 0.65rem;
                 padding: 3px 8px;
+            }
+        }
+
+        /* ============================================
+           TOAST NOTIFICATION
+           ============================================ */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 2000;
+            animation: slideInRight 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .toast-success {
+            background: #22c55e;
+        }
+
+        .toast-error {
+            background: #ef4444;
+        }
+
+        .toast-info {
+            background: #3b82f6;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
             }
         }
     </style>
@@ -709,26 +733,44 @@
     </div>
 
     <!-- ============================================
-    JAVASCRIPT - WITHOUT AUTHENTICATION
+    JAVASCRIPT - COMPLETE WORKING
     ============================================ -->
     <script>
         // ============================================
         // CONFIGURATION
         // ============================================
-        const API_URL = 'https://gsssshilla.onrender.com'; // 🔴 CHANGE THIS
+        const API_URL = 'https://gsssshilla.onrender.com'; // ✅ Your backend URL
         let currentPage = 1;
         let totalPages = 1;
         let selectedIds = [];
 
         // ============================================
-        // LOAD UPDATES (Without Auth Token)
+        // TOAST NOTIFICATION
+        // ============================================
+        function showToast(message, type = 'success') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 4000);
+        }
+
+        // ============================================
+        // LOAD UPDATES
         // ============================================
         function loadUpdates() {
             const search = document.getElementById('searchInput').value;
             const category = document.getElementById('categoryFilter').value;
             const status = document.getElementById('statusFilter').value;
 
-            // 🔴 NOTE: No authentication token required
             fetch(`${API_URL}/recent/admin/all?page=${currentPage}&limit=10&search=${search}&category=${category}&status=${status}`)
                 .then(res => res.json())
                 .then(data => {
@@ -737,13 +779,14 @@
                         renderPagination(data.pagination);
                         loadStats();
                     } else {
-                        alert('Error: ' + data.message);
+                        showToast('Error: ' + data.message, 'error');
                     }
                 })
                 .catch(err => {
                     console.error('Error:', err);
                     document.getElementById('updatesTableBody').innerHTML =
                         `<tr><td colspan="8" class="loading-text">❌ Failed to load updates</td></tr>`;
+                    showToast('Failed to load updates', 'error');
                 });
         }
 
@@ -763,7 +806,7 @@
                 html += `
                         <tr>
                             <td><input type="checkbox" class="row-checkbox" value="${item.id}" onchange="updateSelected()"></td>
-                            <td>${index + 1}</td>
+                            <td>${(currentPage - 1) * 10 + index + 1}</td>
                             <td><strong>${escapeHtml(item.title)}</strong></td>
                             <td><span class="badge-category">${item.category || 'general'}</span></td>
                             <td>${item.file_icon || '📄'} ${item.file_type_display || 'No File'}</td>
@@ -804,7 +847,7 @@
         }
 
         // ============================================
-        // LOAD STATS (Without Auth)
+        // LOAD STATS
         // ============================================
         function loadStats() {
             fetch(`${API_URL}/recent/admin/stats`)
@@ -821,32 +864,52 @@
         }
 
         // ============================================
-        // ADD / UPDATE FORM (Without Auth)
+        // ADD / UPDATE FORM - FIXED
         // ============================================
         document.getElementById('updateForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
             const id = document.getElementById('updateId').value;
-            const formData = new FormData(this);
+            const title = document.getElementById('title').value.trim();
+            
+            // ✅ Validation
+            if (!title) {
+                showToast('Please enter a title', 'error');
+                document.getElementById('title').focus();
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('category', document.getElementById('category').value);
+            formData.append('isNew', document.getElementById('isNew').value);
+            formData.append('link', document.getElementById('link').value);
+
+            // ✅ File append - Important!
+            const fileInput = document.getElementById('file');
+            if (fileInput.files && fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
+            }
 
             const url = id ? `${API_URL}/recent/admin/update/${id}` : `${API_URL}/recent/admin/add`;
 
             fetch(url, {
-                    method: 'POST', // 🔴 Using POST for both add and update
+                    method: 'POST', // Using POST for both add and update
                     body: formData
                 })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        alert(data.message);
+                        showToast(data.message, 'success');
                         resetForm();
                         loadUpdates();
                     } else {
-                        alert('Error: ' + data.message);
+                        showToast('Error: ' + data.message, 'error');
                     }
                 })
                 .catch(err => {
-                    alert('Error: ' + err.message);
+                    showToast('Error: ' + err.message, 'error');
                 });
         });
 
@@ -876,13 +939,16 @@
                         }
 
                         window.scrollTo({ top: 0, behavior: 'smooth' });
+                        showToast('Edit mode: Update the fields and save', 'info');
                     }
                 })
-                .catch(err => console.error('Error:', err));
+                .catch(err => {
+                    showToast('Error loading update: ' + err.message, 'error');
+                });
         }
 
         // ============================================
-        // DELETE UPDATE (Without Auth)
+        // DELETE UPDATE
         // ============================================
         function deleteUpdate(id) {
             if (!confirm('Are you sure you want to delete this update?')) return;
@@ -893,20 +959,24 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        alert(data.message);
+                        showToast(data.message, 'success');
                         loadUpdates();
+                    } else {
+                        showToast('Error: ' + data.message, 'error');
                     }
                 })
-                .catch(err => console.error('Error:', err));
+                .catch(err => {
+                    showToast('Error: ' + err.message, 'error');
+                });
         }
 
         // ============================================
-        // BULK DELETE (Without Auth)
+        // BULK DELETE
         // ============================================
         function bulkDelete() {
             const ids = selectedIds;
             if (ids.length === 0) {
-                alert('Please select at least one update to delete');
+                showToast('Please select at least one update to delete', 'error');
                 return;
             }
 
@@ -922,13 +992,17 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        alert(data.message);
+                        showToast(data.message, 'success');
                         selectedIds = [];
                         document.getElementById('selectAll').checked = false;
                         loadUpdates();
+                    } else {
+                        showToast('Error: ' + data.message, 'error');
                     }
                 })
-                .catch(err => console.error('Error:', err));
+                .catch(err => {
+                    showToast('Error: ' + err.message, 'error');
+                });
         }
 
         // ============================================
@@ -1028,6 +1102,7 @@
             document.getElementById('isNew').value = '1';
             document.getElementById('currentFile').style.display = 'none';
             document.getElementById('file').value = '';
+            document.getElementById('title').focus();
         }
 
         // ============================================
@@ -1063,20 +1138,14 @@
         // INIT
         // ============================================
         document.addEventListener('DOMContentLoaded', function() {
-            if (API_URL === 'https://gsssshilla.onrender.com') {
-                document.getElementById('updatesTableBody').innerHTML = `
-                            <tr><td colspan="8" class="loading-text">⚙️ Please configure API_URL in JavaScript</td></tr>
-                        `;
-                return;
-            }
-
             loadUpdates();
+            showToast('Welcome Admin! 🚀', 'info');
         });
 
         // Auto refresh every 30 seconds
         setInterval(loadUpdates, 30000);
 
-        console.log('🚀 Admin Recent Updates Panel Loaded (No Auth)');
+        console.log('🚀 Admin Recent Updates Panel Loaded');
         console.log(`📡 API_URL: ${API_URL}`);
     </script>
 
