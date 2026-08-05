@@ -118,14 +118,6 @@
             font-size: 0.75rem;
         }
 
-        .btn-logout {
-            background: #ef4444;
-            color: white;
-        }
-        .btn-logout:hover {
-            background: #dc2626;
-        }
-
         /* ============================================
            STATS CARDS
            ============================================ */
@@ -557,7 +549,6 @@
             <h1>📢 Recent Updates Management</h1>
             <div class="admin-info">
                 <span>👋 Welcome, Admin</span>
-                <button class="btn btn-logout" onclick="logout()">🚪 Logout</button>
             </div>
         </div>
 
@@ -718,7 +709,7 @@
     </div>
 
     <!-- ============================================
-    JAVASCRIPT
+    JAVASCRIPT - WITHOUT AUTHENTICATION
     ============================================ -->
     <script>
         // ============================================
@@ -730,18 +721,15 @@
         let selectedIds = [];
 
         // ============================================
-        // LOAD UPDATES
+        // LOAD UPDATES (Without Auth Token)
         // ============================================
         function loadUpdates() {
             const search = document.getElementById('searchInput').value;
             const category = document.getElementById('categoryFilter').value;
             const status = document.getElementById('statusFilter').value;
 
-            fetch(`${API_URL}/recent/admin/all?page=${currentPage}&limit=10&search=${search}&category=${category}&status=${status}`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                })
+            // 🔴 NOTE: No authentication token required
+            fetch(`${API_URL}/recent/admin/all?page=${currentPage}&limit=10&search=${search}&category=${category}&status=${status}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
@@ -816,14 +804,10 @@
         }
 
         // ============================================
-        // LOAD STATS
+        // LOAD STATS (Without Auth)
         // ============================================
         function loadStats() {
-            fetch(`${API_URL}/recent/admin/stats`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                })
+            fetch(`${API_URL}/recent/admin/stats`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
@@ -837,7 +821,7 @@
         }
 
         // ============================================
-        // ADD / UPDATE FORM
+        // ADD / UPDATE FORM (Without Auth)
         // ============================================
         document.getElementById('updateForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -846,13 +830,9 @@
             const formData = new FormData(this);
 
             const url = id ? `${API_URL}/recent/admin/update/${id}` : `${API_URL}/recent/admin/add`;
-            const method = id ? 'PUT' : 'POST';
 
             fetch(url, {
-                    method: method,
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    },
+                    method: 'POST', // 🔴 Using POST for both add and update
                     body: formData
                 })
                 .then(res => res.json())
@@ -874,11 +854,7 @@
         // EDIT UPDATE
         // ============================================
         function editUpdate(id) {
-            fetch(`${API_URL}/recent/${id}`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                })
+            fetch(`${API_URL}/recent/${id}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
@@ -906,16 +882,13 @@
         }
 
         // ============================================
-        // DELETE UPDATE
+        // DELETE UPDATE (Without Auth)
         // ============================================
         function deleteUpdate(id) {
             if (!confirm('Are you sure you want to delete this update?')) return;
 
             fetch(`${API_URL}/recent/admin/delete/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
+                    method: 'DELETE'
                 })
                 .then(res => res.json())
                 .then(data => {
@@ -928,7 +901,7 @@
         }
 
         // ============================================
-        // BULK DELETE
+        // BULK DELETE (Without Auth)
         // ============================================
         function bulkDelete() {
             const ids = selectedIds;
@@ -942,8 +915,7 @@
             fetch(`${API_URL}/recent/admin/bulk-delete`, {
                     method: 'DELETE',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ ids: ids })
                 })
@@ -1078,16 +1050,6 @@
         });
 
         // ============================================
-        // LOGOUT
-        // ============================================
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                localStorage.removeItem('token');
-                window.location.href = '/login';
-            }
-        }
-
-        // ============================================
         // HELPERS
         // ============================================
         function escapeHtml(text) {
@@ -1101,18 +1063,10 @@
         // INIT
         // ============================================
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if API_URL is configured
-            if (API_URL === 'https://your-backend-url.com') {
+            if (API_URL === 'https://gsssshilla.onrender.com') {
                 document.getElementById('updatesTableBody').innerHTML = `
                             <tr><td colspan="8" class="loading-text">⚙️ Please configure API_URL in JavaScript</td></tr>
                         `;
-                return;
-            }
-
-            // Check token
-            const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = '/login';
                 return;
             }
 
@@ -1122,7 +1076,7 @@
         // Auto refresh every 30 seconds
         setInterval(loadUpdates, 30000);
 
-        console.log('🚀 Admin Recent Updates Panel Loaded');
+        console.log('🚀 Admin Recent Updates Panel Loaded (No Auth)');
         console.log(`📡 API_URL: ${API_URL}`);
     </script>
 
