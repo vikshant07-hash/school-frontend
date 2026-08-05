@@ -3,627 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Recent Updates Management</title>
-
+    <title>Admin - Recent Updates</title>
     <style>
-        /* ============================================
-           RESET & BASE STYLES
-           ============================================ */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
-            color: #1a2332;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* ============================================
-           HEADER
-           ============================================ */
-        .header {
-            background: white;
-            padding: 15px 25px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .header h1 {
-            font-size: 1.4rem;
-            color: #1a2332;
-        }
-
-        .header .admin-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        /* ============================================
-           BUTTONS
-           ============================================ */
-        .btn {
-            padding: 8px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: #3b82f6;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-
-        .btn-secondary {
-            background: #e5e7eb;
-            color: #4b5563;
-        }
-        .btn-secondary:hover {
-            background: #d1d5db;
-        }
-
-        .btn-danger {
-            background: #ef4444;
-            color: white;
-        }
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
-        .btn-warning {
-            background: #f59e0b;
-            color: white;
-        }
-        .btn-warning:hover {
-            background: #d97706;
-        }
-
-        .btn-success {
-            background: #22c55e;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #16a34a;
-        }
-
-        .btn-sm {
-            padding: 4px 12px;
-            font-size: 0.75rem;
-        }
-
-        /* ============================================
-           STATS CARDS
-           ============================================ */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .stat-card .icon {
-            font-size: 2rem;
-        }
-
-        .stat-card .info h3 {
-            font-size: 1.5rem;
-            color: #1a2332;
-        }
-
-        .stat-card .info p {
-            color: #6b7280;
-            font-size: 0.8rem;
-        }
-
-        /* ============================================
-           FORM
-           ============================================ */
-        .form-card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .form-card h2 {
-            margin-bottom: 20px;
-            color: #1a2332;
-            font-size: 1.2rem;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #4b5563;
-            font-size: 0.9rem;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            transition: border-color 0.3s;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .form-text {
-            font-size: 0.8rem;
-            color: #6b7280;
-            margin-top: 4px;
-            display: block;
-        }
-
-        /* ============================================
-           FILTER BAR
-           ============================================ */
-        .filter-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-
-        .filter-bar .search-box {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .filter-bar .search-box input {
-            width: 100%;
-            padding: 8px 14px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 0.95rem;
-        }
-
-        .filter-bar .search-box input:focus {
-            outline: none;
-            border-color: #3b82f6;
-        }
-
-        .filter-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .filter-group select {
-            padding: 8px 14px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: white;
-            font-size: 0.95rem;
-        }
-
-        /* ============================================
-           TABLE
-           ============================================ */
-        .table-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        th,
-        td {
-            padding: 10px 12px;
-            text-align: left;
-            border-bottom: 1px solid #f3f4f6;
-        }
-
-        th {
-            background: #f8fafc;
-            font-weight: 600;
-            color: #4b5563;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-        }
-
-        tbody tr:hover {
-            background: #f8fafc;
-        }
-
-        .loading-text {
-            text-align: center;
-            color: #6b7280;
-            padding: 40px !important;
-        }
-
-        /* ============================================
-           BADGES
-           ============================================ */
-        .badge {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .badge-new {
-            background: #fef2f2;
-            color: #ef4444;
-        }
-
-        .badge-old {
-            background: #f3f4f6;
-            color: #6b7280;
-        }
-
-        .badge-category {
-            background: #eff6ff;
-            color: #3b82f6;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            text-transform: capitalize;
-        }
-
-        /* ============================================
-           ACTION BUTTONS
-           ============================================ */
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-
-        /* ============================================
-           PAGINATION
-           ============================================ */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #f3f4f6;
-        }
-
-        .pagination button {
-            padding: 6px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .pagination button:hover:not(:disabled) {
-            background: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
-        }
-
-        .pagination button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .pagination #pageInfo {
-            color: #4b5563;
-            font-size: 0.9rem;
-        }
-
-        /* ============================================
-           CHECKBOX
-           ============================================ */
-        input[type="checkbox"] {
-            cursor: pointer;
-            width: 16px;
-            height: 16px;
-        }
-
-        /* ============================================
-           MODAL
-           ============================================ */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            animation: fadeIn 0.3s;
-        }
-
-        .modal-content {
-            position: relative;
-            background: white;
-            margin: 5% auto;
-            padding: 30px;
-            width: 90%;
-            max-width: 700px;
-            max-height: 90vh;
-            border-radius: 12px;
-            overflow-y: auto;
-            animation: slideDown 0.3s;
-        }
-
-        .modal-content .close {
-            position: absolute;
-            top: 15px;
-            right: 25px;
-            font-size: 2rem;
-            font-weight: bold;
-            color: #6b7280;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .modal-content .close:hover {
-            color: #1a2332;
-        }
-
-        .modal-content img,
-        .modal-content video,
-        .modal-content audio {
-            max-width: 100%;
-            border-radius: 8px;
-        }
-
-        .modal-content .file-preview {
-            text-align: center;
-            padding: 20px;
-        }
-
-        /* ============================================
-           ANIMATIONS
-           ============================================ */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideDown {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-
-            .header {
-                padding: 15px;
-                flex-direction: column;
-                align-items: stretch;
-                text-align: center;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .filter-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .filter-group {
-                flex-wrap: wrap;
-            }
-
-            .stats {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .stat-card {
-                padding: 12px 15px;
-            }
-
-            th,
-            td {
-                padding: 8px 10px;
-                font-size: 0.8rem;
-            }
-
-            .modal-content {
-                padding: 20px;
-                margin: 10% auto;
-                width: 95%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .stats {
-                grid-template-columns: 1fr;
-            }
-
-            .action-buttons .btn-sm {
-                font-size: 0.65rem;
-                padding: 3px 8px;
-            }
-        }
-
-        /* ============================================
-           TOAST NOTIFICATION
-           ============================================ */
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            z-index: 2000;
-            animation: slideInRight 0.3s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        .toast-success {
-            background: #22c55e;
-        }
-
-        .toast-error {
-            background: #ef4444;
-        }
-
-        .toast-info {
-            background: #3b82f6;
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        .header { background: white; padding: 15px 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .header h1 { font-size: 1.4rem; }
+        
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 15px; }
+        .stat-card .icon { font-size: 2rem; }
+        .stat-card .info h3 { font-size: 1.5rem; }
+        .stat-card .info p { color: #6b7280; font-size: 0.8rem; }
+        
+        .form-card { background: white; padding: 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .form-card h2 { margin-bottom: 20px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-control { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.95rem; }
+        .form-control:focus { outline: none; border-color: #3b82f6; }
+        .form-actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        
+        .btn { padding: 8px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: all 0.3s; }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-secondary { background: #e5e7eb; color: #4b5563; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; }
+        .btn-sm { padding: 4px 12px; font-size: 0.75rem; }
+        
+        .filter-bar { display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+        .filter-bar .search-box { flex: 1; min-width: 200px; }
+        .filter-bar .search-box input { width: 100%; padding: 8px 14px; border: 1px solid #d1d5db; border-radius: 6px; }
+        .filter-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .filter-group select { padding: 8px 14px; border: 1px solid #d1d5db; border-radius: 6px; background: white; }
+        
+        .table-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f3f4f6; }
+        th { background: #f8fafc; font-weight: 600; color: #4b5563; font-size: 0.75rem; text-transform: uppercase; }
+        tbody tr:hover { background: #f8fafc; }
+        
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; }
+        .badge-new { background: #fef2f2; color: #ef4444; }
+        .badge-old { background: #f3f4f6; color: #6b7280; }
+        .badge-category { background: #eff6ff; color: #3b82f6; padding: 2px 10px; border-radius: 12px; font-size: 0.7rem; text-transform: capitalize; }
+        
+        .action-buttons { display: flex; gap: 5px; flex-wrap: wrap; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #f3f4f6; }
+        .pagination button { padding: 6px 16px; border: 1px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer; }
+        .pagination button:hover:not(:disabled) { background: #3b82f6; color: white; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .loading-text { text-align: center; color: #6b7280; padding: 40px !important; }
+        .toast { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 8px; color: white; font-weight: 500; z-index: 2000; animation: slideInRight 0.3s; }
+        .toast-success { background: #22c55e; }
+        .toast-error { background: #ef4444; }
+        .toast-info { background: #3b82f6; }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .modal-content { position: relative; background: white; margin: 5% auto; padding: 30px; width: 90%; max-width: 700px; max-height: 90vh; border-radius: 12px; overflow-y: auto; }
+        .modal-content .close { position: absolute; top: 15px; right: 25px; font-size: 2rem; font-weight: bold; color: #6b7280; cursor: pointer; }
+        .modal-content img { max-width: 100%; border-radius: 8px; }
+        
+        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } .stats { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 480px) { .stats { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-
     <div class="container">
 
-        <!-- ===== HEADER ===== -->
+        <!-- Header -->
         <div class="header">
             <h1>📢 Recent Updates Management</h1>
-            <div class="admin-info">
-                <span>👋 Welcome, Admin</span>
-            </div>
+            <div><span>👋 Welcome, Admin</span></div>
         </div>
 
-        <!-- ===== STATS ===== -->
+        <!-- Stats -->
         <div class="stats" id="statsGrid">
-            <div class="stat-card">
-                <div class="icon">📊</div>
-                <div class="info">
-                    <h3 id="totalCount">0</h3>
-                    <p>Total Updates</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="icon">🆕</div>
-                <div class="info">
-                    <h3 id="newCount">0</h3>
-                    <p>New</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="icon">📌</div>
-                <div class="info">
-                    <h3 id="oldCount">0</h3>
-                    <p>Old</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="icon">📎</div>
-                <div class="info">
-                    <h3 id="fileCount">0</h3>
-                    <p>With Files</p>
-                </div>
-            </div>
+            <div class="stat-card"><div class="icon">📊</div><div class="info"><h3 id="totalCount">0</h3><p>Total</p></div></div>
+            <div class="stat-card"><div class="icon">🆕</div><div class="info"><h3 id="newCount">0</h3><p>New</p></div></div>
+            <div class="stat-card"><div class="icon">📌</div><div class="info"><h3 id="oldCount">0</h3><p>Old</p></div></div>
+            <div class="stat-card"><div class="icon">📎</div><div class="info"><h3 id="fileCount">0</h3><p>With Files</p></div></div>
         </div>
 
-        <!-- ===== ADD/EDIT FORM ===== -->
-        <div class="form-card" id="formCard">
+        <!-- Form -->
+        <div class="form-card">
             <h2 id="formTitle">➕ Add New Update</h2>
             <form id="updateForm" enctype="multipart/form-data">
                 <input type="hidden" id="updateId" value="">
-
                 <div class="form-group">
                     <label>Title *</label>
-                    <input type="text" id="title" class="form-control" placeholder="Enter update title" required>
+                    <input type="text" id="title" class="form-control" placeholder="Enter title" required>
                 </div>
-
                 <div class="form-group">
                     <label>Description</label>
                     <textarea id="description" class="form-control" rows="3" placeholder="Enter description"></textarea>
                 </div>
-
                 <div class="form-row">
                     <div class="form-group">
                         <label>Category</label>
@@ -645,32 +127,27 @@
                         </select>
                     </div>
                 </div>
-
                 <div class="form-group">
-                    <label>Link (optional)</label>
+                    <label>Link</label>
                     <input type="url" id="link" class="form-control" placeholder="https://example.com">
                 </div>
-
                 <div class="form-group">
-                    <label>Attachment (Image, PDF, Audio, Video)</label>
+                    <label>Attachment</label>
                     <input type="file" id="file" class="form-control" accept="image/*,.pdf,.doc,.docx,audio/*,video/*">
-                    <small class="form-text">Max: 50MB | Allowed: Images, PDF, Word, Audio, Video</small>
-                    <div id="currentFile" style="display:none; margin-top:8px; padding:8px 12px; background:#f0fdf4; border-radius:6px; border-left:3px solid #22c55e;">
-                        📎 Current: <span id="currentFileName"></span>
-                    </div>
+                    <small style="color:#6b7280;font-size:0.8rem;">Max: 50MB | Images, PDF, Word, Audio, Video</small>
+                    <div id="currentFile" style="display:none; margin-top:8px; padding:8px 12px; background:#f0fdf4; border-radius:6px;">📎 Current: <span id="currentFileName"></span></div>
                 </div>
-
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" id="submitBtn">➕ Add Update</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">➕ Add</button>
                     <button type="button" class="btn btn-secondary" onclick="resetForm()">✖ Cancel</button>
                 </div>
             </form>
         </div>
 
-        <!-- ===== FILTER BAR ===== -->
+        <!-- Filter -->
         <div class="filter-bar">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Search updates..." onkeyup="loadUpdates()">
+                <input type="text" id="searchInput" placeholder="🔍 Search..." onkeyup="loadUpdates()">
             </div>
             <div class="filter-group">
                 <select id="categoryFilter" onchange="loadUpdates()">
@@ -692,7 +169,7 @@
             </div>
         </div>
 
-        <!-- ===== TABLE ===== -->
+        <!-- Table -->
         <div class="table-card">
             <table>
                 <thead>
@@ -703,18 +180,14 @@
                         <th>Category</th>
                         <th>File</th>
                         <th>Status</th>
-                        <th>Created At</th>
+                        <th>Created</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="updatesTableBody">
-                    <tr>
-                        <td colspan="8" class="loading-text">🔄 Loading updates...</td>
-                    </tr>
+                    <tr><td colspan="8" class="loading-text">🔄 Loading...</td></tr>
                 </tbody>
             </table>
-
-            <!-- ===== PAGINATION ===== -->
             <div class="pagination">
                 <button onclick="changePage('prev')" id="prevBtn">◀ Previous</button>
                 <span id="pageInfo">Page 1 of 1</span>
@@ -724,7 +197,7 @@
 
     </div>
 
-    <!-- ===== FILE PREVIEW MODAL ===== -->
+    <!-- Modal -->
     <div id="fileModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
@@ -732,60 +205,63 @@
         </div>
     </div>
 
-    <!-- ============================================
-    JAVASCRIPT - COMPLETE WORKING
-    ============================================ -->
     <script>
         // ============================================
-        // CONFIGURATION
+        // ✅ CONFIGURATION - CHANGE THIS
         // ============================================
-        const API_URL = 'https://gsssshilla.onrender.com'; // ✅ Your backend URL
+        const API_URL = 'https://gsssshilla.onrender.com';
+
         let currentPage = 1;
         let totalPages = 1;
         let selectedIds = [];
 
         // ============================================
-        // TOAST NOTIFICATION
+        // TOAST
         // ============================================
         function showToast(message, type = 'success') {
-            const existingToast = document.querySelector('.toast');
-            if (existingToast) {
-                existingToast.remove();
-            }
-
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             toast.textContent = message;
             document.body.appendChild(toast);
-
-            setTimeout(() => {
-                toast.remove();
-            }, 4000);
+            setTimeout(() => toast.remove(), 4000);
         }
 
         // ============================================
-        // LOAD UPDATES
+        // ✅ LOAD UPDATES - WITH DEBUG
         // ============================================
         function loadUpdates() {
             const search = document.getElementById('searchInput').value;
             const category = document.getElementById('categoryFilter').value;
             const status = document.getElementById('statusFilter').value;
 
-            fetch(`${API_URL}/recent/admin/all?page=${currentPage}&limit=10&search=${search}&category=${category}&status=${status}`)
-                .then(res => res.json())
+            const url = `${API_URL}/recent/admin/all?page=${currentPage}&limit=10&search=${search}&category=${category}&status=${status}`;
+            
+            console.log('🔄 Fetching:', url);
+
+            fetch(url)
+                .then(res => {
+                    console.log('📡 Status:', res.status);
+                    return res.json();
+                })
                 .then(data => {
+                    console.log('📦 Data:', data);
+                    
                     if (data.success) {
                         renderTable(data.data);
                         renderPagination(data.pagination);
                         loadStats();
                     } else {
                         showToast('Error: ' + data.message, 'error');
+                        document.getElementById('updatesTableBody').innerHTML = 
+                            `<tr><td colspan="8" class="loading-text">❌ ${data.message}</td></tr>`;
                     }
                 })
                 .catch(err => {
-                    console.error('Error:', err);
-                    document.getElementById('updatesTableBody').innerHTML =
-                        `<tr><td colspan="8" class="loading-text">❌ Failed to load updates</td></tr>`;
+                    console.error('❌ Error:', err);
+                    document.getElementById('updatesTableBody').innerHTML = 
+                        `<tr><td colspan="8" class="loading-text">❌ Network Error: ${err.message}</td></tr>`;
                     showToast('Failed to load updates', 'error');
                 });
         }
@@ -796,6 +272,8 @@
         function renderTable(updates) {
             const tbody = document.getElementById('updatesTableBody');
 
+            console.log('📊 Rendering updates:', updates);
+
             if (!updates || updates.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="loading-text">📭 No updates found</td></tr>`;
                 return;
@@ -803,24 +281,25 @@
 
             let html = '';
             updates.forEach((item, index) => {
+                const num = (currentPage - 1) * 10 + index + 1;
                 html += `
-                        <tr>
-                            <td><input type="checkbox" class="row-checkbox" value="${item.id}" onchange="updateSelected()"></td>
-                            <td>${(currentPage - 1) * 10 + index + 1}</td>
-                            <td><strong>${escapeHtml(item.title)}</strong></td>
-                            <td><span class="badge-category">${item.category || 'general'}</span></td>
-                            <td>${item.file_icon || '📄'} ${item.file_type_display || 'No File'}</td>
-                            <td><span class="badge ${item.is_new_class}">${item.is_new_badge}</span></td>
-                            <td style="font-size:0.8rem; white-space:nowrap;">${item.created_at_formatted}</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn btn-warning btn-sm" onclick="viewFile('${item.id}', '${item.file_url || ''}', '${item.file_type || ''}', '${escapeHtml(item.title)}')">👁️</button>
-                                    <button class="btn btn-primary btn-sm" onclick="editUpdate(${item.id})">✏️</button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteUpdate(${item.id})">🗑️</button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
+                    <tr>
+                        <td><input type="checkbox" class="row-checkbox" value="${item.id}" onchange="updateSelected()"></td>
+                        <td>${num}</td>
+                        <td><strong>${escapeHtml(item.title)}</strong></td>
+                        <td><span class="badge-category">${item.category || 'general'}</span></td>
+                        <td>${item.file_icon || '📄'} ${item.file_type_display || 'No File'}</td>
+                        <td><span class="badge ${item.is_new_class}">${item.is_new_badge}</span></td>
+                        <td style="font-size:0.8rem; white-space:nowrap;">${item.created_at_formatted}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-warning btn-sm" onclick="viewFile('${item.id}', '${item.file_url || ''}', '${item.file_type || ''}', '${escapeHtml(item.title)}')">👁️</button>
+                                <button class="btn btn-primary btn-sm" onclick="editUpdate(${item.id})">✏️</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteUpdate(${item.id})">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
             });
             tbody.innerHTML = html;
         }
@@ -838,16 +317,13 @@
         }
 
         function changePage(direction) {
-            if (direction === 'prev' && currentPage > 1) {
-                currentPage--;
-            } else if (direction === 'next' && currentPage < totalPages) {
-                currentPage++;
-            }
+            if (direction === 'prev' && currentPage > 1) { currentPage--; }
+            else if (direction === 'next' && currentPage < totalPages) { currentPage++; }
             loadUpdates();
         }
 
         // ============================================
-        // LOAD STATS
+        // STATS
         // ============================================
         function loadStats() {
             fetch(`${API_URL}/recent/admin/stats`)
@@ -860,11 +336,11 @@
                         document.getElementById('fileCount').textContent = data.data.withFile?.[0]?.withFile || 0;
                     }
                 })
-                .catch(err => console.error('Stats Error:', err));
+                .catch(err => console.error('Stats error:', err));
         }
 
         // ============================================
-        // ADD / UPDATE FORM - FIXED
+        // FORM SUBMIT
         // ============================================
         document.getElementById('updateForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -872,10 +348,8 @@
             const id = document.getElementById('updateId').value;
             const title = document.getElementById('title').value.trim();
             
-            // ✅ Validation
             if (!title) {
                 showToast('Please enter a title', 'error');
-                document.getElementById('title').focus();
                 return;
             }
 
@@ -886,7 +360,6 @@
             formData.append('isNew', document.getElementById('isNew').value);
             formData.append('link', document.getElementById('link').value);
 
-            // ✅ File append - Important!
             const fileInput = document.getElementById('file');
             if (fileInput.files && fileInput.files.length > 0) {
                 formData.append('file', fileInput.files[0]);
@@ -894,10 +367,7 @@
 
             const url = id ? `${API_URL}/recent/admin/update/${id}` : `${API_URL}/recent/admin/add`;
 
-            fetch(url, {
-                    method: 'POST', // Using POST for both add and update
-                    body: formData
-                })
+            fetch(url, { method: 'POST', body: formData })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
@@ -908,13 +378,11 @@
                         showToast('Error: ' + data.message, 'error');
                     }
                 })
-                .catch(err => {
-                    showToast('Error: ' + err.message, 'error');
-                });
+                .catch(err => showToast('Error: ' + err.message, 'error'));
         });
 
         // ============================================
-        // EDIT UPDATE
+        // EDIT
         // ============================================
         function editUpdate(id) {
             fetch(`${API_URL}/recent/${id}`)
@@ -930,79 +398,58 @@
                         document.getElementById('link').value = item.link || '';
                         document.getElementById('formTitle').textContent = '✏️ Edit Update';
                         document.getElementById('submitBtn').textContent = '💾 Update';
-
                         if (item.file_url) {
                             document.getElementById('currentFile').style.display = 'block';
                             document.getElementById('currentFileName').textContent = item.file_original_name || 'File attached';
-                        } else {
-                            document.getElementById('currentFile').style.display = 'none';
                         }
-
                         window.scrollTo({ top: 0, behavior: 'smooth' });
-                        showToast('Edit mode: Update the fields and save', 'info');
+                        showToast('Edit mode: Update and save', 'info');
                     }
                 })
-                .catch(err => {
-                    showToast('Error loading update: ' + err.message, 'error');
-                });
+                .catch(err => showToast('Error: ' + err.message, 'error'));
         }
 
         // ============================================
-        // DELETE UPDATE
+        // DELETE
         // ============================================
         function deleteUpdate(id) {
-            if (!confirm('Are you sure you want to delete this update?')) return;
-
-            fetch(`${API_URL}/recent/admin/delete/${id}`, {
-                    method: 'DELETE'
-                })
+            if (!confirm('Delete this update?')) return;
+            fetch(`${API_URL}/recent/admin/delete/${id}`, { method: 'DELETE' })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
                         showToast(data.message, 'success');
                         loadUpdates();
-                    } else {
-                        showToast('Error: ' + data.message, 'error');
                     }
                 })
-                .catch(err => {
-                    showToast('Error: ' + err.message, 'error');
-                });
+                .catch(err => showToast('Error: ' + err.message, 'error'));
         }
 
         // ============================================
         // BULK DELETE
         // ============================================
         function bulkDelete() {
-            const ids = selectedIds;
-            if (ids.length === 0) {
-                showToast('Please select at least one update to delete', 'error');
+            if (selectedIds.length === 0) {
+                showToast('Select at least one update', 'error');
                 return;
             }
-
-            if (!confirm(`Are you sure you want to delete ${ids.length} updates?`)) return;
-
+            if (!confirm(`Delete ${selectedIds.length} updates?`)) return;
+            
             fetch(`${API_URL}/recent/admin/bulk-delete`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ ids: ids })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast(data.message, 'success');
-                        selectedIds = [];
-                        document.getElementById('selectAll').checked = false;
-                        loadUpdates();
-                    } else {
-                        showToast('Error: ' + data.message, 'error');
-                    }
-                })
-                .catch(err => {
-                    showToast('Error: ' + err.message, 'error');
-                });
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids: selectedIds })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    selectedIds = [];
+                    document.getElementById('selectAll').checked = false;
+                    loadUpdates();
+                }
+            })
+            .catch(err => showToast('Error: ' + err.message, 'error'));
         }
 
         // ============================================
@@ -1029,100 +476,43 @@
             const modalBody = document.getElementById('modalBody');
 
             if (!fileUrl) {
-                modalBody.innerHTML = `
-                            <div style="text-align:center;padding:40px;">
-                                <div style="font-size:4rem;margin-bottom:16px;">📄</div>
-                                <h3>${title}</h3>
-                                <p style="color:#6b7280;margin-top:8px;">No attachment available</p>
-                            </div>
-                        `;
+                modalBody.innerHTML = `<div style="text-align:center;padding:40px;"><h3>${title}</h3><p>No attachment</p></div>`;
                 modal.style.display = 'block';
                 return;
             }
 
             let preview = '';
-
             if (fileType && fileType.startsWith('image/')) {
-                preview = `
-                            <img src="${fileUrl}" alt="${title}" style="max-width:100%;border-radius:8px;max-height:60vh;"
-                                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23f3f4f6%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%236b7280%22%3EImage%20not%20found%3C/text%3E%3C/svg%3E'">
-                        `;
+                preview = `<img src="${fileUrl}" style="max-width:100%;border-radius:8px;max-height:60vh;">`;
             } else if (fileType && fileType.startsWith('video/')) {
-                preview = `
-                            <video controls style="max-width:100%;max-height:60vh;">
-                                <source src="${fileUrl}" type="${fileType}">
-                                Your browser does not support the video tag.
-                            </video>
-                        `;
+                preview = `<video controls style="max-width:100%;max-height:60vh;"><source src="${fileUrl}" type="${fileType}"></video>`;
             } else if (fileType && fileType.startsWith('audio/')) {
-                preview = `
-                            <audio controls style="width:100%;">
-                                <source src="${fileUrl}" type="${fileType}">
-                                Your browser does not support the audio tag.
-                            </audio>
-                        `;
+                preview = `<audio controls style="width:100%;"><source src="${fileUrl}" type="${fileType}"></audio>`;
             } else if (fileType === 'application/pdf') {
-                preview = `
-                            <iframe src="${fileUrl}" style="width:100%;height:500px;border:none;"></iframe>
-                            <div style="margin-top:10px;">
-                                <a href="${fileUrl}" download class="btn btn-primary btn-sm">📥 Download PDF</a>
-                            </div>
-                        `;
+                preview = `<iframe src="${fileUrl}" style="width:100%;height:500px;border:none;"></iframe>`;
             } else {
-                preview = `
-                            <div style="text-align:center;padding:20px;">
-                                <div style="font-size:4rem;">📎</div>
-                                <p style="margin:12px 0;color:#4b5563;">${fileType || 'File'}</p>
-                                <a href="${fileUrl}" download class="btn btn-primary">📥 Download File</a>
-                            </div>
-                        `;
+                preview = `<div style="text-align:center;padding:20px;"><div style="font-size:4rem;">📎</div><a href="${fileUrl}" download class="btn btn-primary">Download</a></div>`;
             }
 
-            modalBody.innerHTML = `
-                        <h3 style="margin-bottom:16px;">${title}</h3>
-                        <div class="file-preview">${preview}</div>
-                        <div style="margin-top:12px;padding:12px;background:#f8fafc;border-radius:8px;">
-                            <a href="${fileUrl}" target="_blank" style="color:#3b82f6;text-decoration:none;">🔗 Open in new tab</a>
-                            &nbsp;|&nbsp;
-                            <a href="${fileUrl}" download style="color:#3b82f6;text-decoration:none;">📥 Download</a>
-                        </div>
-                    `;
+            modalBody.innerHTML = `<h3>${title}</h3><div class="file-preview">${preview}</div>`;
             modal.style.display = 'block';
         }
 
+        function closeModal() { document.getElementById('fileModal').style.display = 'none'; }
+        window.onclick = function(e) { if (e.target === document.getElementById('fileModal')) closeModal(); }
+
         // ============================================
-        // RESET FORM
+        // RESET
         // ============================================
         function resetForm() {
             document.getElementById('updateForm').reset();
             document.getElementById('updateId').value = '';
             document.getElementById('formTitle').textContent = '➕ Add New Update';
-            document.getElementById('submitBtn').textContent = '➕ Add Update';
+            document.getElementById('submitBtn').textContent = '➕ Add';
             document.getElementById('category').value = 'general';
             document.getElementById('isNew').value = '1';
             document.getElementById('currentFile').style.display = 'none';
-            document.getElementById('file').value = '';
-            document.getElementById('title').focus();
         }
-
-        // ============================================
-        // MODAL
-        // ============================================
-        function closeModal() {
-            document.getElementById('fileModal').style.display = 'none';
-        }
-
-        window.onclick = function(event) {
-            if (event.target === document.getElementById('fileModal')) {
-                closeModal();
-            }
-        }
-
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeModal();
-            }
-        });
 
         // ============================================
         // HELPERS
@@ -1135,18 +525,17 @@
         }
 
         // ============================================
-        // INIT
+        // ✅ INIT
         // ============================================
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Admin Panel Loaded');
+            console.log('📡 API_URL:', API_URL);
             loadUpdates();
-            showToast('Welcome Admin! 🚀', 'info');
+            showToast('Admin Panel Ready', 'info');
         });
 
-        // Auto refresh every 30 seconds
+        // Auto refresh
         setInterval(loadUpdates, 30000);
-
-        console.log('🚀 Admin Recent Updates Panel Loaded');
-        console.log(`📡 API_URL: ${API_URL}`);
     </script>
 
 </body>
