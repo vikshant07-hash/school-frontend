@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recent Updates - School</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: #f0f2f5; 
+            color: #1a2332;
+        }
+        
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #1a2332, #2a3a5a);
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .header h1 { font-size: 2rem; margin-bottom: 8px; }
+        .header h1 span { color: #facc15; }
+        .header p { color: #94a3b8; font-size: 1rem; }
+        
+        /* Updates Container with Scroll */
+        .updates-wrapper {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            max-height: 600px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        
+        .updates-wrapper::-webkit-scrollbar { width: 6px; }
+        .updates-wrapper::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .updates-wrapper::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+        .updates-wrapper::-webkit-scrollbar-thumb:hover { background: #555; }
+        
+        /* Update Card */
+        .update-card {
+            background: white;
+            border-radius: 10px;
+            padding: 18px 22px;
+            margin-bottom: 12px;
+            border-left: 4px solid #3b82f6;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease forwards;
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        .update-card:last-child { margin-bottom: 0; }
+        .update-card:hover { 
+            transform: translateX(5px); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        }
+        
+        .update-card .update-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .update-card .title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #1a2332;
+            cursor: pointer;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .update-card .title:hover { color: #3b82f6; }
+        .update-card .title .file-icon { font-size: 1.1rem; }
+        
+        .update-card .badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+            animation: pulse 2s infinite;
+        }
+        .update-card .badge.new {
+            background: #fef2f2;
+            color: #ef4444;
+            border: 1px solid #fca5a5;
+        }
+        .update-card .badge.old {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 1px solid #e5e7eb;
+            animation: none;
+        }
+        
+        .update-card .description {
+            color: #4b5563;
+            font-size: 0.9rem;
+            margin: 8px 0 12px;
+            line-height: 1.5;
+        }
+        
+        .update-card .attachment-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #3b82f6;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 3px 12px;
+            border-radius: 6px;
+            background: #eff6ff;
+            transition: all 0.2s;
+            border: none;
+        }
+        .update-card .attachment-link:hover { background: #dbeafe; }
+        
+        .update-card .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: #6b7280;
+            padding-top: 10px;
+            border-top: 1px solid #f3f4f6;
+            margin-top: 10px;
+        }
+        .update-card .meta .date { display: flex; align-items: center; gap: 4px; }
+        .update-card .meta .category {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            background: #eff6ff;
+            color: #3b82f6;
+            font-size: 0.65rem;
+            text-transform: capitalize;
+            font-weight: 500;
+        }
+        
+        .empty-state { 
+            text-align: center; 
+            padding: 40px; 
+            color: #6b7280; 
+        }
+        .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+        
+        /* Animations */
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            animation: fadeIn 0.3s;
+        }
+        .modal-content {
+            position: relative;
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            border-radius: 12px;
+            overflow-y: auto;
+            animation: slideDown 0.3s;
+        }
+        .modal-content .close {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #6b7280;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-content .close:hover { color: #1a2332; }
+        .modal-content img, .modal-content video, .modal-content audio { max-width: 100%; border-radius: 8px; }
+        .modal-content .file-preview { text-align: center; padding: 20px; }
+        .modal-content .file-preview .file-icon-big { font-size: 4rem; margin-bottom: 16px; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container { padding: 10px; }
+            .header { padding: 20px 15px; }
+            .header h1 { font-size: 1.3rem; }
+            .update-card { padding: 14px 16px; }
+            .update-card .title { font-size: 0.95rem; }
+            .update-card .description { font-size: 0.85rem; }
+            .update-card .meta { font-size: 0.7rem; }
+            .modal-content { padding: 20px; margin: 10% auto; width: 95%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📢 <span>Recent</span> Updates</h1>
+            <p>Stay updated with latest news and announcements from school</p>
+        </div>
+
+        <!-- Updates Scroll Box -->
+        <div class="updates-wrapper" id="updatesWrapper">
+            <div id="updatesContainer">
+                <div class="empty-state">
+                    <div class="icon">🔄</div>
+                    <p>Loading updates...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Preview Modal -->
+    <div id="fileModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // ==================== CONFIGURATION ====================
+        // ============================================================
+        const API_URL = 'https://your-backend-url.com'; // Change this
+
+        // ============================================================
+        // ==================== LOAD UPDATES ====================
+        // ============================================================
+        async function loadUpdates() {
+            try {
+                const response = await fetch(`${API_URL}/recent/public?limit=20`);
+                const data = await response.json();
+
+                if (data.success) {
+                    renderUpdates(data.data);
+                    initAutoScroll();
+                } else {
+                    showError('Failed to load updates');
+                }
+            } catch (error) {
+                console.error('Error loading updates:', error);
+                showError('Network error. Please try again.');
+            }
+        }
+
+        // ============================================================
+        // ==================== RENDER UPDATES ====================
+        // ============================================================
+        function renderUpdates(updates) {
+            const container = document.getElementById('updatesContainer');
+            
+            if (!updates || updates.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📭</div>
+                        <p>No updates available</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            updates.forEach((update, index) => {
+                const isNew = update.is_new === 1 || update.is_new_dynamic === 1;
+                const fileIcon = update.file_icon || '📄';
+                const formattedDate = formatDate(update.created_at);
+                
+                html += `
+                    <div class="update-card" style="animation-delay: ${index * 0.08}s">
+                        <div class="update-header">
+                            <div class="title" onclick="openFile('${update.id}', '${update.file_url || ''}', '${update.file_type || ''}', '${update.title}')">
+                                <span class="file-icon">${fileIcon}</span>
+                                ${update.title}
+                            </div>
+                            <span class="badge ${isNew ? 'new' : 'old'}">
+                                ${isNew ? '🆕 NEW' : '📌'}
+                            </span>
+                        </div>
+                        
+                        ${update.description ? `<div class="description">${update.description}</div>` : ''}
+                        
+                        ${update.file_url ? `
+                            <div style="margin-top: 6px;">
+                                <button class="attachment-link" onclick="openFile('${update.id}', '${update.file_url}', '${update.file_type}', '${update.title}')">
+                                    📎 View Attachment
+                                </button>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="meta">
+                            <span class="date">📅 ${formattedDate}</span>
+                            <span class="category">${update.category || 'general'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // ==================== AUTO SCROLL ====================
+        // ============================================================
+        function initAutoScroll() {
+            const wrapper = document.getElementById('updatesWrapper');
+            if (!wrapper) return;
+            
+            // Auto scroll only if content is taller than container
+            if (wrapper.scrollHeight > wrapper.clientHeight) {
+                let scrollAmount = 0;
+                const scrollStep = 0.8;
+                
+                setInterval(() => {
+                    scrollAmount += scrollStep;
+                    if (scrollAmount >= wrapper.scrollHeight - wrapper.clientHeight) {
+                        scrollAmount = 0;
+                    }
+                    wrapper.scrollTop = scrollAmount;
+                }, 50);
+            }
+        }
+
+        // ============================================================
+        // ==================== OPEN FILE ====================
+        // ============================================================
+        function openFile(id, fileUrl, fileType, title) {
+            const modal = document.getElementById('fileModal');
+            const modalBody = document.getElementById('modalBody');
+            
+            if (!fileUrl) {
+                modalBody.innerHTML = `
+                    <div style="text-align:center;padding:40px;">
+                        <div style="font-size:4rem;margin-bottom:16px;">📄</div>
+                        <h3>${title}</h3>
+                        <p style="color:#6b7280;margin-top:8px;">No attachment available</p>
+                    </div>
+                `;
+                modal.style.display = 'block';
+                return;
+            }
+
+            let preview = '';
+            if (fileType && fileType.startsWith('image/')) {
+                preview = `<img src="${fileUrl}" alt="${title}" style="max-width:100%;border-radius:8px;max-height:60vh;">`;
+            } else if (fileType && fileType.startsWith('video/')) {
+                preview = `<video controls style="max-width:100%;max-height:60vh;"><source src="${fileUrl}" type="${fileType}"></video>`;
+            } else if (fileType && fileType.startsWith('audio/')) {
+                preview = `<audio controls style="width:100%;"><source src="${fileUrl}" type="${fileType}"></audio>`;
+            } else if (fileType === 'application/pdf') {
+                preview = `<iframe src="${fileUrl}" style="width:100%;height:500px;border:none;"></iframe>`;
+            } else {
+                preview = `
+                    <div style="text-align:center;padding:20px;">
+                        <div style="font-size:4rem;">📎</div>
+                        <p style="margin:12px 0;color:#4b5563;">${fileType || 'File'}</p>
+                        <a href="${fileUrl}" download class="attachment-link" style="padding:8px 20px;background:#3b82f6;color:white;border-radius:6px;text-decoration:none;">📥 Download File</a>
+                    </div>
+                `;
+            }
+
+            modalBody.innerHTML = `
+                <h3 style="margin-bottom:16px;">${title}</h3>
+                <div class="file-preview">${preview}</div>
+                <div style="margin-top:12px;padding:12px;background:#f8fafc;border-radius:8px;">
+                    <a href="${fileUrl}" target="_blank" style="color:#3b82f6;text-decoration:none;">🔗 Open in new tab</a>
+                </div>
+            `;
+            modal.style.display = 'block';
+        }
+
+        // ============================================================
+        // ==================== MODAL ====================
+        // ============================================================
+        function closeModal() {
+            document.getElementById('fileModal').style.display = 'none';
+        }
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('fileModal')) {
+                closeModal();
+            }
+        }
+
+        // ============================================================
+        // ==================== HELPERS ====================
+        // ============================================================
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return 'Just now';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)} min ago`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)} hours ago`;
+            if (diff < 172800000) return 'Yesterday';
+            
+            return date.toLocaleString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+
+        function showError(message) {
+            document.getElementById('updatesContainer').innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">❌</div>
+                    <p style="color:#ef4444;">${message}</p>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        // ==================== INIT ====================
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', loadUpdates);
+
+        // Refresh every 5 minutes
+        setInterval(loadUpdates, 300000);
+    </script>
+</body>
+</html>
