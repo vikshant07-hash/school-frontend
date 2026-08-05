@@ -194,7 +194,7 @@
 
     <script>
         // ============================================
-        // ✅ CONFIGURATION - YAHAN CHANGE KAREIN
+        // ✅ CONFIGURATION
         // ============================================
         const API_URL = 'https://gsssshilla.onrender.com';
         
@@ -216,7 +216,7 @@
         }
 
         // ============================================
-        // LOAD UPDATES - WITH ERROR HANDLING
+        // LOAD UPDATES
         // ============================================
         function loadUpdates() {
             const search = document.getElementById('searchInput').value;
@@ -227,37 +227,37 @@
             
             console.log('🔄 Fetching:', url);
 
-            // Show loading state
-            document.getElementById('updatesTableBody').innerHTML = 
-                `<tr><td colspan="8" class="loading-text">🔄 Loading updates...</td></tr>`;
-
             fetch(url)
                 .then(res => {
-                    console.log('📡 Response Status:', res.status);
-                    if (!res.ok) {
-                        throw new Error(`HTTP error! status: ${res.status}`);
-                    }
+                    console.log('📡 Status:', res.status);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
                     return res.json();
                 })
                 .then(data => {
                     console.log('📦 Data:', data);
                     
                     if (data.success) {
-                        renderTable(data.data);
-                        renderPagination(data.pagination);
-                        loadStats();
-                        showToast('Updates loaded successfully ✅', 'success');
+                        if (data.data && data.data.length > 0) {
+                            renderTable(data.data);
+                            renderPagination(data.pagination);
+                            loadStats();
+                            showToast('Updates loaded ✅', 'success');
+                        } else {
+                            document.getElementById('updatesTableBody').innerHTML = 
+                                `<tr><td colspan="8" class="loading-text">📭 No updates found</td></tr>`;
+                            showToast('No updates found', 'info');
+                        }
                     } else {
-                        showToast('Error: ' + (data.message || 'Unknown error'), 'error');
+                        showToast('Error: ' + (data.message || 'Unknown'), 'error');
                         document.getElementById('updatesTableBody').innerHTML = 
-                            `<tr><td colspan="8" class="loading-text">❌ ${data.message || 'No data'}</td></tr>`;
+                            `<tr><td colspan="8" class="loading-text">❌ ${data.message || 'Error loading data'}</td></tr>`;
                     }
                 })
                 .catch(err => {
-                    console.error('❌ Fetch Error:', err);
+                    console.error('❌ Error:', err);
                     document.getElementById('updatesTableBody').innerHTML = 
                         `<tr><td colspan="8" class="loading-text">❌ Network Error: ${err.message}</td></tr>`;
-                    showToast('Failed to load updates: ' + err.message, 'error');
+                    showToast('Failed to load: ' + err.message, 'error');
                 });
         }
 
@@ -275,15 +275,21 @@
             let html = '';
             updates.forEach((item, index) => {
                 const num = (currentPage - 1) * 10 + index + 1;
+                const isNew = item.is_new ? 'badge-new' : 'badge-old';
+                const isNewText = item.is_new ? '🆕 New' : '📌 Old';
+                const fileIcon = item.file_icon || '📄';
+                const fileType = item.file_type_display || 'No File';
+                const date = item.created_at_formatted || formatDateTime(item.created_at);
+                
                 html += `
                     <tr>
                         <td><input type="checkbox" class="row-checkbox" value="${item.id}" onchange="updateSelected()"></td>
                         <td>${num}</td>
                         <td><strong>${escapeHtml(item.title)}</strong></td>
                         <td><span class="badge-category">${item.category || 'general'}</span></td>
-                        <td>${item.file_icon || '📄'} ${item.file_type_display || 'No File'}</td>
-                        <td><span class="badge ${item.is_new_class}">${item.is_new_badge}</span></td>
-                        <td style="font-size:0.8rem; white-space:nowrap;">${item.created_at_formatted || formatDateTime(item.created_at)}</td>
+                        <td>${fileIcon} ${fileType}</td>
+                        <td><span class="badge ${isNew}">${isNewText}</span></td>
+                        <td style="font-size:0.8rem;">${date}</td>
                         <td>
                             <div class="action-buttons">
                                 <button class="btn btn-warning btn-sm" onclick="viewFile('${item.id}', '${item.file_url || ''}', '${item.file_type || ''}', '${escapeHtml(item.title)}')">👁️</button>
@@ -376,9 +382,7 @@
             }
 
             const url = id ? `${API_URL}/recent/admin/update/${id}` : `${API_URL}/recent/admin/add`;
-            console.log('📤 Sending to:', url);
-
-            // Show loading
+            
             document.getElementById('submitBtn').textContent = '⏳ Saving...';
             document.getElementById('submitBtn').disabled = true;
 
@@ -388,7 +392,6 @@
             })
             .then(res => res.json())
             .then(data => {
-                console.log('📥 Response:', data);
                 if (data.success) {
                     showToast(data.message, 'success');
                     resetForm();
@@ -398,7 +401,6 @@
                 }
             })
             .catch(err => {
-                console.error('❌ Submit Error:', err);
                 showToast('Error: ' + err.message, 'error');
             })
             .finally(() => {
@@ -543,7 +545,6 @@
             document.getElementById('isNew').value = '1';
             document.getElementById('currentFile').style.display = 'none';
             document.getElementById('file').value = '';
-            showToast('Form reset', 'info');
         }
 
         // ============================================
