@@ -194,7 +194,7 @@
 
     <script>
         // ============================================
-        // ✅ CONFIGURATION
+        // ✅ CONFIGURATION - YAHAN CHANGE KAREIN
         // ============================================
         const API_URL = 'https://gsssshilla.onrender.com';
         
@@ -216,14 +216,11 @@
         }
 
         // ============================================
-        // LOAD UPDATES
+        // ✅ LOAD UPDATES - FIXED URL
         // ============================================
         function loadUpdates() {
-            const search = document.getElementById('searchInput').value;
-            const category = document.getElementById('categoryFilter').value;
-            const status = document.getElementById('statusFilter').value;
-
-            const url = `${API_URL}/recent/admin/all?page=${currentPage}&limit=10&search=${search}&category=${category}&status=${status}`;
+            // ✅ NEW URL - Direct server route
+            const url = `${API_URL}/recent-admin-all`;
             
             console.log('🔄 Fetching:', url);
 
@@ -239,9 +236,7 @@
                     if (data.success) {
                         if (data.data && data.data.length > 0) {
                             renderTable(data.data);
-                            renderPagination(data.pagination);
-                            loadStats();
-                            showToast('Updates loaded ✅', 'success');
+                            showToast(`✅ ${data.data.length} updates loaded`, 'success');
                         } else {
                             document.getElementById('updatesTableBody').innerHTML = 
                                 `<tr><td colspan="8" class="loading-text">📭 No updates found</td></tr>`;
@@ -274,12 +269,10 @@
 
             let html = '';
             updates.forEach((item, index) => {
-                const num = (currentPage - 1) * 10 + index + 1;
+                const num = index + 1;
                 const isNew = item.is_new ? 'badge-new' : 'badge-old';
                 const isNewText = item.is_new ? '🆕 New' : '📌 Old';
-                const fileIcon = item.file_icon || '📄';
-                const fileType = item.file_type_display || 'No File';
-                const date = item.created_at_formatted || formatDateTime(item.created_at);
+                const date = formatDateTime(item.created_at);
                 
                 html += `
                     <tr>
@@ -287,7 +280,7 @@
                         <td>${num}</td>
                         <td><strong>${escapeHtml(item.title)}</strong></td>
                         <td><span class="badge-category">${item.category || 'general'}</span></td>
-                        <td>${fileIcon} ${fileType}</td>
+                        <td>📄 ${item.file_type || 'No File'}</td>
                         <td><span class="badge ${isNew}">${isNewText}</span></td>
                         <td style="font-size:0.8rem;">${date}</td>
                         <td>
@@ -320,41 +313,6 @@
         }
 
         // ============================================
-        // PAGINATION
-        // ============================================
-        function renderPagination(pagination) {
-            if (!pagination) return;
-            currentPage = pagination.page;
-            totalPages = pagination.totalPages;
-            document.getElementById('pageInfo').textContent = `Page ${pagination.page} of ${pagination.totalPages}`;
-            document.getElementById('prevBtn').disabled = !pagination.hasPrev;
-            document.getElementById('nextBtn').disabled = !pagination.hasNext;
-        }
-
-        function changePage(direction) {
-            if (direction === 'prev' && currentPage > 1) { currentPage--; }
-            else if (direction === 'next' && currentPage < totalPages) { currentPage++; }
-            loadUpdates();
-        }
-
-        // ============================================
-        // LOAD STATS
-        // ============================================
-        function loadStats() {
-            fetch(`${API_URL}/recent/admin/stats`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('totalCount').textContent = data.data.total?.[0]?.total || 0;
-                        document.getElementById('newCount').textContent = data.data.new?.[0]?.new || 0;
-                        document.getElementById('oldCount').textContent = data.data.old?.[0]?.old || 0;
-                        document.getElementById('fileCount').textContent = data.data.withFile?.[0]?.withFile || 0;
-                    }
-                })
-                .catch(err => console.error('Stats error:', err));
-        }
-
-        // ============================================
         // ADD / UPDATE FORM
         // ============================================
         document.getElementById('updateForm').addEventListener('submit', function(e) {
@@ -365,7 +323,6 @@
             
             if (!title) {
                 showToast('Please enter a title', 'error');
-                document.getElementById('title').focus();
                 return;
             }
 
@@ -426,11 +383,6 @@
                         document.getElementById('link').value = item.link || '';
                         document.getElementById('formTitle').textContent = '✏️ Edit Update';
                         document.getElementById('submitBtn').textContent = '💾 Update';
-                        
-                        if (item.file_url) {
-                            document.getElementById('currentFile').style.display = 'block';
-                            document.getElementById('currentFileName').textContent = 'File attached';
-                        }
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                         showToast('Edit mode: Update and save', 'info');
                     }
@@ -458,6 +410,22 @@
         }
 
         // ============================================
+        // SELECT ALL
+        // ============================================
+        function selectAllRows() {
+            const checked = document.getElementById('selectAll').checked;
+            document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = checked);
+            updateSelected();
+        }
+
+        function updateSelected() {
+            selectedIds = [];
+            document.querySelectorAll('.row-checkbox:checked').forEach(cb => {
+                selectedIds.push(parseInt(cb.value));
+            });
+        }
+
+        // ============================================
         // BULK DELETE
         // ============================================
         function bulkDelete() {
@@ -482,22 +450,6 @@
                 }
             })
             .catch(err => showToast('Error: ' + err.message, 'error'));
-        }
-
-        // ============================================
-        // SELECT ALL
-        // ============================================
-        function selectAllRows() {
-            const checked = document.getElementById('selectAll').checked;
-            document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = checked);
-            updateSelected();
-        }
-
-        function updateSelected() {
-            selectedIds = [];
-            document.querySelectorAll('.row-checkbox:checked').forEach(cb => {
-                selectedIds.push(parseInt(cb.value));
-            });
         }
 
         // ============================================
