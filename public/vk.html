@@ -57,6 +57,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes slideInRight { from { opacity: 0; transform: translateX(60px); } to { opacity: 1; transform: translateX(0); } }
         @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } .toast { min-width: auto; width: 90%; } }
+        .debug-box { background: #1a1a2e; color: #00ff41; padding: 12px 16px; border-radius: 8px; font-family: monospace; font-size: 0.8rem; margin-top: 10px; max-height: 200px; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -152,6 +153,12 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- ===== DEBUG BOX ===== -->
+            <div class="debug-box" id="debugBox">
+                🐞 Debug Console Ready...<br>
+                Click Delete button to see logs here.
+            </div>
         </section>
 
     </div>
@@ -174,6 +181,24 @@
     // ============================================================
     const API_URL = 'https://gsssshilla.onrender.com';
     let selectedIds = [];
+
+    // ============================================================
+    // DEBUG LOG
+    // ============================================================
+    function debugLog(message, data = null) {
+        const box = document.getElementById('debugBox');
+        const timestamp = new Date().toLocaleTimeString();
+        let log = `[${timestamp}] ${message}`;
+        if (data) {
+            log += `\n📦 ${JSON.stringify(data, null, 2)}`;
+        }
+        box.innerHTML = log + '\n' + box.innerHTML;
+        if (box.innerHTML.split('\n').length > 50) {
+            const lines = box.innerHTML.split('\n');
+            box.innerHTML = lines.slice(0, 50).join('\n');
+        }
+        console.log(message, data);
+    }
 
     // ============================================================
     // TOAST
@@ -204,19 +229,26 @@
     // ============================================================
     function loadUpdates() {
         const tbody = document.getElementById('updatesTableBody');
+        debugLog('🔄 Loading updates...');
 
         fetch(`${API_URL}/recent-admin-all`)
-            .then(res => res.json())
+            .then(res => {
+                debugLog(`📡 Response status: ${res.status}`);
+                return res.json();
+            })
             .then(data => {
+                debugLog('📦 Data received', data);
                 if (data.success) {
                     renderTable(data.data);
                     document.getElementById('updateCount').textContent = data.data?.length || 0;
+                    debugLog(`✅ Loaded ${data.data?.length || 0} updates`);
                 } else {
                     showToast('Failed to load updates', 'error');
+                    debugLog('❌ Failed to load: ' + data.message);
                 }
             })
             .catch(err => {
-                console.error('Load error:', err);
+                debugLog('❌ Error: ' + err.message);
                 showToast('Failed to load updates', 'error');
             });
     }
@@ -256,7 +288,7 @@
                     </td>
                     <td><span class="${isNew}">${isNewText}</span></td>
                     <td style="text-align:center;">
-                        <button class="btn-delete" onclick="deleteUpdate(${item.id})">🗑️ Delete</button>
+                        <button class="btn-delete" data-id="${item.id}" onclick="deleteUpdate(this, ${item.id})">🗑️ Delete</button>
                     </td>
                 </tr>
             `;
@@ -315,54 +347,54 @@
         document.querySelectorAll('.row-checkbox:checked').forEach(cb => {
             selectedIds.push(parseInt(cb.value));
         });
-        console.log('📌 Selected IDs:', selectedIds);
+        debugLog('📌 Selected IDs:', selectedIds);
     }
 
     // ============================================================
-    // ✅ DELETE UPDATE - FIXED WITH console.log
+    // ✅ DELETE UPDATE - FIXED
     // ============================================================
-    function deleteUpdate(id) {
-        console.log('🗑️ Delete button clicked for ID:', id);
+    function deleteUpdate(btn, id) {
+        debugLog(`🗑️ Delete button clicked for ID: ${id}`);
         
         if (!id) {
-            console.error('❌ ID is undefined or null!');
+            debugLog('❌ ID is undefined or null!');
             showToast('Error: Invalid ID', 'error');
             return;
         }
 
         if (!confirm(`Are you sure you want to delete update #${id}?`)) {
-            console.log('❌ Delete cancelled by user');
+            debugLog('❌ Delete cancelled by user');
             return;
         }
 
-        // Get the button that was clicked
-        const btn = event?.target;
         if (btn) {
             btn.textContent = '⏳';
             btn.disabled = true;
         }
 
         const url = `${API_URL}/recent-admin-delete/${id}`;
-        console.log('📤 Sending DELETE request to:', url);
+        debugLog(`📤 Sending DELETE request to: ${url}`);
 
         fetch(url, { 
             method: 'DELETE' 
         })
         .then(res => {
-            console.log('📡 Response status:', res.status);
+            debugLog(`📡 Response status: ${res.status}`);
             return res.json();
         })
         .then(data => {
-            console.log('📦 Response data:', data);
+            debugLog(`📦 Response data:`, data);
             if (data.success) {
                 showToast(data.message || '✅ Update deleted successfully!', 'success');
+                debugLog(`✅ Deleted ID: ${id}`);
                 loadUpdates();
             } else {
                 showToast('❌ ' + (data.message || 'Failed to delete'), 'error');
+                debugLog(`❌ Delete failed: ${data.message}`);
             }
         })
         .catch(err => {
-            console.error('❌ Network error:', err);
+            debugLog(`❌ Network error: ${err.message}`);
             showToast('❌ Error: ' + err.message, 'error');
         })
         .finally(() => {
@@ -385,7 +417,7 @@
             return;
         }
 
-        console.log('📤 Adding new update:', title);
+        debugLog(`📤 Adding new update: "${title}"`);
 
         const formData = new FormData();
         formData.append('title', title);
@@ -397,7 +429,7 @@
         const fileInput = document.getElementById('file');
         if (fileInput.files && fileInput.files.length > 0) {
             formData.append('file', fileInput.files[0]);
-            console.log('📎 File attached:', fileInput.files[0].name);
+            debugLog(`📎 File attached: ${fileInput.files[0].name}`);
         }
 
         const submitBtn = document.getElementById('submitBtn');
@@ -410,7 +442,7 @@
         })
         .then(res => res.json())
         .then(data => {
-            console.log('📦 Add response:', data);
+            debugLog(`📦 Add response:`, data);
             if (data.success) {
                 showToast(data.message || '✅ Update added successfully!', 'success');
                 resetForm();
@@ -420,7 +452,7 @@
             }
         })
         .catch(err => {
-            console.error('❌ Add error:', err);
+            debugLog(`❌ Add error: ${err.message}`);
             showToast('❌ Error: ' + err.message, 'error');
         })
         .finally(() => {
@@ -438,7 +470,7 @@
             return;
         }
 
-        console.log('🗑️ Bulk delete:', selectedIds);
+        debugLog(`🗑️ Bulk delete: ${selectedIds.length} IDs`, selectedIds);
 
         if (!confirm(`Delete ${selectedIds.length} selected updates?`)) return;
 
@@ -449,7 +481,7 @@
         })
         .then(res => res.json())
         .then(data => {
-            console.log('📦 Bulk delete response:', data);
+            debugLog(`📦 Bulk delete response:`, data);
             if (data.success) {
                 showToast(data.message || `✅ ${selectedIds.length} updates deleted!`, 'success');
                 selectedIds = [];
@@ -460,7 +492,7 @@
             }
         })
         .catch(err => {
-            console.error('❌ Bulk delete error:', err);
+            debugLog(`❌ Bulk delete error: ${err.message}`);
             showToast('❌ Error: ' + err.message, 'error');
         });
     }
@@ -524,10 +556,10 @@
     // INIT
     // ============================================================
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('⚙️ Admin Panel Loaded');
-        console.log('📡 API_URL:', API_URL);
+        debugLog('🚀 Admin Panel Loaded');
+        debugLog(`📡 API_URL: ${API_URL}`);
         loadUpdates();
-        showToast('👋 Admin Panel Ready Vik 7', 'info');
+        showToast('👋 Admin Panel Ready', 'info');
     });
 
     setInterval(loadUpdates, 30000);
