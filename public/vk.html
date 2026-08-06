@@ -298,10 +298,11 @@
         document.querySelectorAll('.row-checkbox:checked').forEach(cb => {
             selectedIds.push(parseInt(cb.value));
         });
+        console.log('📌 Selected IDs:', selectedIds);
     }
 
     // ============================================================
-    // ✅ DELETE UPDATE - FIXED
+    // ✅ DELETE UPDATE - WITH DEBUG
     // ============================================================
     function deleteUpdate(id) {
         console.log('🗑️ Delete clicked for ID:', id);
@@ -311,7 +312,10 @@
             return;
         }
 
-        if (!confirm(`Delete update #${id}?`)) return;
+        if (!confirm(`Delete update #${id}?`)) {
+            console.log('❌ Delete cancelled');
+            return;
+        }
 
         const btn = event?.target;
         if (btn) {
@@ -324,7 +328,10 @@
 
         fetch(url, { method: 'DELETE' })
             .then(res => {
-                console.log('📡 Status:', res.status);
+                console.log('📡 Response status:', res.status);
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
                 return res.json();
             })
             .then(data => {
