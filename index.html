@@ -1571,7 +1571,6 @@ body {
   <!-- Video Background -->
   <video class="hero-video" autoplay muted loop playsinline>
     <source src="https://res.cloudinary.com/dwupxj7vf/video/upload/v1786025703/school/recent_updates/update-VID20250628173054-1786025669818-494595776.mp4" type="video/mp4">
-    <!-- Fallback image if video doesn't load -->
     <img src="https://res.cloudinary.com/dwupxj7vf/image/upload/v1786022359/school/recent_updates/update-IMG-20260805-WA0002-1786022358193-448668682.jpg" alt="School Background">
   </video>
 
@@ -1622,7 +1621,7 @@ body {
 </section>
 
 <!-- ============================================================
-     SLIDER / GALLERY
+     SLIDER / GALLERY - FIXED
 ============================================================ -->
 <section class="slider-section">
   <div class="section-label">
@@ -1791,9 +1790,8 @@ body {
       <a href="public/downloads.html">Downloads</a>
       <a href="public/contact.html">Contact</a>
       <a href="public/recent.html">Recent Update</a>
-       <a href="public/vk.html">Add Update</a>
-       <a href="public/slider.html"> Slider </a>
-    </div>
+      <a href="public/vk.html">Add Update</a>
+      <a href="public/slider.html">Slider</a>
     </div>
 
     <div class="footer-col">
@@ -1830,7 +1828,7 @@ body {
 </footer>
 
 <!-- ============================================================
-     SCRIPTS
+     SCRIPTS - FIXED SLIDER
 ============================================================ -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -1877,7 +1875,9 @@ document.addEventListener("DOMContentLoaded", () => {
   updateDateTime();
   setInterval(updateDateTime, 1000);
 
-  /* ---- SLIDER ---- */
+  /* ============================================================
+     SLIDER - FIXED
+  ============================================================ */
   const sliderEl = document.getElementById("slider");
   const dotsEl = document.getElementById("dots");
   const placeholder = document.getElementById("sliderPlaceholder");
@@ -1885,19 +1885,77 @@ document.addEventListener("DOMContentLoaded", () => {
     current = 0,
     timer;
 
+  // Function to get correct image URL
+  function getImageUrl(img) {
+    if (!img) return null;
+    
+    // If file_path exists (Cloudinary URL)
+    if (img.file_path) {
+      if (img.file_path.startsWith('http://') || img.file_path.startsWith('https://')) {
+        return img.file_path;
+      }
+      if (img.file_path.startsWith('/')) {
+        return 'https://gsssshilla.onrender.com' + img.file_path;
+      }
+      return 'https://gsssshilla.onrender.com/' + img.file_path;
+    }
+    
+    // If filename exists
+    if (img.filename) {
+      if (img.filename.startsWith('http://') || img.filename.startsWith('https://')) {
+        return img.filename;
+      }
+      if (img.filename.startsWith('/')) {
+        return 'https://gsssshilla.onrender.com' + img.filename;
+      }
+      return 'https://gsssshilla.onrender.com/uploads/' + img.filename;
+    }
+
+    return null;
+  }
+
+  // Fetch images from backend
   fetch("https://gsssshilla.onrender.com/images")
     .then(r => r.json())
     .then(data => {
-      if (!data || !data.length) return;
+      console.log("📸 Slider Images Data:", data);
+      
+      if (!data || !data.length) {
+        placeholder.innerHTML = `
+          <i class="fas fa-image" style="font-size:48px;color:rgba(255,255,255,0.2);"></i>
+          <span style="color:rgba(255,255,255,0.4);">No images to display</span>
+        `;
+        return;
+      }
+      
+      // Remove placeholder
       placeholder.remove();
 
+      // Create image elements
       data.forEach((img, i) => {
+        const imageUrl = getImageUrl(img);
+        console.log(`📸 Image ${i+1} URL:`, imageUrl);
+        
         const el = document.createElement("img");
-        el.src = img.filename;
-        el.alt = "School image " + (i + 1);
+        el.src = imageUrl || img.filename || img.file_path || '';
+        el.alt = img.title || img.alt_text || "School image " + (i + 1);
+        
+        // Error handling
+        el.onerror = function() {
+          console.error(`❌ Failed to load image: ${this.src}`);
+          this.parentElement.innerHTML = `
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1a2332;color:#64748b;gap:8px;">
+              <i class="fas fa-image" style="font-size:32px;opacity:0.3;"></i>
+              <span style="font-size:12px;">Image not found</span>
+            </div>
+          `;
+        };
+        
+        // First image active
         if (i === 0) el.classList.add("active");
         sliderEl.appendChild(el);
 
+        // Create dot
         const dot = document.createElement("span");
         if (i === 0) dot.classList.add("active");
         dot.addEventListener("click", () => go(i));
@@ -1905,11 +1963,18 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       slides = sliderEl.querySelectorAll("img");
-      startAuto();
+      if (slides.length > 0) startAuto();
     })
-    .catch(() => {});
+    .catch((err) => {
+      console.error("❌ Slider fetch error:", err);
+      placeholder.innerHTML = `
+        <i class="fas fa-exclamation-triangle" style="font-size:48px;color:rgba(255,255,255,0.2);"></i>
+        <span style="color:rgba(255,255,255,0.4);">Failed to load images</span>
+      `;
+    });
 
   function go(n) {
+    if (!slides || slides.length === 0) return;
     slides.forEach(s => s.classList.remove("active"));
     dotsEl.querySelectorAll("span").forEach(d => d.classList.remove("active"));
     current = (n + slides.length) % slides.length;
@@ -1930,7 +1995,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function startAuto() {
-    timer = setInterval(() => go(current + 1), 4500);
+    if (slides && slides.length > 0) {
+      timer = setInterval(() => go(current + 1), 4500);
+    }
   }
 
   /* ---- VISITOR COUNT ---- */
