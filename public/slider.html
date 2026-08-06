@@ -912,7 +912,7 @@ body {
 </div>
 
 <!-- ============================================================
-   JAVASCRIPT - CLOUDINARY SUPPORT
+   JAVASCRIPT
 ============================================================ -->
 <script>
 // ============================================================
@@ -943,7 +943,7 @@ let currentImages = [];
 let editingImageId = null;
 
 // ============================================================
-// TOAST NOTIFICATION
+// TOAST
 // ============================================================
 function showToast(message, type = 'success') {
   toast.className = 'toast ' + type;
@@ -957,48 +957,31 @@ function showToast(message, type = 'success') {
 }
 
 // ============================================================
-// GET IMAGE URL - CLOUDINARY SUPPORT
+// GET IMAGE URL
 // ============================================================
 function getImageUrl(img) {
   if (!img) return null;
   
-  // ============================================================
-  // CLOUDINARY URL - file_path contains full Cloudinary URL
-  // ============================================================
+  // Cloudinary URL from file_path
   if (img.file_path) {
-    // If it's already a Cloudinary URL (starts with http)
     if (img.file_path.startsWith('http://') || img.file_path.startsWith('https://')) {
-      // Check if it's a Cloudinary URL or not
-      if (img.file_path.includes('cloudinary.com') || img.file_path.includes('res.cloudinary.com')) {
-        console.log('☁️ Cloudinary URL detected:', img.file_path);
-        return img.file_path;
-      }
+      console.log('☁️ Image URL:', img.file_path);
       return img.file_path;
     }
-    // If it's a relative path, prepend API base
     if (img.file_path.startsWith('/')) {
       return API_BASE + img.file_path;
     }
     return API_BASE + '/' + img.file_path;
   }
   
-  // ============================================================
-  // CLOUDINARY - Check public_id
-  // ============================================================
+  // Check public_id
   if (img.public_id) {
-    // If public_id is a full URL
     if (img.public_id.startsWith('http://') || img.public_id.startsWith('https://')) {
       return img.public_id;
     }
-    // Cloudinary URLs are stored in file_path
-    if (img.file_path && (img.file_path.includes('cloudinary.com') || img.file_path.includes('res.cloudinary.com'))) {
-      return img.file_path;
-    }
   }
   
-  // ============================================================
-  // FALLBACK - Try filename
-  // ============================================================
+  // Fallback - filename
   if (img.filename) {
     if (img.filename.startsWith('http://') || img.filename.startsWith('https://')) {
       return img.filename;
@@ -1048,7 +1031,7 @@ async function fetchImages() {
     } else {
       showEmptyState();
       updateStats([]);
-      showToast('📭 No images found in Cloudinary', 'warning');
+      showToast('📭 No images found', 'warning');
     }
   } catch (error) {
     console.error('❌ Error fetching images:', error);
@@ -1089,7 +1072,7 @@ function renderImages(images) {
                 <i class='fas fa-image'></i>
                 <span>Image not found</span>
                 <small style='font-size:11px;color:#6b7280;'>${fileName}</small>
-                <small style='font-size:10px;color:#94a3b8;'>${isCloudinary ? '☁️ Cloudinary' : '📁 Local'}</small>
+                <small style='font-size:10px;color:#94a3b8;'>${imageUrl}</small>
               </div>\`;"
           >
         ` : `
@@ -1274,7 +1257,7 @@ async function deleteImage(filename, id) {
 }
 
 // ============================================================
-// BULK DELETE FROM CLOUDINARY
+// BULK DELETE
 // ============================================================
 function confirmBulkDelete() {
   if (currentImages.length === 0) {
@@ -1282,7 +1265,7 @@ function confirmBulkDelete() {
     return;
   }
 
-  if (!confirm(`⚠️ Are you sure you want to delete all ${currentImages.length} images from Cloudinary?`)) return;
+  if (!confirm(`⚠️ Are you sure you want to delete all ${currentImages.length} images?`)) return;
 
   let deleted = 0;
   const total = currentImages.length;
@@ -1300,7 +1283,7 @@ function confirmBulkDelete() {
       if (response.ok) deleted++;
 
       if (index === total - 1) {
-        showToast(`✅ ${deleted} images deleted from Cloudinary!`, 'success');
+        showToast(`✅ ${deleted} images deleted!`, 'success');
         setTimeout(fetchImages, 500);
       }
     } catch (error) {
@@ -1415,7 +1398,7 @@ function saveImageEdit() {
 // REFRESH
 // ============================================================
 function refreshImages() {
-  showToast('🔄 Refreshing from Cloudinary...', 'success');
+  showToast('🔄 Refreshing...', 'success');
   fetchImages();
 }
 
