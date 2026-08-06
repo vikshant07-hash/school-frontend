@@ -22,6 +22,7 @@
         .btn { padding: 8px 22px; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
         .btn-primary { background: #1a3a6b; color: #fff; }
         .btn-primary:hover { background: #0f2a4b; transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .btn-danger { background: #ef4444; color: #fff; }
         .btn-danger:hover { background: #dc2626; }
         .btn-sm { padding: 4px 14px; font-size: 0.72rem; border-radius: 4px; }
@@ -39,6 +40,7 @@
         .badge-category { background: #e0e7ff; color: #1a3a6b; font-size: 0.65rem; font-weight: 500; padding: 2px 12px; border-radius: 30px; }
         .btn-delete { background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; padding: 4px 14px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; cursor: pointer; font-family: inherit; }
         .btn-delete:hover { background: #fecaca; transform: scale(1.04); }
+        .btn-delete:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .btn-view { background: #e0e7ff; color: #1a3a6b; border: 1px solid #bfdbfe; padding: 4px 14px; border-radius: 4px; font-size: 0.7rem; font-weight: 500; cursor: pointer; font-family: inherit; }
         .btn-view:hover { background: #bfdbfe; transform: scale(1.04); }
         .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
@@ -113,7 +115,7 @@
                 </div>
                 <div class="form-actions" style="margin-top: 12px;">
                     <button type="submit" class="btn btn-primary" id="submitBtn">➕ Add Update</button>
-                    <button type="reset" class="btn btn-danger" onclick="resetForm()">✖ Clear</button>
+                    <button type="reset" class="btn btn-danger" id="clearBtn">✖ Clear</button>
                 </div>
             </form>
         </section>
@@ -121,14 +123,14 @@
         <section class="table-section">
             <div class="table-header">
                 <h3>📋 All Updates <span class="count-badge" id="updateCount">0</span></h3>
-                <button class="btn btn-danger btn-sm" onclick="bulkDelete()">🗑️ Delete Selected</button>
+                <button class="btn btn-danger btn-sm" id="bulkDeleteBtn">🗑️ Delete Selected</button>
             </div>
 
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
-                            <th style="width:30px;"><input type="checkbox" id="selectAll" onchange="selectAllRows()" /></th>
+                            <th style="width:30px;"><input type="checkbox" id="selectAll" /></th>
                             <th>#</th>
                             <th>Date</th>
                             <th>Title</th>
@@ -153,7 +155,7 @@
 
 <div id="fileModal" class="modal">
     <div class="modal-content">
-        <button class="close" onclick="closeModal()">&times;</button>
+        <button class="close" id="modalCloseBtn">&times;</button>
         <div id="modalBody"></div>
     </div>
 </div>
@@ -164,6 +166,7 @@
     // ============================================================
     const API_URL = 'https://gsssshilla.onrender.com';
     let selectedIds = [];
+    let currentUpdates = []; // keep the last loaded data so we can look rows up by id (avoids inline-onclick string bugs)
 
     // ============================================================
     // TOAST
@@ -173,12 +176,21 @@
         const icons = { success: '✅', error: '❌', info: 'ℹ️' };
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
-        toast.innerHTML = `
-            <span>${icons[type] || 'ℹ️'}</span>
-            <span>${message}</span>
-            <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
-        `;
+
+        const iconSpan = document.createElement('span');
+        iconSpan.textContent = icons[type] || 'ℹ️';
+        const msgSpan = document.createElement('span');
+        msgSpan.textContent = message; // textContent, not innerHTML -> safe even if message has special chars
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'toast-close';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.onclick = () => toast.remove();
+
+        toast.appendChild(iconSpan);
+        toast.appendChild(msgSpan);
+        toast.appendChild(closeBtn);
         container.appendChild(toast);
+
         setTimeout(() => {
             if (toast.parentElement) {
                 toast.style.opacity = '0';
@@ -196,65 +208,124 @@
         const tbody = document.getElementById('updatesTableBody');
 
         fetch(`${API_URL}/recent/admin/all`)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
             .then(data => {
                 if (data.success) {
-                    renderTable(data.data);
-                    document.getElementById('updateCount').textContent = data.data?.length || 0;
+                    currentUpdates = data.data || [];
+                    renderTable(currentUpdates);
+                    document.getElementById('updateCount').textContent = currentUpdates.length;
                 } else {
                     showToast('Failed to load updates', 'error');
-                    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:#ef4444;">❌ ${data.message || 'Error loading data'}</td></tr>`;
+                    tbody.innerHTML = '';
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td colspan="8" style="text-align:center;padding:30px;color:#ef4444;"></td>`;
+                    tr.firstChild.textContent = '❌ ' + (data.message || 'Error loading data');
+                    tbody.appendChild(tr);
                 }
             })
             .catch(err => {
                 console.error('Load error:', err);
                 showToast('Error: ' + err.message, 'error');
-                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:#ef4444;">❌ Network Error</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:#ef4444;">❌ Network Error — check API connection</td></tr>`;
             });
     }
 
     // ============================================================
-    // RENDER TABLE
+    // RENDER TABLE  (uses DOM APIs + data-id, not inline onclick strings,
+    // so titles/links containing quotes or special characters never break the page)
     // ============================================================
     function renderTable(updates) {
         const tbody = document.getElementById('updatesTableBody');
+        tbody.innerHTML = '';
 
         if (!updates || updates.length === 0) {
             tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:#94a3b8;">📭 No updates found</td></tr>`;
             return;
         }
 
-        let html = '';
         updates.forEach((item, index) => {
             const date = formatDate(item.created_at);
-            const isNew = item.is_new ? 'badge-new' : 'badge-old';
+            const isNewClass = item.is_new ? 'badge-new' : 'badge-old';
             const isNewText = item.is_new ? '🆕 New' : '📌 Old';
             const fileIcon = getFileIcon(item.file_type);
-            const fileType = item.file_type || 'No File';
 
-            html += `
-                <tr>
-                    <td><input type="checkbox" class="row-checkbox" value="${item.id}" onchange="updateSelected()" /></td>
-                    <td>${index + 1}</td>
-                    <td style="font-size:0.75rem;white-space:nowrap;">${date}</td>
-                    <td><strong>${escapeHtml(item.title)}</strong></td>
-                    <td><span class="badge-category">${item.category || 'general'}</span></td>
-                    <td>
-                        ${item.file_url ? `
-                            <button class="btn-view" onclick="viewFile('${item.id}','${item.file_url}','${item.file_type}','${escapeHtml(item.title)}')">
-                                ${fileIcon} ${fileType}
-                            </button>
-                        ` : '—'}
-                    </td>
-                    <td><span class="${isNew}">${isNewText}</span></td>
-                    <td style="text-align:center;">
-                        <button class="btn-delete" onclick="deleteUpdate(${item.id})">🗑️ Delete</button>
-                    </td>
-                </tr>
-            `;
+            const tr = document.createElement('tr');
+
+            // checkbox
+            const tdCheck = document.createElement('td');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'row-checkbox';
+            checkbox.value = item.id;
+            checkbox.addEventListener('change', updateSelected);
+            tdCheck.appendChild(checkbox);
+
+            // index
+            const tdIndex = document.createElement('td');
+            tdIndex.textContent = index + 1;
+
+            // date
+            const tdDate = document.createElement('td');
+            tdDate.style.cssText = 'font-size:0.75rem;white-space:nowrap;';
+            tdDate.textContent = date;
+
+            // title
+            const tdTitle = document.createElement('td');
+            const strong = document.createElement('strong');
+            strong.textContent = item.title || '';
+            tdTitle.appendChild(strong);
+
+            // category
+            const tdCategory = document.createElement('td');
+            const catSpan = document.createElement('span');
+            catSpan.className = 'badge-category';
+            catSpan.textContent = item.category || 'general';
+            tdCategory.appendChild(catSpan);
+
+            // file
+            const tdFile = document.createElement('td');
+            if (item.file_url) {
+                const viewBtn = document.createElement('button');
+                viewBtn.className = 'btn-view';
+                viewBtn.textContent = `${fileIcon} ${item.file_type || 'File'}`;
+                viewBtn.dataset.id = item.id;
+                viewBtn.addEventListener('click', () => viewFile(item.id));
+                tdFile.appendChild(viewBtn);
+            } else {
+                tdFile.textContent = '—';
+            }
+
+            // status
+            const tdStatus = document.createElement('td');
+            const statusSpan = document.createElement('span');
+            statusSpan.className = isNewClass;
+            statusSpan.textContent = isNewText;
+            tdStatus.appendChild(statusSpan);
+
+            // action
+            const tdAction = document.createElement('td');
+            tdAction.style.textAlign = 'center';
+            const delBtn = document.createElement('button');
+            delBtn.className = 'btn-delete';
+            delBtn.textContent = '🗑️ Delete';
+            delBtn.dataset.id = item.id;
+            delBtn.addEventListener('click', () => deleteUpdate(item.id, delBtn));
+            tdAction.appendChild(delBtn);
+
+            tr.appendChild(tdCheck);
+            tr.appendChild(tdIndex);
+            tr.appendChild(tdDate);
+            tr.appendChild(tdTitle);
+            tr.appendChild(tdCategory);
+            tr.appendChild(tdFile);
+            tr.appendChild(tdStatus);
+            tr.appendChild(tdAction);
+
+            tbody.appendChild(tr);
         });
-
-        tbody.innerHTML = html;
     }
 
     // ============================================================
@@ -280,13 +351,6 @@
         return '📎';
     }
 
-    function escapeHtml(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
     function selectAllRows() {
         const checked = document.getElementById('selectAll').checked;
         document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = checked);
@@ -302,11 +366,11 @@
     }
 
     // ============================================================
-    // ✅ DELETE UPDATE - WITH DEBUG
+    // ✅ DELETE UPDATE
     // ============================================================
-    function deleteUpdate(id) {
+    function deleteUpdate(id, btn) {
         console.log('🗑️ Delete clicked for ID:', id);
-        
+
         if (!id) {
             showToast('Error: Invalid ID', 'error');
             return;
@@ -317,7 +381,6 @@
             return;
         }
 
-        const btn = event?.target;
         if (btn) {
             btn.textContent = '⏳';
             btn.disabled = true;
@@ -387,7 +450,10 @@
             method: 'POST',
             body: formData
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+        })
         .then(data => {
             if (data.success) {
                 showToast(data.message || '✅ Added successfully!', 'success');
@@ -423,7 +489,10 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ids: selectedIds })
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+        })
         .then(data => {
             if (data.success) {
                 showToast(data.message || `✅ ${selectedIds.length} deleted!`, 'success');
@@ -451,39 +520,100 @@
     }
 
     // ============================================================
-    // VIEW FILE
+    // VIEW FILE  (looks item up from currentUpdates by id — no interpolated
+    // strings in HTML attributes, so quotes/apostrophes in titles or URLs
+    // can never break the page)
     // ============================================================
-    function viewFile(id, url, type, title) {
+    function viewFile(id) {
+        const item = currentUpdates.find(u => String(u.id) === String(id));
+        if (!item) {
+            showToast('Update not found', 'error');
+            return;
+        }
+
         const modal = document.getElementById('fileModal');
         const body = document.getElementById('modalBody');
+        body.innerHTML = '';
 
-        if (!url) {
-            body.innerHTML = `<div style="text-align:center;padding:20px;"><h3>${title}</h3><p style="color:#94a3b8;">No attachment</p></div>`;
+        const heading = document.createElement('h3');
+        heading.textContent = item.title || '';
+        body.appendChild(heading);
+
+        if (!item.file_url) {
+            const p = document.createElement('p');
+            p.style.color = '#94a3b8';
+            p.textContent = 'No attachment';
+            body.appendChild(p);
             modal.style.display = 'block';
             return;
         }
 
-        let preview = '';
-        if (type?.startsWith('image/')) {
-            preview = `<img src="${url}" style="max-width:100%;max-height:55vh;border-radius:6px;" />`;
-        } else if (type?.startsWith('video/')) {
-            preview = `<video controls style="max-width:100%;max-height:55vh;"><source src="${url}" type="${type}"></video>`;
-        } else if (type?.startsWith('audio/')) {
-            preview = `<audio controls style="width:100%;"><source src="${url}" type="${type}"></audio>`;
+        const previewWrap = document.createElement('div');
+        previewWrap.className = 'file-preview';
+        const type = item.file_type || '';
+        const url = item.file_url;
+
+        if (type.startsWith('image/')) {
+            const img = document.createElement('img');
+            img.src = url;
+            img.style.cssText = 'max-width:100%;max-height:55vh;border-radius:6px;';
+            previewWrap.appendChild(img);
+        } else if (type.startsWith('video/')) {
+            const video = document.createElement('video');
+            video.controls = true;
+            video.style.cssText = 'max-width:100%;max-height:55vh;';
+            const source = document.createElement('source');
+            source.src = url;
+            source.type = type;
+            video.appendChild(source);
+            previewWrap.appendChild(video);
+        } else if (type.startsWith('audio/')) {
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.style.width = '100%';
+            const source = document.createElement('source');
+            source.src = url;
+            source.type = type;
+            audio.appendChild(source);
+            previewWrap.appendChild(audio);
         } else if (type === 'application/pdf') {
-            preview = `<iframe src="${url}" style="width:100%;height:420px;border:none;"></iframe>`;
+            const iframe = document.createElement('iframe');
+            iframe.src = url;
+            iframe.style.cssText = 'width:100%;height:420px;border:none;';
+            previewWrap.appendChild(iframe);
         } else {
-            preview = `<div style="text-align:center;padding:16px;"><a href="${url}" download style="padding:6px 20px;background:#1a3a6b;color:#fff;border-radius:6px;text-decoration:none;">Download</a></div>`;
+            const wrap = document.createElement('div');
+            wrap.style.cssText = 'text-align:center;padding:16px;';
+            const a = document.createElement('a');
+            a.href = url;
+            a.setAttribute('download', '');
+            a.style.cssText = 'padding:6px 20px;background:#1a3a6b;color:#fff;border-radius:6px;text-decoration:none;';
+            a.textContent = 'Download';
+            wrap.appendChild(a);
+            previewWrap.appendChild(wrap);
         }
 
-        body.innerHTML = `
-            <h3>${title}</h3>
-            <div class="file-preview">${preview}</div>
-            <div style="margin-top:16px;padding-top:16px;border-top:1px solid #e2e8f0;display:flex;gap:16px;">
-                <a href="${url}" target="_blank" style="color:#1a3a6b;">🔗 Open</a>
-                <a href="${url}" download style="color:#1a3a6b;">📥 Download</a>
-            </div>
-        `;
+        body.appendChild(previewWrap);
+
+        const linksBar = document.createElement('div');
+        linksBar.style.cssText = 'margin-top:16px;padding-top:16px;border-top:1px solid #e2e8f0;display:flex;gap:16px;';
+
+        const openLink = document.createElement('a');
+        openLink.href = url;
+        openLink.target = '_blank';
+        openLink.rel = 'noopener noreferrer';
+        openLink.style.color = '#1a3a6b';
+        openLink.textContent = '🔗 Open';
+
+        const downloadLink = document.createElement('a');
+        downloadLink.href = url;
+        downloadLink.setAttribute('download', '');
+        downloadLink.style.color = '#1a3a6b';
+        downloadLink.textContent = '📥 Download';
+
+        linksBar.appendChild(openLink);
+        linksBar.appendChild(downloadLink);
+        body.appendChild(linksBar);
 
         modal.style.display = 'block';
     }
@@ -496,13 +626,21 @@
     window.addEventListener('click', (e) => { if (e.target === document.getElementById('fileModal')) closeModal(); });
 
     // ============================================================
+    // WIRE UP STATIC BUTTONS
+    // ============================================================
+    document.getElementById('selectAll').addEventListener('change', selectAllRows);
+    document.getElementById('bulkDeleteBtn').addEventListener('click', bulkDelete);
+    document.getElementById('clearBtn').addEventListener('click', resetForm);
+    document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+
+    // ============================================================
     // INIT
     // ============================================================
     document.addEventListener('DOMContentLoaded', () => {
         console.log('🏛️ Admin Panel Loaded');
         console.log('📡 API:', API_URL);
         loadUpdates();
-        showToast('👋 Admin Panel Ready', 'info');
+        showToast('👋 Admin Panel Ready claude', 'info');
     });
 
     setInterval(loadUpdates, 30000);
