@@ -154,10 +154,8 @@
                 </table>
             </div>
 
-            <!-- ===== DEBUG BOX ===== -->
             <div class="debug-box" id="debugBox">
-                🐞 Debug Console Ready...<br>
-                Click Delete button to see logs here.
+                🐞 Debug Console Ready...
             </div>
         </section>
 
@@ -200,9 +198,6 @@
         console.log(message, data);
     }
 
-    // ============================================================
-    // TOAST
-    // ============================================================
     function showToast(message, type = 'success') {
         const container = document.getElementById('toastContainer');
         const icons = { success: '✅', error: '❌', info: 'ℹ️' };
@@ -232,10 +227,7 @@
         debugLog('🔄 Loading updates...');
 
         fetch(`${API_URL}/recent-admin-all`)
-            .then(res => {
-                debugLog(`📡 Response status: ${res.status}`);
-                return res.json();
-            })
+            .then(res => res.json())
             .then(data => {
                 debugLog('📦 Data received', data);
                 if (data.success) {
@@ -244,7 +236,6 @@
                     debugLog(`✅ Loaded ${data.data?.length || 0} updates`);
                 } else {
                     showToast('Failed to load updates', 'error');
-                    debugLog('❌ Failed to load: ' + data.message);
                 }
             })
             .catch(err => {
@@ -254,7 +245,7 @@
     }
 
     // ============================================================
-    // RENDER TABLE
+    // RENDER TABLE - WITH CORRECT ID
     // ============================================================
     function renderTable(updates) {
         const tbody = document.getElementById('updatesTableBody');
@@ -272,6 +263,7 @@
             const fileIcon = getFileIcon(item.file_type);
             const fileType = item.file_type || 'No File';
 
+            // ✅ IMPORTANT: actual ID pass ho rahi hai
             html += `
                 <tr>
                     <td><input type="checkbox" class="row-checkbox" value="${item.id}" onchange="updateSelected()" /></td>
@@ -297,9 +289,6 @@
         tbody.innerHTML = html;
     }
 
-    // ============================================================
-    // FORMAT DATE — India Region
-    // ============================================================
     function formatDateIndia(ts) {
         if (!ts) return 'N/A';
         const d = new Date(ts);
@@ -311,9 +300,6 @@
         return `${day}/${month}/${year} ${hours}:${minutes}`;
     }
 
-    // ============================================================
-    // FILE ICON
-    // ============================================================
     function getFileIcon(mime) {
         if (!mime) return '📄';
         if (mime.startsWith('image/')) return '🖼️';
@@ -323,9 +309,6 @@
         return '📎';
     }
 
-    // ============================================================
-    // ESCAPE HTML
-    // ============================================================
     function escapeHtml(text) {
         if (!text) return '';
         const div = document.createElement('div');
@@ -333,9 +316,6 @@
         return div.innerHTML;
     }
 
-    // ============================================================
-    // SELECT ALL
-    // ============================================================
     function selectAllRows() {
         const checked = document.getElementById('selectAll').checked;
         document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = checked);
@@ -375,34 +355,27 @@
         const url = `${API_URL}/recent-admin-delete/${id}`;
         debugLog(`📤 Sending DELETE request to: ${url}`);
 
-        fetch(url, { 
-            method: 'DELETE' 
-        })
-        .then(res => {
-            debugLog(`📡 Response status: ${res.status}`);
-            return res.json();
-        })
-        .then(data => {
-            debugLog(`📦 Response data:`, data);
-            if (data.success) {
-                showToast(data.message || '✅ Update deleted successfully!', 'success');
-                debugLog(`✅ Deleted ID: ${id}`);
-                loadUpdates();
-            } else {
-                showToast('❌ ' + (data.message || 'Failed to delete'), 'error');
-                debugLog(`❌ Delete failed: ${data.message}`);
-            }
-        })
-        .catch(err => {
-            debugLog(`❌ Network error: ${err.message}`);
-            showToast('❌ Error: ' + err.message, 'error');
-        })
-        .finally(() => {
-            if (btn) {
-                btn.textContent = '🗑️ Delete';
-                btn.disabled = false;
-            }
-        });
+        fetch(url, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(data => {
+                debugLog(`📦 Response:`, data);
+                if (data.success) {
+                    showToast(data.message || '✅ Update deleted successfully!', 'success');
+                    loadUpdates();
+                } else {
+                    showToast('❌ ' + (data.message || 'Failed to delete'), 'error');
+                }
+            })
+            .catch(err => {
+                debugLog(`❌ Error: ${err.message}`);
+                showToast('❌ Error: ' + err.message, 'error');
+            })
+            .finally(() => {
+                if (btn) {
+                    btn.textContent = '🗑️ Delete';
+                    btn.disabled = false;
+                }
+            });
     }
 
     // ============================================================
@@ -429,7 +402,6 @@
         const fileInput = document.getElementById('file');
         if (fileInput.files && fileInput.files.length > 0) {
             formData.append('file', fileInput.files[0]);
-            debugLog(`📎 File attached: ${fileInput.files[0].name}`);
         }
 
         const submitBtn = document.getElementById('submitBtn');
@@ -461,9 +433,6 @@
         });
     });
 
-    // ============================================================
-    // BULK DELETE
-    // ============================================================
     function bulkDelete() {
         if (selectedIds.length === 0) {
             showToast('Please select at least one update', 'info');
@@ -481,7 +450,7 @@
         })
         .then(res => res.json())
         .then(data => {
-            debugLog(`📦 Bulk delete response:`, data);
+            debugLog(`📦 Bulk response:`, data);
             if (data.success) {
                 showToast(data.message || `✅ ${selectedIds.length} updates deleted!`, 'success');
                 selectedIds = [];
@@ -492,14 +461,11 @@
             }
         })
         .catch(err => {
-            debugLog(`❌ Bulk delete error: ${err.message}`);
+            debugLog(`❌ Bulk error: ${err.message}`);
             showToast('❌ Error: ' + err.message, 'error');
         });
     }
 
-    // ============================================================
-    // RESET FORM
-    // ============================================================
     function resetForm() {
         document.getElementById('updateForm').reset();
         document.getElementById('category').value = 'general';
@@ -507,9 +473,6 @@
         document.getElementById('title').focus();
     }
 
-    // ============================================================
-    // VIEW FILE
-    // ============================================================
     function viewFile(id, url, type, title) {
         const modal = document.getElementById('fileModal');
         const body = document.getElementById('modalBody');
