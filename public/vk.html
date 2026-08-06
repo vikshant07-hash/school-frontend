@@ -71,7 +71,6 @@
 
     <div class="main-box">
 
-        <!-- ===== FORM ===== -->
         <section class="form-section">
             <h2>➕ Add New Update</h2>
             <form id="updateForm" enctype="multipart/form-data">
@@ -122,7 +121,6 @@
             </form>
         </section>
 
-        <!-- ===== TABLE ===== -->
         <section class="table-section">
             <div class="table-header">
                 <h3>📋 All Updates <span class="count" id="updateCount">0</span></h3>
@@ -162,10 +160,8 @@
     </div>
 </div>
 
-<!-- ===== TOAST ===== -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- ===== MODAL ===== -->
 <div id="fileModal" class="modal">
     <div class="modal-content">
         <button class="close" onclick="closeModal()">&times;</button>
@@ -245,7 +241,7 @@
     }
 
     // ============================================================
-    // RENDER TABLE - WITH CORRECT ID
+    // RENDER TABLE
     // ============================================================
     function renderTable(updates) {
         const tbody = document.getElementById('updatesTableBody');
@@ -263,7 +259,6 @@
             const fileIcon = getFileIcon(item.file_type);
             const fileType = item.file_type || 'No File';
 
-            // ✅ IMPORTANT: actual ID pass ho rahi hai
             html += `
                 <tr>
                     <td><input type="checkbox" class="row-checkbox" value="${item.id}" onchange="updateSelected()" /></td>
@@ -356,7 +351,13 @@
         debugLog(`📤 Sending DELETE request to: ${url}`);
 
         fetch(url, { method: 'DELETE' })
-            .then(res => res.json())
+            .then(response => {
+                debugLog(`📡 Response status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 debugLog(`📦 Response:`, data);
                 if (data.success) {
@@ -522,7 +523,7 @@
         debugLog('🚀 Admin Panel Loaded');
         debugLog(`📡 API_URL: ${API_URL}`);
         loadUpdates();
-        showToast('👋 Admin Panel Ready', 'info');
+        showToast('👋 Admin Panel Ready vik', 'info');
     });
 
     setInterval(loadUpdates, 30000);
