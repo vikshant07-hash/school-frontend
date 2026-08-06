@@ -93,6 +93,17 @@ body {
   margin-top: 2px;
 }
 
+.header-left .cloudinary-badge {
+  display: inline-block;
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--blue-light);
+  font-size: 10px;
+  padding: 2px 10px;
+  border-radius: 50px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
 .header-actions {
   display: flex;
   gap: 10px;
@@ -160,6 +171,16 @@ body {
   padding: 6px 14px;
   font-size: 12px;
   border-radius: 8px;
+}
+
+.btn-success {
+  background: #22c55e;
+  color: var(--white);
+}
+
+.btn-success:hover {
+  background: #16a34a;
+  transform: translateY(-2px);
 }
 
 /* STATS ROW */
@@ -453,6 +474,26 @@ body {
   color: var(--white);
 }
 
+.image-card .cloudinary-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  color: var(--white);
+  font-size: 9px;
+  padding: 3px 10px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.image-card .cloudinary-badge i {
+  font-size: 10px;
+  color: #60a5fa;
+}
+
 .image-card .card-body {
   padding: 16px 18px;
 }
@@ -741,14 +782,15 @@ body {
   <!-- HEADER -->
   <header class="header">
     <div class="header-left">
-      <div class="icon"><i class="fas fa-images"></i></div>
+      <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
       <div>
         <h1>Slider Manager</h1>
         <p>Manage your school website slider images</p>
+        <span class="cloudinary-badge">☁️ Cloudinary Storage</span>
       </div>
     </div>
     <div class="header-actions">
-      <a href="/" target="_blank" class="btn btn-outline">
+      <a href="https://gsssshilla07.pages.dev" target="_blank" class="btn btn-outline">
         <i class="fas fa-eye"></i> View Website
       </a>
       <button class="btn btn-primary" onclick="refreshImages()">
@@ -793,7 +835,7 @@ body {
   <div class="upload-area" id="uploadArea">
     <div class="icon-big"><i class="fas fa-cloud-upload-alt"></i></div>
     <h3>Drag & Drop Images Here</h3>
-    <p>Supported formats: JPEG, PNG, WebP, GIF &bull; Max 5MB each</p>
+    <p>Supported formats: JPEG, PNG, WebP, GIF &bull; Max 5MB each &bull; ☁️ Cloudinary</p>
     <button class="browse-btn" onclick="document.getElementById('fileInput').click()">
       <i class="fas fa-folder-open"></i> Browse Images
     </button>
@@ -803,7 +845,7 @@ body {
       <div class="progress-bar">
         <div class="fill" id="progressFill"></div>
       </div>
-      <div class="progress-text" id="progressText">Uploading...</div>
+      <div class="progress-text" id="progressText">Uploading to Cloudinary...</div>
     </div>
   </div>
 
@@ -870,13 +912,13 @@ body {
 </div>
 
 <!-- ============================================================
-   JAVASCRIPT - COMPLETE FIXED VERSION
+   JAVASCRIPT - CLOUDINARY SUPPORT
 ============================================================ -->
 <script>
 // ============================================================
 // CONFIGURATION
 // ============================================================
-const API_BASE = window.location.origin;
+const API_BASE = "https://gsssshilla.onrender.com";
 
 // ============================================================
 // DOM ELEMENTS
@@ -915,37 +957,67 @@ function showToast(message, type = 'success') {
 }
 
 // ============================================================
-// GET IMAGE URL - FIXED
+// GET IMAGE URL - CLOUDINARY SUPPORT
 // ============================================================
 function getImageUrl(img) {
   if (!img) return null;
   
-  // Get the base URL
-  const baseUrl = window.location.origin;
-  
-  // Try file_path first
+  // ============================================================
+  // CLOUDINARY URL - file_path contains full Cloudinary URL
+  // ============================================================
   if (img.file_path) {
+    // If it's already a Cloudinary URL (starts with http)
     if (img.file_path.startsWith('http://') || img.file_path.startsWith('https://')) {
+      // Check if it's a Cloudinary URL or not
+      if (img.file_path.includes('cloudinary.com') || img.file_path.includes('res.cloudinary.com')) {
+        console.log('☁️ Cloudinary URL detected:', img.file_path);
+        return img.file_path;
+      }
       return img.file_path;
     }
+    // If it's a relative path, prepend API base
     if (img.file_path.startsWith('/')) {
-      return baseUrl + img.file_path;
+      return API_BASE + img.file_path;
     }
-    return baseUrl + '/uploads/' + img.file_path;
+    return API_BASE + '/' + img.file_path;
   }
   
-  // Then try filename
+  // ============================================================
+  // CLOUDINARY - Check public_id
+  // ============================================================
+  if (img.public_id) {
+    // If public_id is a full URL
+    if (img.public_id.startsWith('http://') || img.public_id.startsWith('https://')) {
+      return img.public_id;
+    }
+    // Cloudinary URLs are stored in file_path
+    if (img.file_path && (img.file_path.includes('cloudinary.com') || img.file_path.includes('res.cloudinary.com'))) {
+      return img.file_path;
+    }
+  }
+  
+  // ============================================================
+  // FALLBACK - Try filename
+  // ============================================================
   if (img.filename) {
     if (img.filename.startsWith('http://') || img.filename.startsWith('https://')) {
       return img.filename;
     }
     if (img.filename.startsWith('/')) {
-      return baseUrl + img.filename;
+      return API_BASE + img.filename;
     }
-    return baseUrl + '/uploads/' + img.filename;
+    return API_BASE + '/uploads/' + img.filename;
   }
 
   return null;
+}
+
+// ============================================================
+// CHECK IF IMAGE IS FROM CLOUDINARY
+// ============================================================
+function isCloudinaryImage(url) {
+  if (!url) return false;
+  return url.includes('cloudinary.com') || url.includes('res.cloudinary.com');
 }
 
 // ============================================================
@@ -953,25 +1025,30 @@ function getImageUrl(img) {
 // ============================================================
 async function fetchImages() {
   try {
-    showToast('🔄 Loading images...', 'success');
+    showToast('🔄 Loading images from Cloudinary...', 'success');
+    
+    console.log('📡 Fetching from:', `${API_BASE}/images`);
     
     const response = await fetch(`${API_BASE}/images`);
+    
+    console.log('📡 Response status:', response.status);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
+    console.log('📡 Images loaded:', data.length);
 
     if (Array.isArray(data) && data.length > 0) {
       currentImages = data;
       renderImages(data);
       updateStats(data);
-      showToast(`✅ ${data.length} images loaded`, 'success');
+      showToast(`✅ ${data.length} images loaded from Cloudinary`, 'success');
     } else {
       showEmptyState();
       updateStats([]);
-      showToast('📭 No images found', 'warning');
+      showToast('📭 No images found in Cloudinary', 'warning');
     }
   } catch (error) {
     console.error('❌ Error fetching images:', error);
@@ -997,6 +1074,7 @@ function renderImages(images) {
     const fileName = img.title || img.filename?.split('/').pop() || 'Image ' + (index + 1);
     const createdDate = img.created_at_ist || (img.created_at ? new Date(img.created_at).toLocaleDateString('en-IN') : 'Just now');
     const isActive = img.is_active == 1;
+    const isCloudinary = isCloudinaryImage(imageUrl);
 
     return `
     <div class="image-card" data-id="${img.id}" data-index="${index}">
@@ -1011,7 +1089,7 @@ function renderImages(images) {
                 <i class='fas fa-image'></i>
                 <span>Image not found</span>
                 <small style='font-size:11px;color:#6b7280;'>${fileName}</small>
-                <small style='font-size:10px;color:#94a3b8;'>${imageUrl}</small>
+                <small style='font-size:10px;color:#94a3b8;'>${isCloudinary ? '☁️ Cloudinary' : '📁 Local'}</small>
               </div>\`;"
           >
         ` : `
@@ -1025,19 +1103,25 @@ function renderImages(images) {
         <span class="status-badge ${isActive ? 'active' : 'inactive'}">
           ${isActive ? 'Active' : 'Inactive'}
         </span>
+        ${isCloudinary ? `
+          <span class="cloudinary-badge">
+            <i class="fas fa-cloud"></i> Cloudinary
+          </span>
+        ` : ''}
       </div>
       <div class="card-body">
         <div class="filename">${fileName}</div>
         <div class="meta">
           <span><i class="far fa-calendar-alt"></i> ${createdDate}</span>
           <span><i class="far fa-eye"></i> ${img.views || 0}</span>
+          ${isCloudinary ? `<span><i class="fas fa-cloud"></i> Cloudinary</span>` : ''}
         </div>
       </div>
       <div class="card-footer">
         <button class="btn btn-sm btn-primary" onclick="openEditModal(${img.id})">
           <i class="fas fa-edit"></i> Edit
         </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteImage('${img.filename}', ${img.id})">
+        <button class="btn btn-sm btn-danger" onclick="deleteImage('${img.filename || img.public_id}', ${img.id})">
           <i class="fas fa-trash-alt"></i> Delete
         </button>
       </div>
@@ -1083,7 +1167,6 @@ function updateStats(images) {
     lastUploadEl.textContent = '—';
   }
 
-  // Fetch view count from analytics
   fetch(`${API_BASE}/analytics/stats`)
     .then(r => r.json())
     .then(data => {
@@ -1095,7 +1178,7 @@ function updateStats(images) {
 }
 
 // ============================================================
-// UPLOAD IMAGES
+// UPLOAD IMAGES TO CLOUDINARY
 // ============================================================
 async function uploadImages(files) {
   if (!files || files.length === 0) return;
@@ -1107,7 +1190,7 @@ async function uploadImages(files) {
 
   progressWrapper.style.display = 'block';
   progressFill.style.width = '0%';
-  progressText.textContent = 'Uploading... 0%';
+  progressText.textContent = 'Uploading to Cloudinary... 0%';
 
   try {
     let progress = 0;
@@ -1115,7 +1198,7 @@ async function uploadImages(files) {
       progress += Math.random() * 12;
       if (progress > 90) progress = 90;
       progressFill.style.width = Math.min(progress, 90) + '%';
-      progressText.textContent = `Uploading... ${Math.round(Math.min(progress, 90))}%`;
+      progressText.textContent = `Uploading to Cloudinary... ${Math.round(Math.min(progress, 90))}%`;
     }, 200);
 
     const response = await fetch(`${API_BASE}/upload`, {
@@ -1131,7 +1214,7 @@ async function uploadImages(files) {
     }
 
     progressFill.style.width = '100%';
-    progressText.textContent = '✅ Upload Complete!';
+    progressText.textContent = '✅ Uploaded to Cloudinary!';
 
     setTimeout(() => {
       progressWrapper.style.display = 'none';
@@ -1139,7 +1222,7 @@ async function uploadImages(files) {
     }, 1000);
 
     const result = await response.json();
-    showToast(`✅ ${result.uploaded?.length || files.length} images uploaded successfully!`, 'success');
+    showToast(`✅ ${result.uploaded?.length || files.length} images uploaded to Cloudinary!`, 'success');
 
     setTimeout(fetchImages, 500);
 
@@ -1152,10 +1235,10 @@ async function uploadImages(files) {
 }
 
 // ============================================================
-// DELETE IMAGE
+// DELETE IMAGE FROM CLOUDINARY
 // ============================================================
 async function deleteImage(filename, id) {
-  if (!confirm('Are you sure you want to delete this image?')) return;
+  if (!confirm('Are you sure you want to delete this image from Cloudinary?')) return;
 
   try {
     const card = document.querySelector(`.image-card[data-id="${id}"]`);
@@ -1176,12 +1259,12 @@ async function deleteImage(filename, id) {
       throw new Error('Delete failed');
     }
 
-    showToast('✅ Image deleted successfully!', 'success');
+    showToast('✅ Image deleted from Cloudinary!', 'success');
     setTimeout(fetchImages, 300);
 
   } catch (error) {
     console.error('Delete error:', error);
-    showToast('❌ Failed to delete image', 'error');
+    showToast('❌ Failed to delete image from Cloudinary', 'error');
     const card = document.querySelector(`.image-card[data-id="${id}"]`);
     if (card) {
       card.style.opacity = '1';
@@ -1191,7 +1274,7 @@ async function deleteImage(filename, id) {
 }
 
 // ============================================================
-// BULK DELETE
+// BULK DELETE FROM CLOUDINARY
 // ============================================================
 function confirmBulkDelete() {
   if (currentImages.length === 0) {
@@ -1199,7 +1282,7 @@ function confirmBulkDelete() {
     return;
   }
 
-  if (!confirm(`⚠️ Are you sure you want to delete all ${currentImages.length} images?`)) return;
+  if (!confirm(`⚠️ Are you sure you want to delete all ${currentImages.length} images from Cloudinary?`)) return;
 
   let deleted = 0;
   const total = currentImages.length;
@@ -1211,13 +1294,13 @@ function confirmBulkDelete() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ filename: img.filename }),
+        body: JSON.stringify({ filename: img.filename || img.public_id }),
       });
 
       if (response.ok) deleted++;
 
       if (index === total - 1) {
-        showToast(`✅ ${deleted} images deleted successfully!`, 'success');
+        showToast(`✅ ${deleted} images deleted from Cloudinary!`, 'success');
         setTimeout(fetchImages, 500);
       }
     } catch (error) {
@@ -1332,7 +1415,7 @@ function saveImageEdit() {
 // REFRESH
 // ============================================================
 function refreshImages() {
-  showToast('🔄 Refreshing...', 'success');
+  showToast('🔄 Refreshing from Cloudinary...', 'success');
   fetchImages();
 }
 
@@ -1382,6 +1465,9 @@ document.addEventListener('keydown', (e) => {
 // INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 Slider Manager Started (Cloudinary)');
+  console.log('📡 API Base:', API_BASE);
+  console.log('☁️ Cloudinary Storage Enabled');
   fetchImages();
 });
 
