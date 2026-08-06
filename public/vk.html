@@ -301,9 +301,16 @@
     }
 
     // ============================================================
-    // DELETE UPDATE
+    // ✅ DELETE UPDATE - FIXED
     // ============================================================
     function deleteUpdate(id) {
+        console.log('🗑️ Delete clicked for ID:', id);
+        
+        if (!id) {
+            showToast('Error: Invalid ID', 'error');
+            return;
+        }
+
         if (!confirm(`Delete update #${id}?`)) return;
 
         const btn = event?.target;
@@ -312,9 +319,16 @@
             btn.disabled = true;
         }
 
-        fetch(`${API_URL}/recent/admin/delete/${id}`, { method: 'DELETE' })
-            .then(res => res.json())
+        const url = `${API_URL}/recent/admin/delete/${id}`;
+        console.log('📤 DELETE URL:', url);
+
+        fetch(url, { method: 'DELETE' })
+            .then(res => {
+                console.log('📡 Status:', res.status);
+                return res.json();
+            })
             .then(data => {
+                console.log('📦 Response:', data);
                 if (data.success) {
                     showToast(data.message || '✅ Deleted successfully!', 'success');
                     loadUpdates();
@@ -323,7 +337,7 @@
                 }
             })
             .catch(err => {
-                console.error('Delete error:', err);
+                console.error('❌ Delete error:', err);
                 showToast('❌ Error: ' + err.message, 'error');
             })
             .finally(() => {
@@ -481,7 +495,7 @@
         console.log('🏛️ Admin Panel Loaded');
         console.log('📡 API:', API_URL);
         loadUpdates();
-        showToast('👋 vikshant Admin Panel Ready', 'info');
+        showToast('👋 Admin Panel Ready', 'info');
     });
 
     setInterval(loadUpdates, 30000);
