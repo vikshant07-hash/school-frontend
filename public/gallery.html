@@ -269,6 +269,7 @@ table .thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 8px;
 table .status-badge { display: inline-block; padding: 3px 12px; border-radius: 50px; font-size: 11px; font-weight: 600; }
 table .status-badge.active { background: #dcfce7; color: #16a34a; }
 table .status-badge.inactive { background: #fee2e2; color: #dc2626; }
+table .category-badge { display: inline-block; padding: 2px 10px; border-radius: 50px; font-size: 11px; font-weight: 600; background: #dbeafe; color: #2563eb; }
 
 .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
 
@@ -342,7 +343,7 @@ table .status-badge.inactive { background: #fee2e2; color: #dc2626; }
   <header class="header">
     <h1><i class="fas fa-images"></i> Gallery Manager</h1>
     <div class="header-actions">
-      <a href="/" target="_blank" class="btn btn-outline">
+      <a href="gallery.html" target="_blank" class="btn btn-outline">
         <i class="fas fa-eye"></i> View Gallery
       </a>
       <button class="btn btn-primary" onclick="refreshData()">
@@ -373,16 +374,61 @@ table .status-badge.inactive { background: #fee2e2; color: #dc2626; }
 
   <!-- TABS -->
   <div class="tabs">
-    <button class="tab-btn active" data-tab="albums"><i class="fas fa-folder-open"></i> Albums</button>
+    <button class="tab-btn active" data-tab="slider"><i class="fas fa-sliders-h"></i> Slider</button>
+    <button class="tab-btn" data-tab="albums"><i class="fas fa-folder-open"></i> Albums</button>
     <button class="tab-btn" data-tab="add-album"><i class="fas fa-plus-circle"></i> Add Album</button>
     <button class="tab-btn" data-tab="images"><i class="fas fa-images"></i> Album Images</button>
-    <button class="tab-btn" data-tab="slider"><i class="fas fa-sliders-h"></i> Slider</button>
   </div>
 
   <!-- ============================================================
-       TAB 1: ALBUMS
+       TAB 1: SLIDER
   ============================================================ -->
-  <div class="tab-content active" id="tab-albums">
+  <div class="tab-content active" id="tab-slider">
+    <div class="upload-area" id="sliderUploadArea">
+      <div class="icon-big"><i class="fas fa-cloud-upload-alt"></i></div>
+      <h3>Add Slider Image</h3>
+      <p>Upload images for gallery hero slider</p>
+      <button class="browse-btn" onclick="document.getElementById('sliderFileInput').click()">
+        <i class="fas fa-folder-open"></i> Browse
+      </button>
+      <input type="file" id="sliderFileInput" accept="image/*">
+      <div class="progress-wrapper" id="sliderProgressWrapper">
+        <div class="progress-bar"><div class="fill" id="sliderProgressFill"></div></div>
+        <div class="progress-text" id="sliderProgressText">Uploading...</div>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <div class="table-header">
+        <h2>Slider Images <span id="sliderCount2">0</span></h2>
+        <button class="btn btn-sm btn-warning" onclick="reorderSlider()">
+          <i class="fas fa-arrows-alt"></i> Reorder
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:60px;">#</th>
+            <th style="width:80px;">Image</th>
+            <th>Title</th>
+            <th style="width:100px;">Status</th>
+            <th style="width:100px;">Date</th>
+            <th style="width:150px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="sliderTableBody">
+          <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray);">
+            <i class="fas fa-spinner fa-spin"></i> Loading...
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       TAB 2: ALBUMS
+  ============================================================ -->
+  <div class="tab-content" id="tab-albums">
     <div class="table-wrapper">
       <div class="table-header">
         <h2>All Albums <span id="albumsCount">0</span></h2>
@@ -413,7 +459,7 @@ table .status-badge.inactive { background: #fee2e2; color: #dc2626; }
   </div>
 
   <!-- ============================================================
-       TAB 2: ADD ALBUM
+       TAB 3: ADD ALBUM
   ============================================================ -->
   <div class="tab-content" id="tab-add-album">
     <div class="form-section">
@@ -438,11 +484,6 @@ table .status-badge.inactive { background: #fee2e2; color: #dc2626; }
               <option value="annual-function">Annual Function</option>
               <option value="science-exhibition">Science Exhibition</option>
               <option value="republic-day">Republic Day</option>
-              <option value="independence-day">Independence Day</option>
-              <option value="workshops">Workshops</option>
-              <option value="seminars">Seminars</option>
-              <option value="alumni">Alumni</option>
-              <option value="achievements">Achievements</option>
             </select>
           </div>
           <div class="form-group">
@@ -468,7 +509,7 @@ table .status-badge.inactive { background: #fee2e2; color: #dc2626; }
   </div>
 
   <!-- ============================================================
-       TAB 3: ALBUM IMAGES
+       TAB 4: ALBUM IMAGES
   ============================================================ -->
   <div class="tab-content" id="tab-images">
     <div class="form-section">
@@ -512,51 +553,6 @@ table .status-badge.inactive { background: #fee2e2; color: #dc2626; }
         <tbody id="albumImagesTableBody">
           <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray);">
             <i class="fas fa-info-circle"></i> Select an album to view images
-          </td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ============================================================
-       TAB 4: SLIDER
-  ============================================================ -->
-  <div class="tab-content" id="tab-slider">
-    <div class="upload-area" id="sliderUploadArea">
-      <div class="icon-big"><i class="fas fa-cloud-upload-alt"></i></div>
-      <h3>Add Slider Image</h3>
-      <p>Upload images for gallery slider (separate from homepage)</p>
-      <button class="browse-btn" onclick="document.getElementById('sliderFileInput').click()">
-        <i class="fas fa-folder-open"></i> Browse
-      </button>
-      <input type="file" id="sliderFileInput" accept="image/*">
-      <div class="progress-wrapper" id="sliderProgressWrapper">
-        <div class="progress-bar"><div class="fill" id="sliderProgressFill"></div></div>
-        <div class="progress-text" id="sliderProgressText">Uploading...</div>
-      </div>
-    </div>
-
-    <div class="table-wrapper">
-      <div class="table-header">
-        <h2>Slider Images <span id="sliderCount2">0</span></h2>
-        <button class="btn btn-sm btn-warning" onclick="reorderSlider()">
-          <i class="fas fa-arrows-alt"></i> Reorder
-        </button>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th style="width:60px;">#</th>
-            <th style="width:80px;">Image</th>
-            <th>Title</th>
-            <th style="width:100px;">Status</th>
-            <th style="width:100px;">Date</th>
-            <th style="width:150px;">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="sliderTableBody">
-          <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray);">
-            <i class="fas fa-spinner fa-spin"></i> Loading...
           </td></tr>
         </tbody>
       </table>
@@ -649,245 +645,6 @@ async function loadStats() {
     }
   } catch (error) { console.error('Stats error:', error); }
 }
-
-// ============================================================
-// LOAD ALBUMS
-// ============================================================
-async function loadAlbums() {
-  const tbody = document.getElementById('albumsTableBody');
-  tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray);">
-    <i class="fas fa-spinner fa-spin"></i> Loading...
-  </td></tr>`;
-
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/albums?limit=100`);
-    const data = await res.json();
-
-    if (!data.success || !data.data || data.data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray);">
-        <i class="fas fa-folder-open"></i> No albums found
-      </td></tr>`;
-      document.getElementById('albumsCount').textContent = '0';
-      return;
-    }
-
-    document.getElementById('albumsCount').textContent = data.data.length;
-
-    tbody.innerHTML = data.data.map((item, index) => `
-      <tr>
-        <td>${index + 1}</td>
-        <td><img src="${item.cover_image || 'https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'}" class="thumb" onerror="this.src='https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'"></td>
-        <td><strong>${item.title}</strong></td>
-        <td><span style="background:#dbeafe;color:#2563eb;padding:2px 10px;border-radius:50px;font-size:11px;">${item.category || 'general'}</span></td>
-        <td>${item.photo_count || 0}</td>
-        <td>${item.view_count || 0}</td>
-        <td><span class="status-badge ${item.is_active == 1 ? 'active' : 'inactive'}">${item.is_active == 1 ? 'Active' : 'Inactive'}</span></td>
-        <td>
-          <div class="action-btns">
-            <button class="btn btn-sm btn-primary" onclick="editAlbum(${item.id})"><i class="fas fa-edit"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="deleteAlbum(${item.id})"><i class="fas fa-trash-alt"></i></button>
-          </div>
-        </td>
-      </tr>
-    `).join('');
-
-    populateAlbumSelect(data.data);
-
-  } catch (error) {
-    console.error('Albums error:', error);
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#ef4444;">
-      <i class="fas fa-exclamation-circle"></i> Failed to load
-    </td></tr>`;
-  }
-}
-
-// ============================================================
-// POPULATE ALBUM SELECT
-// ============================================================
-function populateAlbumSelect(albums) {
-  const select = document.getElementById('albumSelect');
-  select.innerHTML = '<option value="">-- Select Album --</option>';
-  if (albums) {
-    albums.forEach(album => {
-      select.innerHTML += `<option value="${album.id}">${album.title}</option>`;
-    });
-  }
-}
-
-// ============================================================
-// CREATE ALBUM
-// ============================================================
-document.getElementById('albumForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  const title = document.getElementById('albumTitle').value.trim();
-  if (!title) { showToast('Title is required', 'error'); return; }
-
-  const formData = new FormData();
-  formData.append('title', title);
-  formData.append('description', document.getElementById('albumDescription').value.trim() || '');
-  formData.append('category', document.getElementById('albumCategory').value);
-  formData.append('event_date', document.getElementById('albumEventDate').value || '');
-  formData.append('venue', document.getElementById('albumVenue').value.trim() || '');
-  formData.append('is_featured', document.getElementById('albumFeatured').checked ? 1 : 0);
-
-  const coverFile = document.getElementById('albumCoverInput').files[0];
-  if (coverFile) formData.append('cover', coverFile);
-
-  try {
-    const btn = this.querySelector('button[type="submit"]');
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
-    btn.disabled = true;
-
-    const res = await fetch(`${API_BASE}/api/gallery/albums/add`, { method: 'POST', body: formData });
-    const data = await res.json();
-    if (data.success) {
-      showToast('✅ Album created!', 'success');
-      this.reset();
-      loadAlbums();
-      loadStats();
-      switchTab('albums');
-    } else {
-      showToast(data.message || 'Failed', 'error');
-    }
-  } catch (error) { showToast('Creation failed', 'error'); } finally {
-    const btn = this.querySelector('button[type="submit"]');
-    btn.innerHTML = '<i class="fas fa-save"></i> Create Album';
-    btn.disabled = false;
-  }
-});
-
-// ============================================================
-// ALBUM IMAGES - Select Change
-// ============================================================
-document.getElementById('albumSelect').addEventListener('change', function() {
-  currentAlbumId = this.value;
-  if (currentAlbumId) {
-    loadAlbumImages(currentAlbumId);
-    document.getElementById('currentAlbumName').textContent = 'Album: ' + this.options[this.selectedIndex].text;
-  } else {
-    document.getElementById('albumImagesTableBody').innerHTML = 
-      `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray);">
-        <i class="fas fa-info-circle"></i> Select an album to view images
-      </td></tr>`;
-    document.getElementById('albumImagesCount').textContent = '0';
-    document.getElementById('currentAlbumName').textContent = 'Select an album above';
-  }
-});
-
-// ============================================================
-// LOAD ALBUM IMAGES
-// ============================================================
-async function loadAlbumImages(albumId) {
-  const tbody = document.getElementById('albumImagesTableBody');
-  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray);">
-    <i class="fas fa-spinner fa-spin"></i> Loading...
-  </td></tr>`;
-
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/albums/${albumId}`);
-    const data = await res.json();
-
-    if (!data.success || !data.data.images || data.data.images.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray);">
-        <i class="fas fa-image"></i> No images in this album
-      </td></tr>`;
-      document.getElementById('albumImagesCount').textContent = '0';
-      return;
-    }
-
-    document.getElementById('albumImagesCount').textContent = data.data.images.length;
-    tbody.innerHTML = data.data.images.map((item, index) => `
-      <tr>
-        <td>${index + 1}</td>
-        <td><img src="${item.file_path || item.filename}" class="thumb" onerror="this.src='https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'"></td>
-        <td>${item.title || 'Untitled'}</td>
-        <td style="font-size:12px;color:var(--gray);">${item.created_at || 'N/A'}</td>
-        <td>
-          <div class="action-btns">
-            <button class="btn btn-sm btn-danger" onclick="deleteAlbumImage(${item.id})"><i class="fas fa-trash-alt"></i></button>
-          </div>
-        </td>
-      </tr>
-    `).join('');
-  } catch (error) {
-    console.error('Album images error:', error);
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:#ef4444;">
-      <i class="fas fa-exclamation-circle"></i> Failed to load
-    </td></tr>`;
-  }
-}
-
-// ============================================================
-// DELETE ALBUM IMAGE
-// ============================================================
-async function deleteAlbumImage(id) {
-  if (!confirm('Delete this image?')) return;
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/images/delete/${id}`, { method: 'DELETE' });
-    const data = await res.json();
-    if (data.success) {
-      showToast('✅ Image deleted!', 'success');
-      if (currentAlbumId) { loadAlbumImages(currentAlbumId); loadStats(); }
-    } else { showToast(data.message || 'Failed', 'error'); }
-  } catch (error) { showToast('Delete failed', 'error'); }
-}
-
-// ============================================================
-// DELETE ALBUM
-// ============================================================
-async function deleteAlbum(id) {
-  if (!confirm('Delete this album and all its images?')) return;
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/albums/delete/${id}`, { method: 'DELETE' });
-    const data = await res.json();
-    if (data.success) { showToast('✅ Album deleted!', 'success'); loadAlbums(); loadStats(); }
-    else { showToast(data.message || 'Failed', 'error'); }
-  } catch (error) { showToast('Delete failed', 'error'); }
-}
-
-// ============================================================
-// UPLOAD ALBUM IMAGES
-// ============================================================
-document.getElementById('imagesFileInput').addEventListener('change', async function(e) {
-  if (!this.files.length) return;
-  const albumId = document.getElementById('albumSelect').value;
-  if (!albumId) { showToast('Please select an album first', 'error'); this.value = ''; return; }
-
-  const formData = new FormData();
-  formData.append('album_id', albumId);
-  for (let file of this.files) formData.append('images', file);
-
-  const progressWrapper = document.getElementById('imagesProgressWrapper');
-  const progressFill = document.getElementById('imagesProgressFill');
-  const progressText = document.getElementById('imagesProgressText');
-
-  progressWrapper.style.display = 'block';
-  progressFill.style.width = '0%';
-  progressText.textContent = 'Uploading... 0%';
-
-  try {
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += Math.random() * 10;
-      if (progress > 90) progress = 90;
-      progressFill.style.width = progress + '%';
-      progressText.textContent = `Uploading... ${Math.round(progress)}%`;
-    }, 200);
-
-    const res = await fetch(`${API_BASE}/api/gallery/images/add`, { method: 'POST', body: formData });
-    clearInterval(interval);
-    const data = await res.json();
-
-    if (data.success) {
-      progressFill.style.width = '100%';
-      progressText.textContent = '✅ Uploaded!';
-      showToast(`✅ ${data.uploaded?.length || 0} images uploaded!`, 'success');
-      setTimeout(() => { progressWrapper.style.display = 'none'; progressFill.style.width = '0%'; }, 1000);
-      if (albumId) { loadAlbumImages(albumId); loadStats(); }
-    } else { showToast(data.message || 'Upload failed', 'error'); progressWrapper.style.display = 'none'; }
-  } catch (error) { showToast('Upload failed', 'error'); progressWrapper.style.display = 'none'; }
-  this.value = '';
-});
 
 // ============================================================
 // SLIDER SECTION
@@ -1004,6 +761,221 @@ async function reorderSlider() {
 }
 
 // ============================================================
+// ALBUMS SECTION
+// ============================================================
+async function loadAlbums() {
+  const tbody = document.getElementById('albumsTableBody');
+  tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray);">
+    <i class="fas fa-spinner fa-spin"></i> Loading...
+  </td></tr>`;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/albums?limit=100`);
+    const data = await res.json();
+
+    if (!data.success || !data.data || data.data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray);">
+        <i class="fas fa-folder-open"></i> No albums found
+      </td></tr>`;
+      document.getElementById('albumsCount').textContent = '0';
+      return;
+    }
+
+    document.getElementById('albumsCount').textContent = data.data.length;
+
+    tbody.innerHTML = data.data.map((item, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td><img src="${item.cover_image || 'https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'}" class="thumb" onerror="this.src='https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'"></td>
+        <td><strong>${item.title}</strong></td>
+        <td><span class="category-badge">${item.category || 'general'}</span></td>
+        <td>${item.photo_count || 0}</td>
+        <td>${item.view_count || 0}</td>
+        <td><span class="status-badge ${item.is_active == 1 ? 'active' : 'inactive'}">${item.is_active == 1 ? 'Active' : 'Inactive'}</span></td>
+        <td>
+          <div class="action-btns">
+            <button class="btn btn-sm btn-primary" onclick="editAlbum(${item.id})"><i class="fas fa-edit"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="deleteAlbum(${item.id})"><i class="fas fa-trash-alt"></i></button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+
+    populateAlbumSelect(data.data);
+
+  } catch (error) {
+    console.error('Albums error:', error);
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#ef4444;">
+      <i class="fas fa-exclamation-circle"></i> Failed to load
+    </td></tr>`;
+  }
+}
+
+function populateAlbumSelect(albums) {
+  const select = document.getElementById('albumSelect');
+  select.innerHTML = '<option value="">-- Select Album --</option>';
+  if (albums) {
+    albums.forEach(album => {
+      select.innerHTML += `<option value="${album.id}">${album.title}</option>`;
+    });
+  }
+}
+
+// ============================================================
+// CREATE ALBUM
+// ============================================================
+document.getElementById('albumForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const title = document.getElementById('albumTitle').value.trim();
+  if (!title) { showToast('Title is required', 'error'); return; }
+
+  const formData = new FormData();
+  formData.append('title', title);
+  formData.append('description', document.getElementById('albumDescription').value.trim() || '');
+  formData.append('category', document.getElementById('albumCategory').value);
+  formData.append('event_date', document.getElementById('albumEventDate').value || '');
+  formData.append('venue', document.getElementById('albumVenue').value.trim() || '');
+  formData.append('is_featured', document.getElementById('albumFeatured').checked ? 1 : 0);
+
+  const coverFile = document.getElementById('albumCoverInput').files[0];
+  if (coverFile) formData.append('cover', coverFile);
+
+  try {
+    const btn = this.querySelector('button[type="submit"]');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+    btn.disabled = true;
+
+    const res = await fetch(`${API_BASE}/api/gallery/albums/add`, { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.success) {
+      showToast('✅ Album created!', 'success');
+      this.reset();
+      loadAlbums();
+      loadStats();
+      switchTab('albums');
+    } else {
+      showToast(data.message || 'Failed', 'error');
+    }
+  } catch (error) { showToast('Creation failed', 'error'); } finally {
+    const btn = this.querySelector('button[type="submit"]');
+    btn.innerHTML = '<i class="fas fa-save"></i> Create Album';
+    btn.disabled = false;
+  }
+});
+
+// ============================================================
+// ALBUM IMAGES
+// ============================================================
+document.getElementById('albumSelect').addEventListener('change', function() {
+  currentAlbumId = this.value;
+  if (currentAlbumId) {
+    loadAlbumImages(currentAlbumId);
+    document.getElementById('currentAlbumName').textContent = 'Album: ' + this.options[this.selectedIndex].text;
+  } else {
+    document.getElementById('albumImagesTableBody').innerHTML = 
+      `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray);">
+        <i class="fas fa-info-circle"></i> Select an album to view images
+      </td></tr>`;
+    document.getElementById('albumImagesCount').textContent = '0';
+    document.getElementById('currentAlbumName').textContent = 'Select an album above';
+  }
+});
+
+async function loadAlbumImages(albumId) {
+  const tbody = document.getElementById('albumImagesTableBody');
+  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray);">
+    <i class="fas fa-spinner fa-spin"></i> Loading...
+  </td></tr>`;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/albums/${albumId}`);
+    const data = await res.json();
+
+    if (!data.success || !data.data.images || data.data.images.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray);">
+        <i class="fas fa-image"></i> No images in this album
+      </td></tr>`;
+      document.getElementById('albumImagesCount').textContent = '0';
+      return;
+    }
+
+    document.getElementById('albumImagesCount').textContent = data.data.images.length;
+    tbody.innerHTML = data.data.images.map((item, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td><img src="${item.file_path || item.filename}" class="thumb" onerror="this.src='https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'"></td>
+        <td>${item.title || 'Untitled'}</td>
+        <td style="font-size:12px;color:var(--gray);">${item.created_at || 'N/A'}</td>
+        <td>
+          <div class="action-btns">
+            <button class="btn btn-sm btn-danger" onclick="deleteAlbumImage(${item.id})"><i class="fas fa-trash-alt"></i></button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch (error) {
+    console.error('Album images error:', error);
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:#ef4444;">
+      <i class="fas fa-exclamation-circle"></i> Failed to load
+    </td></tr>`;
+  }
+}
+
+async function deleteAlbumImage(id) {
+  if (!confirm('Delete this image?')) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/images/delete/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      showToast('✅ Image deleted!', 'success');
+      if (currentAlbumId) { loadAlbumImages(currentAlbumId); loadStats(); }
+    } else { showToast(data.message || 'Failed', 'error'); }
+  } catch (error) { showToast('Delete failed', 'error'); }
+}
+
+// UPLOAD ALBUM IMAGES
+document.getElementById('imagesFileInput').addEventListener('change', async function(e) {
+  if (!this.files.length) return;
+  const albumId = document.getElementById('albumSelect').value;
+  if (!albumId) { showToast('Please select an album first', 'error'); this.value = ''; return; }
+
+  const formData = new FormData();
+  formData.append('album_id', albumId);
+  for (let file of this.files) formData.append('images', file);
+
+  const progressWrapper = document.getElementById('imagesProgressWrapper');
+  const progressFill = document.getElementById('imagesProgressFill');
+  const progressText = document.getElementById('imagesProgressText');
+
+  progressWrapper.style.display = 'block';
+  progressFill.style.width = '0%';
+  progressText.textContent = 'Uploading... 0%';
+
+  try {
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 10;
+      if (progress > 90) progress = 90;
+      progressFill.style.width = progress + '%';
+      progressText.textContent = `Uploading... ${Math.round(progress)}%`;
+    }, 200);
+
+    const res = await fetch(`${API_BASE}/api/gallery/images/add`, { method: 'POST', body: formData });
+    clearInterval(interval);
+    const data = await res.json();
+
+    if (data.success) {
+      progressFill.style.width = '100%';
+      progressText.textContent = '✅ Uploaded!';
+      showToast(`✅ ${data.uploaded?.length || 0} images uploaded!`, 'success');
+      setTimeout(() => { progressWrapper.style.display = 'none'; progressFill.style.width = '0%'; }, 1000);
+      if (albumId) { loadAlbumImages(albumId); loadStats(); }
+    } else { showToast(data.message || 'Upload failed', 'error'); progressWrapper.style.display = 'none'; }
+  } catch (error) { showToast('Upload failed', 'error'); progressWrapper.style.display = 'none'; }
+  this.value = '';
+});
+
+// ============================================================
 // EDIT FUNCTIONS
 // ============================================================
 async function editAlbum(id) {
@@ -1030,13 +1002,14 @@ async function editAlbum(id) {
               <option value="cultural" ${item.category === 'cultural' ? 'selected' : ''}>Cultural</option>
               <option value="annual-function" ${item.category === 'annual-function' ? 'selected' : ''}>Annual Function</option>
               <option value="science-exhibition" ${item.category === 'science-exhibition' ? 'selected' : ''}>Science Exhibition</option>
+              <option value="republic-day" ${item.category === 'republic-day' ? 'selected' : ''}>Republic Day</option>
             </select></div>
           <div class="form-group"><label>Event Date</label>
             <input type="date" id="editEventDate" value="${item.event_date || ''}"></div>
         </div>
         <div class="form-group"><label>Venue</label>
           <input type="text" id="editVenue" value="${item.venue || ''}"></div>
-        <div class="form-group"><label><input type="checkbox" id="editFeatured" ${item.is_featured == 1 ? 'checked' : ''}> Featured Album</label></div>
+        <div class="form-group"><label><input type="checkbox" id="editFeatured" ${item.is_featured == 1 ? 'checked' : ''}> Featured</label></div>
         <div class="form-group"><label><input type="checkbox" id="editActive" ${item.is_active == 1 ? 'checked' : ''}> Active</label></div>
       </form>
     `;
@@ -1116,6 +1089,19 @@ async function saveEdit() {
 }
 
 // ============================================================
+// DELETE ALBUM
+// ============================================================
+async function deleteAlbum(id) {
+  if (!confirm('Delete this album and all its images?')) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/albums/delete/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) { showToast('✅ Album deleted!', 'success'); loadAlbums(); loadStats(); }
+    else { showToast(data.message || 'Failed', 'error'); }
+  } catch (error) { showToast('Delete failed', 'error'); }
+}
+
+// ============================================================
 // MODAL
 // ============================================================
 function closeModal() {
@@ -1133,7 +1119,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ============================================================
-// DRAG & DROP - Slider Upload
+// DRAG & DROP
 // ============================================================
 document.getElementById('sliderUploadArea').addEventListener('dragover', function(e) {
   e.preventDefault();
@@ -1153,9 +1139,6 @@ document.getElementById('sliderUploadArea').addEventListener('drop', function(e)
   }
 });
 
-// ============================================================
-// DRAG & DROP - Album Images Upload
-// ============================================================
 document.getElementById('imagesUploadArea').addEventListener('dragover', function(e) {
   e.preventDefault();
   this.classList.add('dragover');
