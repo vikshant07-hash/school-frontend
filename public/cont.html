@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contact Messages - Admin</title>
+<title>Contact Manager - Admin</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -11,6 +11,7 @@
 body { font-family: 'Inter', sans-serif; background: #f0f4ff; color: #1a2332; padding: 20px; }
 .container { max-width: 1200px; margin: 0 auto; }
 
+/* ========== HEADER ========== */
 .header {
   display: flex;
   justify-content: space-between;
@@ -25,6 +26,7 @@ body { font-family: 'Inter', sans-serif; background: #f0f4ff; color: #1a2332; pa
 }
 .header h1 { font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 12px; }
 .header h1 i { color: #4a8af4; }
+.header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
 .btn {
   display: inline-flex;
@@ -44,10 +46,15 @@ body { font-family: 'Inter', sans-serif; background: #f0f4ff; color: #1a2332; pa
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(74, 138, 244, 0.35); }
 .btn-danger { background: #ef4444; color: white; }
 .btn-danger:hover { background: #dc2626; transform: translateY(-2px); }
+.btn-success { background: #22c55e; color: white; }
+.btn-success:hover { background: #16a34a; transform: translateY(-2px); }
+.btn-warning { background: #f59e0b; color: white; }
+.btn-warning:hover { background: #d97706; transform: translateY(-2px); }
 .btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 8px; }
 .btn-outline { background: rgba(255,255,255,0.06); color: white; border: 1px solid rgba(255,255,255,0.1); }
 .btn-outline:hover { background: rgba(255,255,255,0.12); }
 
+/* ========== STATS ========== */
 .stats-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -67,9 +74,11 @@ body { font-family: 'Inter', sans-serif; background: #f0f4ff; color: #1a2332; pa
 .stat-box .icon-box.blue { background: #dbeafe; color: #3b82f6; }
 .stat-box .icon-box.green { background: #dcfce7; color: #22c55e; }
 .stat-box .icon-box.purple { background: #ede9fe; color: #8b5cf6; }
+.stat-box .icon-box.orange { background: #fef3c7; color: #f59e0b; }
 .stat-box .info .number { font-size: 22px; font-weight: 800; color: #0a1628; }
 .stat-box .info .label { font-size: 12px; color: #94a3b8; font-weight: 500; }
 
+/* ========== TABLE ========== */
 .table-wrapper {
   background: white;
   border-radius: 16px;
@@ -97,8 +106,10 @@ table .msg-cell { max-width: 250px; white-space: nowrap; overflow: hidden; text-
 table .date-cell { font-size: 12px; color: #64748b; white-space: nowrap; }
 table .empty-msg { text-align: center; padding: 40px; color: #94a3b8; }
 
-.action-btns { display: flex; gap: 6px; }
+.action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.action-btns .btn-sm { font-size: 11px; padding: 5px 10px; }
 
+/* ========== MODAL ========== */
 .modal-overlay {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
@@ -106,7 +117,7 @@ table .empty-msg { text-align: center; padding: 40px; color: #94a3b8; }
 }
 .modal-overlay.active { display: flex; }
 .modal {
-  background: white; border-radius: 16px; max-width: 500px; width: 100%;
+  background: white; border-radius: 16px; max-width: 600px; width: 100%;
   padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
   animation: modalIn 0.3s ease; max-height: 90vh; overflow-y: auto;
 }
@@ -115,9 +126,23 @@ table .empty-msg { text-align: center; padding: 40px; color: #94a3b8; }
 .modal-header h3 { font-size: 18px; font-weight: 700; color: #0a1628; display: flex; align-items: center; gap: 10px; }
 .modal-close { width: 36px; height: 36px; border: none; background: #f1f5f9; border-radius: 50%; font-size: 18px; cursor: pointer; transition: all 0.3s; }
 .modal-close:hover { background: #fee2e2; color: #ef4444; }
-.modal-body .msg-detail { background: #f8faff; padding: 16px; border-radius: 10px; margin-top: 10px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
-.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid #f1f5f9; }
 
+/* Modal - View Message */
+.modal-body .msg-detail { background: #f8faff; padding: 16px; border-radius: 10px; margin-top: 10px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+
+/* Modal - Edit Contact Info */
+.modal-body .form-group { margin-bottom: 16px; }
+.modal-body .form-group label { display: block; font-size: 13px; font-weight: 600; color: #1a2332; margin-bottom: 4px; }
+.modal-body .form-group label .required { color: #ef4444; }
+.modal-body .form-group input, .modal-body .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #e8edf8; border-radius: 10px; font-size: 14px; font-family: inherit; transition: all 0.3s; background: #fafcff; }
+.modal-body .form-group input:focus, .modal-body .form-group textarea:focus { outline: none; border-color: #4a8af4; box-shadow: 0 0 0 3px rgba(74, 138, 244, 0.08); }
+.modal-body .form-group textarea { resize: vertical; min-height: 50px; }
+.modal-body .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid #f1f5f9; }
+.modal-footer .btn { padding: 10px 22px; }
+
+/* ========== TOAST ========== */
 .toast {
   position: fixed; bottom: 30px; right: 30px; background: #0a1628; color: white;
   padding: 16px 24px; border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.25);
@@ -128,12 +153,17 @@ table .empty-msg { text-align: center; padding: 40px; color: #94a3b8; }
 .toast.success i { color: #22c55e; }
 .toast.error i { color: #ef4444; }
 
+/* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
   .header { flex-direction: column; align-items: stretch; }
   .stats-row { grid-template-columns: 1fr 1fr; }
   table { font-size: 12px; }
   table th, table td { padding: 8px 10px; }
   .modal { padding: 20px; }
+  .modal-body .form-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -141,14 +171,15 @@ table .empty-msg { text-align: center; padding: 40px; color: #94a3b8; }
 
 <div class="container">
 
+  <!-- ========== HEADER ========== -->
   <header class="header">
-    <h1><i class="fas fa-envelope"></i> Contact Messages</h1>
+    <h1><i class="fas fa-envelope"></i> Contact Manager</h1>
     <div class="header-actions">
       <button class="btn btn-primary" onclick="loadMessages()"><i class="fas fa-sync-alt"></i> Refresh</button>
     </div>
   </header>
 
-  <!-- Stats -->
+  <!-- ========== STATS ========== -->
   <div class="stats-row" id="statsRow">
     <div class="stat-box">
       <div class="icon-box blue"><i class="fas fa-envelope"></i></div>
@@ -171,9 +202,16 @@ table .empty-msg { text-align: center; padding: 40px; color: #94a3b8; }
         <div class="label">This Week</div>
       </div>
     </div>
+    <div class="stat-box">
+      <div class="icon-box orange"><i class="fas fa-address-card"></i></div>
+      <div class="info">
+        <div class="number" id="contactInfoStatus">-</div>
+        <div class="label">Contact Info</div>
+      </div>
+    </div>
   </div>
 
-  <!-- Table -->
+  <!-- ========== TABLE ========== -->
   <div class="table-wrapper">
     <div class="table-header">
       <h2>All Messages <span id="msgCount">0</span></h2>
@@ -186,7 +224,7 @@ table .empty-msg { text-align: center; padding: 40px; color: #94a3b8; }
           <th>Email</th>
           <th>Message</th>
           <th style="width:130px;">Date</th>
-          <th style="width:120px;">Actions</th>
+          <th style="width:130px;">Actions</th>
         </tr>
       </thead>
       <tbody id="messagesTableBody">
@@ -197,7 +235,7 @@ table .empty-msg { text-align: center; padding: 40px; color: #94a3b8; }
 
 </div>
 
-<!-- View Modal -->
+<!-- ========== VIEW MESSAGE MODAL ========== -->
 <div class="modal-overlay" id="viewModal">
   <div class="modal">
     <div class="modal-header">
@@ -217,7 +255,43 @@ table .empty-msg { text-align: center; padding: 40px; color: #94a3b8; }
   </div>
 </div>
 
-<!-- Toast -->
+<!-- ========== EDIT CONTACT INFO MODAL ========== -->
+<div class="modal-overlay" id="editInfoModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-address-card"></i> Update Contact Info</h3>
+      <button class="modal-close" onclick="closeEditInfoModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="contactInfoForm">
+        <div class="form-group">
+          <label>School Name <span class="required">*</span></label>
+          <input type="text" id="editSchoolName" placeholder="Enter school name..." required>
+        </div>
+        <div class="form-group">
+          <label>Address <span class="required">*</span></label>
+          <textarea id="editAddress" placeholder="Enter full address..." rows="2" required></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone Number <span class="required">*</span></label>
+            <input type="text" id="editPhone" placeholder="+91 98765 43210" required>
+          </div>
+          <div class="form-group">
+            <label>Email Address <span class="required">*</span></label>
+            <input type="email" id="editEmail" placeholder="info@school.edu.in" required>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-warning" onclick="closeEditInfoModal()">Cancel</button>
+      <button class="btn btn-success" onclick="updateContactInfo()"><i class="fas fa-save"></i> Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== TOAST ========== -->
 <div class="toast" id="toast">
   <i class="fas fa-check-circle"></i>
   <span id="toastMessage">Success!</span>
@@ -237,6 +311,7 @@ const totalCount = document.getElementById('totalCount');
 const todayCount = document.getElementById('todayCount');
 const weekCount = document.getElementById('weekCount');
 const msgCount = document.getElementById('msgCount');
+const contactInfoStatus = document.getElementById('contactInfoStatus');
 
 let currentMessages = [];
 let viewingId = null;
@@ -260,12 +335,10 @@ async function loadMessages() {
   tbody.innerHTML = `<tr><td colspan="6" class="empty-msg"><i class="fas fa-spinner fa-spin"></i> Loading messages...</td></tr>`;
 
   try {
-    console.log("📡 Fetching messages from:", `${API_BASE}/admin/contact/messages`);
-    
     const response = await fetch(`${API_BASE}/admin/contact/messages`);
     const data = await response.json();
     
-    console.log("📋 Response data:", data);
+    console.log("📋 Messages:", data);
     
     if (data.success) {
       currentMessages = data.data || [];
@@ -277,11 +350,11 @@ async function loadMessages() {
         tbody.innerHTML = `<tr><td colspan="6" class="empty-msg"><i class="fas fa-inbox"></i> No messages found</td></tr>`;
       }
     } else {
-      tbody.innerHTML = `<tr><td colspan="6" class="empty-msg"><i class="fas fa-exclamation-circle"></i> ${data.message || 'Failed to load messages'}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="empty-msg"><i class="fas fa-exclamation-circle"></i> ${data.message || 'Failed to load'}</td></tr>`;
     }
   } catch (error) {
-    console.error('❌ Error loading messages:', error);
-    tbody.innerHTML = `<tr><td colspan="6" class="empty-msg"><i class="fas fa-exclamation-circle"></i> Network error. Please try again.</td></tr>`;
+    console.error('❌ Error:', error);
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-msg"><i class="fas fa-exclamation-circle"></i> Network error</td></tr>`;
     showToast('Failed to load messages', 'error');
   }
 }
@@ -290,9 +363,7 @@ async function loadMessages() {
 // RENDER TABLE
 // ============================================================
 function renderTable(messages) {
-  if (!messages || messages.length === 0) {
-    return;
-  }
+  if (!messages || messages.length === 0) return;
 
   tbody.innerHTML = messages.map((item, index) => `
     <tr>
@@ -303,10 +374,10 @@ function renderTable(messages) {
       <td class="date-cell">${item.created_at_ist || item.created_at || 'N/A'}</td>
       <td>
         <div class="action-btns">
-          <button class="btn btn-sm btn-primary" onclick="viewMessage(${item.id})">
+          <button class="btn btn-sm btn-primary" onclick="viewMessage(${item.id})" title="View Message">
             <i class="fas fa-eye"></i>
           </button>
-          <button class="btn btn-sm btn-danger" onclick="deleteMessage(${item.id})">
+          <button class="btn btn-sm btn-danger" onclick="deleteMessage(${item.id})" title="Delete Message">
             <i class="fas fa-trash-alt"></i>
           </button>
         </div>
@@ -336,6 +407,24 @@ function updateStats(messages) {
   totalCount.textContent = total;
   todayCount.textContent = today;
   weekCount.textContent = week;
+  
+  // Update contact info status
+  loadContactInfoStatus();
+}
+
+// ============================================================
+// LOAD CONTACT INFO STATUS
+// ============================================================
+async function loadContactInfoStatus() {
+  try {
+    const response = await fetch(`${API_BASE}/admin/contact/info`);
+    const data = await response.json();
+    contactInfoStatus.textContent = "✅ Loaded";
+    contactInfoStatus.style.color = "#22c55e";
+  } catch (error) {
+    contactInfoStatus.textContent = "❌ Error";
+    contactInfoStatus.style.color = "#ef4444";
+  }
 }
 
 // ============================================================
@@ -390,6 +479,72 @@ async function deleteMessage(id) {
 }
 
 // ============================================================
+// EDIT CONTACT INFO - Open Modal
+// ============================================================
+async function openEditInfoModal() {
+  try {
+    const response = await fetch(`${API_BASE}/admin/contact/info`);
+    const data = await response.json();
+    
+    document.getElementById('editSchoolName').value = data.school_name || '';
+    document.getElementById('editAddress').value = data.address || '';
+    document.getElementById('editPhone').value = data.phone || '';
+    document.getElementById('editEmail').value = data.email || '';
+    
+    document.getElementById('editInfoModal').classList.add('active');
+  } catch (error) {
+    showToast('Failed to load contact info', 'error');
+  }
+}
+
+function closeEditInfoModal() {
+  document.getElementById('editInfoModal').classList.remove('active');
+}
+
+// ============================================================
+// UPDATE CONTACT INFO
+// ============================================================
+async function updateContactInfo() {
+  const data = {
+    school_name: document.getElementById('editSchoolName').value.trim(),
+    address: document.getElementById('editAddress').value.trim(),
+    phone: document.getElementById('editPhone').value.trim(),
+    email: document.getElementById('editEmail').value.trim()
+  };
+
+  if (!data.school_name || !data.address || !data.phone || !data.email) {
+    showToast('❌ All fields are required!', 'error');
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(data.email)) {
+    showToast('❌ Please enter a valid email!', 'error');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/admin/contact/info/update`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    
+    if (result.success) {
+      showToast('✅ Contact info updated!', 'success');
+      closeEditInfoModal();
+      loadContactInfoStatus();
+    } else {
+      showToast(result.message || 'Failed to update', 'error');
+    }
+  } catch (error) {
+    showToast('Network error', 'error');
+  }
+}
+
+// ============================================================
 // HELPERS
 // ============================================================
 function escapeHtml(text) {
@@ -403,22 +558,35 @@ function escapeHtml(text) {
 // INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("🚀 Contact Admin Page Loaded");
-  console.log("📡 API Base:", API_BASE);
+  console.log("🚀 Contact Manager Loaded");
   loadMessages();
-  
-  // Auto refresh every 30 seconds
   setInterval(loadMessages, 30000);
 });
 
-// Close modal on escape
+// Close modals on escape
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeViewModal();
+  if (e.key === 'Escape') {
+    closeViewModal();
+    closeEditInfoModal();
+  }
 });
 
-// Close modal on overlay click
+// Close modals on overlay click
 document.getElementById('viewModal').addEventListener('click', (e) => {
   if (e.target === e.currentTarget) closeViewModal();
+});
+document.getElementById('editInfoModal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeEditInfoModal();
+});
+
+// Add Edit Info button to header dynamically
+document.addEventListener('DOMContentLoaded', () => {
+  const headerActions = document.querySelector('.header-actions');
+  const editBtn = document.createElement('button');
+  editBtn.className = 'btn btn-success';
+  editBtn.innerHTML = '<i class="fas fa-address-card"></i> Edit Contact Info';
+  editBtn.onclick = openEditInfoModal;
+  headerActions.prepend(editBtn);
 });
 </script>
 
