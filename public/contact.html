@@ -822,7 +822,7 @@ body{
         </div>
       </div>
       
-      <button type="submit">Send Message</button>
+      <button type="submit" id="submitBtn">Send Message</button>
     </form>
 
     <div class="success" id="successMsg"></div>
@@ -874,7 +874,7 @@ body{
 ============================================================ -->
 <script>
 // ============================================================
-// CAPTCHA
+// CAPTCHA - FIXED (Case Insensitive)
 // ============================================================
 let captchaText = "";
 
@@ -884,6 +884,7 @@ function generateCaptcha(){
   canvas.width = 160;
   canvas.height = 50;
 
+  // Only uppercase letters and numbers (no confusing chars)
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   captchaText = "";
 
@@ -891,9 +892,11 @@ function generateCaptcha(){
     captchaText += chars.charAt(Math.floor(Math.random()*chars.length));
   }
 
+  // Background
   ctx.fillStyle = "#111";
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
+  // Draw text with distortion
   for(let i=0; i<captchaText.length; i++){
     const x = 20 + i*20;
     const y = 30 + Math.random()*10;
@@ -906,6 +909,7 @@ function generateCaptcha(){
     ctx.restore();
   }
 
+  // Noise lines
   for(let i=0; i<5; i++){
     ctx.strokeStyle = `rgba(255,255,255,0.3)`;
     ctx.beginPath();
@@ -932,7 +936,6 @@ async function loadContactInfo(){
     document.getElementById("email").innerText = data.email || "info@gssshilla.edu.in";
   }catch(err){
     console.error("Error loading contact info", err);
-    // Set default values if API fails
     document.getElementById("schoolName").innerText = "GSS School Shilla";
     document.getElementById("address").innerText = "Shilla, Himachal Pradesh";
     document.getElementById("phone").innerText = "+91 98765 43210";
@@ -942,26 +945,50 @@ async function loadContactInfo(){
 loadContactInfo();
 
 // ============================================================
-// FORM SUBMIT
+// FORM SUBMIT - FIXED
 // ============================================================
 document.getElementById("contactForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
 
-  const userCaptcha = document.getElementById("captchaInput").value.trim();
+  const submitBtn = document.getElementById("submitBtn");
+  const successMsg = document.getElementById("successMsg");
+  const captchaInput = document.getElementById("captchaInput").value.trim();
 
-  if(userCaptcha !== captchaText){
-    alert("❌ Wrong CAPTCHA!");
+  // CAPTCHA CHECK - Case Insensitive
+  if(captchaInput.toUpperCase() !== captchaText.toUpperCase()){
+    alert("❌ Wrong CAPTCHA! Please try again.");
     generateCaptcha();
+    document.getElementById("captchaInput").value = "";
+    document.getElementById("captchaInput").focus();
     return;
   }
 
   const data = {
-    name: document.getElementById("name").value,
-    email: document.getElementById("emailInput").value,
-    message: document.getElementById("message").value
+    name: document.getElementById("name").value.trim(),
+    email: document.getElementById("emailInput").value.trim(),
+    message: document.getElementById("message").value.trim()
   };
 
+  // Validation
+  if(!data.name || !data.email || !data.message){
+    successMsg.style.color = "#ef4444";
+    successMsg.textContent = "❌ All fields are required!";
+    return;
+  }
+
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!emailRegex.test(data.email)){
+    successMsg.style.color = "#ef4444";
+    successMsg.textContent = "❌ Please enter a valid email address!";
+    return;
+  }
+
   try{
+    submitBtn.textContent = "⏳ Sending...";
+    submitBtn.disabled = true;
+    successMsg.textContent = "";
+
     const res = await fetch("https://gsssshilla.onrender.com/contact",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
@@ -969,12 +996,24 @@ document.getElementById("contactForm").addEventListener("submit", async (e)=>{
     });
 
     const result = await res.json();
-    document.getElementById("successMsg").innerText = result.message;
-    document.getElementById("contactForm").reset();
-    generateCaptcha();
-  }catch(err){
-    console.error(err);
-    document.getElementById("successMsg").innerText = "❌ Failed to send message. Please try again.";
+
+    if(result.success){
+      successMsg.style.color = "#22c55e";
+      successMsg.textContent = result.message || "✅ Message sent successfully!";
+      document.getElementById("contactForm").reset();
+      generateCaptcha();
+      document.getElementById("captchaInput").value = "";
+    } else {
+      successMsg.style.color = "#ef4444";
+      successMsg.textContent = result.message || "❌ Failed to send message. Please try again.";
+    }
+  } catch(err){
+    console.error("Submit Error:", err);
+    successMsg.style.color = "#ef4444";
+    successMsg.textContent = "❌ Network error. Please check your connection and try again.";
+  } finally {
+    submitBtn.textContent = "Send Message";
+    submitBtn.disabled = false;
   }
 });
 
