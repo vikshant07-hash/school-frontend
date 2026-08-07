@@ -227,7 +227,7 @@ img { max-width: 100%; }
 ============================================================ */
 .page-header {
   background: linear-gradient(135deg, var(--navy-dark), var(--navy-mid));
-  padding: 40px 20px 30px;
+  padding: 50px 20px 40px;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -242,54 +242,130 @@ img { max-width: 100%; }
 
 .page-header h1 {
   font-family: 'Playfair Display', serif;
-  font-size: 36px;
+  font-size: 38px;
   font-weight: 800;
   color: var(--white);
   position: relative;
   z-index: 1;
 }
-.page-header h1 i { color: var(--blue-bright); }
+.page-header h1 i { color: var(--blue-light); }
 .page-header p { color: rgba(255, 255, 255, 0.6); margin-top: 6px; font-size: 16px; position: relative; z-index: 1; }
 
 /* ============================================================
-   CATEGORY NAVIGATION
+   HERO SLIDER
 ============================================================ */
-.category-nav {
-  background: var(--white);
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--gray-light);
-  overflow-x: auto;
+.hero-slider-section {
+  padding: 30px 20px 40px;
+  background: var(--navy-dark);
 }
 
-.category-nav-wrap {
+.hero-slider-wrap {
+  position: relative;
   max-width: 1200px;
   margin: 0 auto;
-  display: flex;
-  gap: 8px;
-  flex-wrap: nowrap;
-  align-items: center;
+  height: 450px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  background: #0a1628;
 }
 
-.category-nav-wrap .cat-btn {
+.hero-slider-wrap .slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.hero-slider-wrap .slide.active { opacity: 1; }
+
+.hero-slider-wrap .slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-slider-wrap .slide .slide-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 50px 40px 30px;
+  background: linear-gradient(transparent, rgba(10, 22, 40, 0.85));
+}
+
+.hero-slider-wrap .slide .slide-content h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.hero-slider-wrap .slide .slide-content p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(10, 22, 40, 0.5);
+  backdrop-filter: blur(8px);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 10;
+  transition: var(--transition);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 18px;
-  border: none;
+  justify-content: center;
+}
+
+.slider-arrow:hover { background: var(--blue-bright); transform: translateY(-50%) scale(1.08); }
+.slider-arrow.prev { left: 20px; }
+.slider-arrow.next { right: 20px; }
+
+.slider-dots {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+.slider-dots span {
+  width: 10px;
+  height: 10px;
   border-radius: 50px;
-  background: var(--off-white);
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 500;
+  background: rgba(255, 255, 255, 0.2);
   cursor: pointer;
   transition: var(--transition);
-  white-space: nowrap;
-  font-family: inherit;
 }
 
-.category-nav-wrap .cat-btn:hover { background: var(--blue-pale); color: var(--blue-bright); }
-.category-nav-wrap .cat-btn.active { background: var(--blue-bright); color: white; box-shadow: 0 4px 15px rgba(59,130,246,0.25); }
-.category-nav-wrap .cat-btn i { font-size: 14px; }
+.slider-dots span.active { width: 32px; background: var(--blue-bright); }
+
+.slider-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.15);
+  gap: 12px;
+}
+
+.slider-placeholder i { font-size: 48px; }
+.slider-placeholder span { font-size: 16px; color: rgba(255, 255, 255, 0.3); }
 
 /* ============================================================
    SECTION COMMON
@@ -323,14 +399,108 @@ img { max-width: 100%; }
 .section-title .highlight { color: var(--blue-bright); }
 
 /* ============================================================
-   GALLERY GRID
+   RECENT GALLERY (Collage)
 ============================================================ */
-.gallery-section {
+.recent-section {
+  padding: 60px 20px;
+  background: var(--white);
+}
+
+.collage-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 220px;
+  gap: 12px;
+}
+
+.collage-grid .item {
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+
+.collage-grid .item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.collage-grid .item:hover img { transform: scale(1.05); }
+
+.collage-grid .item .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 22, 40, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: var(--transition);
+  padding: 20px;
+}
+
+.collage-grid .item:hover .overlay { opacity: 1; }
+
+.collage-grid .item .overlay h3 {
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.collage-grid .item .overlay p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.collage-grid .item:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+.collage-grid .item:nth-child(2) { grid-column: span 1; grid-row: span 1; }
+.collage-grid .item:nth-child(3) { grid-column: span 1; grid-row: span 1; }
+.collage-grid .item:nth-child(4) { grid-column: span 1; grid-row: span 1; }
+.collage-grid .item:nth-child(5) { grid-column: span 1; grid-row: span 1; }
+
+/* ============================================================
+   CATEGORY ALBUMS
+============================================================ */
+.category-section {
   padding: 60px 20px;
   background: var(--off-white);
 }
 
-.gallery-grid {
+.category-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.category-tabs .cat-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 50px;
+  background: var(--white);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  box-shadow: var(--shadow-sm);
+}
+
+.category-tabs .cat-btn:hover { background: var(--blue-pale); color: var(--blue-bright); }
+.category-tabs .cat-btn.active { background: var(--blue-bright); color: white; box-shadow: 0 4px 15px rgba(59,130,246,0.25); }
+.category-tabs .cat-btn i { margin-right: 6px; }
+
+.album-grid {
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
@@ -338,7 +508,7 @@ img { max-width: 100%; }
   gap: 24px;
 }
 
-.gallery-card {
+.album-card {
   background: var(--white);
   border-radius: var(--radius);
   overflow: hidden;
@@ -348,35 +518,33 @@ img { max-width: 100%; }
   box-shadow: var(--shadow-sm);
 }
 
-.gallery-card:hover {
+.album-card:hover {
   transform: translateY(-6px);
   box-shadow: var(--shadow-lg);
   border-color: var(--blue-bright);
 }
 
-.gallery-card .image-wrap {
+.album-card .image-wrap {
   width: 100%;
   height: 200px;
   overflow: hidden;
-  background: var(--gray-light);
   position: relative;
+  background: var(--gray-light);
 }
 
-.gallery-card .image-wrap img {
+.album-card .image-wrap img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
 }
-.gallery-card:hover .image-wrap img { transform: scale(1.05); }
 
-.gallery-card .image-wrap .category-badge {
+.album-card:hover .image-wrap img { transform: scale(1.05); }
+
+.album-card .image-wrap .category-badge {
   position: absolute;
   top: 12px;
   left: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
   padding: 4px 14px;
   border-radius: 50px;
   font-size: 10px;
@@ -385,7 +553,7 @@ img { max-width: 100%; }
   text-transform: uppercase;
 }
 
-.gallery-card .image-wrap .photo-count {
+.album-card .image-wrap .photo-count {
   position: absolute;
   bottom: 12px;
   right: 12px;
@@ -396,12 +564,12 @@ img { max-width: 100%; }
   border-radius: 50px;
 }
 
-.gallery-card .info { padding: 16px 18px 18px; }
-.gallery-card .info .date { font-size: 12px; color: var(--gray); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
-.gallery-card .info h3 { font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
-.gallery-card .info p { font-size: 13px; color: var(--gray); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.gallery-card .info .meta { display: flex; align-items: center; gap: 12px; margin-top: 8px; font-size: 12px; color: var(--gray); }
-.gallery-card .info .meta span { display: flex; align-items: center; gap: 4px; }
+.album-card .info { padding: 16px 18px 18px; }
+.album-card .info .date { font-size: 12px; color: var(--gray); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.album-card .info h3 { font-size: 16px; font-weight: 700; color: var(--navy); }
+.album-card .info p { font-size: 13px; color: var(--gray); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 4px; }
+.album-card .info .meta { display: flex; align-items: center; gap: 12px; margin-top: 8px; font-size: 12px; color: var(--gray); }
+.album-card .info .meta span { display: flex; align-items: center; gap: 4px; }
 
 /* ============================================================
    LIGHTBOX
@@ -482,6 +650,31 @@ img { max-width: 100%; }
 .empty-state h3 { font-size: 20px; color: var(--text); margin-bottom: 6px; }
 
 /* ============================================================
+   LOAD MORE
+============================================================ */
+.load-more-wrap { text-align: center; margin-top: 40px; }
+
+.load-more-btn {
+  padding: 12px 36px;
+  border: 2px solid var(--blue-bright);
+  background: transparent;
+  color: var(--blue-bright);
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.load-more-btn:hover {
+  background: var(--blue-bright);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.25);
+}
+
+/* ============================================================
    FOOTER
 ============================================================ */
 .footer {
@@ -503,17 +696,32 @@ img { max-width: 100%; }
 /* ============================================================
    RESPONSIVE
 ============================================================ */
+@media (max-width: 992px) {
+  .hero-slider-wrap { height: 350px; }
+  .hero-slider-wrap .slide .slide-content h2 { font-size: 22px; }
+}
+
 @media (max-width: 768px) {
-  .page-header h1 { font-size: 28px; }
-  .category-nav { padding: 12px 16px; }
-  .category-nav-wrap .cat-btn { padding: 6px 14px; font-size: 12px; }
-  .gallery-grid { grid-template-columns: 1fr 1fr; }
+  .hero-slider-wrap { height: 280px; }
+  .hero-slider-wrap .slide .slide-content { padding: 30px 20px 20px; }
+  .hero-slider-wrap .slide .slide-content h2 { font-size: 18px; }
+  .slider-arrow { width: 36px; height: 36px; font-size: 14px; }
+  .slider-arrow.prev { left: 10px; }
+  .slider-arrow.next { right: 10px; }
+  .collage-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 160px; }
+  .collage-grid .item:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+  .album-grid { grid-template-columns: 1fr 1fr; }
+  .category-tabs .cat-btn { padding: 6px 14px; font-size: 12px; }
 }
 
 @media (max-width: 480px) {
-  .page-header h1 { font-size: 22px; }
-  .gallery-grid { grid-template-columns: 1fr; }
-  .gallery-card .image-wrap { height: 180px; }
+  .hero-slider-wrap { height: 220px; }
+  .slider-arrow { width: 30px; height: 30px; font-size: 12px; }
+  .slider-arrow.prev { left: 6px; }
+  .slider-arrow.next { right: 6px; }
+  .collage-grid { grid-template-columns: 1fr 1fr; grid-auto-rows: 120px; gap: 8px; }
+  .collage-grid .item:nth-child(1) { grid-column: span 2; grid-row: span 1; }
+  .album-grid { grid-template-columns: 1fr; }
   .lightbox-overlay .nav-btn { font-size: 28px; padding: 10px 5px; }
   .lightbox-overlay .close { font-size: 24px; top: 12px; right: 16px; }
 }
@@ -568,37 +776,66 @@ img { max-width: 100%; }
 </section>
 
 <!-- ============================================================
-     CATEGORY NAVIGATION
+     HERO SLIDER
 ============================================================ -->
-<section class="category-nav">
-  <div class="category-nav-wrap" id="categoryNav">
-    <button class="cat-btn active" data-category="all">
-      <i class="fas fa-th"></i> All
-    </button>
+<section class="hero-slider-section">
+  <div class="hero-slider-wrap" id="heroSlider">
+    <button class="slider-arrow prev" id="sliderPrev">‹</button>
+    <button class="slider-arrow next" id="sliderNext">›</button>
+    
+    <div class="slider-placeholder" id="sliderPlaceholder">
+      <i class="fas fa-images"></i>
+      <span>Loading gallery...</span>
+    </div>
+  </div>
+  <div class="slider-dots" id="sliderDots"></div>
+</section>
+
+<!-- ============================================================
+     RECENT GALLERY (Collage)
+============================================================ -->
+<section class="recent-section">
+  <div class="section-label">
+    <div class="line"></div>
+    <span>Latest</span>
+    <div class="line right"></div>
+  </div>
+  <h2 class="section-title">Recent <span class="highlight">Gallery</span></h2>
+
+  <div class="collage-grid" id="collageGrid">
+    <div class="empty-state" style="grid-column:1/-1;">
+      <i class="fas fa-spinner fa-spin"></i>
+      <h3>Loading...</h3>
+    </div>
   </div>
 </section>
 
 <!-- ============================================================
-     GALLERY GRID
+     CATEGORY ALBUMS
 ============================================================ -->
-<section class="gallery-section">
+<section class="category-section">
   <div class="section-label">
     <div class="line"></div>
-    <span>Memories</span>
+    <span>Albums</span>
     <div class="line right"></div>
   </div>
-  <h2 class="section-title">Our <span class="highlight">Gallery</span></h2>
+  <h2 class="section-title">Category <span class="highlight">Albums</span></h2>
 
-  <div class="gallery-grid" id="galleryGrid">
-    <div class="empty-state">
+  <div class="category-tabs" id="categoryTabs">
+    <button class="cat-btn active" data-category="all">
+      <i class="fas fa-th"></i> All
+    </button>
+  </div>
+
+  <div class="album-grid" id="albumGrid">
+    <div class="empty-state" style="grid-column:1/-1;">
       <i class="fas fa-spinner fa-spin"></i>
-      <h3>Loading...</h3>
-      <p>Please wait while we load the gallery</p>
+      <h3>Loading albums...</h3>
     </div>
   </div>
 
-  <div class="load-more-wrap" style="text-align:center;margin-top:40px;">
-    <button class="load-more-btn" id="loadMoreBtn" style="padding:12px 36px;border:2px solid var(--blue-bright);background:transparent;color:var(--blue-bright);border-radius:50px;font-size:15px;font-weight:600;cursor:pointer;transition:var(--transition);font-family:inherit;">
+  <div class="load-more-wrap">
+    <button class="load-more-btn" id="loadMoreBtn" style="display:none;">
       <i class="fas fa-plus-circle"></i> Load More
     </button>
   </div>
@@ -676,27 +913,167 @@ document.addEventListener("DOMContentLoaded", () => {
   let allAlbums = [];
   let currentCategory = 'all';
   let currentPage = 1;
-  const limit = 12;
+  const limit = 9;
   let isLoading = false;
   let hasMore = true;
+  let collageImages = [];
+  let albumImages = [];
+
+  // ============================================================
+  // HERO SLIDER
+  // ============================================================
+  let sliderSlides = [];
+  let sliderCurrent = 0;
+  let sliderTimer;
+
+  async function loadHeroSlider() {
+    const wrap = document.getElementById('heroSlider');
+    const placeholder = document.getElementById('sliderPlaceholder');
+    const dotsContainer = document.getElementById('sliderDots');
+
+    try {
+      const response = await fetch(`${API_BASE}/api/gallery/slider`);
+      const data = await response.json();
+
+      if (!data || data.length === 0) {
+        placeholder.innerHTML = `
+          <i class="fas fa-image"></i>
+          <span>No slider images available</span>
+        `;
+        return;
+      }
+
+      placeholder.remove();
+
+      data.forEach((img, index) => {
+        const slide = document.createElement('div');
+        slide.className = `slide${index === 0 ? ' active' : ''}`;
+        const imageUrl = img.file_path || img.filename;
+
+        slide.innerHTML = `
+          <img src="${imageUrl}" alt="${img.title || 'Gallery Image'}" loading="lazy">
+          <div class="slide-content">
+            <h2>${img.title || 'School Event'}</h2>
+            <p>${img.description || 'Capturing beautiful moments from our school'}</p>
+          </div>
+        `;
+
+        wrap.appendChild(slide);
+
+        const dot = document.createElement('span');
+        if (index === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => goToSlide(index));
+        dotsContainer.appendChild(dot);
+      });
+
+      sliderSlides = wrap.querySelectorAll('.slide');
+      if (sliderSlides.length > 1) startSliderAuto();
+
+    } catch (error) {
+      console.error('Slider error:', error);
+      placeholder.innerHTML = `
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>Failed to load slider</span>
+      `;
+    }
+  }
+
+  function goToSlide(index) {
+    if (!sliderSlides.length) return;
+    sliderSlides.forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('#sliderDots span').forEach(d => d.classList.remove('active'));
+    sliderCurrent = (index + sliderSlides.length) % sliderSlides.length;
+    sliderSlides[sliderCurrent].classList.add('active');
+    const dots = document.querySelectorAll('#sliderDots span');
+    if (dots[sliderCurrent]) dots[sliderCurrent].classList.add('active');
+  }
+
+  function nextSlide() { goToSlide(sliderCurrent + 1); }
+  function prevSlide() { goToSlide(sliderCurrent - 1); }
+
+  function startSliderAuto() {
+    clearInterval(sliderTimer);
+    if (sliderSlides.length > 1) {
+      sliderTimer = setInterval(nextSlide, 4500);
+    }
+  }
+
+  document.getElementById('sliderNext').addEventListener('click', () => {
+    clearInterval(sliderTimer);
+    nextSlide();
+    startSliderAuto();
+  });
+
+  document.getElementById('sliderPrev').addEventListener('click', () => {
+    clearInterval(sliderTimer);
+    prevSlide();
+    startSliderAuto();
+  });
+
+  // ============================================================
+  // LOAD COLLAGE IMAGES (Recent)
+  // ============================================================
+  async function loadCollage() {
+    const grid = document.getElementById('collageGrid');
+    try {
+      const response = await fetch(`${API_BASE}/api/gallery/images?limit=5`);
+      const data = await response.json();
+
+      if (!data.success || !data.data || data.data.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1;">
+            <i class="fas fa-images"></i>
+            <h3>No Images Found</h3>
+            <p>Upload images to create a beautiful collage</p>
+          </div>
+        `;
+        return;
+      }
+
+      const images = data.data.slice(0, 5);
+      collageImages = images;
+
+      grid.innerHTML = images.map((img, index) => {
+        const imageUrl = img.file_path || img.filename;
+        return `
+          <div class="item" onclick="openLightbox(${index})">
+            <img src="${imageUrl}" alt="${img.title || 'Image'}" loading="lazy">
+            <div class="overlay">
+              <h3>${img.title || 'Untitled'}</h3>
+              <p>${img.album_title || ''}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      window.collageImages = images;
+
+    } catch (error) {
+      console.error('Collage error:', error);
+    }
+  }
 
   // ============================================================
   // LOAD CATEGORIES
   // ============================================================
   async function loadCategories() {
-    const nav = document.getElementById('categoryNav');
+    const tabs = document.getElementById('categoryTabs');
     try {
       const response = await fetch(`${API_BASE}/api/gallery/categories`);
       const data = await response.json();
 
       if (data.success && data.data) {
+        const mainCategories = ['academic', 'sports', 'cultural', 'annual-function', 'science-exhibition', 'republic-day'];
+        
         data.data.forEach(cat => {
-          const btn = document.createElement('button');
-          btn.className = 'cat-btn';
-          btn.dataset.category = cat.slug;
-          btn.innerHTML = `<i class="${cat.icon || 'fa-folder'}"></i> ${cat.name}`;
-          btn.addEventListener('click', () => filterByCategory(cat.slug));
-          nav.appendChild(btn);
+          if (mainCategories.includes(cat.slug)) {
+            const btn = document.createElement('button');
+            btn.className = 'cat-btn';
+            btn.dataset.category = cat.slug;
+            btn.innerHTML = `<i class="${cat.icon || 'fa-folder'}"></i> ${cat.name}`;
+            btn.addEventListener('click', () => filterByCategory(cat.slug));
+            tabs.appendChild(btn);
+          }
         });
       }
     } catch (error) {
@@ -715,14 +1092,15 @@ document.addEventListener("DOMContentLoaded", () => {
     currentCategory = category;
     currentPage = 1;
     hasMore = true;
-    loadGallery(true);
+    loadAlbums(true);
   }
 
   // ============================================================
-  // LOAD GALLERY
+  // LOAD ALBUMS
   // ============================================================
-  async function loadGallery(reset = true) {
-    const grid = document.getElementById('galleryGrid');
+  async function loadAlbums(reset = true) {
+    const grid = document.getElementById('albumGrid');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
     
     if (isLoading) return;
     isLoading = true;
@@ -731,12 +1109,12 @@ document.addEventListener("DOMContentLoaded", () => {
       currentPage = 1;
       allAlbums = [];
       grid.innerHTML = `
-        <div class="empty-state">
+        <div class="empty-state" style="grid-column:1/-1;">
           <i class="fas fa-spinner fa-spin"></i>
           <h3>Loading...</h3>
-          <p>Please wait while we load the gallery</p>
         </div>
       `;
+      loadMoreBtn.style.display = 'none';
     }
 
     try {
@@ -746,37 +1124,28 @@ document.addEventListener("DOMContentLoaded", () => {
       const response = await fetch(url);
       const data = await response.json();
 
-      if (!data.success) {
-        throw new Error(data.message || 'Failed to load');
-      }
+      if (!data.success) throw new Error('Failed to load');
 
       const albums = data.data || [];
       const pagination = data.pagination || {};
 
-      if (reset) {
-        allAlbums = albums;
-      } else {
-        allAlbums = [...allAlbums, ...albums];
-      }
+      if (reset) allAlbums = albums;
+      else allAlbums = [...allAlbums, ...albums];
 
-      hasMore = pagination.page < pagination.totalPages;
+      hasMore = pagination.page && pagination.totalPages && pagination.page < pagination.totalPages;
 
-      renderGallery(allAlbums);
+      renderAlbums(allAlbums);
 
-      if (!hasMore) {
-        document.getElementById('loadMoreBtn').style.display = 'none';
-      } else {
-        document.getElementById('loadMoreBtn').style.display = 'inline-flex';
-      }
+      if (!hasMore || albums.length === 0) loadMoreBtn.style.display = 'none';
+      else loadMoreBtn.style.display = 'inline-flex';
 
     } catch (error) {
-      console.error('Gallery error:', error);
+      console.error('Albums error:', error);
       grid.innerHTML = `
-        <div class="empty-state" style="border:2px dashed #fee2e2;border-radius:16px;padding:40px;">
-          <i class="fas fa-exclamation-circle" style="color:#ef4444;"></i>
-          <h3 style="color:#ef4444;">Failed to Load</h3>
-          <p>Unable to load gallery. Please try again.</p>
-          <button onclick="loadGallery(true)" style="margin-top:12px;padding:8px 24px;background:#4a8af4;color:white;border:none;border-radius:8px;cursor:pointer;">Retry</button>
+        <div class="empty-state" style="grid-column:1/-1;">
+          <i class="fas fa-exclamation-circle"></i>
+          <h3>Failed to Load</h3>
+          <p>Please try again later</p>
         </div>
       `;
     } finally {
@@ -785,17 +1154,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================================================
-  // RENDER GALLERY
+  // RENDER ALBUMS
   // ============================================================
-  function renderGallery(albums) {
-    const grid = document.getElementById('galleryGrid');
+  function renderAlbums(albums) {
+    const grid = document.getElementById('albumGrid');
 
     if (!albums || albums.length === 0) {
       grid.innerHTML = `
-        <div class="empty-state">
-          <i class="fas fa-images" style="font-size:48px;color:#dbeafe;"></i>
+        <div class="empty-state" style="grid-column:1/-1;">
+          <i class="fas fa-images"></i>
           <h3>No Albums Found</h3>
-          <p>Try adjusting your filters</p>
+          <p>No albums available in this category</p>
         </div>
       `;
       return;
@@ -805,12 +1174,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const coverUrl = album.cover_image || 'https://via.placeholder.com/400x300/1a3a6b/4a8af4?text=No+Image';
       const photoCount = album.photo_count || 0;
       const categoryName = album.category || 'General';
+      const categoryColor = getCategoryColor(categoryName);
       
       return `
-        <div class="gallery-card" onclick="openLightbox(${index})">
+        <div class="album-card" onclick="openLightboxAlbum(${index})">
           <div class="image-wrap">
             <img src="${coverUrl}" alt="${album.title}" loading="lazy">
-            <span class="category-badge" style="background:${getCategoryColor(categoryName)}">${categoryName}</span>
+            <span class="category-badge" style="background:${categoryColor}">${categoryName}</span>
             <span class="photo-count"><i class="fas fa-image"></i> ${photoCount}</span>
           </div>
           <div class="info">
@@ -819,14 +1189,13 @@ document.addEventListener("DOMContentLoaded", () => {
             <p>${album.description || ''}</p>
             <div class="meta">
               <span><i class="far fa-eye"></i> ${album.view_count || 0}</span>
-              <span><i class="far fa-heart"></i> ${Math.floor(Math.random() * 50) + 10}</span>
             </div>
           </div>
         </div>
       `;
     }).join('');
 
-    window.galleryAlbums = albums;
+    window.albumData = albums;
   }
 
   // ============================================================
@@ -842,21 +1211,34 @@ document.addEventListener("DOMContentLoaded", () => {
       'republic-day': '#ef4444',
       'independence-day': '#f97316',
       'workshops': '#8b5cf6',
-      'seminars': '#3b82f6',
-      'alumni': '#6b7280',
-      'achievements': '#f59e0b',
       'general': '#4a8af4'
     };
     return colors[category] || '#4a8af4';
   }
 
   // ============================================================
-  // LIGHTBOX
+  // LIGHTBOX - Collage
   // ============================================================
   let lightboxIndex = 0;
 
   window.openLightbox = function(index) {
-    const albums = window.galleryAlbums || [];
+    const images = window.collageImages || [];
+    if (!images.length) return;
+    
+    lightboxIndex = index;
+    const img = images[lightboxIndex];
+    const imageUrl = img.file_path || img.filename;
+    
+    document.getElementById('lightboxImg').src = imageUrl;
+    document.getElementById('lightboxTitle').textContent = img.title || 'Image';
+    document.getElementById('lightboxDesc').textContent = img.album_title || '';
+    document.getElementById('lightboxCounter').textContent = `${lightboxIndex + 1} / ${images.length}`;
+    document.getElementById('lightbox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  window.openLightboxAlbum = function(index) {
+    const albums = window.albumData || [];
     if (!albums.length) return;
     
     lightboxIndex = index;
@@ -882,24 +1264,24 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById('lightboxNext').addEventListener('click', () => {
-    const albums = window.galleryAlbums || [];
+    const albums = window.albumData || window.collageImages || [];
     if (!albums.length) return;
     lightboxIndex = (lightboxIndex + 1) % albums.length;
-    const album = albums[lightboxIndex];
-    document.getElementById('lightboxImg').src = album.cover_image || 'https://via.placeholder.com/800x500/1a3a6b/4a8af4?text=No+Image';
-    document.getElementById('lightboxTitle').textContent = album.title || 'Album';
-    document.getElementById('lightboxDesc').textContent = album.description || '';
+    const item = albums[lightboxIndex];
+    document.getElementById('lightboxImg').src = item.file_path || item.cover_image || 'https://via.placeholder.com/800x500/1a3a6b/4a8af4?text=No+Image';
+    document.getElementById('lightboxTitle').textContent = item.title || 'Item';
+    document.getElementById('lightboxDesc').textContent = item.description || item.album_title || '';
     document.getElementById('lightboxCounter').textContent = `${lightboxIndex + 1} / ${albums.length}`;
   });
 
   document.getElementById('lightboxPrev').addEventListener('click', () => {
-    const albums = window.galleryAlbums || [];
+    const albums = window.albumData || window.collageImages || [];
     if (!albums.length) return;
     lightboxIndex = (lightboxIndex - 1 + albums.length) % albums.length;
-    const album = albums[lightboxIndex];
-    document.getElementById('lightboxImg').src = album.cover_image || 'https://via.placeholder.com/800x500/1a3a6b/4a8af4?text=No+Image';
-    document.getElementById('lightboxTitle').textContent = album.title || 'Album';
-    document.getElementById('lightboxDesc').textContent = album.description || '';
+    const item = albums[lightboxIndex];
+    document.getElementById('lightboxImg').src = item.file_path || item.cover_image || 'https://via.placeholder.com/800x500/1a3a6b/4a8af4?text=No+Image';
+    document.getElementById('lightboxTitle').textContent = item.title || 'Item';
+    document.getElementById('lightboxDesc').textContent = item.description || item.album_title || '';
     document.getElementById('lightboxCounter').textContent = `${lightboxIndex + 1} / ${albums.length}`;
   });
 
@@ -916,15 +1298,18 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('loadMoreBtn').addEventListener('click', () => {
     if (!isLoading && hasMore) {
       currentPage++;
-      loadGallery(false);
+      loadAlbums(false);
     }
   });
 
   // ============================================================
   // INIT
   // ============================================================
+  console.log('🚀 Gallery Page Loaded');
+  loadHeroSlider();
+  loadCollage();
   loadCategories();
-  loadGallery(true);
+  loadAlbums(true);
 
 });
 </script>
