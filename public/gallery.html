@@ -1,1464 +1,1276 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gallery Manager - Admin</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-/* ============================================================
-   RESET & ROOT
-============================================================ */
-* { margin: 0; padding: 0; box-sizing: border-box; }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Gallery Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f4f8;
+            color: #1a2332;
+            padding: 20px;
+        }
+        .container { max-width: 1300px; margin: 0 auto; }
 
-:root {
-  --navy-dark: #0a1628;
-  --navy: #0f2847;
-  --navy-mid: #1a3a6b;
-  --navy-light: #2a5298;
-  --blue-bright: #3b82f6;
-  --blue-light: #60a5fa;
-  --blue-pale: #dbeafe;
-  --white: #ffffff;
-  --off-white: #f0f4ff;
-  --gray: #94a3b8;
-  --gray-light: #e8edf8;
-  --text: #1a2332;
-  --radius: 16px;
-  --shadow-sm: 0 2px 12px rgba(10,22,40,0.06);
-  --shadow-md: 0 8px 32px rgba(10,22,40,0.10);
-  --shadow-lg: 0 20px 60px rgba(10,22,40,0.15);
-  --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #0a1628, #1a3a6b);
+            padding: 20px 28px;
+            border-radius: 12px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            border-bottom: 4px solid #d4a843;
+        }
+        .header h1 { font-size: 22px; font-weight: 700; }
+        .header h1 span { color: #d4a843; }
+        .header .subtitle { color: rgba(255,255,255,0.7); font-size: 13px; }
 
-body {
-  font-family: 'Inter', sans-serif;
-  background: var(--off-white);
-  color: var(--text);
-  min-height: 100vh;
-  padding: 20px;
-}
+        /* Buttons */
+        .btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary:hover { background: #2563eb; transform: translateY(-2px); }
+        .btn-success { background: #22c55e; color: white; }
+        .btn-success:hover { background: #16a34a; transform: translateY(-2px); }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; transform: translateY(-2px); }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; transform: translateY(-2px); }
+        .btn-outline { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-outline:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+        .btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 6px; }
 
-.container { max-width: 1300px; margin: 0 auto; }
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-box {
+            background: white;
+            padding: 18px 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .stat-box .icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .stat-box .icon.blue { background: #dbeafe; color: #3b82f6; }
+        .stat-box .icon.green { background: #dcfce7; color: #22c55e; }
+        .stat-box .icon.yellow { background: #fef3c7; color: #f59e0b; }
+        .stat-box .icon.purple { background: #ede9fe; color: #8b5cf6; }
+        .stat-box .number { font-size: 22px; font-weight: 800; color: #0a1628; }
+        .stat-box .label { font-size: 12px; color: #94a3b8; font-weight: 500; }
 
-/* ============================================================
-   HEADER
-============================================================ */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 30px;
-  padding: 20px 28px;
-  background: linear-gradient(135deg, var(--navy-dark), var(--navy));
-  border-radius: var(--radius);
-  color: var(--white);
-  box-shadow: var(--shadow-md);
-}
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: white;
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .tab-btn:hover { background: #f0f4f8; color: #1a2332; }
+        .tab-btn.active { background: #1a3a6b; color: white; }
 
-.header h1 { font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 12px; }
-.header h1 i { color: var(--blue-light); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-.header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        /* Form */
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+        }
+        .form-card h2 { font-size: 18px; font-weight: 700; color: #1a3a6b; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px; }
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border 0.3s;
+        }
+        .form-control:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .form-control-file { padding: 8px; }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 22px;
-  border: none;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-  text-decoration: none;
-  font-family: inherit;
-}
+        /* Upload Area */
+        .upload-area {
+            background: #f8fafc;
+            border: 2px dashed #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .upload-area:hover { border-color: #3b82f6; background: #eff6ff; }
+        .upload-area .icon-big { font-size: 40px; color: #3b82f6; margin-bottom: 8px; }
+        .upload-area h3 { font-size: 16px; font-weight: 600; color: #1a2332; }
+        .upload-area p { font-size: 13px; color: #94a3b8; }
 
-.btn-primary { background: linear-gradient(135deg, var(--blue-bright), var(--navy-light)); color: white; box-shadow: 0 4px 20px rgba(59,130,246,0.25); }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(59,130,246,0.35); }
-.btn-success { background: #22c55e; color: white; }
-.btn-success:hover { background: #16a34a; transform: translateY(-2px); }
-.btn-danger { background: #ef4444; color: white; }
-.btn-danger:hover { background: #dc2626; transform: translateY(-2px); }
-.btn-warning { background: #f59e0b; color: white; }
-.btn-warning:hover { background: #d97706; transform: translateY(-2px); }
-.btn-outline { background: rgba(255,255,255,0.06); color: white; border: 1px solid rgba(255,255,255,0.1); }
-.btn-outline:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
-.btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 8px; }
+        /* Table */
+        .table-wrapper {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            overflow-x: auto;
+        }
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .table-header h3 { font-size: 16px; font-weight: 700; color: #1a3a6b; }
+        .table-header .count { background: #dbeafe; color: #3b82f6; padding: 2px 12px; border-radius: 30px; font-size: 13px; font-weight: 600; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { text-align: left; padding: 12px 16px; background: #f8fafc; font-weight: 600; color: #475569; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        tr:hover { background: #f8fafc; }
+        .thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+        .badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-primary { background: #dbeafe; color: #3b82f6; }
+        .badge-success { background: #dcfce7; color: #22c55e; }
+        .badge-warning { background: #fef3c7; color: #f59e0b; }
+        .badge-danger { background: #fee2e2; color: #ef4444; }
 
-/* ============================================================
-   TABS
-============================================================ */
-.tabs {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 30px;
-  background: var(--white);
-  padding: 6px;
-  border-radius: var(--radius);
-  border: 1px solid var(--gray-light);
-  box-shadow: var(--shadow-sm);
-  flex-wrap: wrap;
-}
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
+            z-index: 9999; display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: white; border-radius: 16px; max-width: 600px; width: 100%;
+            padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            max-height: 90vh; overflow-y: auto;
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { font-size: 18px; font-weight: 700; color: #1a3a6b; }
+        .modal-close { width: 36px; height: 36px; border: none; background: #f1f5f9; border-radius: 50%; font-size: 18px; cursor: pointer; transition: 0.3s; }
+        .modal-close:hover { background: #fee2e2; color: #ef4444; }
+        .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
 
-.tab-btn {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 10px;
-  background: transparent;
-  color: var(--gray);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-  font-family: inherit;
-}
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 30px; right: 30px; padding: 14px 24px; border-radius: 12px;
+            color: white; font-weight: 600; font-size: 14px; z-index: 99999;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            display: none; animation: slideIn 0.3s ease;
+        }
+        .toast-success { background: #22c55e; }
+        .toast-error { background: #ef4444; }
+        .toast-info { background: #1a3a6b; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
 
-.tab-btn:hover { background: var(--off-white); color: var(--text); }
-.tab-btn.active { background: var(--blue-bright); color: white; box-shadow: 0 4px 15px rgba(59,130,246,0.25); }
-
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-
-/* ============================================================
-   STATS ROW
-============================================================ */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 16px;
-  margin-bottom: 30px;
-}
-
-.stat-box {
-  background: var(--white);
-  padding: 18px 20px;
-  border-radius: var(--radius);
-  border: 1px solid var(--gray-light);
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  box-shadow: var(--shadow-sm);
-}
-
-.stat-box .icon-box { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-.stat-box .icon-box.blue { background: var(--blue-pale); color: var(--blue-bright); }
-.stat-box .icon-box.green { background: #dcfce7; color: #22c55e; }
-.stat-box .icon-box.yellow { background: #fef3c7; color: #f59e0b; }
-.stat-box .icon-box.purple { background: #ede9fe; color: #8b5cf6; }
-
-.stat-box .info .number { font-size: 22px; font-weight: 800; color: var(--navy-dark); line-height: 1.2; }
-.stat-box .info .label { font-size: 12px; color: var(--gray); font-weight: 500; }
-
-/* ============================================================
-   FORM SECTION
-============================================================ */
-.form-section {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 24px 28px;
-  margin-bottom: 30px;
-  border: 1px solid var(--gray-light);
-  box-shadow: var(--shadow-sm);
-}
-
-.form-section h2 { font-size: 18px; font-weight: 700; color: var(--navy-dark); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
-
-.form-group { margin-bottom: 14px; }
-.form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-.form-group label .required { color: #ef4444; }
-.form-group input, .form-group textarea, .form-group select {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--gray-light);
-  border-radius: 10px;
-  font-size: 14px;
-  font-family: inherit;
-  transition: var(--transition);
-}
-.form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-  outline: none;
-  border-color: var(--blue-bright);
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
-}
-.form-group textarea { resize: vertical; min-height: 80px; }
-
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-
-/* ============================================================
-   UPLOAD AREA
-============================================================ */
-.upload-area {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 40px;
-  margin-bottom: 30px;
-  border: 2px dashed var(--gray-light);
-  text-align: center;
-  transition: var(--transition);
-  cursor: pointer;
-}
-
-.upload-area:hover { border-color: var(--blue-bright); background: #f8faff; }
-.upload-area.dragover { border-color: var(--blue-bright); background: #eff6ff; }
-
-.upload-area .icon-big { font-size: 52px; color: var(--blue-bright); margin-bottom: 12px; }
-.upload-area h3 { font-size: 18px; font-weight: 700; color: var(--navy-dark); margin-bottom: 4px; }
-.upload-area p { color: var(--gray); font-size: 14px; margin-bottom: 14px; }
-
-.upload-area .browse-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 28px;
-  background: linear-gradient(135deg, var(--blue-bright), var(--navy-light));
-  color: var(--white);
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-  border: none;
-  font-family: inherit;
-  font-size: 14px;
-}
-.upload-area .browse-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59,130,246,0.3); }
-
-#fileInput { display: none; }
-
-.progress-wrapper { margin-top: 16px; display: none; }
-.progress-bar { width: 100%; height: 6px; background: var(--gray-light); border-radius: 50px; overflow: hidden; }
-.progress-bar .fill { height: 100%; background: linear-gradient(90deg, var(--blue-bright), var(--navy-light)); width: 0%; transition: width 0.3s; }
-.progress-text { font-size: 12px; color: var(--gray); margin-top: 6px; }
-
-/* ============================================================
-   TABLE
-============================================================ */
-.table-wrapper {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 20px;
-  border: 1px solid var(--gray-light);
-  overflow-x: auto;
-  box-shadow: var(--shadow-sm);
-}
-
-.table-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.table-header h2 { font-size: 18px; font-weight: 700; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; }
-.table-header h2 span { background: var(--blue-pale); color: var(--blue-bright); padding: 2px 12px; border-radius: 50px; font-size: 13px; font-weight: 600; }
-
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-table thead { background: #f8faff; }
-table th { padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text); border-bottom: 2px solid var(--gray-light); }
-table td { padding: 12px 16px; border-bottom: 1px solid var(--gray-light); vertical-align: middle; }
-table tr:hover { background: #f8faff; }
-
-table .thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; background: var(--gray-light); }
-table .status-badge { display: inline-block; padding: 3px 12px; border-radius: 50px; font-size: 11px; font-weight: 600; }
-table .status-badge.active { background: #dcfce7; color: #16a34a; }
-table .status-badge.inactive { background: #fee2e2; color: #dc2626; }
-table .category-badge { display: inline-block; padding: 2px 10px; border-radius: 50px; font-size: 11px; font-weight: 600; background: #dbeafe; color: #2563eb; }
-table .recent-badge { display: inline-block; padding: 2px 10px; border-radius: 50px; font-size: 11px; font-weight: 600; background: #fef3c7; color: #d97706; }
-
-.action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
-
-/* ============================================================
-   MODAL
-============================================================ */
-.modal-overlay {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-  z-index: 9998; display: none; align-items: center; justify-content: center; padding: 20px;
-}
-.modal-overlay.active { display: flex; }
-
-.modal {
-  background: var(--white); border-radius: var(--radius); max-width: 600px; width: 100%;
-  padding: 30px; box-shadow: var(--shadow-lg); animation: modalIn 0.3s ease;
-  max-height: 90vh; overflow-y: auto;
-}
-@keyframes modalIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.modal-header h3 { font-size: 18px; font-weight: 700; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; }
-.modal-close { width: 36px; height: 36px; border: none; background: var(--gray-light); border-radius: 50%; font-size: 18px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
-.modal-close:hover { background: #fee2e2; color: #ef4444; }
-
-.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--gray-light); }
-
-/* ============================================================
-   TOAST
-============================================================ */
-.toast {
-  position: fixed; bottom: 30px; right: 30px; background: var(--navy-dark); color: var(--white);
-  padding: 16px 24px; border-radius: var(--radius); box-shadow: var(--shadow-lg);
-  display: flex; align-items: center; gap: 12px; transform: translateY(100px); opacity: 0;
-  transition: all 0.5s ease; z-index: 9999; max-width: 400px;
-}
-.toast.show { transform: translateY(0); opacity: 1; }
-.toast.success i { color: #22c55e; }
-.toast.error i { color: #ef4444; }
-
-/* ============================================================
-   RESPONSIVE
-============================================================ */
-@media (max-width: 768px) {
-  .header { flex-direction: column; align-items: stretch; }
-  .header-actions { flex-wrap: wrap; }
-  .header-actions .btn { flex: 1; justify-content: center; }
-  .stats-row { grid-template-columns: 1fr 1fr; }
-  .form-row { grid-template-columns: 1fr; }
-  .tabs { gap: 2px; }
-  .tab-btn { padding: 8px 14px; font-size: 12px; }
-  .table-wrapper { padding: 12px; }
-  table { font-size: 12px; }
-  table th, table td { padding: 8px 10px; }
-  .upload-area { padding: 24px; }
-  .modal { padding: 20px; }
-}
-
-@media (max-width: 480px) {
-  .stats-row { grid-template-columns: 1fr; }
-  .tabs { flex-direction: column; }
-  .tab-btn { width: 100%; justify-content: center; }
-}
-</style>
+        @media (max-width: 768px) {
+            .form-row { grid-template-columns: 1fr; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .stats { grid-template-columns: 1fr 1fr; }
+            .tabs { gap: 2px; }
+            .tab-btn { padding: 8px 16px; font-size: 12px; }
+        }
+        @media (max-width: 480px) {
+            .stats { grid-template-columns: 1fr; }
+            .tabs { flex-direction: column; }
+            .tab-btn { width: 100%; justify-content: center; }
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
 
-  <!-- HEADER -->
-  <header class="header">
-    <h1><i class="fas fa-images"></i> Gallery Manager</h1>
-    <div class="header-actions">
-      <a href="gallery.html" target="_blank" class="btn btn-outline">
-        <i class="fas fa-eye"></i> View Gallery
-      </a>
-      <button class="btn btn-primary" onclick="refreshData()">
-        <i class="fas fa-sync-alt"></i> Refresh
-      </button>
-    </div>
-  </header>
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div>
+            <h1>📸 <span>Gallery</span> Admin</h1>
+            <div class="subtitle">Manage school gallery albums & images</div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-outline" onclick="refreshData()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button class="btn btn-outline" onclick="window.open('public-gallery.html', '_blank')">
+                <i class="fas fa-eye"></i> View Gallery
+            </button>
+        </div>
+    </header>
 
-  <!-- STATS -->
-  <div class="stats-row" id="statsRow">
-    <div class="stat-box">
-      <div class="icon-box blue"><i class="fas fa-images"></i></div>
-      <div class="info"><div class="number" id="totalPhotos">0</div><div class="label">Total Photos</div></div>
+    <!-- ===== STATS ===== -->
+    <div class="stats" id="statsRow">
+        <div class="stat-box">
+            <div class="icon blue"><i class="fas fa-images"></i></div>
+            <div><div class="number" id="totalImages">0</div><div class="label">Total Images</div></div>
+        </div>
+        <div class="stat-box">
+            <div class="icon green"><i class="fas fa-folder-open"></i></div>
+            <div><div class="number" id="totalAlbums">0</div><div class="label">Total Albums</div></div>
+        </div>
+        <div class="stat-box">
+            <div class="icon yellow"><i class="fas fa-eye"></i></div>
+            <div><div class="number" id="totalViews">0</div><div class="label">Total Views</div></div>
+        </div>
+        <div class="stat-box">
+            <div class="icon purple"><i class="fas fa-clock"></i></div>
+            <div><div class="number" id="totalRecent">0</div><div class="label">Recent Images</div></div>
+        </div>
     </div>
-    <div class="stat-box">
-      <div class="icon-box green"><i class="fas fa-folder-open"></i></div>
-      <div class="info"><div class="number" id="totalAlbums">0</div><div class="label">Total Albums</div></div>
-    </div>
-    <div class="stat-box">
-      <div class="icon-box yellow"><i class="fas fa-eye"></i></div>
-      <div class="info"><div class="number" id="totalViews">0</div><div class="label">Total Views</div></div>
-    </div>
-    <div class="stat-box">
-      <div class="icon-box purple"><i class="fas fa-sliders-h"></i></div>
-      <div class="info"><div class="number" id="sliderCount">0</div><div class="label">Slider Images</div></div>
-    </div>
-  </div>
 
-  <!-- TABS -->
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="upload"><i class="fas fa-upload"></i> Upload</button>
-    <button class="tab-btn" data-tab="albums"><i class="fas fa-folder-open"></i> Albums</button>
-    <button class="tab-btn" data-tab="slider"><i class="fas fa-sliders-h"></i> Slider</button>
-    <button class="tab-btn" data-tab="recent"><i class="fas fa-clock"></i> Recent</button>
-  </div>
+    <!-- ===== TABS ===== -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="albums"><i class="fas fa-folder-open"></i> Albums</button>
+        <button class="tab-btn" data-tab="upload"><i class="fas fa-upload"></i> Upload</button>
+        <button class="tab-btn" data-tab="images"><i class="fas fa-images"></i> All Images</button>
+        <button class="tab-btn" data-tab="slider"><i class="fas fa-sliders-h"></i> Slider</button>
+        <button class="tab-btn" data-tab="recent"><i class="fas fa-clock"></i> Recent</button>
+    </div>
 
-  <!-- ============================================================
-       TAB 1: UPLOAD IMAGE
-  ============================================================ -->
-  <div class="tab-content active" id="tab-upload">
-    <div class="form-section">
-      <h2><i class="fas fa-cloud-upload-alt"></i> Upload New Image</h2>
-      <form id="uploadForm">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Album <span class="required">*</span></label>
-            <select id="uploadAlbum" required>
-              <option value="">-- Select Album --</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Category <span class="required">*</span></label>
-            <select id="uploadCategory" required>
-              <option value="general">General</option>
-              <option value="academic">Academic</option>
-              <option value="sports">Sports</option>
-              <option value="cultural">Cultural</option>
-              <option value="annual-function">Annual Function</option>
-              <option value="science-exhibition">Science Exhibition</option>
-              <option value="republic-day">Republic Day</option>
-            </select>
-          </div>
+    <!-- ============================================================
+    TAB 1: ALBUMS
+    ============================================================ -->
+    <div class="tab-content active" id="tab-albums">
+
+        <!-- Add Album Form -->
+        <div class="form-card">
+            <h2><i class="fas fa-plus-circle"></i> Create New Album</h2>
+            <form id="albumForm" enctype="multipart/form-data">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Album Title *</label>
+                        <input type="text" id="albumTitle" class="form-control" placeholder="Enter album title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="albumCategory" class="form-control">
+                            <option value="general">General</option>
+                            <option value="academic">Academic</option>
+                            <option value="sports">Sports</option>
+                            <option value="cultural">Cultural</option>
+                            <option value="annual-function">Annual Function</option>
+                            <option value="science-exhibition">Science Exhibition</option>
+                            <option value="republic-day">Republic Day</option>
+                            <option value="infrastructure">Infrastructure</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="albumDescription" class="form-control" rows="2" placeholder="Enter description"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Event Date</label>
+                        <input type="date" id="albumEventDate" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Venue</label>
+                        <input type="text" id="albumVenue" class="form-control" placeholder="Event venue">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cover Image</label>
+                        <input type="file" id="albumCover" class="form-control form-control-file" accept="image/*">
+                    </div>
+                    <div class="form-group" style="display:flex;align-items:center;gap:20px;padding-top:8px;">
+                        <label><input type="checkbox" id="albumFeatured"> ⭐ Featured</label>
+                        <label><input type="checkbox" id="albumActive" checked> ✅ Active</label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success" id="albumSubmitBtn">
+                    <i class="fas fa-save"></i> Create Album
+                </button>
+            </form>
         </div>
 
-        <div class="form-group">
-          <label>Image Title</label>
-          <input type="text" id="uploadTitle" placeholder="Enter image title...">
+        <!-- Albums Table -->
+        <div class="table-wrapper">
+            <div class="table-header">
+                <h3>📋 All Albums <span class="count" id="albumsCount">0</span></h3>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th style="width:70px;">Cover</th>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Photos</th>
+                        <th>Views</th>
+                        <th>Status</th>
+                        <th style="width:140px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="albumsTableBody">
+                    <tr><td colspan="8" style="text-align:center;padding:40px;color:#94a3b8;">
+                        <i class="fas fa-spinner fa-spin"></i> Loading...
+                    </td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    TAB 2: UPLOAD IMAGES
+    ============================================================ -->
+    <div class="tab-content" id="tab-upload">
+        <div class="form-card">
+            <h2><i class="fas fa-cloud-upload-alt"></i> Upload Images</h2>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Select Album *</label>
+                        <select id="uploadAlbum" class="form-control" required>
+                            <option value="">-- Select Album --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="uploadCategory" class="form-control">
+                            <option value="general">General</option>
+                            <option value="academic">Academic</option>
+                            <option value="sports">Sports</option>
+                            <option value="cultural">Cultural</option>
+                            <option value="annual-function">Annual Function</option>
+                            <option value="science-exhibition">Science Exhibition</option>
+                            <option value="republic-day">Republic Day</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Image Title (optional)</label>
+                    <input type="text" id="uploadTitle" class="form-control" placeholder="Enter title">
+                </div>
+                <div class="form-group">
+                    <label>Description (optional)</label>
+                    <textarea id="uploadDescription" class="form-control" rows="2" placeholder="Enter description"></textarea>
+                </div>
+                <div class="form-group" style="display:flex;align-items:center;gap:20px;">
+                    <label><input type="checkbox" id="uploadRecent" checked> Add to Recent Collage</label>
+                    <label><input type="checkbox" id="uploadFeatured"> Mark as Featured</label>
+                </div>
+
+                <div class="upload-area" id="imageUploadArea">
+                    <div class="icon-big"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <h3>Click or Drag & Drop Images</h3>
+                    <p>JPEG, PNG, WebP • Max 5MB each</p>
+                    <button type="button" class="btn btn-primary" onclick="document.getElementById('imageFileInput').click()">
+                        <i class="fas fa-folder-open"></i> Choose Images
+                    </button>
+                    <input type="file" id="imageFileInput" accept="image/*" multiple style="display:none;">
+                </div>
+
+                <button type="submit" class="btn btn-success" id="uploadSubmitBtn">
+                    <i class="fas fa-upload"></i> Upload Images
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    TAB 3: ALL IMAGES
+    ============================================================ -->
+    <div class="tab-content" id="tab-images">
+        <div class="table-wrapper">
+            <div class="table-header">
+                <h3>📋 All Images <span class="count" id="allImagesCount">0</span></h3>
+                <button class="btn btn-danger btn-sm" onclick="bulkDeleteImages()">
+                    <i class="fas fa-trash-alt"></i> Bulk Delete
+                </button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:30px;"><input type="checkbox" id="selectAll" onchange="toggleAll()"></th>
+                        <th>#</th>
+                        <th style="width:70px;">Image</th>
+                        <th>Title</th>
+                        <th>Album</th>
+                        <th>Category</th>
+                        <th>Recent</th>
+                        <th>Featured</th>
+                        <th style="width:140px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="allImagesTableBody">
+                    <tr><td colspan="9" style="text-align:center;padding:40px;color:#94a3b8;">
+                        <i class="fas fa-spinner fa-spin"></i> Loading...
+                    </td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    TAB 4: SLIDER
+    ============================================================ -->
+    <div class="tab-content" id="tab-slider">
+        <div class="upload-area" id="sliderUploadArea">
+            <div class="icon-big"><i class="fas fa-sliders-h"></i></div>
+            <h3>Add Slider Image</h3>
+            <p>Upload images for gallery hero slider</p>
+            <button type="button" class="btn btn-primary" onclick="document.getElementById('sliderFileInput').click()">
+                <i class="fas fa-folder-open"></i> Browse
+            </button>
+            <input type="file" id="sliderFileInput" accept="image/*" style="display:none;">
         </div>
 
-        <div class="form-group">
-          <label>Description</label>
-          <textarea id="uploadDescription" placeholder="Enter image description..." rows="2"></textarea>
+        <div class="table-wrapper">
+            <div class="table-header">
+                <h3>📋 Slider Images <span class="count" id="sliderCount">0</span></h3>
+                <button class="btn btn-warning btn-sm" onclick="reorderSlider()">
+                    <i class="fas fa-arrows-alt"></i> Reorder
+                </button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th style="width:70px;">Image</th>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Order</th>
+                        <th style="width:140px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="sliderTableBody">
+                    <tr><td colspan="6" style="text-align:center;padding:40px;color:#94a3b8;">
+                        <i class="fas fa-spinner fa-spin"></i> Loading...
+                    </td></tr>
+                </tbody>
+            </table>
         </div>
+    </div>
 
-        <div class="form-group">
-          <label>
-            <input type="checkbox" id="uploadRecent" checked> Add to Recent Collage
-          </label>
-          <small style="color:var(--gray);font-size:11px;display:block;margin-top:4px;">Recent images will appear in the collage on the public page</small>
+    <!-- ============================================================
+    TAB 5: RECENT COLLAGE
+    ============================================================ -->
+    <div class="tab-content" id="tab-recent">
+        <div class="table-wrapper">
+            <div class="table-header">
+                <h3>📋 Recent Collage <span class="count" id="recentCount">0</span></h3>
+                <p style="font-size:12px;color:#94a3b8;">Max 5 images shown in collage</p>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th style="width:70px;">Image</th>
+                        <th>Title</th>
+                        <th>Album</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th style="width:140px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recentTableBody">
+                    <tr><td colspan="7" style="text-align:center;padding:40px;color:#94a3b8;">
+                        <i class="fas fa-spinner fa-spin"></i> Loading...
+                    </td></tr>
+                </tbody>
+            </table>
         </div>
-
-        <div class="upload-area" id="imageUploadArea" style="padding:30px;">
-          <div class="icon-big" style="font-size:40px;"><i class="fas fa-cloud-upload-alt"></i></div>
-          <h3 style="font-size:16px;">Click or Drag & Drop Image</h3>
-          <p style="font-size:13px;">JPEG, PNG, WebP • Max 5MB</p>
-          <button class="browse-btn" onclick="document.getElementById('imageFileInput').click()">
-            <i class="fas fa-folder-open"></i> Choose Image
-          </button>
-          <input type="file" id="imageFileInput" accept="image/*">
-          <div class="progress-wrapper" id="imageProgressWrapper">
-            <div class="progress-bar"><div class="fill" id="imageProgressFill"></div></div>
-            <div class="progress-text" id="imageProgressText">Uploading...</div>
-          </div>
-        </div>
-
-        <button type="submit" class="btn btn-success" id="uploadSubmitBtn">
-          <i class="fas fa-save"></i> Upload Image
-        </button>
-      </form>
     </div>
-
-    <div class="table-wrapper">
-      <div class="table-header">
-        <h2>All Images <span id="allImagesCount">0</span></h2>
-        <div class="table-controls">
-          <button class="btn btn-sm btn-danger" onclick="bulkDeleteImages()">
-            <i class="fas fa-trash-alt"></i> Bulk Delete
-          </button>
-        </div>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th style="width:40px;"><input type="checkbox" id="selectAll" onchange="toggleAllCheckboxes()"></th>
-            <th style="width:50px;">#</th>
-            <th style="width:80px;">Image</th>
-            <th>Title</th>
-            <th>Album</th>
-            <th>Category</th>
-            <th style="width:80px;">Recent</th>
-            <th style="width:120px;">Date</th>
-            <th style="width:150px;">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="allImagesTableBody">
-          <tr><td colspan="9" style="text-align:center;padding:40px;color:var(--gray);">
-            <i class="fas fa-spinner fa-spin"></i> Loading...
-          </td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ============================================================
-       TAB 2: ALBUMS
-  ============================================================ -->
-  <div class="tab-content" id="tab-albums">
-    <div class="table-wrapper">
-      <div class="table-header">
-        <h2>All Albums <span id="albumsCount">0</span></h2>
-        <button class="btn btn-sm btn-success" onclick="showAddAlbum()">
-          <i class="fas fa-plus"></i> New Album
-        </button>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th style="width:50px;">#</th>
-            <th style="width:80px;">Cover</th>
-            <th>Title</th>
-            <th>Category</th>
-            <th style="width:80px;">Photos</th>
-            <th style="width:80px;">Views</th>
-            <th style="width:100px;">Status</th>
-            <th style="width:150px;">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="albumsTableBody">
-          <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray);">
-            <i class="fas fa-spinner fa-spin"></i> Loading...
-          </td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ============================================================
-       TAB 3: SLIDER
-  ============================================================ -->
-  <div class="tab-content" id="tab-slider">
-    <div class="upload-area" id="sliderUploadArea">
-      <div class="icon-big"><i class="fas fa-cloud-upload-alt"></i></div>
-      <h3>Add Slider Image</h3>
-      <p>Upload images for gallery hero slider</p>
-      <button class="browse-btn" onclick="document.getElementById('sliderFileInput').click()">
-        <i class="fas fa-folder-open"></i> Browse
-      </button>
-      <input type="file" id="sliderFileInput" accept="image/*">
-      <div class="progress-wrapper" id="sliderProgressWrapper">
-        <div class="progress-bar"><div class="fill" id="sliderProgressFill"></div></div>
-        <div class="progress-text" id="sliderProgressText">Uploading...</div>
-      </div>
-    </div>
-
-    <div class="table-wrapper">
-      <div class="table-header">
-        <h2>Slider Images <span id="sliderCount2">0</span></h2>
-        <button class="btn btn-sm btn-warning" onclick="reorderSlider()">
-          <i class="fas fa-arrows-alt"></i> Reorder
-        </button>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th style="width:60px;">#</th>
-            <th style="width:80px;">Image</th>
-            <th>Title</th>
-            <th style="width:100px;">Status</th>
-            <th style="width:100px;">Date</th>
-            <th style="width:150px;">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="sliderTableBody">
-          <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray);">
-            <i class="fas fa-spinner fa-spin"></i> Loading...
-          </td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ============================================================
-       TAB 4: RECENT (Collage Manager)
-  ============================================================ -->
-  <div class="tab-content" id="tab-recent">
-    <div class="form-section">
-      <h2><i class="fas fa-clock"></i> Recent Collage Manager</h2>
-      <p style="color:var(--gray);margin-bottom:16px;">Toggle images to show/hide in the recent collage on the public page. Maximum 5 images will be shown.</p>
-      
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:50px;">#</th>
-              <th style="width:80px;">Image</th>
-              <th>Title</th>
-              <th>Album</th>
-              <th style="width:100px;">Status</th>
-              <th style="width:100px;">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="recentTableBody">
-            <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray);">
-              <i class="fas fa-spinner fa-spin"></i> Loading...
-            </td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
 
 </div>
 
-<!-- ============================================================
-   ADD/EDIT ALBUM MODAL
-============================================================ -->
-<div class="modal-overlay" id="albumModal">
-  <div class="modal">
-    <div class="modal-header">
-      <h3 id="albumModalTitle"><i class="fas fa-plus-circle"></i> Add Album</h3>
-      <button class="modal-close" onclick="closeAlbumModal()">&times;</button>
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modalTitle"><i class="fas fa-edit"></i> Edit</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer" id="modalFooter">
+            <button class="btn btn-warning" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-success" onclick="saveModal()"><i class="fas fa-save"></i> Save</button>
+        </div>
     </div>
-    <div class="modal-body">
-      <form id="albumForm">
-        <input type="hidden" id="editAlbumId">
-        <div class="form-group">
-          <label>Album Title <span class="required">*</span></label>
-          <input type="text" id="albumTitle" placeholder="Enter album title..." required>
-        </div>
-        <div class="form-group">
-          <label>Description</label>
-          <textarea id="albumDescription" placeholder="Enter album description..." rows="2"></textarea>
-        </div>
-        <div class="form-group">
-          <label>Category <span class="required">*</span></label>
-          <select id="albumCategory" required>
-            <option value="general">General</option>
-            <option value="academic">Academic</option>
-            <option value="sports">Sports</option>
-            <option value="cultural">Cultural</option>
-            <option value="annual-function">Annual Function</option>
-            <option value="science-exhibition">Science Exhibition</option>
-            <option value="republic-day">Republic Day</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Event Date</label>
-          <input type="date" id="albumEventDate">
-        </div>
-        <div class="form-group">
-          <label>Venue</label>
-          <input type="text" id="albumVenue" placeholder="Event venue...">
-        </div>
-        <div class="form-group">
-          <label>Cover Image (Optional)</label>
-          <input type="file" id="albumCoverInput" accept="image/*">
-          <small style="color:var(--gray);font-size:11px;">Recommended: 800x600px</small>
-        </div>
-        <div class="form-group">
-          <label><input type="checkbox" id="albumFeatured"> Featured Album</label>
-        </div>
-        <div class="form-group">
-          <label><input type="checkbox" id="albumActive" checked> Active</label>
-        </div>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-warning" onclick="closeAlbumModal()">Cancel</button>
-      <button class="btn btn-success" id="albumSubmitBtn" onclick="saveAlbum()">
-        <i class="fas fa-save"></i> Save Album
-      </button>
-    </div>
-  </div>
 </div>
 
-<!-- ============================================================
-   TOAST
-============================================================ -->
-<div class="toast" id="toast">
-  <i class="fas fa-check-circle"></i>
-  <span id="toastMessage">Success!</span>
-</div>
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
 
-<!-- ============================================================
-   SCRIPTS
-============================================================ -->
 <script>
-// ============================================================
-// CONFIGURATION
-// ============================================================
-const API_BASE = 'https://gsssshilla.onrender.com';
-let allImages = [];
-let currentAlbumId = null;
-let editingImageId = null;
-let selectedImages = [];
+    // ============================================================
+    // CONFIG
+    // ============================================================
+    const API_BASE = 'https://gsssshilla.onrender.com';
+    let currentEditId = null;
+    let currentEditType = null;
+    let selectedIds = [];
 
-// ============================================================
-// TOAST
-// ============================================================
-function showToast(message, type = 'success') {
-  const toast = document.getElementById('toast');
-  toast.className = 'toast ' + type;
-  document.getElementById('toastMessage').textContent = message;
-  toast.classList.add('show');
-  clearTimeout(toast.timeout);
-  toast.timeout = setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
-// ============================================================
-// TABS
-// ============================================================
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-    
-    // Refresh data when switching tabs
-    if (btn.dataset.tab === 'upload') loadAllImages();
-    if (btn.dataset.tab === 'albums') loadAlbums();
-    if (btn.dataset.tab === 'slider') loadSlider();
-    if (btn.dataset.tab === 'recent') loadRecentImages();
-  });
-});
-
-// ============================================================
-// LOAD STATS
-// ============================================================
-async function loadStats() {
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/stats`);
-    const data = await res.json();
-    if (data.success) {
-      document.getElementById('totalPhotos').textContent = data.data.total_images || 0;
-      document.getElementById('totalAlbums').textContent = data.data.total_albums || 0;
-      document.getElementById('totalViews').textContent = data.data.total_views || 0;
-    }
-    const sliderRes = await fetch(`${API_BASE}/api/gallery/slider/stats`);
-    const sliderData = await sliderRes.json();
-    if (sliderData.success) {
-      document.getElementById('sliderCount').textContent = sliderData.data.total || 0;
-      document.getElementById('sliderCount2').textContent = sliderData.data.total || 0;
-    }
-  } catch (error) { console.error('Stats error:', error); }
-}
-
-// ============================================================
-// LOAD ALBUMS FOR DROPDOWN
-// ============================================================
-async function loadAlbumSelect() {
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/albums?limit=100`);
-    const data = await res.json();
-    const select = document.getElementById('uploadAlbum');
-    select.innerHTML = '<option value="">-- Select Album --</option>';
-    
-    if (data.success && data.data) {
-      data.data.forEach(album => {
-        select.innerHTML += `<option value="${album.id}">${album.title}</option>`;
-      });
-    }
-  } catch (error) { console.error('Album select error:', error); }
-}
-
-// ============================================================
-// LOAD ALL IMAGES (Upload Tab)
-// ============================================================
-async function loadAllImages() {
-  const tbody = document.getElementById('allImagesTableBody');
-  tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--gray);">
-    <i class="fas fa-spinner fa-spin"></i> Loading...
-  </td></tr>`;
-
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/images`);
-    const data = await res.json();
-    
-    if (!data.success || !data.data || data.data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--gray);">
-        <i class="fas fa-image"></i> No images found
-      </td></tr>`;
-      document.getElementById('allImagesCount').textContent = '0';
-      return;
+    // ============================================================
+    // TOAST
+    // ============================================================
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `toast toast-${type}`;
+        toast.style.display = 'block';
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3500);
     }
 
-    allImages = data.data;
-    document.getElementById('allImagesCount').textContent = allImages.length;
-
-    tbody.innerHTML = allImages.map((item, index) => {
-      const isRecent = item.is_recent == 1;
-      return `
-      <tr>
-        <td><input type="checkbox" class="image-checkbox" value="${item.id}" onchange="updateSelectedImages()"></td>
-        <td>${index + 1}</td>
-        <td><img src="${item.file_path || item.filename}" class="thumb" onerror="this.src='https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'"></td>
-        <td><strong>${item.title || 'Untitled'}</strong></td>
-        <td>${item.album_title || 'N/A'}</td>
-        <td><span class="category-badge">${item.category || 'general'}</span></td>
-        <td><span class="recent-badge">${isRecent ? '✅ Yes' : '❌ No'}</span></td>
-        <td style="font-size:12px;color:var(--gray);">${item.created_at || 'N/A'}</td>
-        <td>
-          <div class="action-btns">
-            <button class="btn btn-sm btn-primary" onclick="editImage(${item.id})"><i class="fas fa-edit"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="deleteImage(${item.id})"><i class="fas fa-trash-alt"></i></button>
-          </div>
-        </td>
-      </tr>
-    `}).join('');
-
-  } catch (error) {
-    console.error('Images error:', error);
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#ef4444;">
-      <i class="fas fa-exclamation-circle"></i> Failed to load
-    </td></tr>`;
-  }
-}
-
-// ============================================================
-// UPLOAD IMAGE
-// ============================================================
-document.getElementById('uploadForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-
-  const albumId = document.getElementById('uploadAlbum').value;
-  const category = document.getElementById('uploadCategory').value;
-  const title = document.getElementById('uploadTitle').value.trim();
-  const description = document.getElementById('uploadDescription').value.trim();
-  const isRecent = document.getElementById('uploadRecent').checked ? 1 : 0;
-  const fileInput = document.getElementById('imageFileInput');
-
-  if (!albumId) { showToast('Please select an album', 'error'); return; }
-  if (!fileInput.files.length) { showToast('Please select an image', 'error'); return; }
-
-  const formData = new FormData();
-  formData.append('album_id', albumId);
-  formData.append('category', category);
-  formData.append('title', title);
-  formData.append('description', description);
-  formData.append('is_recent', isRecent);
-  formData.append('images', fileInput.files[0]);
-
-  const progressWrapper = document.getElementById('imageProgressWrapper');
-  const progressFill = document.getElementById('imageProgressFill');
-  const progressText = document.getElementById('imageProgressText');
-
-  progressWrapper.style.display = 'block';
-  progressFill.style.width = '0%';
-  progressText.textContent = 'Uploading... 0%';
-
-  try {
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += Math.random() * 15;
-      if (progress > 90) progress = 90;
-      progressFill.style.width = progress + '%';
-      progressText.textContent = `Uploading... ${Math.round(progress)}%`;
-    }, 200);
-
-    const submitBtn = document.getElementById('uploadSubmitBtn');
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
-    submitBtn.disabled = true;
-
-    const res = await fetch(`${API_BASE}/api/gallery/images/add`, {
-      method: 'POST',
-      body: formData
+    // ============================================================
+    // TABS
+    // ============================================================
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+            if (btn.dataset.tab === 'albums') loadAlbums();
+            if (btn.dataset.tab === 'images') loadAllImages();
+            if (btn.dataset.tab === 'slider') loadSlider();
+            if (btn.dataset.tab === 'recent') loadRecent();
+        });
     });
 
-    clearInterval(interval);
-    const data = await res.json();
-
-    if (data.success) {
-      progressFill.style.width = '100%';
-      progressText.textContent = '✅ Uploaded!';
-      showToast('✅ Image uploaded successfully!', 'success');
-      setTimeout(() => {
-        progressWrapper.style.display = 'none';
-        progressFill.style.width = '0%';
-      }, 1000);
-      
-      document.getElementById('uploadForm').reset();
-      document.getElementById('imageFileInput').value = '';
-      loadAllImages();
-      loadStats();
-      loadRecentImages();
-    } else {
-      showToast(data.message || 'Upload failed', 'error');
-      progressWrapper.style.display = 'none';
+    // ============================================================
+    // STATS
+    // ============================================================
+    async function loadStats() {
+        try {
+            const res = await fetch(`${API_BASE}/api/gallery/stats`);
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('totalImages').textContent = data.data.total_images || 0;
+                document.getElementById('totalAlbums').textContent = data.data.total_albums || 0;
+                document.getElementById('totalViews').textContent = data.data.total_views || 0;
+                document.getElementById('totalRecent').textContent = data.data.total_recent || 0;
+            }
+        } catch (error) { console.error('Stats error:', error); }
     }
-  } catch (error) {
-    showToast('Upload failed', 'error');
-    progressWrapper.style.display = 'none';
-  } finally {
-    document.getElementById('uploadSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Upload Image';
-    document.getElementById('uploadSubmitBtn').disabled = false;
-  }
-});
 
-// ============================================================
-// EDIT IMAGE
-// ============================================================
-function editImage(id) {
-  const img = allImages.find(i => i.id === id);
-  if (!img) { showToast('Image not found', 'error'); return; }
+    // ============================================================
+    // LOAD ALBUMS
+    // ============================================================
+    async function loadAlbums() {
+        const tbody = document.getElementById('albumsTableBody');
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#94a3b8;">
+            <i class="fas fa-spinner fa-spin"></i> Loading...
+        </td></tr>`;
 
-  editingImageId = id;
-  
-  document.getElementById('modalBody').innerHTML = `
-    <form id="editImageForm">
-      <input type="hidden" id="editImageId" value="${img.id}">
-      <div class="form-group">
-        <label>Title</label>
-        <input type="text" id="editImageTitle" value="${img.title || ''}">
-      </div>
-      <div class="form-group">
-        <label>Description</label>
-        <textarea id="editImageDescription" rows="2">${img.description || ''}</textarea>
-      </div>
-      <div class="form-group">
-        <label>Category</label>
-        <select id="editImageCategory">
-          <option value="general" ${img.category === 'general' ? 'selected' : ''}>General</option>
-          <option value="academic" ${img.category === 'academic' ? 'selected' : ''}>Academic</option>
-          <option value="sports" ${img.category === 'sports' ? 'selected' : ''}>Sports</option>
-          <option value="cultural" ${img.category === 'cultural' ? 'selected' : ''}>Cultural</option>
-          <option value="annual-function" ${img.category === 'annual-function' ? 'selected' : ''}>Annual Function</option>
-          <option value="science-exhibition" ${img.category === 'science-exhibition' ? 'selected' : ''}>Science Exhibition</option>
-          <option value="republic-day" ${img.category === 'republic-day' ? 'selected' : ''}>Republic Day</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label><input type="checkbox" id="editImageRecent" ${img.is_recent == 1 ? 'checked' : ''}> Add to Recent Collage</label>
-      </div>
-    </form>
-  `;
+        try {
+            const res = await fetch(`${API_BASE}/api/gallery/albums`);
+            const data = await res.json();
 
-  document.querySelector('.modal-header h3').innerHTML = '<i class="fas fa-edit"></i> Edit Image';
-  document.querySelector('.modal-footer').innerHTML = `
-    <button class="btn btn-warning" onclick="closeModal()">Cancel</button>
-    <button class="btn btn-success" onclick="saveImageEdit()"><i class="fas fa-save"></i> Save</button>
-  `;
-  document.getElementById('editModal').classList.add('active');
-}
+            if (data.success && data.data) {
+                document.getElementById('albumsCount').textContent = data.data.length;
+                tbody.innerHTML = data.data.map((item, index) => `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td><img src="${item.cover_image || 'https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'}" class="thumb" onerror="this.src='https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'"></td>
+                        <td><strong>${item.title}</strong></td>
+                        <td><span class="badge badge-primary">${item.category || 'general'}</span></td>
+                        <td>${item.photo_count || 0}</td>
+                        <td>${item.view_count || 0}</td>
+                        <td>${item.is_active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Inactive</span>'}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editAlbum(${item.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteAlbum(${item.id})"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        } catch (error) {
+            console.error('Albums error:', error);
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#ef4444;">
+                ❌ Failed to load albums
+            </td></tr>`;
+        }
+    }
 
-async function saveImageEdit() {
-  const id = editingImageId;
-  const title = document.getElementById('editImageTitle').value.trim();
-  const description = document.getElementById('editImageDescription').value.trim();
-  const category = document.getElementById('editImageCategory').value;
-  const is_recent = document.getElementById('editImageRecent').checked ? 1 : 0;
+    // ============================================================
+    // LOAD ALBUM SELECT (Dropdown)
+    // ============================================================
+    async function loadAlbumSelect() {
+        try {
+            const res = await fetch(`${API_BASE}/api/gallery/albums`);
+            const data = await res.json();
+            const select = document.getElementById('uploadAlbum');
+            select.innerHTML = '<option value="">-- Select Album --</option>';
+            if (data.success && data.data) {
+                data.data.forEach(album => {
+                    select.innerHTML += `<option value="${album.id}">${album.title}</option>`;
+                });
+            }
+        } catch (error) { console.error('Album select error:', error); }
+    }
 
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/images/update/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, description, category, is_recent })
+    // ============================================================
+    // CREATE ALBUM
+    // ============================================================
+    document.getElementById('albumForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const title = document.getElementById('albumTitle').value.trim();
+        if (!title) {
+            showToast('Please enter a title', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('description', document.getElementById('albumDescription').value.trim());
+        formData.append('category', document.getElementById('albumCategory').value);
+        formData.append('event_date', document.getElementById('albumEventDate').value);
+        formData.append('venue', document.getElementById('albumVenue').value.trim());
+        formData.append('is_featured', document.getElementById('albumFeatured').checked ? 1 : 0);
+        formData.append('is_active', document.getElementById('albumActive').checked ? 1 : 0);
+
+        const cover = document.getElementById('albumCover').files[0];
+        if (cover) formData.append('cover', cover);
+
+        const btn = document.getElementById('albumSubmitBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch(`${API_BASE}/api/gallery/albums/add`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                showToast('✅ Album created successfully!', 'success');
+                document.getElementById('albumForm').reset();
+                document.getElementById('albumActive').checked = true;
+                loadAlbums();
+                loadStats();
+                loadAlbumSelect();
+            } else {
+                showToast(data.message || 'Failed to create album', 'error');
+            }
+        } catch (error) {
+            showToast('Failed to create album', 'error');
+        } finally {
+            btn.innerHTML = '<i class="fas fa-save"></i> Create Album';
+            btn.disabled = false;
+        }
     });
 
-    const data = await res.json();
-    if (data.success) {
-      showToast('✅ Image updated!', 'success');
-      closeModal();
-      loadAllImages();
-      loadRecentImages();
-    } else {
-      showToast(data.message || 'Update failed', 'error');
-    }
-  } catch (error) {
-    showToast('Update failed', 'error');
-  }
-}
+    // ============================================================
+    // EDIT ALBUM
+    // ============================================================
+    async function editAlbum(id) {
+        try {
+            const res = await fetch(`${API_BASE}/api/gallery/albums/${id}`);
+            const data = await res.json();
+            if (!data.success || !data.data) {
+                showToast('Album not found', 'error');
+                return;
+            }
 
-// ============================================================
-// DELETE IMAGE
-// ============================================================
-async function deleteImage(id) {
-  if (!confirm('Delete this image?')) return;
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/images/delete/${id}`, { method: 'DELETE' });
-    const data = await res.json();
-    if (data.success) {
-      showToast('✅ Image deleted!', 'success');
-      loadAllImages();
-      loadStats();
-      loadRecentImages();
-    } else {
-      showToast(data.message || 'Failed', 'error');
-    }
-  } catch (error) { showToast('Delete failed', 'error'); }
-}
+            const item = data.data.album;
+            currentEditId = id;
+            currentEditType = 'album';
 
-// ============================================================
-// BULK DELETE IMAGES
-// ============================================================
-function updateSelectedImages() {
-  selectedImages = [];
-  document.querySelectorAll('.image-checkbox:checked').forEach(cb => {
-    selectedImages.push(parseInt(cb.value));
-  });
-}
-
-function toggleAllCheckboxes() {
-  const master = document.getElementById('selectAll');
-  document.querySelectorAll('.image-checkbox').forEach(cb => {
-    cb.checked = master.checked;
-  });
-  updateSelectedImages();
-}
-
-async function bulkDeleteImages() {
-  updateSelectedImages();
-  if (selectedImages.length === 0) {
-    showToast('Select images to delete', 'error');
-    return;
-  }
-
-  if (!confirm(`Delete ${selectedImages.length} images?`)) return;
-
-  try {
-    let deleted = 0;
-    for (const id of selectedImages) {
-      const res = await fetch(`${API_BASE}/api/gallery/images/delete/${id}`, { method: 'DELETE' });
-      if (res.ok) deleted++;
-    }
-    showToast(`✅ ${deleted} images deleted!`, 'success');
-    loadAllImages();
-    loadStats();
-    loadRecentImages();
-  } catch (error) {
-    showToast('Bulk delete failed', 'error');
-  }
-}
-
-// ============================================================
-// LOAD RECENT IMAGES (Collage Manager)
-// ============================================================
-async function loadRecentImages() {
-  const tbody = document.getElementById('recentTableBody');
-  tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray);">
-    <i class="fas fa-spinner fa-spin"></i> Loading...
-  </td></tr>`;
-
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/images`);
-    const data = await res.json();
-    
-    if (!data.success || !data.data || data.data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray);">
-        <i class="fas fa-clock"></i> No images found
-      </td></tr>`;
-      return;
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Album';
+            document.getElementById('modalBody').innerHTML = `
+                <form id="editAlbumForm">
+                    <div class="form-group">
+                        <label>Title *</label>
+                        <input type="text" id="editAlbumTitle" class="form-control" value="${item.title}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="editAlbumDescription" class="form-control" rows="2">${item.description || ''}</textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="editAlbumCategory" class="form-control">
+                                <option value="general" ${item.category === 'general' ? 'selected' : ''}>General</option>
+                                <option value="academic" ${item.category === 'academic' ? 'selected' : ''}>Academic</option>
+                                <option value="sports" ${item.category === 'sports' ? 'selected' : ''}>Sports</option>
+                                <option value="cultural" ${item.category === 'cultural' ? 'selected' : ''}>Cultural</option>
+                                <option value="annual-function" ${item.category === 'annual-function' ? 'selected' : ''}>Annual Function</option>
+                                <option value="science-exhibition" ${item.category === 'science-exhibition' ? 'selected' : ''}>Science Exhibition</option>
+                                <option value="republic-day" ${item.category === 'republic-day' ? 'selected' : ''}>Republic Day</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Venue</label>
+                            <input type="text" id="editAlbumVenue" class="form-control" value="${item.venue || ''}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Event Date</label>
+                            <input type="date" id="editAlbumEventDate" class="form-control" value="${item.event_date || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Cover Image</label>
+                            <input type="file" id="editAlbumCover" class="form-control form-control-file" accept="image/*">
+                            ${item.cover_image ? `<p style="font-size:12px;color:#94a3b8;margin-top:4px;">Current: <a href="${item.cover_image}" target="_blank">View</a></p>` : ''}
+                        </div>
+                    </div>
+                    <div class="form-group" style="display:flex;align-items:center;gap:20px;padding-top:8px;">
+                        <label><input type="checkbox" id="editAlbumFeatured" ${item.is_featured ? 'checked' : ''}> Featured</label>
+                        <label><input type="checkbox" id="editAlbumActive" ${item.is_active ? 'checked' : ''}> Active</label>
+                    </div>
+                </form>
+            `;
+            document.getElementById('modalFooter').innerHTML = `
+                <button class="btn btn-warning" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-success" onclick="saveModal()"><i class="fas fa-save"></i> Update</button>
+            `;
+            document.getElementById('modal').classList.add('active');
+        } catch (error) {
+            showToast('Failed to load album', 'error');
+        }
     }
 
-    // Show all images with recent toggle
-    const recentData = data.data;
+    // ============================================================
+    // DELETE ALBUM
+    // ============================================================
+    async function deleteAlbum(id) {
+        if (!confirm('Delete this album and all its images?')) return;
 
-    tbody.innerHTML = recentData.map((item, index) => {
-      const isRecent = item.is_recent == 1;
-      return `
-      <tr>
-        <td>${index + 1}</td>
-        <td><img src="${item.file_path || item.filename}" class="thumb" onerror="this.src='https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'"></td>
-        <td><strong>${item.title || 'Untitled'}</strong></td>
-        <td>${item.album_title || 'N/A'}</td>
-        <td><span class="recent-badge">${isRecent ? '✅ In Collage' : '❌ Hidden'}</span></td>
-        <td>
-          <button class="btn btn-sm ${isRecent ? 'btn-warning' : 'btn-success'}" onclick="toggleRecent(${item.id})">
-            ${isRecent ? '<i class="fas fa-eye-slash"></i> Hide' : '<i class="fas fa-eye"></i> Show'}
-          </button>
-        </td>
-      </tr>
-    `}).join('');
+        try {
+            const res = await fetch(`${API_BASE}/api/gallery/albums/delete/${id}`, {
+                method: 'DELETE'
+            });
+            const data = await res.json();
 
-  } catch (error) {
-    console.error('Recent images error:', error);
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:#ef4444;">
-      <i class="fas fa-exclamation-circle"></i> Failed to load
-    </td></tr>`;
-  }
-}
+            if (data.success) {
+                showToast('✅ Album deleted!', 'success');
+                loadAlbums();
+                loadStats();
+                loadAlbumSelect();
+            } else {
+                showToast(data.message || 'Failed to delete', 'error');
+            }
+        } catch (error) {
+            showToast('Failed to delete album', 'error');
+        }
+    }
 
-async function toggleRecent(id) {
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/images/toggle-recent/${id}`, {
-      method: 'PUT'
+    // ============================================================
+    // SAVE MODAL
+    // ============================================================
+    async function saveModal() {
+        if (currentEditType === 'album') {
+            const id = currentEditId;
+            const title = document.getElementById('editAlbumTitle').value.trim();
+            if (!title) {
+                showToast('Please enter a title', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('description', document.getElementById('editAlbumDescription').value.trim());
+            formData.append('category', document.getElementById('editAlbumCategory').value);
+            formData.append('event_date', document.getElementById('editAlbumEventDate').value);
+            formData.append('venue', document.getElementById('editAlbumVenue').value.trim());
+            formData.append('is_featured', document.getElementById('editAlbumFeatured').checked ? 1 : 0);
+            formData.append('is_active', document.getElementById('editAlbumActive').checked ? 1 : 0);
+
+            const cover = document.getElementById('editAlbumCover').files[0];
+            if (cover) formData.append('cover', cover);
+
+            try {
+                const res = await fetch(`${API_BASE}/api/gallery/albums/update/${id}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast('✅ Album updated!', 'success');
+                    closeModal();
+                    loadAlbums();
+                    loadStats();
+                    loadAlbumSelect();
+                } else {
+                    showToast(data.message || 'Failed to update', 'error');
+                }
+            } catch (error) {
+                showToast('Failed to update album', 'error');
+            }
+        }
+    }
+
+    // ============================================================
+    // LOAD ALL IMAGES
+    // ============================================================
+    async function loadAllImages() {
+        const tbody = document.getElementById('allImagesTableBody');
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#94a3b8;">
+            <i class="fas fa-spinner fa-spin"></i> Loading...
+        </td></tr>`;
+
+        try {
+            const res = await fetch(`${API_BASE}/api/gallery/images`);
+            const data = await res.json();
+
+            if (data.success && data.data) {
+                document.getElementById('allImagesCount').textContent = data.data.length;
+                tbody.innerHTML = data.data.map((item, index) => `
+                    <tr>
+                        <td><input type="checkbox" class="img-checkbox" value="${item.id}"></td>
+                        <td>${index + 1}</td>
+                        <td><img src="${item.image_url || item.filename}" class="thumb" onerror="this.src='https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'"></td>
+                        <td><strong>${item.title || 'Untitled'}</strong></td>
+                        <td>${item.album_title || 'N/A'}</td>
+                        <td><span class="badge badge-primary">${item.category || 'general'}</span></td>
+                        <td>${item.is_recent ? '✅' : '—'}</td>
+                        <td>${item.is_featured ? '⭐' : '—'}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editImage(${item.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteImage(${item.id})"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        } catch (error) {
+            console.error('Images error:', error);
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#ef4444;">
+                ❌ Failed to load images
+            </td></tr>`;
+        }
+    }
+
+    // ============================================================
+    // UPLOAD IMAGES
+    // ============================================================
+    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const albumId = document.getElementById('uploadAlbum').value;
+        if (!albumId) {
+            showToast('Please select an album', 'error');
+            return;
+        }
+
+        const files = document.getElementById('imageFileInput').files;
+        if (!files || files.length === 0) {
+            showToast('Please select images', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('album_id', albumId);
+        formData.append('category', document.getElementById('uploadCategory').value);
+        formData.append('title', document.getElementById('uploadTitle').value.trim());
+        formData.append('description', document.getElementById('uploadDescription').value.trim());
+        formData.append('is_recent', document.getElementById('uploadRecent').checked ? 1 : 0);
+        formData.append('is_featured', document.getElementById('uploadFeatured').checked ? 1 : 0);
+        for (let file of files) {
+            formData.append('images', file);
+        }
+
+        const btn = document.getElementById('uploadSubmitBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch(`${API_BASE}/api/gallery/images/add`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                showToast(`✅ ${data.uploaded?.length || 0} images uploaded!`, 'success');
+                document.getElementById('uploadForm').reset();
+                document.getElementById('imageFileInput').value = '';
+                document.getElementById('uploadRecent').checked = true;
+                loadAllImages();
+                loadRecent();
+                loadStats();
+            } else {
+                showToast(data.message || 'Upload failed', 'error');
+            }
+        } catch (error) {
+            showToast('Upload failed', 'error');
+        } finally {
+            btn.innerHTML = '<i class="fas fa-upload"></i> Upload Images';
+            btn.disabled = false;
+        }
     });
-    const data = await res.json();
-    if (data.success) {
-      showToast(data.message, 'success');
-      loadRecentImages();
-      loadAllImages();
-    } else {
-      showToast('Failed to toggle', 'error');
-    }
-  } catch (error) {
-    showToast('Failed to toggle', 'error');
-  }
-}
 
-// ============================================================
-// ALBUMS
-// ============================================================
-async function loadAlbums() {
-  const tbody = document.getElementById('albumsTableBody');
-  tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray);">
-    <i class="fas fa-spinner fa-spin"></i> Loading...
-  </td></tr>`;
-
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/albums?limit=100`);
-    const data = await res.json();
-
-    if (!data.success || !data.data || data.data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray);">
-        <i class="fas fa-folder-open"></i> No albums found
-      </td></tr>`;
-      document.getElementById('albumsCount').textContent = '0';
-      return;
-    }
-
-    document.getElementById('albumsCount').textContent = data.data.length;
-
-    tbody.innerHTML = data.data.map((item, index) => `
-      <tr>
-        <td>${index + 1}</td>
-        <td><img src="${item.cover_image || 'https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'}" class="thumb" onerror="this.src='https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'"></td>
-        <td><strong>${item.title}</strong></td>
-        <td><span class="category-badge">${item.category || 'general'}</span></td>
-        <td>${item.photo_count || 0}</td>
-        <td>${item.view_count || 0}</td>
-        <td><span class="status-badge ${item.is_active == 1 ? 'active' : 'inactive'}">${item.is_active == 1 ? 'Active' : 'Inactive'}</span></td>
-        <td>
-          <div class="action-btns">
-            <button class="btn btn-sm btn-primary" onclick="editAlbum(${item.id})"><i class="fas fa-edit"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="deleteAlbum(${item.id})"><i class="fas fa-trash-alt"></i></button>
-          </div>
-        </td>
-      </tr>
-    `).join('');
-
-  } catch (error) {
-    console.error('Albums error:', error);
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#ef4444;">
-      <i class="fas fa-exclamation-circle"></i> Failed to load
-    </td></tr>`;
-  }
-}
-
-// ============================================================
-// ALBUM MODAL
-// ============================================================
-function showAddAlbum() {
-  document.getElementById('albumModalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Add Album';
-  document.getElementById('albumSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Create Album';
-  document.getElementById('editAlbumId').value = '';
-  document.getElementById('albumForm').reset();
-  document.getElementById('albumActive').checked = true;
-  document.getElementById('albumModal').classList.add('active');
-}
-
-function closeAlbumModal() {
-  document.getElementById('albumModal').classList.remove('active');
-}
-
-async function saveAlbum() {
-  const id = document.getElementById('editAlbumId').value;
-  const title = document.getElementById('albumTitle').value.trim();
-  const description = document.getElementById('albumDescription').value.trim();
-  const category = document.getElementById('albumCategory').value;
-  const event_date = document.getElementById('albumEventDate').value;
-  const venue = document.getElementById('albumVenue').value.trim();
-  const is_featured = document.getElementById('albumFeatured').checked ? 1 : 0;
-  const is_active = document.getElementById('albumActive').checked ? 1 : 0;
-  const coverFile = document.getElementById('albumCoverInput').files[0];
-
-  if (!title) { showToast('Title is required', 'error'); return; }
-
-  const formData = new FormData();
-  formData.append('title', title);
-  formData.append('description', description);
-  formData.append('category', category);
-  formData.append('event_date', event_date);
-  formData.append('venue', venue);
-  formData.append('is_featured', is_featured);
-  formData.append('is_active', is_active);
-  if (coverFile) formData.append('cover', coverFile);
-
-  const isEdit = id !== '';
-  const url = isEdit ? `${API_BASE}/api/gallery/albums/update/${id}` : `${API_BASE}/api/gallery/albums/add`;
-  const method = isEdit ? 'PUT' : 'POST';
-
-  try {
-    const btn = document.getElementById('albumSubmitBtn');
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-    btn.disabled = true;
-
-    const res = await fetch(url, { method, body: formData });
-    const data = await res.json();
-
-    if (data.success) {
-      showToast(isEdit ? '✅ Album updated!' : '✅ Album created!', 'success');
-      closeAlbumModal();
-      loadAlbums();
-      loadStats();
-      loadAlbumSelect();
-    } else {
-      showToast(data.message || 'Failed', 'error');
-    }
-  } catch (error) {
-    showToast('Operation failed', 'error');
-  } finally {
-    document.getElementById('albumSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Save Album';
-    document.getElementById('albumSubmitBtn').disabled = false;
-  }
-}
-
-async function editAlbum(id) {
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/albums/${id}`);
-    const data = await res.json();
-    if (!data.success) return;
-    
-    const item = data.data.album;
-    document.getElementById('albumModalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Album';
-    document.getElementById('albumSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Update Album';
-    document.getElementById('editAlbumId').value = id;
-    document.getElementById('albumTitle').value = item.title || '';
-    document.getElementById('albumDescription').value = item.description || '';
-    document.getElementById('albumCategory').value = item.category || 'general';
-    document.getElementById('albumEventDate').value = item.event_date || '';
-    document.getElementById('albumVenue').value = item.venue || '';
-    document.getElementById('albumFeatured').checked = item.is_featured == 1;
-    document.getElementById('albumActive').checked = item.is_active == 1;
-    document.getElementById('albumModal').classList.add('active');
-  } catch (error) {
-    showToast('Failed to load album', 'error');
-  }
-}
-
-async function deleteAlbum(id) {
-  if (!confirm('Delete this album and all its images?')) return;
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/albums/delete/${id}`, { method: 'DELETE' });
-    const data = await res.json();
-    if (data.success) {
-      showToast('✅ Album deleted!', 'success');
-      loadAlbums();
-      loadStats();
-      loadAlbumSelect();
-    } else {
-      showToast(data.message || 'Failed', 'error');
-    }
-  } catch (error) { showToast('Delete failed', 'error'); }
-}
-
-// ============================================================
-// SLIDER SECTION
-// ============================================================
-async function loadSlider() {
-  const tbody = document.getElementById('sliderTableBody');
-  tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray);">
-    <i class="fas fa-spinner fa-spin"></i> Loading...
-  </td></tr>`;
-
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/slider`);
-    const data = await res.json();
-    if (!data || data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray);">
-        <i class="fas fa-image"></i> No slider images found
-      </td></tr>`;
-      return;
-    }
-
-    tbody.innerHTML = data.map((item, index) => `
-      <tr>
-        <td>${index + 1}</td>
-        <td><img src="${item.file_path || item.filename}" class="thumb" onerror="this.src='https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'"></td>
-        <td><strong>${item.title || 'Untitled'}</strong></td>
-        <td><span class="status-badge ${item.is_active == 1 ? 'active' : 'inactive'}">${item.is_active == 1 ? 'Active' : 'Inactive'}</span></td>
-        <td style="font-size:12px;color:var(--gray);">${item.created_at_ist || 'N/A'}</td>
-        <td>
-          <div class="action-btns">
-            <button class="btn btn-sm btn-primary" onclick="editSlider(${item.id})"><i class="fas fa-edit"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="deleteSlider(${item.id})"><i class="fas fa-trash-alt"></i></button>
-          </div>
-        </td>
-      </tr>
-    `).join('');
-  } catch (error) {
-    console.error('Slider error:', error);
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:#ef4444;">
-      <i class="fas fa-exclamation-circle"></i> Failed to load
-    </td></tr>`;
-  }
-}
-
-// UPLOAD SLIDER IMAGE
-document.getElementById('sliderFileInput').addEventListener('change', async function(e) {
-  if (!this.files.length) return;
-  const file = this.files[0];
-  const formData = new FormData();
-  formData.append('image', file);
-
-  const title = prompt('Enter image title (optional):') || '';
-  if (title) formData.append('title', title);
-
-  const progressWrapper = document.getElementById('sliderProgressWrapper');
-  const progressFill = document.getElementById('sliderProgressFill');
-  const progressText = document.getElementById('sliderProgressText');
-
-  progressWrapper.style.display = 'block';
-  progressFill.style.width = '0%';
-  progressText.textContent = 'Uploading... 0%';
-
-  try {
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += Math.random() * 15;
-      if (progress > 90) progress = 90;
-      progressFill.style.width = progress + '%';
-      progressText.textContent = `Uploading... ${Math.round(progress)}%`;
-    }, 200);
-
-    const res = await fetch(`${API_BASE}/api/gallery/slider/add`, { method: 'POST', body: formData });
-    clearInterval(interval);
-    const data = await res.json();
-
-    if (data.success) {
-      progressFill.style.width = '100%';
-      progressText.textContent = '✅ Uploaded!';
-      showToast('✅ Slider image added!', 'success');
-      setTimeout(() => { progressWrapper.style.display = 'none'; progressFill.style.width = '0%'; }, 1000);
-      loadSlider();
-      loadStats();
-    } else { showToast(data.message || 'Upload failed', 'error'); progressWrapper.style.display = 'none'; }
-  } catch (error) { showToast('Upload failed', 'error'); progressWrapper.style.display = 'none'; }
-  this.value = '';
-});
-
-async function deleteSlider(id) {
-  if (!confirm('Delete this slider image?')) return;
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/slider/delete/${id}`, { method: 'DELETE' });
-    const data = await res.json();
-    if (data.success) { showToast('✅ Deleted!', 'success'); loadSlider(); loadStats(); }
-    else { showToast(data.message || 'Failed', 'error'); }
-  } catch (error) { showToast('Delete failed', 'error'); }
-}
-
-async function reorderSlider() {
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/slider`);
-    const data = await res.json();
-    if (!data || data.length < 2) { showToast('Need at least 2 images to reorder', 'error'); return; }
-
-    const orders = data.map((item, index) => ({ id: item.id, order: data.length - index }));
-    const response = await fetch(`${API_BASE}/api/gallery/slider/reorder`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orders })
+    // ============================================================
+    // DRAG & DROP UPLOAD
+    // ============================================================
+    document.getElementById('imageUploadArea').addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#3b82f6';
+        this.style.background = '#eff6ff';
     });
-    const result = await response.json();
-    if (result.success) { showToast('✅ Reordered!', 'success'); loadSlider(); }
-    else { showToast('Reorder failed', 'error'); }
-  } catch (error) { showToast('Reorder failed', 'error'); }
-}
+    document.getElementById('imageUploadArea').addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#e2e8f0';
+        this.style.background = '#f8fafc';
+    });
+    document.getElementById('imageUploadArea').addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#e2e8f0';
+        this.style.background = '#f8fafc';
+        const files = e.dataTransfer.files;
+        if (files.length) {
+            document.getElementById('imageFileInput').files = files;
+            showToast(`${files.length} images selected`, 'info');
+        }
+    });
 
-async function editSlider(id) {
-  try {
-    const res = await fetch(`${API_BASE}/api/gallery/slider`);
-    const data = await res.json();
-    const item = data.find(d => d.id === id);
-    if (!item) return;
+    // ============================================================
+    // LOAD SLIDER
+    // ============================================================
+    async function loadSlider() {
+        const tbody = document.getElementById('sliderTableBody');
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:#94a3b8;">
+            <i class="fas fa-spinner fa-spin"></i> Loading...
+        </td></tr>`;
 
-    document.getElementById('modalBody').innerHTML = `
-      <form id="editSliderForm">
-        <div class="form-group"><label>Title</label>
-          <input type="text" id="editSliderTitle" value="${item.title || ''}"></div>
-        <div class="form-group"><label>Description</label>
-          <textarea id="editSliderDescription" rows="2">${item.description || ''}</textarea></div>
-        <div class="form-group"><label>Link (optional)</label>
-          <input type="text" id="editSliderLink" value="${item.link || ''}"></div>
-        <div class="form-group"><label><input type="checkbox" id="editSliderActive" ${item.is_active == 1 ? 'checked' : ''}> Active</label></div>
-      </form>
-    `;
+        try {
+            const res = await fetch(`${API_BASE}/api/gallery/slider/admin/all`);
+            const data = await res.json();
 
-    document.querySelector('.modal-header h3').innerHTML = '<i class="fas fa-edit"></i> Edit Slider Image';
-    document.querySelector('.modal-footer').innerHTML = `
-      <button class="btn btn-warning" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-success" onclick="saveSliderEdit()"><i class="fas fa-save"></i> Save</button>
-    `;
-    document.getElementById('editModal').classList.add('active');
-  } catch (error) { showToast('Failed to load', 'error'); }
-}
+            if (data.success && data.data) {
+                document.getElementById('sliderCount').textContent = data.data.length;
+                tbody.innerHTML = data.data.map((item, index) => `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td><img src="${item.image_url || item.file_path}" class="thumb" onerror="this.src='https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'"></td>
+                        <td><strong>${item.title || 'Untitled'}</strong></td>
+                        <td>${item.is_active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Inactive</span>'}</td>
+                        <td>${item.sort_order || item.order || 0}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editSlider(${item.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteSlider(${item.id})"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        } catch (error) {
+            console.error('Slider error:', error);
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:#ef4444;">
+                ❌ Failed to load slider
+            </td></tr>`;
+        }
+    }
 
-async function saveSliderEdit() {
-  const id = editingImageId || document.querySelector('#editSliderForm input').value;
-  // This would need proper implementation
-  showToast('Slider update feature coming soon', 'warning');
-}
+    // ============================================================
+    // ADD SLIDER
+    // ============================================================
+    document.getElementById('sliderFileInput').addEventListener('change', async function(e) {
+        if (!this.files.length) return;
 
-// ============================================================
-// MODAL
-// ============================================================
-function closeModal() {
-  document.getElementById('editModal').classList.remove('active');
-  editingImageId = null;
-}
+        const file = this.files[0];
+        const formData = new FormData();
+        formData.append('image', file);
+        const title = prompt('Enter image title (optional):') || '';
+        if (title) formData.append('title', title);
 
-document.getElementById('editModal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
+        try {
+            const res = await fetch(`${API_BASE}/api/gallery/slider/add`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
 
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeModal();
-});
+            if (data.success) {
+                showToast('✅ Slider image added!', 'success');
+                loadSlider();
+                loadStats();
+            } else {
+                showToast(data.message || 'Upload failed', 'error');
+            }
+        } catch (error) {
+            showToast('Upload failed', 'error');
+        }
+        this.value = '';
+    });
 
-// ============================================================
-// DRAG & DROP - Upload Image
-// ============================================================
-document.getElementById('imageUploadArea').addEventListener('dragover', function(e) {
-  e.preventDefault();
-  this.classList.add('dragover');
-});
-document.getElementById('imageUploadArea').addEventListener('dragleave', function(e) {
-  e.preventDefault();
-  this.classList.remove('dragover');
-});
-document.getElementById('imageUploadArea').addEventListener('drop', function(e) {
-  e.preventDefault();
-  this.classList.remove('dragover');
-  const files = e.dataTransfer.files;
-  if (files.length) {
-    document.getElementById('imageFileInput').files = files;
-    document.getElementById('imageFileInput').dispatchEvent(new Event('change'));
-  }
-});
+    // ============================================================
+    // DELETE SLIDER
+    // ============================================================
+    async function deleteSlider(id) {
+        if (!confirm('Delete this slider image?')) return;
 
-// ============================================================
-// DRAG & DROP - Slider Upload
-// ============================================================
-document.getElementById('sliderUploadArea').addEventListener('dragover', function(e) {
-  e.preventDefault();
-  this.classList.add('dragover');
-});
-document.getElementById('sliderUploadArea').addEventListener('dragleave', function(e) {
-  e.preventDefault();
-  this.classList.remove('dragover');
-});
-document.getElementById('sliderUploadArea').addEventListener('drop', function(e) {
-  e.preventDefault();
-  this.classList.remove('dragover');
-  const files = e.dataTransfer.files;
-  if (files.length) {
-    document.getElementById('sliderFileInput').files = files;
-    document.getElementById('sliderFileInput').dispatchEvent(new Event('change'));
-  }
-});
+        try {
+            const res = await fetch(`${API_BASE}/api/gallery/slider/delete/${id}`, {
+                method: 'DELETE'
+            });
+            const data = await res.json();
 
-// ============================================================
-// REFRESH
-// ============================================================
-function refreshData() {
-  showToast('🔄 Refreshing...', 'success');
-  loadStats();
-  loadAlbums();
-  loadSlider();
-  loadAllImages();
-  loadRecentImages();
-  loadAlbumSelect();
-}
+            if (data.success) {
+                showToast('✅ Slider deleted!', 'success');
+                loadSlider();
+                loadStats();
+            } else {
+                showToast(data.message || 'Failed to delete', 'error');
+            }
+        } catch (error) {
+            showToast('Delete failed', 'error');
+        }
+    }
 
-// ============================================================
-// INIT
-// ============================================================
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('🚀 Gallery Admin Loaded');
-  loadStats();
-  loadAlbums();
-  loadSlider();
-  loadAllImages();
-  loadRecentImages();
-  loadAlbumSelect();
-});
+    // ============================================================
+    // REORDER SLIDER
+    // ============================================================
+    async function reorderSlider() {
+        try {
+            const res = await fetch(`${API_BASE}/api/gallery/slider/admin/all`);
+            const data = await res.json();
+            if (!data.success || !data.data || data.data.length < 2) {
+                showToast('Need at least 2 images to reorder', 'error');
+                return;
+            }
+
+            const orders = data.data.map((item, index) => ({ id: item.id, order: index + 1 }));
+            const response = await fetch(`${API_BASE}/api/gallery/slider/reorder`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orders })
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                showToast('✅ Reordered!', 'success');
+                loadSlider();
+            } else {
+                showToast('Reorder failed', 'error');
+            }
+        } catch (error) {
+            showToast('Reorder failed', 'error');
+        }
+    }
+
+    // ============================================================
+    // LOAD RECENT
+    // ============================================================
+    async function loadRecent() {
+        const tbody = document.getElementById('recentTableBody');
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:#94a3b8;">
+            <i class="fas fa-spinner fa-spin"></i> Loading...
+        </td></tr>`;
+
+        try {
+            const res = await fetch(`${API_BASE}/api/gallery/recent`);
+            const data = await res.json();
+
+            if (data.success && data.data) {
+                document.getElementById('recentCount').textContent = data.data.length;
+                tbody.innerHTML = data.data.map((item, index) => `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td><img src="${item.image_url || item.filename}" class="thumb" onerror="this.src='https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'"></td>
+                        <td><strong>${item.title || 'Untitled'}</strong></td>
+                        <td>${item.album_title || 'N/A'}</td>
+                        <td><span class="badge badge-primary">${item.category || 'general'}</span></td>
+                        <td>${item.is_recent ? '✅ In Collage' : '❌ Hidden'}</td>
+                        <td>
+                            <button class="btn btn-sm ${item.is_recent ? 'btn-warning' : 'btn-success'}" onclick="toggleRecent(${item.id})">
+                                ${item.is_recent ? '<i class="fas fa-eye-slash"></i> Hide' : '<i class="fas fa-eye"></i> Show'}
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        } catch (error) {
+            console.error('Recent error:', error);
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:#ef4444;">
+                ❌ Failed to load recent
+            </td></tr>`;
+        }
+    }
+
+    // ============================================================
+    // TOGGLE RECENT
+    // ============================================================
+    async function toggleRecent(id) {
+        try {
+            const res = await fetch(`${API_BASE}/api/gallery/images/toggle-recent/${id}`, {
+                method: 'PUT'
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                showToast(data.message, 'success');
+                loadRecent();
+                loadAllImages();
+            } else {
+                showToast('Failed to toggle', 'error');
+            }
+        } catch (error) {
+            showToast('Failed to toggle', 'error');
+        }
+    }
+
+    // ============================================================
+    // TOGGLE ALL CHECKBOXES
+    // ============================================================
+    function toggleAll() {
+        const master = document.getElementById('selectAll');
+        document.querySelectorAll('.img-checkbox').forEach(cb => cb.checked = master.checked);
+        updateSelected();
+    }
+
+    function updateSelected() {
+        selectedIds = [];
+        document.querySelectorAll('.img-checkbox:checked').forEach(cb => {
+            selectedIds.push(parseInt(cb.value));
+        });
+    }
+
+    // ============================================================
+    // BULK DELETE
+    // ============================================================
+    async function bulkDeleteImages() {
+        updateSelected();
+        if (selectedIds.length === 0) {
+            showToast('Select images to delete', 'error');
+            return;
+        }
+
+        if (!confirm(`Delete ${selectedIds.length} images?`)) return;
+
+        try {
+            const res = await fetch(`${API_BASE}/api/gallery/images/bulk-delete`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids: selectedIds })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                showToast(`✅ ${selectedIds.length} images deleted!`, 'success');
+                selectedIds = [];
+                document.getElementById('selectAll').checked = false;
+                loadAllImages();
+                loadRecent();
+                loadStats();
+            } else {
+                showToast(data.message || 'Failed', 'error');
+            }
+        } catch (error) {
+            showToast('Bulk delete failed', 'error');
+        }
+    }
+
+    // ============================================================
+    // CLOSE MODAL
+    // ============================================================
+    function closeModal() {
+        document.getElementById('modal').classList.remove('active');
+        currentEditId = null;
+        currentEditType = null;
+    }
+
+    // ============================================================
+    // REFRESH
+    // ============================================================
+    function refreshData() {
+        showToast('🔄 Refreshing...', 'info');
+        loadStats();
+        loadAlbums();
+        loadAllImages();
+        loadSlider();
+        loadRecent();
+        loadAlbumSelect();
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('🚀 Gallery Admin Loaded');
+        console.log('📡 API:', API_BASE);
+        loadStats();
+        loadAlbums();
+        loadAllImages();
+        loadSlider();
+        loadRecent();
+        loadAlbumSelect();
+        showToast('👋 Gallery Admin Ready', 'info');
+    });
+
+    // Modal close on background click
+    document.getElementById('modal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
+
+    // File input change for upload
+    document.getElementById('imageFileInput').addEventListener('change', function(e) {
+        if (this.files.length) {
+            showToast(`${this.files.length} images selected`, 'info');
+        }
+    });
 </script>
 
 </body>
