@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gallery - GSS School Shilla</title>
+<title>Gallery Manager - Admin</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
    RESET & ROOT
@@ -26,906 +26,1172 @@
   --gray-light: #e8edf8;
   --text: #1a2332;
   --radius: 16px;
-  --shadow-sm: 0 4px 20px rgba(10,22,40,0.08);
-  --shadow-md: 0 8px 40px rgba(10,22,40,0.12);
-  --shadow-lg: 0 20px 60px rgba(10,22,40,0.20);
-  --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --shadow-sm: 0 2px 12px rgba(10,22,40,0.06);
+  --shadow-md: 0 8px 32px rgba(10,22,40,0.10);
+  --shadow-lg: 0 20px 60px rgba(10,22,40,0.15);
+  --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 body {
   font-family: 'Inter', sans-serif;
   background: var(--off-white);
   color: var(--text);
-  overflow-x: hidden;
-  padding-top: 80px;
+  min-height: 100vh;
+  padding: 20px;
 }
 
-a { text-decoration: none; color: inherit; }
-ul { list-style: none; }
-img { max-width: 100%; }
+.container { max-width: 1300px; margin: 0 auto; }
 
 /* ============================================================
-   SCROLLBAR
+   HEADER
 ============================================================ */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--navy-dark); }
-::-webkit-scrollbar-thumb { background: var(--blue-bright); border-radius: 50px; }
-
-/* ============================================================
-   NAVBAR
-============================================================ */
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 9999;
+.header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 0 50px;
-  height: 80px;
-  background: rgba(10, 22, 40, 0.96);
-  backdrop-filter: blur(24px);
-  border-bottom: 1px solid rgba(59, 130, 246, 0.15);
-  transition: var(--transition);
-}
-
-.navbar.scrolled { height: 70px; background: rgba(10, 22, 40, 0.98); }
-
-.logo {
-  display: flex;
   align-items: center;
-  gap: 14px;
-}
-
-.logo img {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  border: 2px solid var(--blue-bright);
-  object-fit: cover;
-  padding: 2px;
-  background: var(--white);
-}
-
-.logo-text .school-name {
-  font-family: 'Playfair Display', serif;
-  font-size: 17px;
-  font-weight: 800;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 30px;
+  padding: 20px 28px;
+  background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+  border-radius: var(--radius);
   color: var(--white);
-  background: linear-gradient(135deg, #ffffff, var(--blue-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  box-shadow: var(--shadow-md);
 }
 
-.logo-text .school-tagline {
-  font-size: 10px;
-  color: var(--blue-light);
-  text-transform: uppercase;
-  font-weight: 600;
-}
+.header h1 { font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+.header h1 i { color: var(--blue-light); }
 
-.nav-links {
-  display: flex;
+.header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.btn {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-}
-
-.nav-links a {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 14px;
-  font-weight: 500;
-  padding: 8px 18px;
+  gap: 8px;
+  padding: 10px 22px;
+  border: none;
   border-radius: 10px;
-  transition: var(--transition);
-  position: relative;
-}
-
-.nav-links a::after {
-  content: '';
-  position: absolute;
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%) scaleX(0);
-  width: 60%;
-  height: 2.5px;
-  background: var(--blue-bright);
-  transition: var(--transition);
-  border-radius: 50px;
-}
-
-.nav-links a:hover::after,
-.nav-links a.active::after { transform: translateX(-50%) scaleX(1); }
-.nav-links a:hover { color: var(--white); background: rgba(59, 130, 246, 0.08); }
-.nav-links a.active { color: var(--white); background: rgba(59, 130, 246, 0.12); }
-
-.nav-actions { display: flex; align-items: center; gap: 14px; }
-
-.login-btn {
-  padding: 10px 24px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--blue-bright), var(--navy-light));
-  color: var(--white);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
-  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.25);
-}
-
-.login-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(59, 130, 246, 0.35); }
-
-.menu-toggle {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.06);
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.menu-toggle .bar {
-  display: block;
-  width: 22px;
-  height: 2px;
-  background: var(--white);
-  transition: var(--transition);
-  border-radius: 50px;
-}
-
-.menu-toggle.active .bar:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
-.menu-toggle.active .bar:nth-child(2) { opacity: 0; }
-.menu-toggle.active .bar:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
-
-.mobile-login-item { display: none; }
-
-@media (max-width: 992px) {
-  .navbar { padding: 0 20px; height: 72px; }
-  body { padding-top: 72px; }
-  .nav-links {
-    position: absolute;
-    top: 76px;
-    right: 20px;
-    width: 280px;
-    background: linear-gradient(145deg, #0a1628, #142a5c);
-    border-radius: 16px;
-    flex-direction: column;
-    padding: 16px;
-    gap: 4px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-12px);
-    transition: var(--transition);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid rgba(59, 130, 246, 0.1);
-  }
-  .nav-links.active { opacity: 1; visibility: visible; transform: translateY(0); }
-  .nav-links a { width: 100%; padding: 12px 16px; }
-  .nav-links a::after { display: none; }
-  .desktop-login { display: none !important; }
-  .mobile-login-item { display: block !important; width: 100%; margin-top: 4px; }
-  .mobile-login-item .login-btn { width: 100%; justify-content: center; }
-  .menu-toggle { display: flex; }
-}
-
-@media (max-width: 480px) {
-  .logo-text .school-name { font-size: 13px; }
-  .logo img { width: 40px; height: 40px; }
-  .navbar { padding: 0 14px; height: 64px; }
-  body { padding-top: 64px; }
-}
-
-/* ============================================================
-   PAGE HEADER
-============================================================ */
-.page-header {
-  background: linear-gradient(135deg, var(--navy-dark), var(--navy-mid));
-  padding: 40px 20px 30px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.page-header::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 30% 50%, rgba(59, 130, 246, 0.08), transparent 60%);
-}
-
-.page-header h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 36px;
-  font-weight: 800;
-  color: var(--white);
-  position: relative;
-  z-index: 1;
-}
-.page-header h1 i { color: var(--blue-bright); }
-.page-header p { color: rgba(255, 255, 255, 0.6); margin-top: 6px; font-size: 16px; position: relative; z-index: 1; }
-
-/* ============================================================
-   CATEGORY NAVIGATION
-============================================================ */
-.category-nav {
-  background: var(--white);
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--gray-light);
-  overflow-x: auto;
-}
-
-.category-nav-wrap {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  gap: 8px;
-  flex-wrap: nowrap;
-  align-items: center;
-}
-
-.category-nav-wrap .cat-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 18px;
-  border: none;
-  border-radius: 50px;
-  background: var(--off-white);
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: var(--transition);
-  white-space: nowrap;
+  text-decoration: none;
   font-family: inherit;
 }
 
-.category-nav-wrap .cat-btn:hover { background: var(--blue-pale); color: var(--blue-bright); }
-.category-nav-wrap .cat-btn.active { background: var(--blue-bright); color: white; box-shadow: 0 4px 15px rgba(59,130,246,0.25); }
-.category-nav-wrap .cat-btn i { font-size: 14px; }
+.btn-primary { background: linear-gradient(135deg, var(--blue-bright), var(--navy-light)); color: white; box-shadow: 0 4px 20px rgba(59,130,246,0.25); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(59,130,246,0.35); }
+.btn-success { background: #22c55e; color: white; }
+.btn-success:hover { background: #16a34a; transform: translateY(-2px); }
+.btn-danger { background: #ef4444; color: white; }
+.btn-danger:hover { background: #dc2626; transform: translateY(-2px); }
+.btn-warning { background: #f59e0b; color: white; }
+.btn-warning:hover { background: #d97706; transform: translateY(-2px); }
+.btn-outline { background: rgba(255,255,255,0.06); color: white; border: 1px solid rgba(255,255,255,0.1); }
+.btn-outline:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
+.btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 8px; }
 
 /* ============================================================
-   SECTION COMMON
+   TABS
 ============================================================ */
-.section-padding { padding: 70px 20px; }
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 30px;
+  background: var(--white);
+  padding: 6px;
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-light);
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+}
 
-.section-label {
+.tab-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--gray);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.tab-btn:hover { background: var(--off-white); color: var(--text); }
+.tab-btn.active { background: var(--blue-bright); color: white; box-shadow: 0 4px 15px rgba(59,130,246,0.25); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ============================================================
+   STATS ROW
+============================================================ */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.stat-box {
+  background: var(--white);
+  padding: 18px 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-light);
   display: flex;
   align-items: center;
-  gap: 12px;
-  justify-content: center;
-  margin-bottom: 12px;
-}
-
-.section-label .line {
-  width: 50px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--blue-bright));
-}
-.section-label .line.right { background: linear-gradient(90deg, var(--blue-bright), transparent); }
-.section-label span { font-size: 12px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--blue-bright); }
-
-.section-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(28px, 4vw, 40px);
-  font-weight: 800;
-  color: var(--navy);
-  text-align: center;
-  margin-bottom: 40px;
-}
-.section-title .highlight { color: var(--blue-bright); }
-
-/* ============================================================
-   GALLERY GRID
-============================================================ */
-.gallery-section {
-  padding: 60px 20px;
-  background: var(--off-white);
-}
-
-.gallery-grid {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-}
-
-.gallery-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  overflow: hidden;
-  border: 1px solid var(--gray-light);
-  transition: var(--transition);
-  cursor: pointer;
+  gap: 14px;
   box-shadow: var(--shadow-sm);
 }
 
-.gallery-card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--blue-bright);
-}
+.stat-box .icon-box { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.stat-box .icon-box.blue { background: var(--blue-pale); color: var(--blue-bright); }
+.stat-box .icon-box.green { background: #dcfce7; color: #22c55e; }
+.stat-box .icon-box.yellow { background: #fef3c7; color: #f59e0b; }
+.stat-box .icon-box.purple { background: #ede9fe; color: #8b5cf6; }
 
-.gallery-card .image-wrap {
-  width: 100%;
-  height: 200px;
-  overflow: hidden;
-  background: var(--gray-light);
-  position: relative;
-}
-
-.gallery-card .image-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-.gallery-card:hover .image-wrap img { transform: scale(1.05); }
-
-.gallery-card .image-wrap .category-badge {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 14px;
-  border-radius: 50px;
-  font-size: 10px;
-  font-weight: 700;
-  color: white;
-  text-transform: uppercase;
-}
-
-.gallery-card .image-wrap .photo-count {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  font-size: 12px;
-  padding: 4px 12px;
-  border-radius: 50px;
-}
-
-.gallery-card .info { padding: 16px 18px 18px; }
-.gallery-card .info .date { font-size: 12px; color: var(--gray); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
-.gallery-card .info h3 { font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
-.gallery-card .info p { font-size: 13px; color: var(--gray); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.gallery-card .info .meta { display: flex; align-items: center; gap: 12px; margin-top: 8px; font-size: 12px; color: var(--gray); }
-.gallery-card .info .meta span { display: flex; align-items: center; gap: 4px; }
+.stat-box .info .number { font-size: 22px; font-weight: 800; color: var(--navy-dark); line-height: 1.2; }
+.stat-box .info .label { font-size: 12px; color: var(--gray); font-weight: 500; }
 
 /* ============================================================
-   LIGHTBOX
+   FORM SECTION
 ============================================================ */
-.lightbox-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.92);
-  z-index: 99999;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-.lightbox-overlay.active { display: flex; }
-
-.lightbox-overlay .close {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  color: white;
-  font-size: 32px;
-  cursor: pointer;
-  transition: var(--transition);
-  z-index: 10;
-}
-.lightbox-overlay .close:hover { transform: rotate(90deg); color: var(--blue-bright); }
-
-.lightbox-overlay .nav-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 40px;
-  cursor: pointer;
-  transition: var(--transition);
-  z-index: 10;
-  padding: 20px 15px;
-}
-.lightbox-overlay .nav-btn:hover { color: white; }
-.lightbox-overlay .nav-btn.prev { left: 20px; }
-.lightbox-overlay .nav-btn.next { right: 20px; }
-
-.lightbox-content {
-  max-width: 90vw;
-  max-height: 85vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.form-section {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  margin-bottom: 30px;
+  border: 1px solid var(--gray-light);
+  box-shadow: var(--shadow-sm);
 }
 
-.lightbox-content img {
-  max-width: 100%;
-  max-height: 70vh;
-  object-fit: contain;
-  border-radius: 8px;
-}
+.form-section h2 { font-size: 18px; font-weight: 700; color: var(--navy-dark); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
 
-.lightbox-content .info { color: white; text-align: center; margin-top: 16px; }
-.lightbox-content .info h3 { font-size: 18px; font-weight: 600; }
-.lightbox-content .info p { color: rgba(255, 255, 255, 0.5); font-size: 14px; margin-top: 2px; }
-
-.lightbox-counter {
-  position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: rgba(255, 255, 255, 0.3);
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.form-group label .required { color: #ef4444; }
+.form-group input, .form-group textarea, .form-group select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--gray-light);
+  border-radius: 10px;
   font-size: 14px;
-  z-index: 10;
+  font-family: inherit;
+  transition: var(--transition);
 }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+  outline: none;
+  border-color: var(--blue-bright);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+}
+.form-group textarea { resize: vertical; min-height: 80px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
 /* ============================================================
-   EMPTY STATE
+   UPLOAD AREA
 ============================================================ */
-.empty-state { text-align: center; padding: 60px 20px; color: var(--gray); grid-column: 1/-1; }
-.empty-state i { font-size: 48px; color: var(--gray-light); margin-bottom: 16px; }
-.empty-state h3 { font-size: 20px; color: var(--text); margin-bottom: 6px; }
-
-/* ============================================================
-   FOOTER
-============================================================ */
-.footer {
-  background: var(--navy-dark);
-  color: var(--white);
-  padding: 40px 20px 25px;
-  border-top: 1px solid rgba(59, 130, 246, 0.1);
-}
-
-.footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
+.upload-area {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 40px;
+  margin-bottom: 30px;
+  border: 2px dashed var(--gray-light);
   text-align: center;
+  transition: var(--transition);
+  cursor: pointer;
 }
-.footer-content p { color: rgba(255, 255, 255, 0.4); font-size: 14px; }
-.footer-content .dev { margin-top: 8px; color: rgba(255, 255, 255, 0.3); font-size: 13px; }
-.footer-content .dev b { color: var(--blue-light); }
+
+.upload-area:hover { border-color: var(--blue-bright); background: #f8faff; }
+.upload-area.dragover { border-color: var(--blue-bright); background: #eff6ff; }
+
+.upload-area .icon-big { font-size: 52px; color: var(--blue-bright); margin-bottom: 12px; }
+.upload-area h3 { font-size: 18px; font-weight: 700; color: var(--navy-dark); margin-bottom: 4px; }
+.upload-area p { color: var(--gray); font-size: 14px; margin-bottom: 14px; }
+
+.upload-area .browse-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--blue-bright), var(--navy-light));
+  color: var(--white);
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+}
+.upload-area .browse-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59,130,246,0.3); }
+
+#fileInput { display: none; }
+
+.progress-wrapper { margin-top: 16px; display: none; }
+.progress-bar { width: 100%; height: 6px; background: var(--gray-light); border-radius: 50px; overflow: hidden; }
+.progress-bar .fill { height: 100%; background: linear-gradient(90deg, var(--blue-bright), var(--navy-light)); width: 0%; transition: width 0.3s; }
+.progress-text { font-size: 12px; color: var(--gray); margin-top: 6px; }
+
+/* ============================================================
+   TABLE
+============================================================ */
+.table-wrapper {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 20px;
+  border: 1px solid var(--gray-light);
+  overflow-x: auto;
+  box-shadow: var(--shadow-sm);
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.table-header h2 { font-size: 18px; font-weight: 700; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; }
+.table-header h2 span { background: var(--blue-pale); color: var(--blue-bright); padding: 2px 12px; border-radius: 50px; font-size: 13px; font-weight: 600; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+table thead { background: #f8faff; }
+table th { padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text); border-bottom: 2px solid var(--gray-light); }
+table td { padding: 12px 16px; border-bottom: 1px solid var(--gray-light); vertical-align: middle; }
+table tr:hover { background: #f8faff; }
+
+table .thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; background: var(--gray-light); }
+table .status-badge { display: inline-block; padding: 3px 12px; border-radius: 50px; font-size: 11px; font-weight: 600; }
+table .status-badge.active { background: #dcfce7; color: #16a34a; }
+table .status-badge.inactive { background: #fee2e2; color: #dc2626; }
+
+.action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ============================================================
+   MODAL
+============================================================ */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+  z-index: 9998; display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--white); border-radius: var(--radius); max-width: 600px; width: 100%;
+  padding: 30px; box-shadow: var(--shadow-lg); animation: modalIn 0.3s ease;
+  max-height: 90vh; overflow-y: auto;
+}
+@keyframes modalIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.modal-header h3 { font-size: 18px; font-weight: 700; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; }
+.modal-close { width: 36px; height: 36px; border: none; background: var(--gray-light); border-radius: 50%; font-size: 18px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
+.modal-close:hover { background: #fee2e2; color: #ef4444; }
+
+.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--gray-light); }
+
+/* ============================================================
+   TOAST
+============================================================ */
+.toast {
+  position: fixed; bottom: 30px; right: 30px; background: var(--navy-dark); color: var(--white);
+  padding: 16px 24px; border-radius: var(--radius); box-shadow: var(--shadow-lg);
+  display: flex; align-items: center; gap: 12px; transform: translateY(100px); opacity: 0;
+  transition: all 0.5s ease; z-index: 9999; max-width: 400px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success i { color: #22c55e; }
+.toast.error i { color: #ef4444; }
 
 /* ============================================================
    RESPONSIVE
 ============================================================ */
 @media (max-width: 768px) {
-  .page-header h1 { font-size: 28px; }
-  .category-nav { padding: 12px 16px; }
-  .category-nav-wrap .cat-btn { padding: 6px 14px; font-size: 12px; }
-  .gallery-grid { grid-template-columns: 1fr 1fr; }
+  .header { flex-direction: column; align-items: stretch; }
+  .header-actions { flex-wrap: wrap; }
+  .header-actions .btn { flex: 1; justify-content: center; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .tabs { gap: 2px; }
+  .tab-btn { padding: 8px 14px; font-size: 12px; }
+  .table-wrapper { padding: 12px; }
+  table { font-size: 12px; }
+  table th, table td { padding: 8px 10px; }
+  .upload-area { padding: 24px; }
+  .modal { padding: 20px; }
 }
 
 @media (max-width: 480px) {
-  .page-header h1 { font-size: 22px; }
-  .gallery-grid { grid-template-columns: 1fr; }
-  .gallery-card .image-wrap { height: 180px; }
-  .lightbox-overlay .nav-btn { font-size: 28px; padding: 10px 5px; }
-  .lightbox-overlay .close { font-size: 24px; top: 12px; right: 16px; }
+  .stats-row { grid-template-columns: 1fr; }
+  .tabs { flex-direction: column; }
+  .tab-btn { width: 100%; justify-content: center; }
 }
 </style>
 </head>
 <body>
 
-<!-- ============================================================
-     NAVBAR
-============================================================ -->
-<header class="navbar" id="navbar">
-  <div class="logo">
-    <img src="1778132110413-ChatGPT Image May 7, 2026, 10_56_26 AM.png" alt="School Logo">
-    <div class="logo-text">
-      <span class="school-name">GSS School Shilla</span>
-      <span class="school-tagline">Est. Himachal Pradesh</span>
-    </div>
-  </div>
+<div class="container">
 
-  <ul class="nav-links" id="navLinks">
-    <li><a href="../index.html">Home</a></li>
-    <li><a href="pub-notif.html">Notices</a></li>
-    <li><a href="result.html">Results</a></li>
-    <li><a href="downloads.html">Downloads</a></li>
-    <li><a href="gallery.html" class="active">Gallery</a></li>
-    <li><a href="contact.html">Contact</a></li>
-    <li class="mobile-login-item">
-      <button class="login-btn" onclick="window.location.href='../admin/login.html'">
-        <i class="fas fa-sign-in-alt"></i> Login
+  <!-- HEADER -->
+  <header class="header">
+    <h1><i class="fas fa-images"></i> Gallery Manager</h1>
+    <div class="header-actions">
+      <a href="/" target="_blank" class="btn btn-outline">
+        <i class="fas fa-eye"></i> View Gallery
+      </a>
+      <button class="btn btn-primary" onclick="refreshData()">
+        <i class="fas fa-sync-alt"></i> Refresh
       </button>
-    </li>
-  </ul>
-
-  <div class="nav-actions">
-    <button class="login-btn desktop-login" onclick="window.location.href='../admin/login.html'">
-      <i class="fas fa-sign-in-alt"></i> Login
-    </button>
-    <div class="menu-toggle" id="menuToggle">
-      <span class="bar"></span>
-      <span class="bar"></span>
-      <span class="bar"></span>
     </div>
-  </div>
-</header>
+  </header>
 
-<!-- ============================================================
-     PAGE HEADER
-============================================================ -->
-<section class="page-header">
-  <h1><i class="fas fa-images"></i> School Gallery</h1>
-  <p>Capturing memories and celebrating moments at GSS School Shilla</p>
-</section>
-
-<!-- ============================================================
-     CATEGORY NAVIGATION
-============================================================ -->
-<section class="category-nav">
-  <div class="category-nav-wrap" id="categoryNav">
-    <button class="cat-btn active" data-category="all">
-      <i class="fas fa-th"></i> All
-    </button>
-  </div>
-</section>
-
-<!-- ============================================================
-     GALLERY GRID
-============================================================ -->
-<section class="gallery-section">
-  <div class="section-label">
-    <div class="line"></div>
-    <span>Memories</span>
-    <div class="line right"></div>
-  </div>
-  <h2 class="section-title">Our <span class="highlight">Gallery</span></h2>
-
-  <div class="gallery-grid" id="galleryGrid">
-    <div class="empty-state">
-      <i class="fas fa-spinner fa-spin"></i>
-      <h3>Loading...</h3>
-      <p>Please wait while we load the gallery</p>
+  <!-- STATS -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-box">
+      <div class="icon-box blue"><i class="fas fa-images"></i></div>
+      <div class="info"><div class="number" id="totalPhotos">0</div><div class="label">Total Photos</div></div>
+    </div>
+    <div class="stat-box">
+      <div class="icon-box green"><i class="fas fa-folder-open"></i></div>
+      <div class="info"><div class="number" id="totalAlbums">0</div><div class="label">Total Albums</div></div>
+    </div>
+    <div class="stat-box">
+      <div class="icon-box yellow"><i class="fas fa-eye"></i></div>
+      <div class="info"><div class="number" id="totalViews">0</div><div class="label">Total Views</div></div>
+    </div>
+    <div class="stat-box">
+      <div class="icon-box purple"><i class="fas fa-sliders-h"></i></div>
+      <div class="info"><div class="number" id="sliderCount">0</div><div class="label">Slider Images</div></div>
     </div>
   </div>
 
-  <div class="load-more-wrap" style="text-align:center;margin-top:40px;">
-    <button class="load-more-btn" id="loadMoreBtn" style="padding:12px 36px;border:2px solid var(--blue-bright);background:transparent;color:var(--blue-bright);border-radius:50px;font-size:15px;font-weight:600;cursor:pointer;transition:var(--transition);font-family:inherit;">
-      <i class="fas fa-plus-circle"></i> Load More
-    </button>
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="albums"><i class="fas fa-folder-open"></i> Albums</button>
+    <button class="tab-btn" data-tab="add-album"><i class="fas fa-plus-circle"></i> Add Album</button>
+    <button class="tab-btn" data-tab="images"><i class="fas fa-images"></i> Album Images</button>
+    <button class="tab-btn" data-tab="slider"><i class="fas fa-sliders-h"></i> Slider</button>
   </div>
-</section>
 
-<!-- ============================================================
-     LIGHTBOX
-============================================================ -->
-<div class="lightbox-overlay" id="lightbox">
-  <span class="close" id="closeLightbox">✕</span>
-  <span class="nav-btn prev" id="lightboxPrev">‹</span>
-  <span class="nav-btn next" id="lightboxNext">›</span>
-  
-  <div class="lightbox-content">
-    <img id="lightboxImg" src="" alt="">
-    <div class="info">
-      <h3 id="lightboxTitle"></h3>
-      <p id="lightboxDesc"></p>
+  <!-- ============================================================
+       TAB 1: ALBUMS
+  ============================================================ -->
+  <div class="tab-content active" id="tab-albums">
+    <div class="table-wrapper">
+      <div class="table-header">
+        <h2>All Albums <span id="albumsCount">0</span></h2>
+        <button class="btn btn-sm btn-success" onclick="switchTab('add-album')">
+          <i class="fas fa-plus"></i> New Album
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:50px;">#</th>
+            <th style="width:80px;">Cover</th>
+            <th>Title</th>
+            <th>Category</th>
+            <th style="width:80px;">Photos</th>
+            <th style="width:80px;">Views</th>
+            <th style="width:100px;">Status</th>
+            <th style="width:150px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="albumsTableBody">
+          <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray);">
+            <i class="fas fa-spinner fa-spin"></i> Loading...
+          </td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
-  
-  <span class="lightbox-counter" id="lightboxCounter">1 / 10</span>
+
+  <!-- ============================================================
+       TAB 2: ADD ALBUM
+  ============================================================ -->
+  <div class="tab-content" id="tab-add-album">
+    <div class="form-section">
+      <h2><i class="fas fa-plus-circle"></i> Create New Album</h2>
+      <form id="albumForm">
+        <div class="form-group">
+          <label>Album Title <span class="required">*</span></label>
+          <input type="text" id="albumTitle" placeholder="Enter album title..." required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="albumDescription" placeholder="Enter album description..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select id="albumCategory">
+              <option value="general">General</option>
+              <option value="academic">Academic</option>
+              <option value="sports">Sports</option>
+              <option value="cultural">Cultural</option>
+              <option value="annual-function">Annual Function</option>
+              <option value="science-exhibition">Science Exhibition</option>
+              <option value="republic-day">Republic Day</option>
+              <option value="independence-day">Independence Day</option>
+              <option value="workshops">Workshops</option>
+              <option value="seminars">Seminars</option>
+              <option value="alumni">Alumni</option>
+              <option value="achievements">Achievements</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Event Date</label>
+            <input type="date" id="albumEventDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Venue</label>
+          <input type="text" id="albumVenue" placeholder="Event venue...">
+        </div>
+        <div class="form-group">
+          <label>Cover Image</label>
+          <input type="file" id="albumCoverInput" accept="image/*">
+          <small style="color:var(--gray);font-size:11px;">Recommended: 800x600px</small>
+        </div>
+        <div class="form-group">
+          <label><input type="checkbox" id="albumFeatured"> Featured Album</label>
+        </div>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Create Album</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       TAB 3: ALBUM IMAGES
+  ============================================================ -->
+  <div class="tab-content" id="tab-images">
+    <div class="form-section">
+      <h2><i class="fas fa-upload"></i> Upload Images to Album</h2>
+      <div class="form-group">
+        <label>Select Album <span class="required">*</span></label>
+        <select id="albumSelect">
+          <option value="">-- Select Album --</option>
+        </select>
+      </div>
+      <div class="upload-area" id="imagesUploadArea" style="padding:24px;">
+        <div class="icon-big" style="font-size:36px;"><i class="fas fa-cloud-upload-alt"></i></div>
+        <h3 style="font-size:16px;">Drag & Drop Images Here</h3>
+        <p style="font-size:13px;">JPEG, PNG, WebP • Max 5MB each</p>
+        <button class="browse-btn" onclick="document.getElementById('imagesFileInput').click()">
+          <i class="fas fa-folder-open"></i> Browse
+        </button>
+        <input type="file" id="imagesFileInput" accept="image/*" multiple>
+        <div class="progress-wrapper" id="imagesProgressWrapper">
+          <div class="progress-bar"><div class="fill" id="imagesProgressFill"></div></div>
+          <div class="progress-text" id="imagesProgressText">Uploading...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <div class="table-header">
+        <h2>Album Images <span id="albumImagesCount">0</span></h2>
+        <div><span style="font-size:13px;color:var(--gray);" id="currentAlbumName">Select an album above</span></div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:50px;">#</th>
+            <th style="width:80px;">Image</th>
+            <th>Title</th>
+            <th style="width:100px;">Date</th>
+            <th style="width:120px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="albumImagesTableBody">
+          <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray);">
+            <i class="fas fa-info-circle"></i> Select an album to view images
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       TAB 4: SLIDER
+  ============================================================ -->
+  <div class="tab-content" id="tab-slider">
+    <div class="upload-area" id="sliderUploadArea">
+      <div class="icon-big"><i class="fas fa-cloud-upload-alt"></i></div>
+      <h3>Add Slider Image</h3>
+      <p>Upload images for gallery slider (separate from homepage)</p>
+      <button class="browse-btn" onclick="document.getElementById('sliderFileInput').click()">
+        <i class="fas fa-folder-open"></i> Browse
+      </button>
+      <input type="file" id="sliderFileInput" accept="image/*">
+      <div class="progress-wrapper" id="sliderProgressWrapper">
+        <div class="progress-bar"><div class="fill" id="sliderProgressFill"></div></div>
+        <div class="progress-text" id="sliderProgressText">Uploading...</div>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <div class="table-header">
+        <h2>Slider Images <span id="sliderCount2">0</span></h2>
+        <button class="btn btn-sm btn-warning" onclick="reorderSlider()">
+          <i class="fas fa-arrows-alt"></i> Reorder
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:60px;">#</th>
+            <th style="width:80px;">Image</th>
+            <th>Title</th>
+            <th style="width:100px;">Status</th>
+            <th style="width:100px;">Date</th>
+            <th style="width:150px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="sliderTableBody">
+          <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray);">
+            <i class="fas fa-spinner fa-spin"></i> Loading...
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <!-- ============================================================
-     FOOTER
+   EDIT MODAL
 ============================================================ -->
-<footer class="footer">
-  <div class="footer-content">
-    <p>© 2026 Govt. Sr. Sec. School Shilla · All Rights Reserved</p>
-    <div class="dev">Designed & Developed by <b>Vikshant Kralta</b></div>
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-edit"></i> Edit Item</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
   </div>
-</footer>
+</div>
 
 <!-- ============================================================
-     SCRIPTS
+   TOAST
+============================================================ -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toastMessage">Success!</span>
+</div>
+
+<!-- ============================================================
+   SCRIPTS
 ============================================================ -->
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+// ============================================================
+// CONFIGURATION
+// ============================================================
+const API_BASE = 'https://gsssshilla.onrender.com';
+let currentAlbumId = null;
+let currentEditId = null;
+let currentEditType = null;
 
-  // ============================================================
-  // NAVBAR
-  // ============================================================
-  const navbar = document.getElementById('navbar');
-  const menuToggle = document.getElementById('menuToggle');
-  const navLinks = document.getElementById('navLinks');
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast');
+  toast.className = 'toast ' + type;
+  document.getElementById('toastMessage').textContent = message;
+  toast.classList.add('show');
+  clearTimeout(toast.timeout);
+  toast.timeout = setTimeout(() => toast.classList.remove('show'), 3000);
+}
 
-  window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 50);
+// ============================================================
+// TABS
+// ============================================================
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
   });
+});
 
-  menuToggle.addEventListener('click', () => {
-    navLinks.classList.toggle('active');
-    menuToggle.classList.toggle('active');
-  });
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
 
-  document.querySelectorAll('#navLinks a').forEach(link => {
-    link.addEventListener('click', () => {
-      navLinks.classList.remove('active');
-      menuToggle.classList.remove('active');
-    });
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.navbar')) {
-      navLinks.classList.remove('active');
-      menuToggle.classList.remove('active');
+// ============================================================
+// LOAD STATS
+// ============================================================
+async function loadStats() {
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/stats`);
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('totalPhotos').textContent = data.data.total_images || 0;
+      document.getElementById('totalAlbums').textContent = data.data.total_albums || 0;
+      document.getElementById('totalViews').textContent = data.data.total_views || 0;
     }
-  });
-
-  // ============================================================
-  // CONFIG
-  // ============================================================
-  const API_BASE = 'https://gsssshilla.onrender.com';
-  let allAlbums = [];
-  let currentCategory = 'all';
-  let currentPage = 1;
-  const limit = 12;
-  let isLoading = false;
-  let hasMore = true;
-
-  // ============================================================
-  // LOAD CATEGORIES
-  // ============================================================
-  async function loadCategories() {
-    const nav = document.getElementById('categoryNav');
-    try {
-      const response = await fetch(`${API_BASE}/api/gallery/categories`);
-      const data = await response.json();
-
-      if (data.success && data.data) {
-        data.data.forEach(cat => {
-          const btn = document.createElement('button');
-          btn.className = 'cat-btn';
-          btn.dataset.category = cat.slug;
-          btn.innerHTML = `<i class="${cat.icon || 'fa-folder'}"></i> ${cat.name}`;
-          btn.addEventListener('click', () => filterByCategory(cat.slug));
-          nav.appendChild(btn);
-        });
-      }
-    } catch (error) {
-      console.error('Categories error:', error);
+    const sliderRes = await fetch(`${API_BASE}/api/gallery/slider/stats`);
+    const sliderData = await sliderRes.json();
+    if (sliderData.success) {
+      document.getElementById('sliderCount').textContent = sliderData.data.total || 0;
+      document.getElementById('sliderCount2').textContent = sliderData.data.total || 0;
     }
-  }
+  } catch (error) { console.error('Stats error:', error); }
+}
 
-  // ============================================================
-  // FILTER BY CATEGORY
-  // ============================================================
-  function filterByCategory(category) {
-    document.querySelectorAll('.cat-btn').forEach(btn => {
-      btn.classList.remove('active');
-      if (btn.dataset.category === category) btn.classList.add('active');
-    });
-    currentCategory = category;
-    currentPage = 1;
-    hasMore = true;
-    loadGallery(true);
-  }
+// ============================================================
+// LOAD ALBUMS
+// ============================================================
+async function loadAlbums() {
+  const tbody = document.getElementById('albumsTableBody');
+  tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray);">
+    <i class="fas fa-spinner fa-spin"></i> Loading...
+  </td></tr>`;
 
-  // ============================================================
-  // LOAD GALLERY
-  // ============================================================
-  async function loadGallery(reset = true) {
-    const grid = document.getElementById('galleryGrid');
-    
-    if (isLoading) return;
-    isLoading = true;
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/albums?limit=100`);
+    const data = await res.json();
 
-    if (reset) {
-      currentPage = 1;
-      allAlbums = [];
-      grid.innerHTML = `
-        <div class="empty-state">
-          <i class="fas fa-spinner fa-spin"></i>
-          <h3>Loading...</h3>
-          <p>Please wait while we load the gallery</p>
-        </div>
-      `;
-    }
-
-    try {
-      let url = `${API_BASE}/api/gallery/albums?page=${currentPage}&limit=${limit}`;
-      if (currentCategory !== 'all') url += `&category=${currentCategory}`;
-
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.message || 'Failed to load');
-      }
-
-      const albums = data.data || [];
-      const pagination = data.pagination || {};
-
-      if (reset) {
-        allAlbums = albums;
-      } else {
-        allAlbums = [...allAlbums, ...albums];
-      }
-
-      hasMore = pagination.page < pagination.totalPages;
-
-      renderGallery(allAlbums);
-
-      if (!hasMore) {
-        document.getElementById('loadMoreBtn').style.display = 'none';
-      } else {
-        document.getElementById('loadMoreBtn').style.display = 'inline-flex';
-      }
-
-    } catch (error) {
-      console.error('Gallery error:', error);
-      grid.innerHTML = `
-        <div class="empty-state" style="border:2px dashed #fee2e2;border-radius:16px;padding:40px;">
-          <i class="fas fa-exclamation-circle" style="color:#ef4444;"></i>
-          <h3 style="color:#ef4444;">Failed to Load</h3>
-          <p>Unable to load gallery. Please try again.</p>
-          <button onclick="loadGallery(true)" style="margin-top:12px;padding:8px 24px;background:#4a8af4;color:white;border:none;border-radius:8px;cursor:pointer;">Retry</button>
-        </div>
-      `;
-    } finally {
-      isLoading = false;
-    }
-  }
-
-  // ============================================================
-  // RENDER GALLERY
-  // ============================================================
-  function renderGallery(albums) {
-    const grid = document.getElementById('galleryGrid');
-
-    if (!albums || albums.length === 0) {
-      grid.innerHTML = `
-        <div class="empty-state">
-          <i class="fas fa-images" style="font-size:48px;color:#dbeafe;"></i>
-          <h3>No Albums Found</h3>
-          <p>Try adjusting your filters</p>
-        </div>
-      `;
+    if (!data.success || !data.data || data.data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray);">
+        <i class="fas fa-folder-open"></i> No albums found
+      </td></tr>`;
+      document.getElementById('albumsCount').textContent = '0';
       return;
     }
 
-    grid.innerHTML = albums.map((album, index) => {
-      const coverUrl = album.cover_image || 'https://via.placeholder.com/400x300/1a3a6b/4a8af4?text=No+Image';
-      const photoCount = album.photo_count || 0;
-      const categoryName = album.category || 'General';
-      
-      return `
-        <div class="gallery-card" onclick="openLightbox(${index})">
-          <div class="image-wrap">
-            <img src="${coverUrl}" alt="${album.title}" loading="lazy">
-            <span class="category-badge" style="background:${getCategoryColor(categoryName)}">${categoryName}</span>
-            <span class="photo-count"><i class="fas fa-image"></i> ${photoCount}</span>
+    document.getElementById('albumsCount').textContent = data.data.length;
+
+    tbody.innerHTML = data.data.map((item, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td><img src="${item.cover_image || 'https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'}" class="thumb" onerror="this.src='https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'"></td>
+        <td><strong>${item.title}</strong></td>
+        <td><span style="background:#dbeafe;color:#2563eb;padding:2px 10px;border-radius:50px;font-size:11px;">${item.category || 'general'}</span></td>
+        <td>${item.photo_count || 0}</td>
+        <td>${item.view_count || 0}</td>
+        <td><span class="status-badge ${item.is_active == 1 ? 'active' : 'inactive'}">${item.is_active == 1 ? 'Active' : 'Inactive'}</span></td>
+        <td>
+          <div class="action-btns">
+            <button class="btn btn-sm btn-primary" onclick="editAlbum(${item.id})"><i class="fas fa-edit"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="deleteAlbum(${item.id})"><i class="fas fa-trash-alt"></i></button>
           </div>
-          <div class="info">
-            <div class="date"><i class="far fa-calendar-alt"></i> ${album.created_at_ist || 'Recent'}</div>
-            <h3>${album.title}</h3>
-            <p>${album.description || ''}</p>
-            <div class="meta">
-              <span><i class="far fa-eye"></i> ${album.view_count || 0}</span>
-              <span><i class="far fa-heart"></i> ${Math.floor(Math.random() * 50) + 10}</span>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
+        </td>
+      </tr>
+    `).join('');
 
-    window.galleryAlbums = albums;
+    populateAlbumSelect(data.data);
+
+  } catch (error) {
+    console.error('Albums error:', error);
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#ef4444;">
+      <i class="fas fa-exclamation-circle"></i> Failed to load
+    </td></tr>`;
   }
+}
 
-  // ============================================================
-  // GET CATEGORY COLOR
-  // ============================================================
-  function getCategoryColor(category) {
-    const colors = {
-      'academic': '#3b82f6',
-      'sports': '#22c55e',
-      'cultural': '#8b5cf6',
-      'annual-function': '#f59e0b',
-      'science-exhibition': '#06b6d4',
-      'republic-day': '#ef4444',
-      'independence-day': '#f97316',
-      'workshops': '#8b5cf6',
-      'seminars': '#3b82f6',
-      'alumni': '#6b7280',
-      'achievements': '#f59e0b',
-      'general': '#4a8af4'
-    };
-    return colors[category] || '#4a8af4';
+// ============================================================
+// POPULATE ALBUM SELECT
+// ============================================================
+function populateAlbumSelect(albums) {
+  const select = document.getElementById('albumSelect');
+  select.innerHTML = '<option value="">-- Select Album --</option>';
+  if (albums) {
+    albums.forEach(album => {
+      select.innerHTML += `<option value="${album.id}">${album.title}</option>`;
+    });
   }
+}
 
-  // ============================================================
-  // LIGHTBOX
-  // ============================================================
-  let lightboxIndex = 0;
+// ============================================================
+// CREATE ALBUM
+// ============================================================
+document.getElementById('albumForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const title = document.getElementById('albumTitle').value.trim();
+  if (!title) { showToast('Title is required', 'error'); return; }
 
-  window.openLightbox = function(index) {
-    const albums = window.galleryAlbums || [];
-    if (!albums.length) return;
-    
-    lightboxIndex = index;
-    const album = albums[lightboxIndex];
-    const coverUrl = album.cover_image || 'https://via.placeholder.com/800x500/1a3a6b/4a8af4?text=No+Image';
-    
-    document.getElementById('lightboxImg').src = coverUrl;
-    document.getElementById('lightboxTitle').textContent = album.title || 'Album';
-    document.getElementById('lightboxDesc').textContent = album.description || '';
-    document.getElementById('lightboxCounter').textContent = `${lightboxIndex + 1} / ${albums.length}`;
-    document.getElementById('lightbox').classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
+  const formData = new FormData();
+  formData.append('title', title);
+  formData.append('description', document.getElementById('albumDescription').value.trim() || '');
+  formData.append('category', document.getElementById('albumCategory').value);
+  formData.append('event_date', document.getElementById('albumEventDate').value || '');
+  formData.append('venue', document.getElementById('albumVenue').value.trim() || '');
+  formData.append('is_featured', document.getElementById('albumFeatured').checked ? 1 : 0);
 
-  function closeLightbox() {
-    document.getElementById('lightbox').classList.remove('active');
-    document.body.style.overflow = '';
-  }
+  const coverFile = document.getElementById('albumCoverInput').files[0];
+  if (coverFile) formData.append('cover', coverFile);
 
-  document.getElementById('closeLightbox').addEventListener('click', closeLightbox);
-  document.getElementById('lightbox').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) closeLightbox();
-  });
+  try {
+    const btn = this.querySelector('button[type="submit"]');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+    btn.disabled = true;
 
-  document.getElementById('lightboxNext').addEventListener('click', () => {
-    const albums = window.galleryAlbums || [];
-    if (!albums.length) return;
-    lightboxIndex = (lightboxIndex + 1) % albums.length;
-    const album = albums[lightboxIndex];
-    document.getElementById('lightboxImg').src = album.cover_image || 'https://via.placeholder.com/800x500/1a3a6b/4a8af4?text=No+Image';
-    document.getElementById('lightboxTitle').textContent = album.title || 'Album';
-    document.getElementById('lightboxDesc').textContent = album.description || '';
-    document.getElementById('lightboxCounter').textContent = `${lightboxIndex + 1} / ${albums.length}`;
-  });
-
-  document.getElementById('lightboxPrev').addEventListener('click', () => {
-    const albums = window.galleryAlbums || [];
-    if (!albums.length) return;
-    lightboxIndex = (lightboxIndex - 1 + albums.length) % albums.length;
-    const album = albums[lightboxIndex];
-    document.getElementById('lightboxImg').src = album.cover_image || 'https://via.placeholder.com/800x500/1a3a6b/4a8af4?text=No+Image';
-    document.getElementById('lightboxTitle').textContent = album.title || 'Album';
-    document.getElementById('lightboxDesc').textContent = album.description || '';
-    document.getElementById('lightboxCounter').textContent = `${lightboxIndex + 1} / ${albums.length}`;
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (!document.getElementById('lightbox').classList.contains('active')) return;
-    if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowRight') document.getElementById('lightboxNext').click();
-    if (e.key === 'ArrowLeft') document.getElementById('lightboxPrev').click();
-  });
-
-  // ============================================================
-  // LOAD MORE
-  // ============================================================
-  document.getElementById('loadMoreBtn').addEventListener('click', () => {
-    if (!isLoading && hasMore) {
-      currentPage++;
-      loadGallery(false);
+    const res = await fetch(`${API_BASE}/api/gallery/albums/add`, { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.success) {
+      showToast('✅ Album created!', 'success');
+      this.reset();
+      loadAlbums();
+      loadStats();
+      switchTab('albums');
+    } else {
+      showToast(data.message || 'Failed', 'error');
     }
-  });
+  } catch (error) { showToast('Creation failed', 'error'); } finally {
+    const btn = this.querySelector('button[type="submit"]');
+    btn.innerHTML = '<i class="fas fa-save"></i> Create Album';
+    btn.disabled = false;
+  }
+});
 
-  // ============================================================
-  // INIT
-  // ============================================================
-  loadCategories();
-  loadGallery(true);
+// ============================================================
+// ALBUM IMAGES - Select Change
+// ============================================================
+document.getElementById('albumSelect').addEventListener('change', function() {
+  currentAlbumId = this.value;
+  if (currentAlbumId) {
+    loadAlbumImages(currentAlbumId);
+    document.getElementById('currentAlbumName').textContent = 'Album: ' + this.options[this.selectedIndex].text;
+  } else {
+    document.getElementById('albumImagesTableBody').innerHTML = 
+      `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray);">
+        <i class="fas fa-info-circle"></i> Select an album to view images
+      </td></tr>`;
+    document.getElementById('albumImagesCount').textContent = '0';
+    document.getElementById('currentAlbumName').textContent = 'Select an album above';
+  }
+});
 
+// ============================================================
+// LOAD ALBUM IMAGES
+// ============================================================
+async function loadAlbumImages(albumId) {
+  const tbody = document.getElementById('albumImagesTableBody');
+  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray);">
+    <i class="fas fa-spinner fa-spin"></i> Loading...
+  </td></tr>`;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/albums/${albumId}`);
+    const data = await res.json();
+
+    if (!data.success || !data.data.images || data.data.images.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray);">
+        <i class="fas fa-image"></i> No images in this album
+      </td></tr>`;
+      document.getElementById('albumImagesCount').textContent = '0';
+      return;
+    }
+
+    document.getElementById('albumImagesCount').textContent = data.data.images.length;
+    tbody.innerHTML = data.data.images.map((item, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td><img src="${item.file_path || item.filename}" class="thumb" onerror="this.src='https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'"></td>
+        <td>${item.title || 'Untitled'}</td>
+        <td style="font-size:12px;color:var(--gray);">${item.created_at || 'N/A'}</td>
+        <td>
+          <div class="action-btns">
+            <button class="btn btn-sm btn-danger" onclick="deleteAlbumImage(${item.id})"><i class="fas fa-trash-alt"></i></button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch (error) {
+    console.error('Album images error:', error);
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:#ef4444;">
+      <i class="fas fa-exclamation-circle"></i> Failed to load
+    </td></tr>`;
+  }
+}
+
+// ============================================================
+// DELETE ALBUM IMAGE
+// ============================================================
+async function deleteAlbumImage(id) {
+  if (!confirm('Delete this image?')) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/images/delete/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      showToast('✅ Image deleted!', 'success');
+      if (currentAlbumId) { loadAlbumImages(currentAlbumId); loadStats(); }
+    } else { showToast(data.message || 'Failed', 'error'); }
+  } catch (error) { showToast('Delete failed', 'error'); }
+}
+
+// ============================================================
+// DELETE ALBUM
+// ============================================================
+async function deleteAlbum(id) {
+  if (!confirm('Delete this album and all its images?')) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/albums/delete/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) { showToast('✅ Album deleted!', 'success'); loadAlbums(); loadStats(); }
+    else { showToast(data.message || 'Failed', 'error'); }
+  } catch (error) { showToast('Delete failed', 'error'); }
+}
+
+// ============================================================
+// UPLOAD ALBUM IMAGES
+// ============================================================
+document.getElementById('imagesFileInput').addEventListener('change', async function(e) {
+  if (!this.files.length) return;
+  const albumId = document.getElementById('albumSelect').value;
+  if (!albumId) { showToast('Please select an album first', 'error'); this.value = ''; return; }
+
+  const formData = new FormData();
+  formData.append('album_id', albumId);
+  for (let file of this.files) formData.append('images', file);
+
+  const progressWrapper = document.getElementById('imagesProgressWrapper');
+  const progressFill = document.getElementById('imagesProgressFill');
+  const progressText = document.getElementById('imagesProgressText');
+
+  progressWrapper.style.display = 'block';
+  progressFill.style.width = '0%';
+  progressText.textContent = 'Uploading... 0%';
+
+  try {
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 10;
+      if (progress > 90) progress = 90;
+      progressFill.style.width = progress + '%';
+      progressText.textContent = `Uploading... ${Math.round(progress)}%`;
+    }, 200);
+
+    const res = await fetch(`${API_BASE}/api/gallery/images/add`, { method: 'POST', body: formData });
+    clearInterval(interval);
+    const data = await res.json();
+
+    if (data.success) {
+      progressFill.style.width = '100%';
+      progressText.textContent = '✅ Uploaded!';
+      showToast(`✅ ${data.uploaded?.length || 0} images uploaded!`, 'success');
+      setTimeout(() => { progressWrapper.style.display = 'none'; progressFill.style.width = '0%'; }, 1000);
+      if (albumId) { loadAlbumImages(albumId); loadStats(); }
+    } else { showToast(data.message || 'Upload failed', 'error'); progressWrapper.style.display = 'none'; }
+  } catch (error) { showToast('Upload failed', 'error'); progressWrapper.style.display = 'none'; }
+  this.value = '';
+});
+
+// ============================================================
+// SLIDER SECTION
+// ============================================================
+async function loadSlider() {
+  const tbody = document.getElementById('sliderTableBody');
+  tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray);">
+    <i class="fas fa-spinner fa-spin"></i> Loading...
+  </td></tr>`;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/slider`);
+    const data = await res.json();
+    if (!data || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray);">
+        <i class="fas fa-image"></i> No slider images found
+      </td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map((item, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td><img src="${item.file_path || item.filename}" class="thumb" onerror="this.src='https://via.placeholder.com/60x60/1a3a6b/4a8af4?text=No'"></td>
+        <td><strong>${item.title || 'Untitled'}</strong></td>
+        <td><span class="status-badge ${item.is_active == 1 ? 'active' : 'inactive'}">${item.is_active == 1 ? 'Active' : 'Inactive'}</span></td>
+        <td style="font-size:12px;color:var(--gray);">${item.created_at_ist || 'N/A'}</td>
+        <td>
+          <div class="action-btns">
+            <button class="btn btn-sm btn-primary" onclick="editSlider(${item.id})"><i class="fas fa-edit"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="deleteSlider(${item.id})"><i class="fas fa-trash-alt"></i></button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch (error) {
+    console.error('Slider error:', error);
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:#ef4444;">
+      <i class="fas fa-exclamation-circle"></i> Failed to load
+    </td></tr>`;
+  }
+}
+
+// UPLOAD SLIDER IMAGE
+document.getElementById('sliderFileInput').addEventListener('change', async function(e) {
+  if (!this.files.length) return;
+  const file = this.files[0];
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const title = prompt('Enter image title (optional):') || '';
+  if (title) formData.append('title', title);
+
+  const progressWrapper = document.getElementById('sliderProgressWrapper');
+  const progressFill = document.getElementById('sliderProgressFill');
+  const progressText = document.getElementById('sliderProgressText');
+
+  progressWrapper.style.display = 'block';
+  progressFill.style.width = '0%';
+  progressText.textContent = 'Uploading... 0%';
+
+  try {
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 15;
+      if (progress > 90) progress = 90;
+      progressFill.style.width = progress + '%';
+      progressText.textContent = `Uploading... ${Math.round(progress)}%`;
+    }, 200);
+
+    const res = await fetch(`${API_BASE}/api/gallery/slider/add`, { method: 'POST', body: formData });
+    clearInterval(interval);
+    const data = await res.json();
+
+    if (data.success) {
+      progressFill.style.width = '100%';
+      progressText.textContent = '✅ Uploaded!';
+      showToast('✅ Slider image added!', 'success');
+      setTimeout(() => { progressWrapper.style.display = 'none'; progressFill.style.width = '0%'; }, 1000);
+      loadSlider();
+      loadStats();
+    } else { showToast(data.message || 'Upload failed', 'error'); progressWrapper.style.display = 'none'; }
+  } catch (error) { showToast('Upload failed', 'error'); progressWrapper.style.display = 'none'; }
+  this.value = '';
+});
+
+// DELETE SLIDER IMAGE
+async function deleteSlider(id) {
+  if (!confirm('Delete this slider image?')) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/slider/delete/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) { showToast('✅ Deleted!', 'success'); loadSlider(); loadStats(); }
+    else { showToast(data.message || 'Failed', 'error'); }
+  } catch (error) { showToast('Delete failed', 'error'); }
+}
+
+// REORDER SLIDER
+async function reorderSlider() {
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/slider`);
+    const data = await res.json();
+    if (!data || data.length < 2) { showToast('Need at least 2 images to reorder', 'error'); return; }
+
+    const orders = data.map((item, index) => ({ id: item.id, order: data.length - index }));
+    const response = await fetch(`${API_BASE}/api/gallery/slider/reorder`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orders })
+    });
+    const result = await response.json();
+    if (result.success) { showToast('✅ Reordered!', 'success'); loadSlider(); }
+    else { showToast('Reorder failed', 'error'); }
+  } catch (error) { showToast('Reorder failed', 'error'); }
+}
+
+// ============================================================
+// EDIT FUNCTIONS
+// ============================================================
+async function editAlbum(id) {
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/albums/${id}`);
+    const data = await res.json();
+    if (!data.success) return;
+    const item = data.data.album;
+    currentEditId = id;
+    currentEditType = 'album';
+
+    document.getElementById('modalBody').innerHTML = `
+      <form id="editForm">
+        <div class="form-group"><label>Title <span class="required">*</span></label>
+          <input type="text" id="editTitle" value="${item.title || ''}"></div>
+        <div class="form-group"><label>Description</label>
+          <textarea id="editDescription" rows="2">${item.description || ''}</textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Category</label>
+            <select id="editCategory">
+              <option value="general" ${item.category === 'general' ? 'selected' : ''}>General</option>
+              <option value="academic" ${item.category === 'academic' ? 'selected' : ''}>Academic</option>
+              <option value="sports" ${item.category === 'sports' ? 'selected' : ''}>Sports</option>
+              <option value="cultural" ${item.category === 'cultural' ? 'selected' : ''}>Cultural</option>
+              <option value="annual-function" ${item.category === 'annual-function' ? 'selected' : ''}>Annual Function</option>
+              <option value="science-exhibition" ${item.category === 'science-exhibition' ? 'selected' : ''}>Science Exhibition</option>
+            </select></div>
+          <div class="form-group"><label>Event Date</label>
+            <input type="date" id="editEventDate" value="${item.event_date || ''}"></div>
+        </div>
+        <div class="form-group"><label>Venue</label>
+          <input type="text" id="editVenue" value="${item.venue || ''}"></div>
+        <div class="form-group"><label><input type="checkbox" id="editFeatured" ${item.is_featured == 1 ? 'checked' : ''}> Featured Album</label></div>
+        <div class="form-group"><label><input type="checkbox" id="editActive" ${item.is_active == 1 ? 'checked' : ''}> Active</label></div>
+      </form>
+    `;
+
+    document.querySelector('.modal-header h3').innerHTML = '<i class="fas fa-edit"></i> Edit Album';
+    document.querySelector('.modal-footer').innerHTML = `
+      <button class="btn btn-warning" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-success" onclick="saveEdit()"><i class="fas fa-save"></i> Save</button>
+    `;
+    document.getElementById('editModal').classList.add('active');
+  } catch (error) { showToast('Failed to load', 'error'); }
+}
+
+async function editSlider(id) {
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/slider`);
+    const data = await res.json();
+    const item = data.find(d => d.id === id);
+    if (!item) return;
+    currentEditId = id;
+    currentEditType = 'slider';
+
+    document.getElementById('modalBody').innerHTML = `
+      <form id="editForm">
+        <div class="form-group"><label>Title</label>
+          <input type="text" id="editTitle" value="${item.title || ''}"></div>
+        <div class="form-group"><label>Description</label>
+          <textarea id="editDescription" rows="2">${item.description || ''}</textarea></div>
+        <div class="form-group"><label>Link (optional)</label>
+          <input type="text" id="editLink" value="${item.link || ''}"></div>
+        <div class="form-group"><label><input type="checkbox" id="editActive" ${item.is_active == 1 ? 'checked' : ''}> Active</label></div>
+      </form>
+    `;
+
+    document.querySelector('.modal-header h3').innerHTML = '<i class="fas fa-edit"></i> Edit Slider Image';
+    document.querySelector('.modal-footer').innerHTML = `
+      <button class="btn btn-warning" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-success" onclick="saveEdit()"><i class="fas fa-save"></i> Save</button>
+    `;
+    document.getElementById('editModal').classList.add('active');
+  } catch (error) { showToast('Failed to load', 'error'); }
+}
+
+async function saveEdit() {
+  const title = document.getElementById('editTitle').value.trim();
+  if (!title) { showToast('Title is required', 'error'); return; }
+
+  try {
+    let url, body;
+    if (currentEditType === 'slider') {
+      const description = document.getElementById('editDescription').value.trim();
+      const link = document.getElementById('editLink').value.trim();
+      const is_active = document.getElementById('editActive').checked ? 1 : 0;
+      url = `${API_BASE}/api/gallery/slider/update/${currentEditId}`;
+      body = JSON.stringify({ title, description, link, is_active });
+    } else if (currentEditType === 'album') {
+      const description = document.getElementById('editDescription').value.trim();
+      const category = document.getElementById('editCategory').value;
+      const event_date = document.getElementById('editEventDate').value;
+      const venue = document.getElementById('editVenue').value.trim();
+      const is_featured = document.getElementById('editFeatured').checked ? 1 : 0;
+      const is_active = document.getElementById('editActive').checked ? 1 : 0;
+      url = `${API_BASE}/api/gallery/albums/update/${currentEditId}`;
+      body = JSON.stringify({ title, description, category, event_date: event_date || null, venue, is_featured, is_active });
+    }
+
+    const res = await fetch(url, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body });
+    const data = await res.json();
+    if (data.success) {
+      showToast('✅ Updated!', 'success');
+      closeModal();
+      loadSlider();
+      loadAlbums();
+      loadStats();
+    } else { showToast(data.message || 'Update failed', 'error'); }
+  } catch (error) { showToast('Update failed', 'error'); }
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function closeModal() {
+  document.getElementById('editModal').classList.remove('active');
+  currentEditId = null;
+  currentEditType = null;
+}
+
+document.getElementById('editModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ============================================================
+// DRAG & DROP - Slider Upload
+// ============================================================
+document.getElementById('sliderUploadArea').addEventListener('dragover', function(e) {
+  e.preventDefault();
+  this.classList.add('dragover');
+});
+document.getElementById('sliderUploadArea').addEventListener('dragleave', function(e) {
+  e.preventDefault();
+  this.classList.remove('dragover');
+});
+document.getElementById('sliderUploadArea').addEventListener('drop', function(e) {
+  e.preventDefault();
+  this.classList.remove('dragover');
+  const files = e.dataTransfer.files;
+  if (files.length) {
+    document.getElementById('sliderFileInput').files = files;
+    document.getElementById('sliderFileInput').dispatchEvent(new Event('change'));
+  }
+});
+
+// ============================================================
+// DRAG & DROP - Album Images Upload
+// ============================================================
+document.getElementById('imagesUploadArea').addEventListener('dragover', function(e) {
+  e.preventDefault();
+  this.classList.add('dragover');
+});
+document.getElementById('imagesUploadArea').addEventListener('dragleave', function(e) {
+  e.preventDefault();
+  this.classList.remove('dragover');
+});
+document.getElementById('imagesUploadArea').addEventListener('drop', function(e) {
+  e.preventDefault();
+  this.classList.remove('dragover');
+  const files = e.dataTransfer.files;
+  if (files.length) {
+    document.getElementById('imagesFileInput').files = files;
+    document.getElementById('imagesFileInput').dispatchEvent(new Event('change'));
+  }
+});
+
+// ============================================================
+// REFRESH
+// ============================================================
+function refreshData() {
+  showToast('🔄 Refreshing...', 'success');
+  loadStats();
+  loadAlbums();
+  loadSlider();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 Gallery Admin Loaded');
+  loadStats();
+  loadAlbums();
+  loadSlider();
 });
 </script>
 
