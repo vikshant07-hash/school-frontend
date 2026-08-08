@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gallery Admin - GSS School Shilla</title>
+    <title>Gallery Manager - GSS School Shilla</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
@@ -387,36 +387,6 @@
             display: flex;
             gap: 10px;
             margin-top: 6px;
-        }
-
-        /* ============================================================
-           UPLOAD AREA
-        ============================================================ */
-        .upload-area {
-            background: var(--bg);
-            border: 2px dashed var(--border);
-            border-radius: var(--radius-sm);
-            padding: 24px;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-bottom: 14px;
-        }
-
-        .upload-area:hover {
-            border-color: var(--gold);
-            background: var(--gold-bg);
-        }
-
-        .upload-area .icon-big {
-            font-size: 36px;
-            color: var(--gold);
-            margin-bottom: 8px;
-        }
-
-        .upload-area p {
-            color: var(--text-muted);
-            font-size: 13px;
         }
 
         /* ============================================================
@@ -820,7 +790,31 @@ document.querySelectorAll('.nav-links a').forEach(link => {
 });
 
 // ============================================================
-// LOAD SLIDER IMAGES
+// GET IMAGE URL - FIXED
+// ============================================================
+function getImageUrl(item) {
+    if (!item) return null;
+    
+    // Check file_path (Cloudinary URL)
+    if (item.file_path && (item.file_path.startsWith('http://') || item.file_path.startsWith('https://'))) {
+        return item.file_path;
+    }
+    
+    // Check public_id
+    if (item.public_id && (item.public_id.startsWith('http://') || item.public_id.startsWith('https://'))) {
+        return item.public_id;
+    }
+    
+    // If file_path is a relative path
+    if (item.file_path && item.file_path.startsWith('/')) {
+        return API_BASE + item.file_path;
+    }
+    
+    return null;
+}
+
+// ============================================================
+// LOAD SLIDER IMAGES - FIXED
 // ============================================================
 async function loadSliderImages() {
     const tbody = document.getElementById('sliderTableBody');
@@ -829,25 +823,28 @@ async function loadSliderImages() {
         const data = await res.json();
 
         if (data.success && data.data && data.data.length > 0) {
-            tbody.innerHTML = data.data.map((item, i) => `
-                <tr>
-                    <td>${i + 1}</td>
-                    <td>
-                        ${item.file_path ? 
-                            `<img src="${item.file_path}" class="thumb" onerror="this.style.display='none'">` :
-                            `<div class="thumb-placeholder"><i class="fas fa-image"></i></div>`
-                        }
-                    </td>
-                    <td>${item.title || '-'}</td>
-                    <td>${item.description || '-'}</td>
-                    <td>${item.order || i + 1}</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm" onclick="deleteSlider(${item.id})">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = data.data.map((item, i) => {
+                const imgUrl = getImageUrl(item);
+                return `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td>
+                            ${imgUrl ? 
+                                `<img src="${imgUrl}" class="thumb" onerror="this.style.display='none'">` :
+                                `<div class="thumb-placeholder"><i class="fas fa-image"></i></div>`
+                            }
+                        </td>
+                        <td>${item.title || '-'}</td>
+                        <td>${item.description || '-'}</td>
+                        <td>${item.order || i + 1}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="deleteSlider(${item.id})">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         } else {
             tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted);">📭 No slider images yet</td></tr>';
         }
@@ -893,7 +890,7 @@ document.getElementById('sliderForm').addEventListener('submit', async function(
             showToast(data.message || 'Upload failed', 'error');
         }
     } catch (error) {
-        showToast('Upload failed: ' + error.message', 'error');
+        showToast('Upload failed: ' + error.message, 'error');
     } finally {
         btn.innerHTML = '<i class="fas fa-upload"></i> Add Slider Image';
         btn.disabled = false;
@@ -922,7 +919,7 @@ async function deleteSlider(id) {
 }
 
 // ============================================================
-// LOAD GALLERY IMAGES
+// LOAD GALLERY IMAGES - FIXED
 // ============================================================
 async function loadGalleryImages() {
     const tbody = document.getElementById('galleryTableBody');
@@ -931,25 +928,29 @@ async function loadGalleryImages() {
         const data = await res.json();
 
         if (data.success && data.data && data.data.length > 0) {
-            tbody.innerHTML = data.data.map((item, i) => `
-                <tr>
-                    <td>${i + 1}</td>
-                    <td>
-                        ${item.file_path ? 
-                            `<img src="${item.file_path}" class="thumb" onerror="this.style.display='none'">` :
-                            `<div class="thumb-placeholder"><i class="fas fa-image"></i></div>`
-                        }
-                    </td>
-                    <td>${item.title || 'Untitled'}</td>
-                    <td>${item.image_date ? new Date(item.image_date).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'}) : '-'}</td>
-                    <td>${item.description || '-'}</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm" onclick="deleteGalleryImage(${item.id})">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = data.data.map((item, i) => {
+                const imgUrl = getImageUrl(item);
+                const date = item.image_date ? new Date(item.image_date).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'}) : '-';
+                return `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td>
+                            ${imgUrl ? 
+                                `<img src="${imgUrl}" class="thumb" onerror="this.style.display='none'">` :
+                                `<div class="thumb-placeholder"><i class="fas fa-image"></i></div>`
+                            }
+                        </td>
+                        <td>${item.title || 'Untitled'}</td>
+                        <td>${date}</td>
+                        <td>${item.description || '-'}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="deleteGalleryImage(${item.id})">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         } else {
             tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted);">📭 No images uploaded yet</td></tr>';
         }
