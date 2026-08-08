@@ -1691,19 +1691,21 @@ body {
 <!-- ============================================================
      PRINCIPAL SPOTLIGHT - WITH IMAGE UPLOAD SUPPORT
 ============================================================ -->
-<!-- ============================================================
+
+   <!-- ============================================================
      PRINCIPAL SECTION - HTML
 ============================================================ -->
 <div class="principal-wrapper" id="principalSection">
-    <!-- Content will be loaded dynamically -->
+    <!-- Loading State -->
+    <div id="principalLoading" style="text-align:center; padding:60px 20px;">
+        <div style="width:48px; height:48px; border-radius:50%; border:3px solid rgba(255,255,255,0.08); border-top:3px solid #c8963e; border-right:3px solid rgba(201,151,43,0.35); animation:spin 0.75s linear infinite; margin:0 auto 16px;"></div>
+        <p style="color:rgba(255,255,255,0.4); font-size:14px;">Loading Principal...</p>
+    </div>
+    <!-- Content will be rendered here -->
 </div>
 
-
-<!-- ============================================================
-     PRINCIPAL SECTION - CSS
-============================================================ -->
 <style>
-/* ========== PRINCIPAL SECTION ========== */
+/* ========== PRINCIPAL SECTION - CSS ========== */
 .principal-wrapper {
     margin-top: -40px;
     position: relative;
@@ -1724,6 +1726,12 @@ body {
     position: relative;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .principal-card:hover {
@@ -1866,6 +1874,50 @@ body {
     font-size: 13px;
 }
 
+/* Error State */
+.principal-error {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+}
+.principal-error .error-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+.principal-error h3 {
+    color: #1e293b;
+    font-size: 18px;
+    margin-bottom: 4px;
+}
+.principal-error p {
+    color: #94a3b8;
+    font-size: 14px;
+}
+.principal-error .retry-btn {
+    margin-top: 16px;
+    padding: 10px 28px;
+    background: #c8963e;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: inherit;
+}
+.principal-error .retry-btn:hover {
+    background: #b0802e;
+    transform: translateY(-2px);
+}
+
+/* Loading Spinner */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
     .principal-wrapper {
@@ -1922,32 +1974,68 @@ body {
 
 
 <!-- ============================================================
-     PRINCIPAL SECTION - JAVASCRIPT
+     PRINCIPAL SECTION - JAVASCRIPT (Only API Fetch)
 ============================================================ -->
 <script>
-// ============================================================
-// PRINCIPAL DATA (Static - Aap API se bhi la sakte hain)
-// ============================================================
-const principalData = {
-    id: 1,
-    name: "Dr. Rajesh Kumar Sharma",
-    designation: "Principal",
-    department: "Administration",
-    qualification: "Ph.D. in Education, M.A. (English)",
-    experience: "25+ Years",
-    email: "principal@gsssshilla.edu.in",
-    phone: "+91 98765 43210",
-    joining_date: "2010-04-15",
-    message: "Education is the most powerful weapon which you can use to change the world. At Govt. Sr. Sec. School Shilla, we are committed to nurturing young minds with values, knowledge, and skills for a brighter tomorrow.",
-    photo_url: "", // Empty to use avatar
-    is_principal: true,
-    staff_type: "administrative"
-};
-
 // ============================================================
 // API CONFIGURATION
 // ============================================================
 const API_BASE = 'https://gsssshilla.onrender.com';
+
+// ============================================================
+// FETCH PRINCIPAL FROM API
+// ============================================================
+async function fetchPrincipal() {
+    const container = document.getElementById('principalSection');
+    
+    try {
+        // Show loading state
+        container.innerHTML = `
+            <div style="text-align:center; padding:60px 20px;">
+                <div style="width:48px; height:48px; border-radius:50%; border:3px solid rgba(255,255,255,0.08); border-top:3px solid #c8963e; border-right:3px solid rgba(201,151,43,0.35); animation:spin 0.75s linear infinite; margin:0 auto 16px;"></div>
+                <p style="color:rgba(255,255,255,0.4); font-size:14px;">Loading Principal...</p>
+            </div>
+        `;
+
+        // API Call
+        const response = await fetch(`${API_BASE}/api/faculty/principal`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            signal: AbortSignal.timeout(10000) // 10 seconds timeout
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.success || !data.data) {
+            throw new Error('No principal data found');
+        }
+
+        // Render principal
+        renderPrincipal(data.data);
+
+    } catch (error) {
+        console.error('❌ Error fetching principal:', error);
+        
+        // Show error state
+        container.innerHTML = `
+            <div class="principal-error">
+                <div class="error-icon">⚠️</div>
+                <h3>Unable to load principal</h3>
+                <p>${error.message || 'Please check your internet connection'}</p>
+                <button class="retry-btn" onclick="fetchPrincipal()">
+                    <i class="fas fa-redo"></i> Retry
+                </button>
+            </div>
+        `;
+    }
+}
 
 // ============================================================
 // RENDER PRINCIPAL FUNCTION
@@ -1957,14 +2045,42 @@ function renderPrincipal(p) {
     
     if (!p) {
         container.innerHTML = `
-            <div class="principal-card" style="text-align:center; padding: 40px;">
-                <p style="color: #94a3b8;">No principal data available</p>
+            <div class="principal-error">
+                <div class="error-icon">📋</div>
+                <h3>No Principal Data</h3>
+                <p>Principal information is not available at the moment.</p>
             </div>`;
         return;
     }
 
+    // Photo URL - fallback to avatar generator
     const photoUrl = p.photo_url || 
         `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&size=200&background=d4a843&color=1a3a6b&bold=true`;
+
+    // Format joining date
+    let joiningDate = '';
+    if (p.joining_date) {
+        try {
+            const date = new Date(p.joining_date);
+            if (!isNaN(date.getTime())) {
+                joiningDate = date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+        } catch (e) {
+            joiningDate = p.joining_date;
+        }
+    }
+
+    // Build meta items
+    const metaItems = [];
+    if (p.qualification) metaItems.push(`<span><i class="fas fa-graduation-cap"></i> ${p.qualification}</span>`);
+    if (p.experience) metaItems.push(`<span><i class="fas fa-briefcase"></i> ${p.experience}</span>`);
+    if (p.email) metaItems.push(`<span><i class="fas fa-envelope"></i> ${p.email}</span>`);
+    if (p.phone) metaItems.push(`<span><i class="fas fa-phone"></i> ${p.phone}</span>`);
+    if (joiningDate) metaItems.push(`<span><i class="fas fa-calendar"></i> Joined: ${joiningDate}</span>`);
 
     container.innerHTML = `
         <div class="principal-card">
@@ -1975,22 +2091,19 @@ function renderPrincipal(p) {
                 <img src="${photoUrl}" 
                      class="principal-photo" 
                      alt="${p.name}" 
+                     loading="lazy"
                      onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&size=200&background=d4a843&color=1a3a6b&bold=true'">
             </div>
             
             <div class="principal-info">
                 <div class="principal-label">👑 Principal</div>
-                <h2>${p.name}</h2>
+                <h2>${p.name || 'Principal'}</h2>
                 <div class="role">${p.designation || 'Principal'}</div>
                 
                 ${p.message ? `<div class="quote">"${p.message}"</div>` : ''}
                 
                 <div class="principal-meta">
-                    ${p.qualification ? `<span><i class="fas fa-graduation-cap"></i> ${p.qualification}</span>` : ''}
-                    ${p.experience ? `<span><i class="fas fa-briefcase"></i> ${p.experience}</span>` : ''}
-                    ${p.email ? `<span><i class="fas fa-envelope"></i> ${p.email}</span>` : ''}
-                    ${p.phone ? `<span><i class="fas fa-phone"></i> ${p.phone}</span>` : ''}
-                    ${p.joining_date ? `<span><i class="fas fa-calendar"></i> Joined: ${new Date(p.joining_date).toLocaleDateString('en-US', {year:'numeric', month:'long', day:'numeric'})}</span>` : ''}
+                    ${metaItems.join('')}
                 </div>
             </div>
         </div>
@@ -1998,46 +2111,19 @@ function renderPrincipal(p) {
 }
 
 // ============================================================
-// LOAD PRINCIPAL FROM API (Optional)
-// ============================================================
-async function loadPrincipalFromAPI() {
-    try {
-        const response = await fetch(`${API_BASE}/api/faculty/principal`);
-        const data = await response.json();
-        
-        if (data.success && data.data) {
-            renderPrincipal(data.data);
-        } else {
-            // Fallback to static data
-            renderPrincipal(principalData);
-        }
-    } catch (error) {
-        console.log('Using static principal data (API unavailable)');
-        renderPrincipal(principalData);
-    }
-}
-
-// ============================================================
 // LOAD ON PAGE READY
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Pehle static data render karein
-    renderPrincipal(principalData);
-    
-    // Agar API se lana hai toh uncomment karein
-    // loadPrincipalFromAPI();
+    fetchPrincipal();
 });
 
 // ============================================================
-// NAVBAR FLOAT ANIMATION (Optional)
+// EXPOSE FOR RETRY BUTTON
 // ============================================================
-window.addEventListener('scroll', function() {
-    const navbar = document.getElementById('navbar');
-    if (navbar) {
-        navbar.classList.toggle('scrolled', window.scrollY > 50);
-    }
-});
+window.fetchPrincipal = fetchPrincipal;
 </script>
+    
+
 <!-- ============================================================
      STATS
 ============================================================ -->
