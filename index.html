@@ -50,7 +50,7 @@ ul { list-style: none; }
 /* ============================================================
    SCROLLBAR
 ============================================================ */
-::-webkit-scrollbar { width: 7px; }
+::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: var(--primary); }
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, var(--accent), var(--accent-dark));
@@ -89,6 +89,7 @@ body { padding-top: 85px; }
   display: flex;
   align-items: center;
   gap: 16px;
+  flex-shrink: 0;
 }
 
 .logo img {
@@ -129,6 +130,9 @@ body { padding-top: 85px; }
   font-weight: 600;
 }
 
+/* ============================================================
+   DESKTOP NAV LINKS
+============================================================ */
 .nav-links {
   display: flex;
   align-items: center;
@@ -175,7 +179,7 @@ body { padding-top: 85px; }
   background: rgba(212, 168, 67, 0.1);
 }
 
-.nav-actions { display: flex; align-items: center; gap: 14px; }
+.nav-actions { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
 
 .login-dropdown { position: relative; }
 
@@ -265,6 +269,9 @@ body { padding-top: 85px; }
   font-size: 16px;
 }
 
+/* ============================================================
+   MOBILE NAV - MODERN SLIDE MENU
+============================================================ */
 .menu-toggle {
   display: none;
   flex-direction: column;
@@ -273,13 +280,13 @@ body { padding-top: 85px; }
   height: 46px;
   border-radius: var(--radius-sm);
   background: rgba(255,255,255,0.06);
-  color: var(--white);
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
   border: 1px solid rgba(255,255,255,0.08);
   transition: var(--transition);
+  position: relative;
+  z-index: 10001;
 }
 
 .menu-toggle:hover { background: rgba(255,255,255,0.12); }
@@ -295,65 +302,96 @@ body { padding-top: 85px; }
 
 .menu-toggle.active .bar:nth-child(1) {
   transform: rotate(45deg) translate(5px, 5px);
+  background: var(--accent-light);
 }
 .menu-toggle.active .bar:nth-child(2) { opacity: 0; }
 .menu-toggle.active .bar:nth-child(3) {
   transform: rotate(-45deg) translate(5px, -5px);
+  background: var(--accent-light);
 }
 
-@media (max-width: 1024px) {
-  .navbar { padding: 0 30px; height: 78px; }
-  body { padding-top: 78px; }
-  .nav-links a { padding: 8px 18px; font-size: 13px; }
+.mobile-login-item { display: none; }
+
+/* Mobile Overlay */
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  z-index: 9998;
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
 
+.mobile-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Mobile Menu - Modern Slide */
 @media (max-width: 900px) {
-  .navbar { padding: 0 20px; height: 72px; }
+  .navbar {
+    padding: 0 20px;
+    height: 72px;
+  }
   body { padding-top: 72px; }
 
   .nav-links {
-    position: absolute;
-    top: 76px;
-    right: 20px;
-    width: 290px;
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 320px;
+    max-width: 80%;
+    height: 100vh;
     background: linear-gradient(160deg, #0f172a, #1e293b);
-    border-radius: var(--radius);
     flex-direction: column;
-    padding: 18px;
-    gap: 6px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-12px) scale(0.95);
-    transition: var(--transition);
-    box-shadow: var(--shadow-xl);
-    border: 1px solid rgba(212, 168, 67, 0.1);
+    padding: 80px 24px 30px;
+    gap: 4px;
+    transition: right 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: -10px 0 60px rgba(0,0,0,0.5);
+    border-left: 1px solid rgba(212, 168, 67, 0.1);
+    overflow-y: auto;
+    z-index: 10000;
     backdrop-filter: blur(20px);
   }
 
   .nav-links.active {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
+    right: 0;
   }
 
   .nav-links a {
     width: 100%;
-    padding: 14px 18px;
+    padding: 14px 20px;
     border-radius: var(--radius-sm);
     color: rgba(255, 255, 255, 0.7);
-    font-size: 14px;
+    font-size: 15px;
+    font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: var(--transition);
   }
 
   .nav-links a::after { display: none; }
+
   .nav-links a:hover {
-    background: rgba(212, 168, 67, 0.12);
+    background: rgba(212, 168, 67, 0.08);
     color: var(--white);
-    padding-left: 24px;
+    border-left-color: var(--accent);
+    padding-left: 26px;
     transform: none;
   }
+
   .nav-links a.active {
-    background: rgba(212, 168, 67, 0.15);
-    color: var(--white);
+    background: rgba(212, 168, 67, 0.12);
+    color: var(--accent-light);
+    border-left-color: var(--accent);
+  }
+
+  .nav-links a i {
+    width: 24px;
+    text-align: center;
+    margin-right: 8px;
+    color: var(--accent-light);
   }
 
   .desktop-login { display: none !important; }
@@ -361,8 +399,8 @@ body { padding-top: 85px; }
   .mobile-login-item {
     display: block !important;
     width: 100%;
-    margin-top: 8px;
-    padding-top: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
     border-top: 1px solid rgba(255, 255, 255, 0.06);
   }
 
@@ -372,6 +410,35 @@ body { padding-top: 85px; }
   }
 
   .menu-toggle { display: flex; }
+
+  /* Mobile close button inside menu */
+  .mobile-close-btn {
+    display: flex !important;
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+    color: var(--white);
+    font-size: 22px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+  }
+
+  .mobile-close-btn:hover {
+    background: rgba(255,255,255,0.12);
+    transform: rotate(90deg);
+  }
+}
+
+/* Mobile close button - hidden by default */
+.mobile-close-btn {
+  display: none;
 }
 
 @media (max-width: 480px) {
@@ -379,8 +446,8 @@ body { padding-top: 85px; }
   .logo img { width: 42px; height: 42px; }
   .navbar { padding: 0 14px; height: 66px; }
   body { padding-top: 66px; }
-  .nav-links { width: 270px; right: 12px; top: 70px; padding: 14px; }
-  .nav-links a { padding: 12px 16px; font-size: 13px; }
+  .nav-links { width: 280px; padding: 70px 18px 20px; }
+  .nav-links a { font-size: 14px; padding: 12px 16px; }
 }
 
 .mobile-login-item { display: none; }
@@ -452,33 +519,59 @@ body { padding-top: 85px; }
   text-align: center;
   overflow: hidden;
   padding: 40px 20px;
-  background: linear-gradient(160deg, var(--primary) 0%, #162b4a 40%, #1a3a5f 100%);
+  background: var(--primary);
 }
 
-.hero::before {
-  content: '';
+.hero-video {
   position: absolute;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
 }
 
-.hero::after {
+.hero-video::-webkit-media-controls { display: none !important; }
+.hero-video::-webkit-media-controls-enclosure { display: none !important; }
+.hero-video::-webkit-media-controls-panel { display: none !important; }
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(160deg, rgba(15, 23, 42, 0.85), rgba(30, 58, 95, 0.75));
+  z-index: 1;
+}
+
+.hero-overlay::after {
   content: '';
   position: absolute;
-  width: 700px; height: 700px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(212, 168, 67, 0.06), transparent 70%);
-  top: -300px; right: -200px;
-  pointer-events: none;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at 30% 50%, rgba(212, 168, 67, 0.08), transparent 60%);
+  animation: glowPulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes glowPulse {
+  0% { opacity: 0.4; }
+  100% { opacity: 1; }
 }
 
 .hero-glow {
   position: absolute;
-  width: 500px; height: 500px;
+  width: 500px;
+  height: 500px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(212, 168, 67, 0.04), transparent 70%);
-  bottom: -200px; left: -150px;
+  bottom: -200px;
+  left: -150px;
   pointer-events: none;
+  z-index: 1;
 }
 
 .hero-content {
@@ -820,7 +913,7 @@ body { padding-top: 85px; }
 }
 
 /* ============================================================
-   PRINCIPAL SECTION - PREMIUM
+   PRINCIPAL SECTION
 ============================================================ */
 .principal-section {
   padding: 60px 20px;
@@ -980,7 +1073,7 @@ body { padding-top: 85px; }
 }
 
 /* ============================================================
-   STATS SECTION - PREMIUM
+   STATS SECTION
 ============================================================ */
 .stats-section {
   background: linear-gradient(160deg, var(--primary), #162b4a);
@@ -1413,6 +1506,11 @@ body { padding-top: 85px; }
 <body>
 
 <!-- ============================================================
+     MOBILE OVERLAY
+============================================================ -->
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+<!-- ============================================================
      NAVBAR
 ============================================================ -->
 <header class="navbar" id="navbar">
@@ -1425,6 +1523,11 @@ body { padding-top: 85px; }
   </div>
 
   <ul class="nav-links" id="navLinks">
+    <!-- Mobile Close Button -->
+    <button class="mobile-close-btn" id="mobileCloseBtn" aria-label="Close Menu">
+      <i class="fas fa-times"></i>
+    </button>
+
     <li><a href="#" class="active"><i class="fas fa-home"></i> Home</a></li>
     <li><a href="public/pub-notif.html"><i class="fas fa-bullhorn"></i> Notices</a></li>
     <li><a href="public/result.html"><i class="fas fa-chart-bar"></i> Results</a></li>
@@ -1476,6 +1579,12 @@ body { padding-top: 85px; }
      HERO SECTION
 ============================================================ -->
 <section class="hero">
+  <video class="hero-video" id="heroVideo" autoplay muted loop playsinline preload="auto">
+    <source src="https://res.cloudinary.com/dwupxj7vf/video/upload/v1786025703/school/recent_updates/update-VID20250628173054-1786025669818-494595776.mp4" type="video/mp4">
+    <img src="https://res.cloudinary.com/dwupxj7vf/image/upload/v1786022359/school/recent_updates/update-IMG-20260805-WA0002-1786022358193-448668682.jpg" alt="School Background">
+  </video>
+
+  <div class="hero-overlay"></div>
   <div class="hero-glow"></div>
 
   <div class="hero-content">
@@ -1814,11 +1923,11 @@ window.fetchPrincipal = fetchPrincipal;
      SCRIPTS
 ============================================================ -->
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function() {
 
   /* ---- NAVBAR SCROLL ---- */
-  const navbar = document.getElementById("navbar");
-  window.addEventListener("scroll", () => {
+  var navbar = document.getElementById("navbar");
+  window.addEventListener("scroll", function() {
     if (window.scrollY > 50) {
       navbar.classList.add("scrolled");
     } else {
@@ -1826,67 +1935,110 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  /* ---- MOBILE MENU ---- */
-  const menuToggle = document.getElementById("menuToggle");
-  const navLinks = document.getElementById("navLinks");
+  /* ---- MOBILE MENU - MODERN SLIDE ---- */
+  var menuToggle = document.getElementById("menuToggle");
+  var navLinks = document.getElementById("navLinks");
+  var mobileOverlay = document.getElementById("mobileOverlay");
+  var mobileCloseBtn = document.getElementById("mobileCloseBtn");
 
-  menuToggle.addEventListener("click", () => {
-    const isOpen = navLinks.classList.toggle("active");
-    menuToggle.classList.toggle("active");
+  function openMobileMenu() {
+    navLinks.classList.add("active");
+    mobileOverlay.classList.add("active");
+    menuToggle.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeMobileMenu() {
+    navLinks.classList.remove("active");
+    mobileOverlay.classList.remove("active");
+    menuToggle.classList.remove("active");
+    document.body.style.overflow = "";
+  }
+
+  menuToggle.addEventListener("click", function(e) {
+    e.stopPropagation();
+    if (navLinks.classList.contains("active")) {
+      closeMobileMenu();
+    } else {
+      openMobileMenu();
+    }
   });
 
-  navLinks.querySelectorAll("a").forEach(link => {
-    link.addEventListener("click", () => {
-      navLinks.classList.remove("active");
-      menuToggle.classList.remove("active");
+  mobileCloseBtn.addEventListener("click", closeMobileMenu);
+
+  mobileOverlay.addEventListener("click", closeMobileMenu);
+
+  // Close menu when clicking any link
+  navLinks.querySelectorAll("a").forEach(function(link) {
+    link.addEventListener("click", function() {
+      closeMobileMenu();
     });
   });
 
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest(".navbar")) {
-      navLinks.classList.remove("active");
-      menuToggle.classList.remove("active");
+  // Close on escape key
+  document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") {
+      closeMobileMenu();
     }
   });
 
   /* ---- LOGIN DROPDOWNS ---- */
   function setupDropdown(btnId, menuId) {
-    const btn = document.getElementById(btnId);
-    const menu = document.getElementById(menuId);
+    var btn = document.getElementById(btnId);
+    var menu = document.getElementById(menuId);
     if (!btn || !menu) return;
-    btn.addEventListener("click", e => {
+    btn.addEventListener("click", function(e) {
       e.stopPropagation();
       menu.classList.toggle("show");
     });
-    document.addEventListener("click", e => {
-      if (!menu.contains(e.target) && !btn.contains(e.target))
+    document.addEventListener("click", function(e) {
+      if (!menu.contains(e.target) && !btn.contains(e.target)) {
         menu.classList.remove("show");
+      }
     });
   }
 
   setupDropdown("loginBtn", "dropdownMenu");
   setupDropdown("loginBtnMobile", "dropdownMenuMobile");
 
+  /* ---- FIX VIDEO AUTOPLAY ---- */
+  var video = document.getElementById("heroVideo");
+  if (video) {
+    video.play().catch(function() {});
+    
+    document.addEventListener("click", function() {
+      if (video.paused) {
+        video.play().catch(function() {});
+      }
+    });
+    
+    document.addEventListener("touchstart", function() {
+      if (video.paused) {
+        video.play().catch(function() {});
+      }
+    });
+  }
+
   /* ---- LIVE DATE/TIME ---- */
   function updateDateTime() {
-    const now = new Date();
-    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    const day = days[now.getDay()];
-    const date = now.getDate();
-    const month = months[now.getMonth()];
-    const year = now.getFullYear();
-    const time = now.toLocaleTimeString('en-IN', { hour12: true });
-    document.getElementById('liveDateTime').innerHTML = `${day}, ${date} ${month} ${year} &nbsp;|&nbsp; ${time}`;
+    var now = new Date();
+    var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var day = days[now.getDay()];
+    var date = now.getDate();
+    var month = months[now.getMonth()];
+    var year = now.getFullYear();
+    var time = now.toLocaleTimeString('en-IN', { hour12: true });
+    document.getElementById('liveDateTime').innerHTML = day + ', ' + date + ' ' + month + ' ' + year + ' &nbsp;|&nbsp; ' + time;
   }
   updateDateTime();
   setInterval(updateDateTime, 1000);
 
   /* ---- SLIDER ---- */
-  const sliderEl = document.getElementById("slider");
-  const dotsEl = document.getElementById("dots");
-  const placeholder = document.getElementById("sliderPlaceholder");
-  let slides = [], current = 0, timer;
+  var sliderEl = document.getElementById("slider");
+  var dotsEl = document.getElementById("dots");
+  var placeholder = document.getElementById("sliderPlaceholder");
+  var slides = [], current = 0, timer;
 
   function getImageUrl(img) {
     if (!img) return null;
@@ -1900,82 +2052,65 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function createSlide(img, index) {
-    const imageUrl = getImageUrl(img);
-    const fileName = img.title || img.filename?.split('/').pop() || 'Image ' + (index + 1);
-    const wrapper = document.createElement('div');
+    var imageUrl = getImageUrl(img);
+    var fileName = img.title || (img.filename ? img.filename.split('/').pop() : 'Image ' + (index + 1));
+    var wrapper = document.createElement('div');
     wrapper.className = 'slide-wrapper';
     if (index === 0) wrapper.classList.add('active');
     if (imageUrl) {
-      const imgEl = document.createElement('img');
+      var imgEl = document.createElement('img');
       imgEl.src = imageUrl;
       imgEl.alt = fileName;
       imgEl.loading = 'lazy';
       imgEl.onerror = function() {
-        this.parentElement.innerHTML = `
-          <div style='display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;background:#1a2332;color:#64748b;gap:12px;border-radius:8px;'>
-            <i class='fas fa-image' style='font-size:48px;opacity:0.3;'></i>
-            <span style='font-size:14px;'>Image not found</span>
-          </div>
-        `;
+        this.parentElement.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;background:#1a2332;color:#64748b;gap:12px;border-radius:8px;"><i class="fas fa-image" style="font-size:48px;opacity:0.3;"></i><span style="font-size:14px;">Image not found</span></div>';
       };
       wrapper.appendChild(imgEl);
     } else {
-      wrapper.innerHTML = `
-        <div style='display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;background:#1a2332;color:#64748b;gap:12px;border-radius:8px;'>
-          <i class='fas fa-exclamation-triangle' style='font-size:48px;opacity:0.3;'></i>
-          <span style='font-size:14px;'>Invalid image</span>
-        </div>
-      `;
+      wrapper.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;background:#1a2332;color:#64748b;gap:12px;border-radius:8px;"><i class="fas fa-exclamation-triangle" style="font-size:48px;opacity:0.3;"></i><span style="font-size:14px;">Invalid image</span></div>';
     }
     return wrapper;
   }
 
   fetch("https://gsssshilla.onrender.com/images")
-    .then(r => r.json())
-    .then(data => {
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
       if (!data || !data.length) {
-        placeholder.innerHTML = `
-          <i class="fas fa-image" style="font-size:48px;color:rgba(255,255,255,0.2);"></i>
-          <span style="color:rgba(255,255,255,0.4);">No images to display</span>
-        `;
+        placeholder.innerHTML = '<i class="fas fa-image" style="font-size:48px;color:rgba(255,255,255,0.2);"></i><span style="color:rgba(255,255,255,0.4);">No images to display</span>';
         return;
       }
       placeholder.remove();
-      data.forEach((img, i) => {
-        const wrapper = createSlide(img, i);
+      data.forEach(function(img, i) {
+        var wrapper = createSlide(img, i);
         sliderEl.appendChild(wrapper);
-        const dot = document.createElement('span');
+        var dot = document.createElement('span');
         if (i === 0) dot.classList.add('active');
-        dot.addEventListener('click', () => go(i));
+        dot.addEventListener('click', function() { go(i); });
         dotsEl.appendChild(dot);
       });
       slides = sliderEl.querySelectorAll('.slide-wrapper');
       if (slides.length > 0) startAuto();
     })
-    .catch((err) => {
-      console.error("❌ Slider fetch error:", err);
-      placeholder.innerHTML = `
-        <i class="fas fa-exclamation-triangle" style="font-size:48px;color:rgba(255,255,255,0.2);"></i>
-        <span style="color:rgba(255,255,255,0.4);">Failed to load images</span>
-      `;
+    .catch(function() {
+      placeholder.innerHTML = '<i class="fas fa-exclamation-triangle" style="font-size:48px;color:rgba(255,255,255,0.2);"></i><span style="color:rgba(255,255,255,0.4);">Failed to load images</span>';
     });
 
   function go(n) {
     if (!slides || slides.length === 0) return;
-    slides.forEach(s => s.classList.remove('active'));
-    dotsEl.querySelectorAll('span').forEach(d => d.classList.remove('active'));
+    slides.forEach(function(s) { s.classList.remove('active'); });
+    dotsEl.querySelectorAll('span').forEach(function(d) { d.classList.remove('active'); });
     current = (n + slides.length) % slides.length;
     if (slides[current]) slides[current].classList.add('active');
-    const dotSpans = dotsEl.querySelectorAll('span');
+    var dotSpans = dotsEl.querySelectorAll('span');
     if (dotSpans[current]) dotSpans[current].classList.add('active');
   }
 
-  document.getElementById('next').addEventListener('click', () => {
+  document.getElementById('next').addEventListener('click', function() {
     clearInterval(timer);
     go(current + 1);
     startAuto();
   });
-  document.getElementById('prev').addEventListener('click', () => {
+  document.getElementById('prev').addEventListener('click', function() {
     clearInterval(timer);
     go(current - 1);
     startAuto();
@@ -1983,32 +2118,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function startAuto() {
     if (slides && slides.length > 0) {
-      timer = setInterval(() => go(current + 1), 4500);
+      timer = setInterval(function() { go(current + 1); }, 4500);
     }
   }
 
   /* ---- VISITOR COUNT ---- */
   fetch("https://gsssshilla.onrender.com/analytics/track")
-    .then(() => fetch("https://gsssshilla.onrender.com/analytics/stats"))
-    .then(r => r.json())
-    .then(data => {
-      document.getElementById("count").innerText = data.total?.toLocaleString() || "—";
+    .then(function() { return fetch("https://gsssshilla.onrender.com/analytics/stats"); })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      document.getElementById("count").innerText = data.total ? data.total.toLocaleString() : "—";
     })
-    .catch(() => {
+    .catch(function() {
       document.getElementById("count").innerText = "—";
     });
 
   /* ---- SCROLL REVEAL ---- */
-  const revealEls = document.querySelectorAll(".reveal");
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => {
+  var revealEls = document.querySelectorAll(".reveal");
+  var io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
       if (e.isIntersecting) {
         e.target.classList.add("visible");
         io.unobserve(e.target);
       }
     });
   }, { threshold: 0.12 });
-  revealEls.forEach(el => io.observe(el));
+  revealEls.forEach(function(el) { io.observe(el); });
 
 });
 </script>
