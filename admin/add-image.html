@@ -3,889 +3,1468 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Gallery Management</title>
-
+<title>Slider Manager - GSS School Shilla</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
+/* ============================================================
+   ROOT VARIABLES - CLEAN THEME
+============================================================ */
+:root {
+  --bg: #f5f7fb;
+  --bg-white: #ffffff;
+  --bg-card: #ffffff;
+  --text-primary: #1a2332;
+  --text-secondary: #5a6a7e;
+  --text-muted: #94a3b8;
+  --gold: #c9972b;
+  --gold-light: #e8b84b;
+  --gold-bg: #fef8ed;
+  --blue: #4a8af4;
+  --blue-bg: #eef4ff;
+  --green: #10b981;
+  --green-bg: #ecfdf5;
+  --purple: #8b5cf6;
+  --purple-bg: #f5f0ff;
+  --pink: #ec4899;
+  --pink-bg: #fdf2f8;
+  --orange: #f59e0b;
+  --orange-bg: #fffbeb;
+  --red: #ef4444;
+  --border: #e8edf8;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-body{
-background:#f4f6f9;
-padding:0px;
+/* ============================================================
+   RESET
+============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.container{
-max-width:1300px;
-margin:auto;
+/* ============================================================
+   NAVBAR - CLEAN WHITE
+============================================================ */
+.navbar {
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
 }
 
-.card{
-background:#fff;
-padding:25px;
-border-radius:15px;
-box-shadow:0 5px 20px rgba(0,0,0,.08);
-margin-bottom:30px;
+.navbar .brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
 }
 
-h1{
-margin-bottom:20px;
+.navbar .brand .logo-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #fff;
+  flex-shrink: 0;
 }
 
-input[type=text],
-textarea{
-width:100%;
-padding:12px;
-border:1px solid #ddd;
-border-radius:10px;
-margin-bottom:15px;
+.navbar .brand .name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
-textarea{
-height:120px;
-resize:none;
+.navbar .brand .name span {
+  color: var(--gold);
 }
 
-input[type=file]{
-margin-bottom:15px;
+.navbar .nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
 }
 
-.preview{
-width:100%;
-max-height:300px;
-object-fit:cover;
-border-radius:10px;
-display:none;
-margin-bottom:15px;
+.navbar .nav-links a {
+  text-decoration: none;
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  transition: var(--transition);
 }
 
-.btn{
-background:#2563eb;
-color:white;
-border:none;
-padding:12px 25px;
-border-radius:10px;
-cursor:pointer;
+.navbar .nav-links a:hover {
+  background: var(--bg);
+  color: var(--text-primary);
 }
 
-.btn:hover{
-opacity:.9;
+.navbar .nav-links a.active {
+  background: var(--gold-bg);
+  color: var(--gold);
 }
 
-.gallery-grid{
-display:grid;
-grid-template-columns:
-repeat(auto-fill,minmax(280px,1fr));
-gap:20px;
+.navbar .nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.gallery-card{
-background:white;
-border-radius:15px;
-overflow:hidden;
-box-shadow:0 4px 15px rgba(0,0,0,.1);
+.navbar .nav-right .admin-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 10px;
+  background: var(--bg);
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
-.gallery-card img{
-width:100%;
-height:220px;
-object-fit:cover;
+.navbar .nav-right .admin-badge .avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
 }
 
-.content{
-padding:15px;
+.navbar .nav-right .admin-badge .online-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  margin-left: 4px;
 }
 
-.content h3{
-margin-bottom:10px;
+.navbar .hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 4px;
 }
 
-.content p{
-color:#555;
-font-size:14px;
+/* ============================================================
+   MAIN CONTAINER
+============================================================ */
+.main-container {
+  flex: 1;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 24px 32px 40px;
+  width: 100%;
 }
 
-.featured{
-display:inline-block;
-padding:5px 12px;
-background:green;
-color:white;
-border-radius:20px;
-font-size:12px;
-margin-bottom:10px;
+/* ============================================================
+   PAGE HEADER
+============================================================ */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding: 20px 28px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
-.delete-btn{
-width:100%;
-padding:12px;
-background:#dc2626;
-color:white;
-border:none;
-cursor:pointer;
+.page-header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.delete-btn:hover{
-background:#b91c1c;
+.page-header h1 i {
+  color: var(--gold);
 }
 
-@media(max-width:768px){
-
-body{
-padding:10px;
+.page-header .header-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
+/* ============================================================
+   BUTTONS
+============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  font-family: inherit;
 }
 
-/* ===================================
-   PROFESSIONAL ADMIN NAVBAR
-=================================== */
-
-.navbar{
-    width:100%;
-    position:sticky;
-    top:0;
-    z-index:9999;
-
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-
-    background:linear-gradient(
-        135deg,
-        #081C45,
-        #123A7A
-    );
-
-    padding:14px 25px;
-
-    box-shadow:
-    0 10px 30px rgba(0,0,0,.15);
-
-    margin-bottom:25px;
+.btn-primary {
+  background: var(--gold);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--gold-light);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(201, 151, 43, 0.3);
 }
 
-/* Logo */
-
-.logo-section{
-    display:flex;
-    align-items:center;
-    gap:14px;
+.btn-success {
+  background: var(--green);
+  color: #fff;
+}
+.btn-success:hover {
+  background: #059669;
+  transform: translateY(-2px);
 }
 
-.school-logo{
-    width:55px;
-    height:55px;
-
-    border-radius:50%;
-    object-fit:cover;
-
-    border:3px solid #D4AF37;
-
-    background:#fff;
+.btn-danger {
+  background: var(--red);
+  color: #fff;
+}
+.btn-danger:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
 }
 
-.school-info{
-    display:flex;
-    flex-direction:column;
+.btn-warning {
+  background: var(--orange);
+  color: #fff;
+}
+.btn-warning:hover {
+  background: #d97706;
+  transform: translateY(-2px);
 }
 
-.school-info h2{
-    color:#fff;
-    font-size:18px;
-    font-weight:700;
-    line-height:1.2;
+.btn-secondary {
+  background: var(--text-muted);
+  color: #fff;
+}
+.btn-secondary:hover {
+  background: #64748b;
+  transform: translateY(-2px);
 }
 
-.school-info span{
-    color:#D4AF37;
-    font-size:12px;
-    font-weight:500;
+.btn-outline {
+  background: var(--bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.btn-outline:hover {
+  background: var(--border);
+  transform: translateY(-2px);
 }
 
-/* Nav */
-
-.nav-menu{
-    display:flex;
-    align-items:center;
-    gap:8px;
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 12px;
+  border-radius: 8px;
 }
 
-.nav-menu a{
-    text-decoration:none;
-
-    color:#dbeafe;
-
-    padding:11px 15px;
-
-    border-radius:10px;
-
-    font-size:14px;
-    font-weight:600;
-
-    transition:.3s;
+/* ============================================================
+   STATS
+============================================================ */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
 }
 
-.nav-menu a:hover{
-    background:rgba(212,175,55,.15);
-    color:#fff;
+.stat-box {
+  background: var(--bg-white);
+  padding: 18px 22px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: var(--transition);
 }
 
-.nav-menu a.active{
-    background:#D4AF37;
-    color:#081C45;
+.stat-box:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--gold);
 }
 
-/* Logout */
-
-.logout-btn{
-    margin-left:10px;
-
-    border:none;
-
-    background:linear-gradient(
-        135deg,
-        #3a168d,
-        #F5D76E
-    );
-
-    color:#081C45;
-
-    padding:11px 22px;
-
-    border-radius:50px;
-
-    font-size:14px;
-    font-weight:700;
-
-    cursor:pointer;
-
-    transition:.3s;
+.stat-box .icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
 }
 
-.logout-btn:hover{
-    transform:translateY(-2px);
+.stat-box .icon-box.blue { background: var(--blue-bg); color: var(--blue); }
+.stat-box .icon-box.green { background: var(--green-bg); color: var(--green); }
+.stat-box .icon-box.yellow { background: var(--orange-bg); color: var(--orange); }
+.stat-box .icon-box.purple { background: var(--purple-bg); color: var(--purple); }
 
-    box-shadow:
-    0 8px 20px rgba(212,175,55,.35);
+.stat-box .info .number {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
 }
 
-/* Mobile Menu Button */
-
-.mobile-menu-btn{
-    display:none;
-
-    color:#fff;
-
-    font-size:28px;
-
-    cursor:pointer;
+.stat-box .info .label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
-/* ===================================
-   TABLET
-=================================== */
-
-@media(max-width:1200px){
-
-    .school-info h2{
-        font-size:16px;
-    }
-
-    .nav-menu a{
-        padding:10px 12px;
-        font-size:13px;
-    }
-
+/* ============================================================
+   UPLOAD AREA
+============================================================ */
+.upload-area {
+  background: var(--bg-white);
+  border-radius: var(--radius);
+  padding: 40px;
+  margin-bottom: 28px;
+  border: 2px dashed var(--border);
+  text-align: center;
+  transition: var(--transition);
+  cursor: pointer;
+  box-shadow: var(--shadow);
 }
 
-/* ===================================
-   MOBILE
-=================================== */
-
-@media(max-width:950px){
-
-    .mobile-menu-btn{
-        display:block;
-    }
-
-    .nav-menu{
-
-        position:absolute;
-
-        top:100%;
-
-        left:0;
-        right:0;
-
-        background:#081C45;
-
-        flex-direction:column;
-
-        padding:15px;
-
-        gap:5px;
-
-        display:none;
-
-        box-shadow:
-        0 15px 30px rgba(0,0,0,.2);
-    }
-
-    .nav-menu.active{
-        display:flex;
-    }
-
-    .nav-menu a{
-        width:100%;
-        text-align:left;
-    }
-
-    .logout-btn{
-        width:100%;
-        margin:10px 0 0;
-    }
-
+.upload-area:hover {
+  border-color: var(--gold);
+  background: var(--gold-bg);
 }
 
-/* ===================================
-   SMALL MOBILE
-=================================== */
-
-@media(max-width:600px){
-
-    .navbar{
-        padding:12px 15px;
-    }
-
-    .school-logo{
-        width:45px;
-        height:45px;
-    }
-
-    .school-info h2{
-        font-size:14px;
-    }
-
-    .school-info span{
-        font-size:11px;
-    }
-
+.upload-area.dragover {
+  border-color: var(--gold);
+  background: var(--gold-bg);
+  transform: scale(1.01);
 }
 
-/* ===================================
-   EXTRA SMALL
-=================================== */
-
-@media(max-width:450px){
-
-    .school-info h2{
-        font-size:13px;
-    }
-
-    .school-info span{
-        display:none;
-    }
-
+.upload-area .icon-big {
+  font-size: 52px;
+  color: var(--gold);
+  margin-bottom: 12px;
 }
 
-
-/* Page content overlap fix */
-.admin-notice{
-    min-height:100vh;
-    padding:100px 20px 40px;
+.upload-area h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
 }
 
+.upload-area p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 14px;
+}
 
+.upload-area .browse-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+}
 
+.upload-area .browse-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(201, 151, 43, 0.3);
+}
 
+#fileInput { display: none; }
 
+.progress-wrapper {
+  margin-top: 16px;
+  display: none;
+}
 
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--border);
+  border-radius: 50px;
+  overflow: hidden;
+}
 
+.progress-bar .fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  width: 0%;
+  border-radius: 50px;
+  transition: width 0.3s ease;
+}
 
+.progress-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+/* ============================================================
+   GRID
+============================================================ */
+.grid-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.grid-header h2 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.grid-header h2 span {
+  background: var(--gold-bg);
+  color: var(--gold);
+  padding: 2px 12px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.grid-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* ============================================================
+   IMAGE CARD
+============================================================ */
+.image-card {
+  background: var(--bg-white);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: var(--transition);
+}
+
+.image-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--gold);
+}
+
+.image-card .image-wrapper {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  background: var(--bg);
+  position: relative;
+}
+
+.image-card .image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.image-card:hover .image-wrapper img {
+  transform: scale(1.05);
+}
+
+.image-card .order-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 50px;
+}
+
+.image-card .status-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 50px;
+  text-transform: uppercase;
+}
+
+.image-card .status-badge.active {
+  background: var(--green);
+  color: #fff;
+}
+
+.image-card .status-badge.inactive {
+  background: var(--red);
+  color: #fff;
+}
+
+.image-card .card-body {
+  padding: 16px 18px;
+}
+
+.image-card .card-body .filename {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.image-card .card-body .meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.image-card .card-body .meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.image-card .card-footer {
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.image-card .card-footer .btn {
+  flex: 1;
+  justify-content: center;
+  font-size: 12px;
+  padding: 7px 12px;
+}
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: var(--bg-white);
+  border-radius: var(--radius);
+  border: 2px dashed var(--border);
+  box-shadow: var(--shadow);
+}
+
+.empty-state .icon {
+  font-size: 56px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  font-size: 20px;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.empty-state p {
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  padding: 16px 24px;
+  border-radius: var(--radius);
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 9999;
+  display: none;
+  animation: slideIn 0.3s ease;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+}
+
+.toast-success { background: var(--green); }
+.toast-error { background: var(--red); }
+.toast-info { background: var(--text-primary); }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ============================================================
+   MODAL
+============================================================ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9998;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--bg-white);
+  border-radius: var(--radius);
+  max-width: 500px;
+  width: 100%;
+  padding: 30px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: modalIn 0.3s ease;
+}
+
+@keyframes modalIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.modal-close {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: var(--bg);
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  background: #fef2f2;
+  color: var(--red);
+}
+
+.modal-body label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.modal-body input,
+.modal-body select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text-primary);
+  transition: var(--transition);
+  margin-bottom: 14px;
+}
+
+.modal-body input:focus,
+.modal-body select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201, 151, 43, 0.1);
+  background: var(--bg-white);
+}
+
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+.footer {
+  background: var(--bg-white);
+  border-top: 1px solid var(--border);
+  padding: 20px 32px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.footer .footer-content {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer .footer-content a {
+  color: var(--gold);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.footer .footer-content a:hover {
+  text-decoration: underline;
+}
+
+.footer .footer-links {
+  display: flex;
+  gap: 20px;
+}
+
+.footer .footer-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.footer .footer-links a:hover {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 1024px) {
+  .main-container { padding: 20px; }
+  .navbar { padding: 0 20px; }
+  .footer { padding: 16px 20px; }
+}
+
+@media (max-width: 768px) {
+  .navbar .nav-links {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 68px;
+    left: 0;
+    right: 0;
+    background: var(--bg-white);
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .navbar .nav-links.open { display: flex; }
+  .navbar .hamburger { display: block; }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .page-header .header-actions { flex-wrap: wrap; }
+  .page-header .header-actions .btn { flex: 1; justify-content: center; }
+
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .upload-area { padding: 24px; }
+  .upload-area .icon-big { font-size: 36px; }
+  .image-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+
+  .footer .footer-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  .footer .footer-links {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .toast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    max-width: none;
+  }
+
+  .modal { padding: 20px; }
+}
+
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: 1fr; }
+  .image-grid { grid-template-columns: 1fr; }
+  .image-card .image-wrapper { height: 180px; }
+  .main-container { padding: 12px; }
+  .navbar { padding: 0 12px; }
+  .page-header { padding: 16px; }
+  .upload-area { padding: 16px; }
+}
 </style>
 </head>
 <body>
-<header class="navbar">
 
-    <!-- Left Logo -->
-    <div class="logo-section">
-
-        <img src="../1778132110413-ChatGPT Image May 7, 2026, 10_56_26 AM.png" alt="School Logo" class="school-logo">
-
-        <div class="school-info">
-            <h2>Govt. Sr. Sec. School Shilla</h2>
-            <span>Gallery Management Panel</span>
-        </div>
-
+<!-- ============================================================
+   NAVBAR
+============================================================ -->
+<nav class="navbar">
+  <a href="#" class="brand">
+    <div class="logo-placeholder">
+      <i class="fas fa-school"></i>
     </div>
+    <div class="name">GSS <span>School</span></div>
+  </a>
 
-    <!-- Mobile Menu -->
-    <div class="mobile-menu-btn" id="menuToggle">
-        ☰
+  <ul class="nav-links" id="navLinks">
+    <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+    <li><a href="admin-notif.html"><i class="fas fa-bell"></i> Notifications</a></li>
+    <li><a href="admin-downl.html"><i class="fas fa-download"></i> Downloads</a></li>
+    <li><a href="admin-faculity.html"><i class="fas fa-users"></i> Faculty</a></li>
+    <li><a href="admin-contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
+    <li><a href="admin-img.html" class="active"><i class="fas fa-images"></i> Slider</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <div class="admin-badge">
+      <span class="avatar" id="adminAvatar">A</span>
+      <span id="adminName">Admin</span>
+      <span class="online-dot"></span>
     </div>
+    <button class="hamburger" onclick="toggleNav()">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+</nav>
 
-    <!-- Nav -->
-    <nav class="nav-menu" id="navLinks">
+<!-- ============================================================
+   MAIN CONTAINER
+============================================================ -->
+<div class="main-container">
 
-        <a href="admin-dashboard.html">Dashboard</a>
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1><i class="fas fa-images"></i> Slider Manager</h1>
+    <div class="header-actions">
+      <a href="https://gsssshilla07.pages.dev" target="_blank" class="btn btn-outline">
+        <i class="fas fa-eye"></i> View Website
+      </a>
+      <button class="btn btn-primary" onclick="refreshImages()">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+    </div>
+  </div>
 
-        <a href="add-image.html" class="active">
-            Gallery
-        </a>
+  <!-- STATS -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-box">
+      <div class="icon-box blue"><i class="fas fa-images"></i></div>
+      <div class="info">
+        <div class="number" id="totalImages">0</div>
+        <div class="label">Total Images</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="icon-box green"><i class="fas fa-check-circle"></i></div>
+      <div class="info">
+        <div class="number" id="activeImages">0</div>
+        <div class="label">Active</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="icon-box yellow"><i class="fas fa-eye"></i></div>
+      <div class="info">
+        <div class="number" id="totalViews">0</div>
+        <div class="label">Total Views</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="icon-box purple"><i class="fas fa-clock"></i></div>
+      <div class="info">
+        <div class="number" id="lastUpload">—</div>
+        <div class="label">Last Upload</div>
+      </div>
+    </div>
+  </div>
 
-        <a href="admin-img.html">
-            Home Slider
-        </a>
+  <!-- UPLOAD -->
+  <div class="upload-area" id="uploadArea">
+    <div class="icon-big"><i class="fas fa-cloud-upload-alt"></i></div>
+    <h3>Drag & Drop Images Here</h3>
+    <p>Supported formats: JPEG, PNG, WebP, GIF &bull; Max 5MB each &bull; Cloudinary Storage</p>
+    <button class="browse-btn" onclick="document.getElementById('fileInput').click()">
+      <i class="fas fa-folder-open"></i> Browse Images
+    </button>
+    <input type="file" id="fileInput" accept="image/*" multiple>
 
-        <a href="admin-faculity.html">
-            Faculty
-        </a>
+    <div class="progress-wrapper" id="progressWrapper">
+      <div class="progress-bar">
+        <div class="fill" id="progressFill"></div>
+      </div>
+      <div class="progress-text" id="progressText">Uploading to Cloudinary...</div>
+    </div>
+  </div>
 
-        <a href="admin-notif.html">
-            Notifications
-        </a>
+  <!-- GRID HEADER -->
+  <div class="grid-header">
+    <h2>
+      <i class="fas fa-th-large"></i>
+      All Images
+      <span id="imageCount">0</span>
+    </h2>
+    <div class="grid-controls">
+      <button class="btn btn-sm btn-warning" onclick="reorderImages()">
+        <i class="fas fa-arrows-alt"></i> Reorder
+      </button>
+      <button class="btn btn-sm btn-danger" onclick="confirmBulkDelete()">
+        <i class="fas fa-trash-alt"></i> Bulk Delete
+      </button>
+    </div>
+  </div>
 
-        <a href="admin-downl.html">
-            Downloads
-        </a>
-
-        <a href="visitor.html">
-            Visitors
-        </a>
-
-        <button class="logout-btn" onclick="logout()">
-            Logout
-        </button>
-
-    </nav>
-
-</header>
-
-<div class="container">
-
-
-
-<h1>Gallery Management</h1>
-
-<form id="galleryForm">
-
-<input
-type="text"
-id="title"
-placeholder="Image Title"
-required>
-
-<textarea
-id="description"
-placeholder="Image Description">
-</textarea>
-
-<input
-type="file"
-id="image"
-accept="image/*"
-required>
-
-<img
-id="preview"
-class="preview">
-
-<label>
-
-<input
-type="checkbox"
-id="featured">
-
- Add To Slider
-
-</label>
-
-<br><br>
-
-<button
-type="submit"
-class="btn">
-
-Upload Image
-
-</button>
-
-</form>
-
-</div>
-
-
-<div>
-
-<h2 style="margin-bottom:20px;">
-Gallery Images
-</h2>
-
-<div
-id="galleryGrid"
-class="gallery-grid">
-</div>
+  <!-- IMAGE GRID -->
+  <div id="imageGridContainer">
+    <div class="empty-state" id="emptyState">
+      <div class="icon"><i class="fas fa-images"></i></div>
+      <h3>No Images Yet</h3>
+      <p>Upload your first image to start building your slider gallery.</p>
+    </div>
+    <div class="image-grid" id="imageGrid"></div>
+  </div>
 
 </div>
 
+<!-- ============================================================
+   FOOTER
+============================================================ -->
+<footer class="footer">
+  <div class="footer-content">
+    <span>&copy; 2026 <a href="#">GSS School Shilla</a>. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Contact Support</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+   TOAST
+============================================================ -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toastMessage">Success!</span>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- ============================================================
+   EDIT MODAL
+============================================================ -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-edit"></i> Edit Image</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <label>Title</label>
+      <input type="text" id="editTitle" placeholder="Image title...">
+
+      <label>Alt Text</label>
+      <input type="text" id="editAlt" placeholder="Alternative text...">
+
+      <label>Status</label>
+      <select id="editStatus">
+        <option value="1">Active</option>
+        <option value="0">Inactive</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveImageEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
 
 <script>
+// ============================================================
+// CONFIGURATION
+// ============================================================
+const API_BASE = "https://gsssshilla.onrender.com";
 
-// ✅ Token globally define karo, localStorage se
-const token = localStorage.getItem("token");
-
-if (!token) {
-  window.location.replace("login.html");
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast');
+  const toastMessage = document.getElementById('toastMessage');
+  toast.className = 'toast toast-' + type;
+  toastMessage.textContent = message;
+  toast.style.display = 'block';
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(() => {
+    toast.style.display = 'none';
+  }, 3500);
 }
 
-// Auth verify (optional double-check)
-fetch("https://gsssshilla.onrender.com/verify-admin", {
-  headers: { Authorization: `Bearer ${token}` }
-})
-.then(res => res.json())
-.then(data => {
-  if (!data.success) {
-    localStorage.removeItem("token");
-    window.location.replace("login.html");
+// ============================================================
+// NAVBAR TOGGLE
+// ============================================================
+function toggleNav() {
+  document.getElementById('navLinks').classList.toggle('open');
+}
+
+document.querySelectorAll('.nav-links a').forEach(link => {
+  link.addEventListener('click', () => {
+    document.getElementById('navLinks').classList.remove('open');
+  });
+});
+
+// ============================================================
+// GET IMAGE URL
+// ============================================================
+function getImageUrl(img) {
+  if (!img) return null;
+  if (img.file_path && (img.file_path.startsWith('http://') || img.file_path.startsWith('https://'))) {
+    return img.file_path;
   }
-})
-.catch(() => {
-  localStorage.removeItem("token");
-  window.location.replace("login.html");
-});
+  if (img.public_id && (img.public_id.startsWith('http://') || img.public_id.startsWith('https://'))) {
+    return img.public_id;
+  }
+  return null;
+}
 
-function logout(){
+// ============================================================
+// FETCH IMAGES
+// ============================================================
+async function fetchImages() {
+  try {
+    const response = await fetch(`${API_BASE}/images`);
+    if (!response.ok) throw new Error('Failed to fetch');
+    const data = await response.json();
 
-    const navLinks = document.getElementById("navLinks");
-    const menuToggle = document.getElementById("menuToggle");
-
-    navLinks.classList.remove("active");
-
-    if(menuToggle){
-        menuToggle.innerHTML = "☰";
+    if (Array.isArray(data) && data.length > 0) {
+      currentImages = data;
+      renderImages(data);
+      updateStats(data);
+      showToast(`✅ ${data.length} images loaded`, 'success');
+    } else {
+      showEmptyState();
+      updateStats([]);
     }
-
-    Swal.fire({
-        title: "Logout?",
-        text: "Do you really want to logout from Admin Panel?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#D4AF37",
-        cancelButtonColor: "#123A7A",
-        confirmButtonText: "Yes, Logout",
-        cancelButtonText: "Cancel"
-    }).then((result) => {
-
-        if(result.isConfirmed){
-
-            localStorage.removeItem("token");
-            sessionStorage.clear();
-
-            window.location.replace("login.html");
-        }
-
-    });
-
+  } catch (error) {
+    console.error('Error:', error);
+    showToast('❌ Failed to load images', 'error');
+    showEmptyState();
+  }
 }
 
-const menuToggle = document.getElementById("menuToggle");
-const navLinks = document.getElementById("navLinks");
+// ============================================================
+// RENDER IMAGES
+// ============================================================
+function renderImages(images) {
+  if (!images || images.length === 0) {
+    showEmptyState();
+    return;
+  }
 
-menuToggle.addEventListener("click", () => {
+  emptyState.style.display = 'none';
+  imageGrid.style.display = 'grid';
 
-    navLinks.classList.toggle("active");
+  imageGrid.innerHTML = images.map((img, index) => {
+    const imageUrl = getImageUrl(img);
+    const fileName = img.title || img.filename || 'Image';
+    const isActive = img.is_active == 1;
+    const createdDate = img.created_at_ist || (img.created_at ? new Date(img.created_at).toLocaleDateString('en-IN') : 'Just now');
 
-    menuToggle.innerHTML =
-    navLinks.classList.contains("active")
-    ? "✕"
-    : "☰";
-
-});
-
-function logout(){
-
-    localStorage.removeItem("token");
-    window.location.href = "login.html";
-
-}
-
-const API =
-"https://gsssshilla.onrender.com/api/gallery";
-
-const IMAGE_URL =
-"https://gsssshilla.onrender.com/https://gsssshilla.onrender.comgallery";
-
-const form =
-document.getElementById(
-"galleryForm"
-);
-
-const grid =
-document.getElementById(
-"galleryGrid"
-);
-
-
-// IMAGE PREVIEW
-
-document
-.getElementById("image")
-.addEventListener(
-"change",
-function(){
-
-const file =
-this.files[0];
-
-if(!file) return;
-
-const reader =
-new FileReader();
-
-reader.onload = e => {
-
-const preview =
-document.getElementById(
-"preview"
-);
-
-preview.src =
-e.target.result;
-
-preview.style.display =
-"block";
-
-};
-
-reader.readAsDataURL(file);
-
-});
-
-
-
-
-// LOAD GALLERY
-
-async function loadGallery(){
-
-try{
-
-const res =
-await fetch(API);
-
-const data =
-await res.json();
-
-grid.innerHTML = "";
-
-data.forEach(item => {
-  grid.innerHTML += `
-    <div class="gallery-card">
-
-      <img src="${item.image}" alt="${item.title}" loading="lazy">
-
-      <div class="content">
-        ${item.featured == 1 ? '<div class="featured">Featured</div>' : ''}
-        <h3>${item.title}</h3>
-        <p>${item.description || ''}</p>
+    return `
+    <div class="image-card" data-id="${img.id}">
+      <div class="image-wrapper">
+        ${imageUrl ? `
+          <img src="${imageUrl}" alt="${img.alt_text || fileName}" loading="lazy"
+            onerror="this.parentElement.innerHTML='<div class=\\'empty-state\\' style=\\'padding:40px;\\'><i class=\\'fas fa-image\\'></i><p>Image not found</p></div>'">
+        ` : `
+          <div class="empty-state" style="padding:40px;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>No image URL</p>
+          </div>
+        `}
+        <span class="order-badge">#${index + 1}</span>
+        <span class="status-badge ${isActive ? 'active' : 'inactive'}">
+          ${isActive ? 'Active' : 'Inactive'}
+        </span>
       </div>
-
-      <button class="delete-btn" onclick="deleteImage(${item.id})">
-        Delete
-      </button>
-
+      <div class="card-body">
+        <div class="filename">${fileName}</div>
+        <div class="meta">
+          <span><i class="far fa-calendar-alt"></i> ${createdDate}</span>
+          <span><i class="far fa-eye"></i> ${img.views || 0}</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="btn btn-sm btn-primary" onclick="openEditModal(${img.id})">
+          <i class="fas fa-edit"></i> Edit
+        </button>
+        <button class="btn btn-sm btn-danger" onclick="deleteImage('${img.filename || img.public_id}', ${img.id})">
+          <i class="fas fa-trash-alt"></i> Delete
+        </button>
+      </div>
     </div>
-  `;
-});
+  `}).join('');
 
-}catch(err){
-
-console.error(err);
-
+  imageCountEl.textContent = images.length;
 }
 
+// ============================================================
+// SHOW EMPTY STATE
+// ============================================================
+function showEmptyState() {
+  emptyState.style.display = 'block';
+  imageGrid.style.display = 'none';
+  imageGrid.innerHTML = '';
+  imageCountEl.textContent = '0';
 }
 
+// ============================================================
+// UPDATE STATS
+// ============================================================
+function updateStats(images) {
+  const total = images ? images.length : 0;
+  totalImagesEl.textContent = total;
+  activeImagesEl.textContent = images ? images.filter(img => img.is_active == 1).length : 0;
 
-
-
-// UPLOAD IMAGE
-
-form.addEventListener(
-"submit",
-async(e)=>{
-
-e.preventDefault();
-
-const file =
-document.getElementById(
-"image"
-).files[0];
-
-if(!file){
-
-alert(
-"Please Select Image"
-);
-
-return;
-
+  if (images && images.length > 0) {
+    const last = images[images.length - 1];
+    lastUploadEl.textContent = last.created_at ? new Date(last.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Today';
+  } else {
+    lastUploadEl.textContent = '—';
+  }
 }
 
-const fd =
-new FormData();
+// ============================================================
+// UPLOAD IMAGES
+// ============================================================
+async function uploadImages(files) {
+  if (!files || files.length === 0) return;
 
-fd.append(
-"title",
-document.getElementById(
-"title"
-).value
-);
+  const formData = new FormData();
+  for (let i = 0; i < files.length; i++) {
+    formData.append('images', files[i]);
+  }
 
-fd.append(
-"description",
-document.getElementById(
-"description"
-).value
-);
+  progressWrapper.style.display = 'block';
+  progressFill.style.width = '0%';
+  progressText.textContent = 'Uploading... 0%';
 
-fd.append(
-"featured",
-document.getElementById(
-"featured"
-).checked ? 1 : 0
-);
-
-fd.append(
-"image",
-file
-);
-
-try{
-
-const res =
-await fetch(
-API,
-{
-method:"POST",
-body:fd
-}
-);
-
-const data =
-await res.json();
-
-alert(
-data.message
-);
-
-form.reset();
-
-document.getElementById(
-"preview"
-).style.display="none";
-
-loadGallery();
-
-}catch(err){
-
-console.error(err);
-
-alert(
-"Upload Failed"
-);
-
-}
-
-});
-
-
-
-
-// DELETE
-
-async function deleteImage(id){
-
-if(
-!confirm(
-"Delete Image ?"
-)
-)return;
-
-try{
-
-const res =
-await fetch(
-`${API}/${id}`,
-{
-method:"DELETE"
-}
-);
-
-const data =
-await res.json();
-
-alert(
-data.message
-);
-
-loadGallery();
-
-}catch(err){
-
-console.error(err);
-
-}
-
-}
-
-function logout(){
-
-    const navLinks = document.getElementById("navLinks");
-    const menuToggle = document.getElementById("menuToggle");
-
-    navLinks.classList.remove("active");
-
-    if(menuToggle){
-        menuToggle.innerHTML = "☰";
-    }
-
-    Swal.fire({
-        title: "Logout?",
-        text: "Do you really want to logout from Admin Panel?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#D4AF37",
-        cancelButtonColor: "#123A7A",
-        confirmButtonText: "Yes, Logout",
-        cancelButtonText: "Cancel"
-    }).then((result) => {
-
-        if(result.isConfirmed){
-
-            localStorage.removeItem("token");
-            sessionStorage.clear();
-
-            window.location.replace("login.html");
-        }
-
+  try {
+    const response = await fetch(`${API_BASE}/upload`, {
+      method: 'POST',
+      body: formData,
     });
 
+    if (!response.ok) throw new Error('Upload failed');
+
+    progressFill.style.width = '100%';
+    progressText.textContent = '✅ Uploaded!';
+
+    setTimeout(() => {
+      progressWrapper.style.display = 'none';
+      progressFill.style.width = '0%';
+    }, 1000);
+
+    const result = await response.json();
+    showToast(`✅ ${result.uploaded?.length || files.length} images uploaded!`, 'success');
+    setTimeout(fetchImages, 500);
+
+  } catch (error) {
+    showToast('❌ Upload failed: ' + error.message, 'error');
+    progressWrapper.style.display = 'none';
+  }
 }
 
+// ============================================================
+// DELETE IMAGE
+// ============================================================
+async function deleteImage(filename, id) {
+  if (!confirm('Delete this image?')) return;
 
+  try {
+    const response = await fetch(`${API_BASE}/delete`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename }),
+    });
 
-loadGallery();
+    if (!response.ok) throw new Error('Delete failed');
 
+    showToast('✅ Image deleted!', 'success');
+    setTimeout(fetchImages, 300);
+
+  } catch (error) {
+    showToast('❌ Failed to delete', 'error');
+  }
+}
+
+// ============================================================
+// BULK DELETE
+// ============================================================
+function confirmBulkDelete() {
+  if (currentImages.length === 0) {
+    showToast('No images to delete', 'error');
+    return;
+  }
+
+  if (!confirm(`Delete all ${currentImages.length} images?`)) return;
+
+  let deleted = 0;
+  const total = currentImages.length;
+
+  currentImages.forEach(async (img) => {
+    try {
+      const response = await fetch(`${API_BASE}/delete`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: img.filename || img.public_id }),
+      });
+      if (response.ok) deleted++;
+    } catch (e) {}
+  });
+
+  setTimeout(() => {
+    showToast(`✅ ${deleted} of ${total} deleted`, 'success');
+    setTimeout(fetchImages, 500);
+  }, 2000);
+}
+
+// ============================================================
+// REORDER IMAGES
+// ============================================================
+function reorderImages() {
+  if (currentImages.length < 2) {
+    showToast('Need at least 2 images', 'error');
+    return;
+  }
+
+  const reversed = [...currentImages].reverse();
+  const orders = reversed.map((img, index) => ({ id: img.id, order: index + 1 }));
+
+  fetch(`${API_BASE}/images/reorder`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orders }),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      showToast('✅ Reordered!', 'success');
+      setTimeout(fetchImages, 300);
+    } else {
+      showToast('❌ Failed', 'error');
+    }
+  })
+  .catch(() => showToast('❌ Failed', 'error'));
+}
+
+// ============================================================
+// EDIT MODAL
+// ============================================================
+function openEditModal(id) {
+  const img = currentImages.find(i => i.id === id);
+  if (!img) { showToast('Image not found', 'error'); return; }
+
+  editingImageId = id;
+  document.getElementById('editTitle').value = img.title || '';
+  document.getElementById('editAlt').value = img.alt_text || '';
+  document.getElementById('editStatus').value = img.is_active || 1;
+
+  editModal.classList.add('active');
+}
+
+function closeModal() {
+  editModal.classList.remove('active');
+  editingImageId = null;
+}
+
+function saveImageEdit() {
+  if (!editingImageId) { showToast('No image selected', 'error'); return; }
+
+  const title = document.getElementById('editTitle').value.trim();
+  const alt_text = document.getElementById('editAlt').value.trim();
+  const is_active = parseInt(document.getElementById('editStatus').value);
+
+  if (!title) { showToast('Please enter a title', 'error'); return; }
+
+  fetch(`${API_BASE}/images/update/${editingImageId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, alt_text, is_active }),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      showToast('✅ Updated!', 'success');
+      closeModal();
+      setTimeout(fetchImages, 300);
+    } else {
+      showToast('❌ Failed', 'error');
+    }
+  })
+  .catch(() => showToast('❌ Failed', 'error'));
+}
+
+// ============================================================
+// REFRESH
+// ============================================================
+function refreshImages() {
+  showToast('🔄 Refreshing...', 'info');
+  fetchImages();
+}
+
+// ============================================================
+// DRAG & DROP
+// ============================================================
+const uploadArea = document.getElementById('uploadArea');
+uploadArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadArea.classList.add('dragover');
+});
+uploadArea.addEventListener('dragleave', () => {
+  uploadArea.classList.remove('dragover');
+});
+uploadArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadArea.classList.remove('dragover');
+  const files = e.dataTransfer.files;
+  if (files.length) uploadImages(files);
+});
+
+document.getElementById('fileInput').addEventListener('change', (e) => {
+  if (e.target.files.length) {
+    uploadImages(e.target.files);
+    e.target.value = '';
+  }
+});
+
+uploadArea.addEventListener('click', (e) => {
+  if (e.target === uploadArea || e.target.closest('.upload-area') && !e.target.closest('.browse-btn')) {
+    document.getElementById('fileInput').click();
+  }
+});
+
+editModal.addEventListener('click', (e) => {
+  if (e.target === editModal) closeModal();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ============================================================
+// INIT
+// ============================================================
+let currentImages = [];
+let editingImageId = null;
+
+const totalImagesEl = document.getElementById('totalImages');
+const activeImagesEl = document.getElementById('activeImages');
+const totalViewsEl = document.getElementById('totalViews');
+const lastUploadEl = document.getElementById('lastUpload');
+const imageCountEl = document.getElementById('imageCount');
+const emptyState = document.getElementById('emptyState');
+const imageGrid = document.getElementById('imageGrid');
+
+document.addEventListener('DOMContentLoaded', function() {
+  const adminData = localStorage.getItem('adminData');
+  if (adminData) {
+    try {
+      const data = JSON.parse(adminData);
+      const name = data.name || data.username || 'Admin';
+      document.getElementById('adminName').textContent = name;
+      document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
+    } catch (e) {}
+  }
+
+  fetchImages();
+  setInterval(fetchImages, 60000);
+});
 </script>
-
 </body>
 </html>
