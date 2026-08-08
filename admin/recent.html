@@ -1,742 +1,1188 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Recent Updates</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Recent Updates - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
+        /* ============================================================
+           ROOT VARIABLES - CLEAN THEME
+        ============================================================ */
+        :root {
+            --bg: #f5f7fb;
+            --bg-white: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #1a2332;
+            --text-secondary: #5a6a7e;
+            --text-muted: #94a3b8;
+            --gold: #c9972b;
+            --gold-light: #e8b84b;
+            --gold-bg: #fef8ed;
+            --blue: #4a8af4;
+            --blue-bg: #eef4ff;
+            --green: #10b981;
+            --green-bg: #ecfdf5;
+            --purple: #8b5cf6;
+            --purple-bg: #f5f0ff;
+            --orange: #f59e0b;
+            --orange-bg: #fffbeb;
+            --red: #ef4444;
+            --border: #e8edf8;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ============================================================
+           RESET
+        ============================================================ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #1a2332; }
-        
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        
-        /* Header */
-        .header { 
-            background: white; 
-            padding: 20px 30px; 
-            border-radius: 12px; 
-            margin-bottom: 20px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ============================================================
+           NAVBAR - CLEAN WHITE
+        ============================================================ */
+        .navbar {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .navbar .brand .logo-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .navbar .brand .name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .navbar .brand .name span {
+            color: var(--gold);
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            list-style: none;
+        }
+
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .navbar .nav-links a:hover {
+            background: var(--bg);
+            color: var(--text-primary);
+        }
+
+        .navbar .nav-links a.active {
+            background: var(--gold-bg);
+            color: var(--gold);
+        }
+
+        .navbar .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar .nav-right .admin-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px 6px 10px;
+            background: var(--bg);
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .navbar .nav-right .admin-badge .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .navbar .nav-right .admin-badge .online-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            margin-left: 4px;
+        }
+
+        .navbar .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        /* ============================================================
+           MAIN CONTAINER
+        ============================================================ */
+        .main-container {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 32px 40px;
+            width: 100%;
+        }
+
+        /* ============================================================
+           PAGE HEADER
+        ============================================================ */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 28px;
+            padding: 20px 28px;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .page-header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
             gap: 10px;
         }
-        .header h1 { font-size: 1.5rem; color: #1a2332; }
-        .header .admin-info { display: flex; align-items: center; gap: 15px; }
-        .header .admin-info span { font-size: 0.95rem; }
-        
-        /* Buttons */
-        .btn { 
-            padding: 8px 20px; 
-            border: none; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-size: 0.9rem; 
-            font-weight: 500;
-            transition: all 0.3s; 
+
+        .page-header h1 i {
+            color: var(--gold);
         }
-        .btn-primary { background: #3b82f6; color: white; }
-        .btn-primary:hover { background: #2563eb; }
-        .btn-secondary { background: #e5e7eb; color: #4b5563; }
-        .btn-secondary:hover { background: #d1d5db; }
-        .btn-danger { background: #ef4444; color: white; }
-        .btn-danger:hover { background: #dc2626; }
-        .btn-warning { background: #f59e0b; color: white; }
-        .btn-warning:hover { background: #d97706; }
-        .btn-success { background: #22c55e; color: white; }
-        .btn-success:hover { background: #16a34a; }
-        .btn-sm { padding: 4px 12px; font-size: 0.75rem; }
-        .btn-logout { background: #ef4444; color: white; }
-        .btn-logout:hover { background: #dc2626; }
-        
-        /* Stats */
-        .stats { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
-            gap: 15px; 
-            margin-bottom: 20px; 
+
+        .page-header .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        .stat-card { 
-            background: white; 
-            padding: 15px 20px; 
-            border-radius: 10px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
+
+        /* ============================================================
+           BUTTONS
+        ============================================================ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            font-family: inherit;
         }
-        .stat-card .icon { font-size: 2rem; }
-        .stat-card .info h3 { font-size: 1.5rem; color: #1a2332; }
-        .stat-card .info p { color: #6b7280; font-size: 0.85rem; }
-        
-        /* Form */
-        .form-card { 
-            background: white; 
-            padding: 25px; 
-            border-radius: 12px; 
-            margin-bottom: 20px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
+
+        .btn-primary {
+            background: var(--gold);
+            color: #fff;
         }
-        .form-card h2 { margin-bottom: 20px; color: #1a2332; font-size: 1.2rem; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #4b5563; font-size: 0.9rem; }
-        .form-control { 
-            width: 100%; 
-            padding: 10px 14px; 
-            border: 1px solid #d1d5db; 
-            border-radius: 6px; 
-            font-size: 0.95rem; 
-            transition: border-color 0.3s;
+        .btn-primary:hover {
+            background: var(--gold-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(201, 151, 43, 0.3);
         }
-        .form-control:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-        .form-actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-        .form-text { font-size: 0.8rem; color: #6b7280; margin-top: 4px; display: block; }
-        
-        /* Filter */
-        .filter-bar { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            gap: 15px; 
-            flex-wrap: wrap; 
-            margin-bottom: 20px; 
+
+        .btn-success {
+            background: var(--green);
+            color: #fff;
         }
-        .filter-bar .search-box { flex: 1; min-width: 200px; }
-        .filter-bar .search-box input { 
-            width: 100%; 
-            padding: 8px 14px; 
-            border: 1px solid #d1d5db; 
-            border-radius: 6px; 
-            font-size: 0.95rem; 
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
         }
-        .filter-bar .search-box input:focus { outline: none; border-color: #3b82f6; }
-        .filter-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        .filter-group select { 
-            padding: 8px 14px; 
-            border: 1px solid #d1d5db; 
-            border-radius: 6px; 
-            background: white; 
-            font-size: 0.95rem; 
+
+        .btn-danger {
+            background: var(--red);
+            color: #fff;
         }
-        
-        /* Table */
-        .table-card { 
-            background: white; 
-            border-radius: 12px; 
-            padding: 20px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
-            overflow-x: auto; 
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
         }
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f3f4f6; }
-        th { 
-            background: #f8fafc; 
-            font-weight: 600; 
-            color: #4b5563; 
-            font-size: 0.75rem; 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px;
+
+        .btn-secondary {
+            background: var(--text-muted);
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background: #64748b;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: var(--bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .btn-outline:hover {
+            background: var(--border);
+            transform: translateY(-2px);
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+
+        /* ============================================================
+           CARDS
+        ============================================================ */
+        .card {
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .card h2 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h2 i {
+            color: var(--gold);
+        }
+
+        /* ============================================================
+           FORM
+        ============================================================ */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .form-group label .required {
+            color: var(--red);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: inherit;
+            background: var(--bg);
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(201, 151, 43, 0.1);
+            background: var(--bg-white);
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .form-group small {
+            color: var(--text-muted);
+            font-size: 11px;
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* ============================================================
+           TABLE
+        ============================================================ */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        table thead {
+            background: var(--bg);
+        }
+
+        table th {
+            text-align: left;
+            padding: 10px 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--border);
             white-space: nowrap;
-        }
-        tbody tr:hover { background: #f8fafc; }
-        .loading-text { text-align: center; color: #6b7280; padding: 40px !important; }
-        
-        /* Badges */
-        .badge { 
-            display: inline-block; 
-            padding: 2px 10px; 
-            border-radius: 20px; 
-            font-size: 0.65rem; 
-            font-weight: 600; 
+            font-size: 12px;
             text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
-        .badge-new { background: #fef2f2; color: #ef4444; }
-        .badge-old { background: #f3f4f6; color: #6b7280; }
-        .badge-category { 
-            background: #eff6ff; 
-            color: #3b82f6; 
-            padding: 2px 10px; 
-            border-radius: 12px; 
-            font-size: 0.7rem; 
-            text-transform: capitalize; 
+
+        table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
         }
-        
-        .action-buttons { display: flex; gap: 5px; flex-wrap: wrap; }
-        
-        /* Pagination */
-        .pagination { 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 15px; 
-            margin-top: 20px; 
-            padding-top: 15px; 
-            border-top: 1px solid #f3f4f6; 
+
+        table tr:hover {
+            background: var(--bg);
         }
-        .pagination button { 
-            padding: 6px 16px; 
-            border: 1px solid #d1d5db; 
-            border-radius: 6px; 
-            background: white; 
-            cursor: pointer; 
-            transition: all 0.3s; 
+
+        /* ============================================================
+           BADGES
+        ============================================================ */
+        .badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
         }
-        .pagination button:hover:not(:disabled) { background: #3b82f6; color: white; border-color: #3b82f6; }
-        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
-        .pagination #pageInfo { color: #4b5563; font-size: 0.9rem; }
-        
-        input[type="checkbox"] { cursor: pointer; width: 16px; height: 16px; }
-        
-        /* Modal */
-        .modal { 
-            display: none; 
-            position: fixed; 
-            z-index: 1000; 
-            left: 0; 
-            top: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.8); 
-            animation: fadeIn 0.3s;
+
+        .badge-new {
+            background: var(--green-bg);
+            color: var(--green);
         }
-        .modal-content { 
-            position: relative; 
-            background: white; 
-            margin: 5% auto; 
-            padding: 30px; 
-            width: 90%; 
-            max-width: 700px; 
-            max-height: 90vh; 
-            border-radius: 12px; 
-            overflow-y: auto; 
-            animation: slideDown 0.3s;
+
+        .badge-old {
+            background: var(--bg);
+            color: var(--text-muted);
         }
-        .modal-content .close { 
-            position: absolute; 
-            top: 15px; 
-            right: 25px; 
-            font-size: 2rem; 
-            font-weight: bold; 
-            color: #6b7280; 
-            cursor: pointer; 
-            transition: color 0.2s;
+
+        .badge-category {
+            background: var(--gold-bg);
+            color: var(--gold);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 12px;
+            border-radius: 50px;
+            text-transform: capitalize;
         }
-        .modal-content .close:hover { color: #1a2332; }
-        .modal-content img, .modal-content video, .modal-content audio { max-width: 100%; border-radius: 8px; }
-        .modal-content .file-preview { text-align: center; padding: 20px; }
-        .modal-content .file-preview .file-icon-big { font-size: 4rem; margin-bottom: 16px; }
-        
-        /* Animations */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        /* Responsive */
+
+        .badge-category.general { background: var(--blue-bg); color: var(--blue); }
+        .badge-category.events { background: var(--purple-bg); color: var(--purple); }
+        .badge-category.academic { background: var(--green-bg); color: var(--green); }
+        .badge-category.holiday { background: var(--orange-bg); color: var(--orange); }
+        .badge-category.admission { background: #fef2f2; color: var(--red); }
+        .badge-category.exam { background: #fdf2f8; color: #ec4899; }
+        .badge-category.important { background: #fef3c7; color: #92400e; }
+
+        /* ============================================================
+           ACTION BUTTONS
+        ============================================================ */
+        .action-btns {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .action-btns .btn-sm {
+            font-size: 11px;
+            padding: 4px 10px;
+        }
+
+        /* ============================================================
+           TOAST
+        ============================================================ */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 16px 24px;
+            border-radius: var(--radius);
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+            z-index: 9999;
+            display: none;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+        }
+
+        .toast-success { background: var(--green); }
+        .toast-error { background: var(--red); }
+        .toast-info { background: var(--text-primary); }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ============================================================
+           MODAL
+        ============================================================ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 9998;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: modalIn 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes modalIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--bg);
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: #fef2f2;
+            color: var(--red);
+        }
+
+        .modal-body img {
+            max-width: 100%;
+            border-radius: var(--radius-sm);
+        }
+
+        .modal-body video,
+        .modal-body audio {
+            width: 100%;
+            border-radius: var(--radius-sm);
+        }
+
+        .modal-body iframe {
+            width: 100%;
+            height: 420px;
+            border: none;
+            border-radius: var(--radius-sm);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        /* ============================================================
+           FOOTER
+        ============================================================ */
+        .footer {
+            background: var(--bg-white);
+            border-top: 1px solid var(--border);
+            padding: 20px 32px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .footer .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .footer .footer-content a {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer .footer-content a:hover {
+            text-decoration: underline;
+        }
+
+        .footer .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .footer .footer-links a:hover {
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+        ============================================================ */
+        @media (max-width: 1024px) {
+            .main-container { padding: 20px; }
+            .navbar { padding: 0 20px; }
+            .footer { padding: 16px 20px; }
+        }
+
         @media (max-width: 768px) {
-            .container { padding: 10px; }
-            .header { padding: 15px; flex-direction: column; align-items: stretch; text-align: center; }
-            .header .admin-info { justify-content: center; flex-wrap: wrap; }
-            .form-row { grid-template-columns: 1fr; }
-            .filter-bar { flex-direction: column; align-items: stretch; }
-            .filter-group { flex-wrap: wrap; }
-            .stats { grid-template-columns: 1fr 1fr; }
-            .stat-card { padding: 12px 15px; }
-            th, td { padding: 8px 10px; font-size: 0.8rem; }
-            .modal-content { padding: 20px; margin: 10% auto; width: 95%; }
+            .navbar .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 68px;
+                left: 0;
+                right: 0;
+                background: var(--bg-white);
+                padding: 16px 20px;
+                border-bottom: 1px solid var(--border);
+                box-shadow: var(--shadow);
+            }
+            .navbar .nav-links.open { display: flex; }
+            .navbar .hamburger { display: block; }
+
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            .page-header .header-actions { flex-wrap: wrap; }
+            .page-header .header-actions .btn { flex: 1; justify-content: center; }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .card { padding: 16px; }
+
+            table { font-size: 12px; }
+            table th, table td { padding: 8px 10px; }
+            .action-btns .btn-sm { font-size: 10px; padding: 3px 8px; }
+
+            .footer .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            .footer .footer-links {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .toast {
+                left: 16px;
+                right: 16px;
+                bottom: 16px;
+                max-width: none;
+            }
+
+            .modal { padding: 20px; }
         }
+
         @media (max-width: 480px) {
-            .stats { grid-template-columns: 1fr; }
-            .action-buttons .btn-sm { font-size: 0.65rem; padding: 3px 8px; }
+            .main-container { padding: 12px; }
+            .navbar { padding: 0 12px; }
+            .page-header { padding: 16px; }
+        }
+
+        /* Loading State */
+        .loading-text {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>📢 Recent Updates Management</h1>
-            <div class="admin-info">
-                <span>👋 Welcome, Admin</span>
-                <button class="btn btn-logout" onclick="logout()">🚪 Logout</button>
-            </div>
-        </div>
 
-        <!-- Stats -->
-        <div class="stats" id="statsGrid">
-            <div class="stat-card">
-                <div class="icon">📊</div>
-                <div class="info"><h3 id="totalCount">0</h3><p>Total Updates</p></div>
-            </div>
-            <div class="stat-card">
-                <div class="icon">🆕</div>
-                <div class="info"><h3 id="newCount">0</h3><p>New</p></div>
-            </div>
-            <div class="stat-card">
-                <div class="icon">📌</div>
-                <div class="info"><h3 id="oldCount">0</h3><p>Old</p></div>
-            </div>
-            <div class="stat-card">
-                <div class="icon">📎</div>
-                <div class="info"><h3 id="fileCount">0</h3><p>With Files</p></div>
-            </div>
+<!-- ============================================================
+   NAVBAR
+============================================================ -->
+<nav class="navbar">
+    <a href="#" class="brand">
+        <div class="logo-placeholder">
+            <i class="fas fa-school"></i>
         </div>
+        <div class="name">GSS <span>School</span></div>
+    </a>
 
-        <!-- Add/Edit Form -->
-        <div class="form-card" id="formCard">
-            <h2 id="formTitle">➕ Add New Update</h2>
-            <form id="updateForm" enctype="multipart/form-data">
-                <input type="hidden" id="updateId" value="">
+    <ul class="nav-links" id="navLinks">
+        <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="admin-notif.html"><i class="fas fa-bell"></i> Notifications</a></li>
+        <li><a href="admin-downl.html"><i class="fas fa-download"></i> Downloads</a></li>
+        <li><a href="admin-faculity.html"><i class="fas fa-users"></i> Faculty</a></li>
+        <li><a href="admin-contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
+        <li><a href="recent.html" class="active"><i class="fas fa-clock"></i> Recent</a></li>
+    </ul>
+
+    <div class="nav-right">
+        <div class="admin-badge">
+            <span class="avatar" id="adminAvatar">A</span>
+            <span id="adminName">Admin</span>
+            <span class="online-dot"></span>
+        </div>
+        <button class="hamburger" onclick="toggleNav()">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+</nav>
+
+<!-- ============================================================
+   MAIN CONTAINER
+============================================================ -->
+<div class="main-container">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h1><i class="fas fa-clock"></i> Recent Updates</h1>
+        <div class="header-actions">
+            <button class="btn btn-primary" onclick="loadUpdates()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- ADD FORM -->
+    <div class="card">
+        <h2><i class="fas fa-plus-circle"></i> Add New Update</h2>
+        <form id="updateForm" enctype="multipart/form-data">
+            <div class="form-row">
                 <div class="form-group">
-                    <label>Title *</label>
-                    <input type="text" id="title" class="form-control" placeholder="Enter update title" required>
+                    <label>Title <span class="required">*</span></label>
+                    <input type="text" id="title" class="form-control" placeholder="Enter title" required>
                 </div>
                 <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="description" class="form-control" rows="3" placeholder="Enter description"></textarea>
+                    <label>Category</label>
+                    <select id="category" class="form-control">
+                        <option value="general">General</option>
+                        <option value="events">Events</option>
+                        <option value="academic">Academic</option>
+                        <option value="holiday">Holiday</option>
+                        <option value="admission">Admission</option>
+                        <option value="exam">Exam</option>
+                        <option value="important">Important</option>
+                    </select>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Category</label>
-                        <select id="category" class="form-control">
-                            <option value="general">General</option>
-                            <option value="events">Events</option>
-                            <option value="academic">Academic</option>
-                            <option value="holiday">Holiday</option>
-                            <option value="admission">Admission</option>
-                            <option value="exam">Exam</option>
-                            <option value="important">Important</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select id="isNew" class="form-control">
-                            <option value="1">🆕 New</option>
-                            <option value="0">📌 Old</option>
-                        </select>
-                    </div>
-                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="description" class="form-control" rows="2" placeholder="Enter description"></textarea>
+            </div>
+
+            <div class="form-row">
                 <div class="form-group">
                     <label>Link (optional)</label>
                     <input type="url" id="link" class="form-control" placeholder="https://example.com">
                 </div>
                 <div class="form-group">
-                    <label>Attachment (Image, PDF, Audio, Video)</label>
-                    <input type="file" id="file" class="form-control" accept="image/*,.pdf,.doc,.docx,audio/*,video/*">
-                    <small class="form-text">Max: 50MB | Allowed: Images, PDF, Word, Audio, Video</small>
-                    <div id="currentFile" style="display:none; margin-top:8px; padding:8px 12px; background:#f0fdf4; border-radius:6px; border-left:3px solid #22c55e;">
-                        📎 Current: <span id="currentFileName"></span>
-                    </div>
+                    <label>Status</label>
+                    <select id="isNew" class="form-control">
+                        <option value="1">🆕 New</option>
+                        <option value="0">📌 Old</option>
+                    </select>
                 </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" id="submitBtn">➕ Add Update</button>
-                    <button type="button" class="btn btn-secondary" onclick="resetForm()">✖ Cancel</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Filter Bar -->
-        <div class="filter-bar">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Search updates..." onkeyup="loadUpdates()">
             </div>
-            <div class="filter-group">
-                <select id="categoryFilter" onchange="loadUpdates()">
-                    <option value="all">All Categories</option>
-                    <option value="general">General</option>
-                    <option value="events">Events</option>
-                    <option value="academic">Academic</option>
-                    <option value="holiday">Holiday</option>
-                    <option value="admission">Admission</option>
-                    <option value="exam">Exam</option>
-                    <option value="important">Important</option>
-                </select>
-                <select id="statusFilter" onchange="loadUpdates()">
-                    <option value="all">All Status</option>
-                    <option value="1">🆕 New</option>
-                    <option value="0">📌 Old</option>
-                </select>
-                <button class="btn btn-danger" onclick="bulkDelete()">🗑️ Delete Selected</button>
-            </div>
-        </div>
 
-        <!-- Table -->
-        <div class="table-card">
+            <div class="form-group">
+                <label>Attachment</label>
+                <input type="file" id="file" class="form-control" accept="image/*,.pdf,.doc,.docx,audio/*,video/*">
+                <small>Max: 50MB (Images, PDF, Word, Audio, Video)</small>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success" id="submitBtn">
+                    <i class="fas fa-plus"></i> Add Update
+                </button>
+                <button type="reset" class="btn btn-secondary" onclick="resetForm()">
+                    <i class="fas fa-times"></i> Clear
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card">
+        <h2><i class="fas fa-list"></i> All Updates <span class="badge badge-new" id="updateCount">0</span></h2>
+        <div class="table-wrapper">
             <table>
                 <thead>
                     <tr>
-                        <th><input type="checkbox" id="selectAll" onchange="selectAllRows()"></th>
                         <th>#</th>
+                        <th>Date</th>
                         <th>Title</th>
                         <th>Category</th>
                         <th>File</th>
                         <th>Status</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
+                        <th style="text-align:center;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="updatesTableBody">
-                    <tr><td colspan="8" class="loading-text">🔄 Loading updates...</td></tr>
-                </tbody>
-            </table>
-            <div class="pagination">
-                <button onclick="changePage('prev')" id="prevBtn">◀ Previous</button>
-                <span id="pageInfo">Page 1 of 1</span>
-                <button onclick="changePage('next')" id="nextBtn">Next ▶</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- File Preview Modal -->
-    <div id="fileModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <div id="modalBody"></div>
-        </div>
-    </div>
-
-    <script>
-        // ============================================================
-        // ==================== CONFIGURATION ====================
-        // ============================================================
-        const API_URL = 'https://your-backend-url.com'; // Change this
-        let currentPage = 1;
-        let totalPages = 1;
-        let selectedIds = [];
-
-        // ============================================================
-        // ==================== LOAD UPDATES ====================
-        // ============================================================
-        function loadUpdates() {
-            const search = document.getElementById('searchInput').value;
-            const category = document.getElementById('categoryFilter').value;
-            const status = document.getElementById('statusFilter').value;
-
-            fetch(`${API_URL}/recent/admin/all?page=${currentPage}&limit=10&search=${search}&category=${category}&status=${status}`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    renderTable(data.data);
-                    renderPagination(data.pagination);
-                    loadStats();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(err => {
-                console.error('Error:', err);
-                document.getElementById('updatesTableBody').innerHTML = 
-                    `<tr><td colspan="8" class="loading-text">❌ Failed to load updates</td></tr>`;
-            });
-        }
-
-        // ============================================================
-        // ==================== RENDER TABLE ====================
-        // ============================================================
-        function renderTable(updates) {
-            const tbody = document.getElementById('updatesTableBody');
-            
-            if (!updates || updates.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="loading-text">📭 No updates found</td></tr>`;
-                return;
-            }
-
-            let html = '';
-            updates.forEach((item, index) => {
-                html += `
                     <tr>
-                        <td><input type="checkbox" class="row-checkbox" value="${item.id}" onchange="updateSelected()"></td>
-                        <td>${index + 1}</td>
-                        <td><strong>${item.title}</strong></td>
-                        <td><span class="badge-category">${item.category || 'general'}</span></td>
-                        <td>${item.file_icon || '📄'} ${item.file_type_display || 'No File'}</td>
-                        <td><span class="badge ${item.is_new_class}">${item.is_new_badge}</span></td>
-                        <td style="font-size:0.8rem; white-space:nowrap;">${item.created_at_formatted}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-warning btn-sm" onclick="viewFile(${item.id}, '${item.file_url || ''}', '${item.file_type || ''}', '${item.title}')">👁️</button>
-                                <button class="btn btn-primary btn-sm" onclick="editUpdate(${item.id})">✏️</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteUpdate(${item.id})">🗑️</button>
-                            </div>
+                        <td colspan="7" class="loading-text">
+                            <i class="fas fa-spinner fa-spin"></i> Loading updates...
                         </td>
                     </tr>
-                `;
-            });
-            tbody.innerHTML = html;
-        }
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-        // ============================================================
-        // ==================== PAGINATION ====================
-        // ============================================================
-        function renderPagination(pagination) {
-            if (!pagination) return;
-            currentPage = pagination.page;
-            totalPages = pagination.totalPages;
-            document.getElementById('pageInfo').textContent = `Page ${pagination.page} of ${pagination.totalPages}`;
-            document.getElementById('prevBtn').disabled = !pagination.hasPrev;
-            document.getElementById('nextBtn').disabled = !pagination.hasNext;
-        }
+</div>
 
-        function changePage(direction) {
-            if (direction === 'prev' && currentPage > 1) {
-                currentPage--;
-            } else if (direction === 'next' && currentPage < totalPages) {
-                currentPage++;
-            }
-            loadUpdates();
-        }
+<!-- ============================================================
+   FOOTER
+============================================================ -->
+<footer class="footer">
+    <div class="footer-content">
+        <span>&copy; 2026 <a href="#">GSS School Shilla</a>. All rights reserved.</span>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Contact Support</a>
+        </div>
+    </div>
+</footer>
 
-        // ============================================================
-        // ==================== STATS ====================
-        // ============================================================
-        function loadStats() {
-            fetch(`${API_URL}/recent/admin/stats`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('totalCount').textContent = data.data.total?.[0]?.total || 0;
-                    document.getElementById('newCount').textContent = data.data.new?.[0]?.new || 0;
-                    document.getElementById('oldCount').textContent = data.data.old?.[0]?.old || 0;
-                    document.getElementById('fileCount').textContent = data.data.withFile?.[0]?.withFile || 0;
-                }
-            })
-            .catch(err => console.error('Stats Error:', err));
-        }
+<!-- ============================================================
+   TOAST
+============================================================ -->
+<div class="toast" id="toast"></div>
 
-        // ============================================================
-        // ==================== ADD / UPDATE FORM ====================
-        // ============================================================
-        document.getElementById('updateForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const id = document.getElementById('updateId').value;
-            const formData = new FormData(this);
-            
-            const url = id ? `${API_URL}/recent/admin/update/${id}` : `${API_URL}/recent/admin/add`;
-            const method = id ? 'PUT' : 'POST';
+<!-- ============================================================
+   MODAL
+============================================================ -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modalTitle">File Preview</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer" id="modalFooter"></div>
+    </div>
+</div>
 
-            fetch(url, {
-                method: method,
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    resetForm();
-                    loadUpdates();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(err => {
-                alert('Error: ' + err.message);
-            });
-        });
+<script>
+// ============================================================
+// CONFIGURATION
+// ============================================================
+const API_BASE = 'https://gsssshilla.onrender.com';
 
-        // ============================================================
-        // ==================== EDIT UPDATE ====================
-        // ============================================================
-        function editUpdate(id) {
-            fetch(`${API_URL}/recent/${id}`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    const item = data.data;
-                    document.getElementById('updateId').value = item.id;
-                    document.getElementById('title').value = item.title;
-                    document.getElementById('description').value = item.description || '';
-                    document.getElementById('category').value = item.category || 'general';
-                    document.getElementById('isNew').value = item.is_new ? 1 : 0;
-                    document.getElementById('link').value = item.link || '';
-                    document.getElementById('formTitle').textContent = '✏️ Edit Update';
-                    document.getElementById('submitBtn').textContent = '💾 Update';
-                    
-                    if (item.file_url) {
-                        document.getElementById('currentFile').style.display = 'block';
-                        document.getElementById('currentFileName').textContent = item.file_original_name || 'File attached';
-                    } else {
-                        document.getElementById('currentFile').style.display = 'none';
-                    }
-                    
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            })
-            .catch(err => console.error('Error:', err));
-        }
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `toast toast-${type}`;
+    toast.style.display = 'block';
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+        toast.style.display = 'none';
+    }, 3500);
+}
 
-        // ============================================================
-        // ==================== DELETE UPDATE ====================
-        // ============================================================
-        function deleteUpdate(id) {
-            if (!confirm('Are you sure you want to delete this update?')) return;
-            
-            fetch(`${API_URL}/recent/admin/delete/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    loadUpdates();
-                }
-            })
-            .catch(err => console.error('Error:', err));
-        }
+// ============================================================
+// NAVBAR TOGGLE
+// ============================================================
+function toggleNav() {
+    document.getElementById('navLinks').classList.toggle('open');
+}
 
-        // ============================================================
-        // ==================== BULK DELETE ====================
-        // ============================================================
-        function bulkDelete() {
-            const ids = selectedIds;
-            if (ids.length === 0) {
-                alert('Please select at least one update to delete');
-                return;
-            }
-            
-            if (!confirm(`Are you sure you want to delete ${ids.length} updates?`)) return;
-            
-            fetch(`${API_URL}/recent/admin/bulk-delete`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({ ids: ids })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    selectedIds = [];
-                    document.getElementById('selectAll').checked = false;
-                    loadUpdates();
-                }
-            })
-            .catch(err => console.error('Error:', err));
-        }
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+        document.getElementById('navLinks').classList.remove('open');
+    });
+});
 
-        // ============================================================
-        // ==================== SELECT ALL ====================
-        // ============================================================
-        function selectAllRows() {
-            const checked = document.getElementById('selectAll').checked;
-            document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = checked);
-            updateSelected();
-        }
+// ============================================================
+// LOAD UPDATES
+// ============================================================
+function loadUpdates() {
+    const tbody = document.getElementById('updatesTableBody');
 
-        function updateSelected() {
-            selectedIds = [];
-            document.querySelectorAll('.row-checkbox:checked').forEach(cb => {
-                selectedIds.push(parseInt(cb.value));
-            });
-        }
-
-        // ============================================================
-        // ==================== VIEW FILE ====================
-        // ============================================================
-        function viewFile(id, fileUrl, fileType, title) {
-            const modal = document.getElementById('fileModal');
-            const modalBody = document.getElementById('modalBody');
-            
-            if (!fileUrl) {
-                modalBody.innerHTML = `
-                    <div style="text-align:center;padding:40px;">
-                        <div style="font-size:4rem;margin-bottom:16px;">📄</div>
-                        <h3>${title}</h3>
-                        <p style="color:#6b7280;margin-top:8px;">No attachment available</p>
-                    </div>
-                `;
-                modal.style.display = 'block';
-                return;
-            }
-
-            let preview = '';
-            if (fileType && fileType.startsWith('image/')) {
-                preview = `<img src="${fileUrl}" alt="${title}" style="max-width:100%;border-radius:8px;max-height:60vh;">`;
-            } else if (fileType && fileType.startsWith('video/')) {
-                preview = `<video controls style="max-width:100%;max-height:60vh;"><source src="${fileUrl}" type="${fileType}"></video>`;
-            } else if (fileType && fileType.startsWith('audio/')) {
-                preview = `<audio controls style="width:100%;"><source src="${fileUrl}" type="${fileType}"></audio>`;
-            } else if (fileType === 'application/pdf') {
-                preview = `<iframe src="${fileUrl}" style="width:100%;height:500px;border:none;"></iframe>`;
+    fetch(`${API_BASE}/recent/admin/all`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                renderTable(data.data);
+                document.getElementById('updateCount').textContent = data.data?.length || 0;
             } else {
-                preview = `
-                    <div style="text-align:center;padding:20px;">
-                        <div style="font-size:4rem;">📎</div>
-                        <p style="margin:12px 0;color:#4b5563;">${fileType || 'File'}</p>
-                        <a href="${fileUrl}" download class="btn btn-primary">📥 Download File</a>
-                    </div>
-                `;
+                showToast('Failed to load updates', 'error');
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--red);">❌ ${data.message || 'Error loading data'}</td></tr>`;
             }
-
-            modalBody.innerHTML = `
-                <h3 style="margin-bottom:16px;">${title}</h3>
-                <div class="file-preview">${preview}</div>
-                <div style="margin-top:12px;padding:12px;background:#f8fafc;border-radius:8px;">
-                    <a href="${fileUrl}" target="_blank" style="color:#3b82f6;text-decoration:none;">🔗 Open in new tab</a>
-                </div>
-            `;
-            modal.style.display = 'block';
-        }
-
-        // ============================================================
-        // ==================== RESET FORM ====================
-        // ============================================================
-        function resetForm() {
-            document.getElementById('updateForm').reset();
-            document.getElementById('updateId').value = '';
-            document.getElementById('formTitle').textContent = '➕ Add New Update';
-            document.getElementById('submitBtn').textContent = '➕ Add Update';
-            document.getElementById('category').value = 'general';
-            document.getElementById('isNew').value = '1';
-            document.getElementById('currentFile').style.display = 'none';
-            document.getElementById('file').value = '';
-        }
-
-        // ============================================================
-        // ==================== MODAL ====================
-        // ============================================================
-        function closeModal() {
-            document.getElementById('fileModal').style.display = 'none';
-        }
-        window.onclick = function(event) {
-            if (event.target === document.getElementById('fileModal')) {
-                closeModal();
-            }
-        }
-
-        // ============================================================
-        // ==================== LOGOUT ====================
-        // ============================================================
-        function logout() {
-            localStorage.removeItem('token');
-            window.location.href = '/login';
-        }
-
-        // ============================================================
-        // ==================== INIT ====================
-        // ============================================================
-        document.addEventListener('DOMContentLoaded', () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = '/login';
-                return;
-            }
-            loadUpdates();
+        })
+        .catch(err => {
+            console.error('Load error:', err);
+            showToast('Error: ' + err.message, 'error');
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--red);">❌ Network Error</td></tr>`;
         });
+}
 
-        // Auto refresh every 30 seconds
-        setInterval(loadUpdates, 30000);
-    </script>
+// ============================================================
+// RENDER TABLE
+// ============================================================
+function renderTable(updates) {
+    const tbody = document.getElementById('updatesTableBody');
+
+    if (!updates || updates.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">📭 No updates found</td></tr>`;
+        return;
+    }
+
+    let html = '';
+    updates.forEach((item, index) => {
+        const date = item.created_at_ist || formatDate(item.created_at);
+        const isNew = item.is_new ? 'badge-new' : 'badge-old';
+        const isNewText = item.is_new ? '🆕 New' : '📌 Old';
+        const categoryClass = item.category || 'general';
+        const fileIcon = getFileIcon(item.file_type);
+        const fileType = item.file_type || 'No File';
+
+        html += `
+            <tr>
+                <td>${index + 1}</td>
+                <td style="font-size:12px;white-space:nowrap;color:var(--text-secondary);">${date}</td>
+                <td><strong>${escapeHtml(item.title)}</strong></td>
+                <td><span class="badge-category ${categoryClass}">${item.category || 'general'}</span></td>
+                <td>
+                    ${item.file_url ? `
+                        <button class="btn btn-primary btn-sm" onclick="viewFile('${escapeHtml(item.title)}','${item.file_url}','${item.file_type}')">
+                            ${fileIcon} ${fileType}
+                        </button>
+                    ` : '—'}
+                </td>
+                <td><span class="badge ${isNew}">${isNewText}</span></td>
+                <td style="text-align:center;">
+                    <button class="btn btn-danger btn-sm" onclick="deleteUpdate(${item.id})">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    tbody.innerHTML = html;
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function formatDate(ts) {
+    if (!ts) return 'N/A';
+    const d = new Date(ts);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = String(d.getFullYear()).slice(-2);
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
+
+function getFileIcon(mime) {
+    if (!mime) return '📄';
+    if (mime.startsWith('image/')) return '🖼️';
+    if (mime === 'application/pdf') return '📄';
+    if (mime.startsWith('audio/')) return '🎵';
+    if (mime.startsWith('video/')) return '🎬';
+    return '📎';
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ============================================================
+// VIEW FILE
+// ============================================================
+function viewFile(title, url, type) {
+    const modal = document.getElementById('modalOverlay');
+    const body = document.getElementById('modalBody');
+    const footer = document.getElementById('modalFooter');
+
+    document.getElementById('modalTitle').textContent = title || 'File Preview';
+
+    let preview = '';
+    if (type?.startsWith('image/')) {
+        preview = `<img src="${url}" alt="${title}" />`;
+    } else if (type?.startsWith('video/')) {
+        preview = `<video controls><source src="${url}" type="${type}"></video>`;
+    } else if (type?.startsWith('audio/')) {
+        preview = `<audio controls><source src="${url}" type="${type}"></audio>`;
+    } else if (type === 'application/pdf') {
+        preview = `<iframe src="${url}"></iframe>`;
+    } else {
+        preview = `
+            <div style="text-align:center;padding:20px;">
+                <p style="font-size:48px;margin-bottom:12px;">📄</p>
+                <p style="color:var(--text-secondary);">${type || 'File'}</p>
+            </div>
+        `;
+    }
+
+    body.innerHTML = preview;
+
+    footer.innerHTML = `
+        <a href="${url}" target="_blank" class="btn btn-primary">
+            <i class="fas fa-external-link-alt"></i> Open in New Tab
+        </a>
+        <a href="${url}" download class="btn btn-success">
+            <i class="fas fa-download"></i> Download
+        </a>
+    `;
+
+    modal.classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('active');
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+});
+
+// ============================================================
+// DELETE UPDATE
+// ============================================================
+function deleteUpdate(id) {
+    if (!confirm(`Delete update #${id}?`)) return;
+
+    fetch(`${API_BASE}/recent/admin/delete/${id}`, { method: 'DELETE' })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message || '✅ Deleted successfully!', 'success');
+                loadUpdates();
+            } else {
+                showToast('❌ ' + (data.message || 'Failed to delete'), 'error');
+            }
+        })
+        .catch(err => {
+            console.error('Delete error:', err);
+            showToast('❌ Error: ' + err.message, 'error');
+        });
+}
+
+// ============================================================
+// ADD UPDATE
+// ============================================================
+document.getElementById('updateForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const title = document.getElementById('title').value.trim();
+    if (!title) {
+        showToast('Please enter a title', 'error');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', document.getElementById('description').value);
+    formData.append('category', document.getElementById('category').value);
+    formData.append('isNew', document.getElementById('isNew').value);
+    formData.append('link', document.getElementById('link').value);
+
+    const fileInput = document.getElementById('file');
+    if (fileInput.files && fileInput.files.length > 0) {
+        formData.append('file', fileInput.files[0]);
+    }
+
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    submitBtn.disabled = true;
+
+    fetch(`${API_BASE}/recent/admin/add`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message || '✅ Added successfully!', 'success');
+            resetForm();
+            loadUpdates();
+        } else {
+            showToast('❌ ' + (data.message || 'Failed to add'), 'error');
+        }
+    })
+    .catch(err => {
+        console.error('Add error:', err);
+        showToast('❌ Error: ' + err.message, 'error');
+    })
+    .finally(() => {
+        submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Update';
+        submitBtn.disabled = false;
+    });
+});
+
+// ============================================================
+// RESET FORM
+// ============================================================
+function resetForm() {
+    document.getElementById('updateForm').reset();
+    document.getElementById('category').value = 'general';
+    document.getElementById('isNew').value = '1';
+    document.getElementById('title').focus();
+    showToast('Form cleared', 'info');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Admin name from localStorage
+    const adminData = localStorage.getItem('adminData');
+    if (adminData) {
+        try {
+            const data = JSON.parse(adminData);
+            const name = data.name || data.username || 'Admin';
+            document.getElementById('adminName').textContent = name;
+            document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
+        } catch (e) {}
+    }
+
+    console.log('🏛️ Recent Updates Admin Panel Loaded');
+    loadUpdates();
+    // Auto refresh every 30 seconds
+    setInterval(loadUpdates, 30000);
+});
+</script>
+
 </body>
 </html>
