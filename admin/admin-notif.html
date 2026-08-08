@@ -3,384 +3,1311 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notifications Admin | GSSS Shilla</title>
+<title>Notification Manager - Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-:root{
-  --primary:#1E3A8A;
-  --primary-light:#3B82F6;
-  --gold:#F59E0B;
-  --bg:#f6f8fc;
-  --card:#ffffff;
-  --text:#0f172a;
-  --muted:#64748b;
-  --border:rgba(15,23,42,.08);
-  --shadow:0 10px 25px rgba(0,0,0,.06);
-  --shadow-hover:0 18px 40px rgba(0,0,0,.12);
+/* ============================================================
+   ROOT VARIABLES - CLEAN THEME
+============================================================ */
+:root {
+  --bg: #f5f7fb;
+  --bg-white: #ffffff;
+  --bg-card: #ffffff;
+  --text-primary: #1a2332;
+  --text-secondary: #5a6a7e;
+  --text-muted: #94a3b8;
+  --gold: #c9972b;
+  --gold-light: #e8b84b;
+  --gold-bg: #fef8ed;
+  --blue: #4a8af4;
+  --blue-bg: #eef4ff;
+  --green: #10b981;
+  --green-bg: #ecfdf5;
+  --purple: #8b5cf6;
+  --purple-bg: #f5f0ff;
+  --pink: #ec4899;
+  --pink-bg: #fdf2f8;
+  --orange: #f59e0b;
+  --orange-bg: #fffbeb;
+  --red: #ef4444;
+  --border: #e8edf8;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-*{ margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
-body{ background:linear-gradient(135deg,#f8fbff,#ffffff,#fffaf2); color:var(--text); }
-
-/* ================= PAGE WRAPPER ================= */
-.page-wrap{ padding:30px 20px 50px; max-width:900px; margin:0 auto; }
-
-.page-wrap h2{
-  text-align:center; font-size:26px; font-weight:700;
-  color:var(--primary); margin-bottom:22px;
+/* ============================================================
+   RESET
+============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-/* ================= FORM ================= */
-#noticeForm{
-  background:var(--card); padding:22px; border-radius:18px;
-  border:1px solid var(--border); box-shadow:var(--shadow);
-  display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:30px;
+/* ============================================================
+   NAVBAR - CLEAN WHITE
+============================================================ */
+.navbar {
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
 }
 
-#noticeForm input,
-#noticeForm select,
-#noticeForm textarea{
-  padding:13px 14px; border-radius:12px; border:1px solid var(--border);
-  outline:none; font-size:15px; background:#f9fbff; width:100%;
-  transition:.25s;
-}
-#noticeForm input:focus,
-#noticeForm select:focus,
-#noticeForm textarea:focus{ border-color:var(--primary-light); }
-
-#noticeForm textarea{ grid-column:1/-1; min-height:110px; resize:vertical; }
-
-#noticeForm input[type="file"]{
-  grid-column:1/-1; background:#f9fbff; border:1.5px dashed #cbd5e1;
-  cursor:pointer; padding:12px;
+.navbar .brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
 }
 
-#noticeForm label{
-  grid-column:1/-1; display:flex; align-items:center; gap:10px;
-  font-size:14px; color:#475569; padding:4px 0;
-}
-#noticeForm input[type="checkbox"]{
-  width:18px; height:18px; accent-color:var(--primary); flex-shrink:0;
-}
-
-#noticeForm button{
-  grid-column:1/-1; height:50px; border:none; border-radius:12px;
-  background:linear-gradient(135deg,var(--primary),var(--primary-light));
-  color:#fff; font-weight:600; font-size:15px; cursor:pointer; transition:.25s;
-}
-#noticeForm button:hover{ transform:translateY(-2px); box-shadow:var(--shadow-hover); }
-
-/* ================= LIST ================= */
-.notice-list{ display:grid; gap:16px; }
-
-.card{
-  background:var(--card); padding:18px 20px; border-radius:16px;
-  box-shadow:var(--shadow); border-left:5px solid var(--primary);
-  transition:.25s;
-}
-.card:hover{ box-shadow:var(--shadow-hover); }
-
-.card h3{ color:var(--primary); font-size:16px; margin-bottom:6px; }
-.card p{ font-size:13.5px; color:#475569; line-height:1.6; margin-bottom:8px; }
-
-.important-badge{
-  display:inline-block; font-size:11px; font-weight:700;
-  color:#fff; background:linear-gradient(135deg,#ef4444,#dc2626);
-  padding:3px 10px; border-radius:100px; margin-bottom:8px;
-  letter-spacing:.03em; text-transform:uppercase;
+.navbar .brand .logo-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #fff;
+  flex-shrink: 0;
 }
 
-.meta{ font-size:12px; color:var(--muted); margin-top:4px; }
-
-.actions{ margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; }
-
-.actions a, .actions button{
-  display:inline-flex; align-items:center; justify-content:center;
-  padding:8px 16px; border-radius:10px; font-size:12.5px; font-weight:600;
-  border:none; cursor:pointer; text-decoration:none; color:#fff;
-  transition:.25s;
+.navbar .brand .name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
-.file-link{ background:linear-gradient(135deg,var(--gold),#fbbf24); color:#1e1300; }
-.delete-btn{ background:linear-gradient(135deg,#ef4444,#dc2626); }
-.actions a:hover, .actions button:hover{ transform:translateY(-2px); }
-
-.no-data{
-  text-align:center; padding:40px; background:var(--card);
-  border-radius:16px; box-shadow:var(--shadow); color:var(--muted); font-weight:500;
+.navbar .brand .name span {
+  color: var(--gold);
 }
 
-/* ================= NAVBAR (shared admin pattern) ================= */
-.navbar{
-  width:100%; position:sticky; top:0; z-index:9999;
-  display:flex; align-items:center; justify-content:space-between;
-  background:linear-gradient(135deg,#081C45,#123A7A);
-  padding:14px 25px; box-shadow:0 10px 30px rgba(0,0,0,.15); margin-bottom:10px;
-}
-.logo-section{ display:flex; align-items:center; gap:14px; }
-.school-logo{ width:55px; height:55px; border-radius:50%; object-fit:cover; border:3px solid #D4AF37; background:#fff; }
-.school-info{ display:flex; flex-direction:column; }
-.school-info h2{ color:#fff; font-size:18px; font-weight:700; line-height:1.2; }
-.school-info span{ color:#D4AF37; font-size:12px; font-weight:500; }
-
-.nav-menu{ display:flex; align-items:center; gap:8px; }
-.nav-menu a{
-  text-decoration:none; color:#dbeafe; padding:11px 15px;
-  border-radius:10px; font-size:14px; font-weight:600; transition:.3s;
-}
-.nav-menu a:hover{ background:rgba(212,175,55,.15); color:#fff; }
-.nav-menu a.active{ background:#D4AF37; color:#081C45; }
-
-.logout-btn{
-  margin-left:10px; border:none;
-  background:linear-gradient(135deg,#19347e,#F5D76E); color:#081C45;
-  padding:11px 22px; border-radius:50px; font-size:14px; font-weight:700;
-  cursor:pointer; transition:.3s;
-}
-.logout-btn:hover{ transform:translateY(-2px); box-shadow:0 8px 20px rgba(212,175,55,.35); }
-
-.mobile-menu-btn{ display:none; color:#fff; font-size:28px; cursor:pointer; }
-
-/* ================= RESPONSIVE (single, ordered, no later overrides) ================= */
-
-@media (max-width:1200px){
-  .school-info h2{ font-size:16px; }
-  .nav-menu a{ padding:10px 12px; font-size:13px; }
+.navbar .nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
 }
 
-@media (max-width:992px){
-  .page-wrap{ padding:24px 16px 40px; }
+.navbar .nav-links a {
+  text-decoration: none;
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  transition: var(--transition);
 }
 
-@media (max-width:950px){
-  .mobile-menu-btn{ display:block; }
-  .nav-menu{
-    position:absolute; top:100%; left:0; right:0; background:#081C45;
-    flex-direction:column; padding:15px; gap:5px; display:none;
-    box-shadow:0 15px 30px rgba(0,0,0,.2);
+.navbar .nav-links a:hover {
+  background: var(--bg);
+  color: var(--text-primary);
+}
+
+.navbar .nav-links a.active {
+  background: var(--gold-bg);
+  color: var(--gold);
+}
+
+.navbar .nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar .nav-right .admin-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 10px;
+  background: var(--bg);
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.navbar .nav-right .admin-badge .avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.navbar .nav-right .admin-badge .online-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  margin-left: 4px;
+}
+
+.navbar .hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* ============================================================
+   MAIN CONTAINER
+============================================================ */
+.main-container {
+  flex: 1;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 24px 32px 40px;
+  width: 100%;
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding: 20px 28px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.page-header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-header h1 i {
+  color: var(--gold);
+}
+
+.page-header .header-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: var(--gold);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--gold-light);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(201, 151, 43, 0.3);
+}
+
+.btn-success {
+  background: var(--green);
+  color: #fff;
+}
+.btn-success:hover {
+  background: #059669;
+  transform: translateY(-2px);
+}
+
+.btn-danger {
+  background: var(--red);
+  color: #fff;
+}
+.btn-danger:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+}
+
+.btn-warning {
+  background: var(--orange);
+  color: #fff;
+}
+.btn-warning:hover {
+  background: #d97706;
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: var(--text-muted);
+  color: #fff;
+}
+.btn-secondary:hover {
+  background: #64748b;
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  background: var(--bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.btn-outline:hover {
+  background: var(--border);
+  transform: translateY(-2px);
+}
+
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+
+/* ============================================================
+   STATS
+============================================================ */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-box {
+  background: var(--bg-white);
+  padding: 18px 22px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: var(--transition);
+}
+.stat-box:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--gold);
+}
+
+.stat-box .icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.stat-box .icon-box.blue { background: var(--blue-bg); color: var(--blue); }
+.stat-box .icon-box.green { background: var(--green-bg); color: var(--green); }
+.stat-box .icon-box.yellow { background: var(--orange-bg); color: var(--orange); }
+.stat-box .icon-box.purple { background: var(--purple-bg); color: var(--purple); }
+.stat-box .icon-box.red { background: #fef2f2; color: var(--red); }
+
+.stat-box .info .number {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.stat-box .info .label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ============================================================
+   FORM
+============================================================ */
+.form-section {
+  background: var(--bg-white);
+  border-radius: var(--radius);
+  padding: 28px 30px;
+  margin-bottom: 28px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.form-section h2 {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-section h2 i {
+  color: var(--gold);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.form-group label .required {
+  color: var(--red);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--bg);
+  transition: var(--transition);
+  color: var(--text-primary);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201, 151, 43, 0.1);
+  background: var(--bg-white);
+}
+
+.form-group textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.form-group small {
+  color: var(--text-muted);
+  font-size: 11px;
+  display: block;
+  margin-top: 4px;
+}
+
+/* ============================================================
+   TABLE
+============================================================ */
+.table-wrapper {
+  background: var(--bg-white);
+  border-radius: var(--radius);
+  padding: 20px;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  box-shadow: var(--shadow);
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.table-header h2 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.table-header h2 span {
+  background: var(--gold-bg);
+  color: var(--gold);
+  padding: 2px 12px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.table-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+table thead {
+  background: var(--bg);
+}
+
+table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+table tr:hover {
+  background: var(--bg);
+}
+
+table .title-cell {
+  font-weight: 600;
+  color: var(--text-primary);
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+table .desc-cell {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+table .status-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+table .status-badge.active {
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+table .status-badge.inactive {
+  background: #fef2f2;
+  color: var(--red);
+}
+
+table .attendance-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--blue-bg);
+  color: var(--blue);
+}
+
+table .file-link {
+  color: var(--blue);
+  text-decoration: none;
+  font-size: 12px;
+}
+
+table .file-link:hover {
+  text-decoration: underline;
+}
+
+table .file-size {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.action-btns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.action-btns .btn-sm {
+  font-size: 11px;
+  padding: 4px 10px;
+}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+.footer {
+  background: var(--bg-white);
+  border-top: 1px solid var(--border);
+  padding: 20px 32px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.footer .footer-content {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer .footer-content a {
+  color: var(--gold);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.footer .footer-content a:hover {
+  text-decoration: underline;
+}
+
+.footer .footer-links {
+  display: flex;
+  gap: 20px;
+}
+
+.footer .footer-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.footer .footer-links a:hover {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: var(--text-primary);
+  color: #fff;
+  padding: 16px 24px;
+  border-radius: var(--radius);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.5s ease;
+  z-index: 9999;
+  max-width: 400px;
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast.success i { color: var(--green); }
+.toast.error i { color: var(--red); }
+.toast i {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 1024px) {
+  .main-container { padding: 20px; }
+  .navbar { padding: 0 20px; }
+  .footer { padding: 16px 20px; }
+}
+
+@media (max-width: 768px) {
+  .navbar .nav-links {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 68px;
+    left: 0;
+    right: 0;
+    background: var(--bg-white);
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow);
   }
-  .nav-menu.active{ display:flex; }
-  .nav-menu a{ width:100%; text-align:left; }
-  .logout-btn{ width:100%; margin:10px 0 0; }
+  .navbar .nav-links.open { display: flex; }
+  .navbar .hamburger { display: block; }
+
+  .page-header { flex-direction: column; align-items: stretch; gap: 12px; }
+  .page-header .header-actions { flex-wrap: wrap; }
+  .page-header .header-actions .btn { flex: 1; justify-content: center; }
+
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .table-wrapper { padding: 12px; }
+  table { font-size: 12px; }
+  table th, table td { padding: 8px 10px; }
+  .action-btns .btn-sm { font-size: 10px; padding: 3px 8px; }
+
+  .footer .footer-content { flex-direction: column; text-align: center; }
+  .footer .footer-links { justify-content: center; flex-wrap: wrap; }
 }
 
-@media (max-width:768px){
-  .page-wrap h2{ font-size:22px; }
-
-  #noticeForm{ grid-template-columns:1fr; padding:16px; border-radius:16px; }
-  #noticeForm input, #noticeForm select, #noticeForm textarea{ font-size:16px; } /* iPhone zoom fix */
-
-  .card{ padding:16px; }
-  .card h3{ font-size:16px; }
-  .meta{ font-size:11px; line-height:1.5; }
-
-  .actions{ flex-direction:column; }
-  .actions a, .actions button{ width:100%; }
-}
-
-@media (max-width:600px){
-  .navbar{ padding:12px 15px; }
-  .school-logo{ width:45px; height:45px; }
-  .school-info h2{ font-size:14px; }
-  .school-info span{ font-size:11px; }
-}
-
-@media (max-width:480px){
-  .page-wrap{ padding:18px 12px 32px; }
-  .page-wrap h2{ font-size:20px; }
-  #noticeForm{ padding:14px; }
-}
-
-@media (max-width:450px){
-  .school-info h2{ font-size:13px; }
-  .school-info span{ display:none; }
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: 1fr; }
+  .main-container { padding: 12px; }
+  .navbar { padding: 0 12px; }
+  .page-header { padding: 16px; }
+  .form-section { padding: 16px; }
+  .table-wrapper { padding: 8px; }
+  .toast { left: 16px; right: 16px; bottom: 16px; max-width: none; }
 }
 </style>
 </head>
-
 <body>
 
-<header class="navbar">
-  <div class="logo-section">
-    <img src="../1778132110413-ChatGPT Image May 7, 2026, 10_56_26 AM.png" alt="School Logo" class="school-logo">
-    <div class="school-info">
-      <h2>Govt. Sr. Sec. School Shilla</h2>
-      <span>School Management Panel</span>
+<!-- ============================================================
+   NAVBAR
+============================================================ -->
+<nav class="navbar">
+  <a href="#" class="brand">
+    <div class="logo-placeholder">
+      <i class="fas fa-school"></i>
+    </div>
+    <div class="name">GSS <span>School</span></div>
+  </a>
+
+  <ul class="nav-links" id="navLinks">
+    <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+    <li><a href="admin-notif.html" class="active"><i class="fas fa-bell"></i> Notifications</a></li>
+    <li><a href="admin-downl.html"><i class="fas fa-download"></i> Downloads</a></li>
+    <li><a href="admin-faculity.html"><i class="fas fa-users"></i> Faculty</a></li>
+    <li><a href="admin-contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <div class="admin-badge">
+      <span class="avatar" id="adminAvatar">A</span>
+      <span id="adminName">Admin</span>
+      <span class="online-dot"></span>
+    </div>
+    <button class="hamburger" onclick="toggleNav()">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+</nav>
+
+<!-- ============================================================
+   MAIN CONTAINER
+============================================================ -->
+<div class="main-container">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1><i class="fas fa-bell"></i> Notification Manager</h1>
+    <div class="header-actions">
+      <a href="/" target="_blank" class="btn btn-outline">
+        <i class="fas fa-eye"></i> View Website
+      </a>
+      <button class="btn btn-primary" onclick="refreshNotifications()">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
     </div>
   </div>
 
-  <div class="mobile-menu-btn" id="menuToggle">☰</div>
+  <!-- STATS -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-box">
+      <div class="icon-box blue"><i class="fas fa-bell"></i></div>
+      <div class="info">
+        <div class="number" id="totalCount">0</div>
+        <div class="label">Total</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="icon-box green"><i class="fas fa-check-circle"></i></div>
+      <div class="info">
+        <div class="number" id="activeCount">0</div>
+        <div class="label">Active</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="icon-box red"><i class="fas fa-times-circle"></i></div>
+      <div class="info">
+        <div class="number" id="inactiveCount">0</div>
+        <div class="label">Inactive</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="icon-box purple"><i class="fas fa-paperclip"></i></div>
+      <div class="info">
+        <div class="number" id="withFileCount">0</div>
+        <div class="label">With Files</div>
+      </div>
+    </div>
+  </div>
 
-  <nav class="nav-menu" id="navLinks">
-    <a href="admin-dashboard.html">Dashboard</a>
-    <a href="add-image.html">Gallery</a>
-    <a href="admin-img.html">Home Slider</a>
-    <a href="admin-faculity.html">Faculty</a>
-    <a href="admin-notif.html" class="active">Notifications</a>
-    <a href="admin-downl.html">Downloads</a>
-    <a href="admin-contact.html">Contact</a>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </nav>
-</header>
+  <!-- FORM -->
+  <div class="form-section" id="formSection">
+    <h2 id="formTitle"><i class="fas fa-plus-circle"></i> Add New Notification</h2>
+    <form id="notificationForm">
+      <input type="hidden" id="editId" value="">
 
-<div class="page-wrap">
+      <div class="form-group">
+        <label>Title <span class="required">*</span></label>
+        <input type="text" id="title" placeholder="Enter notification title..." required>
+      </div>
 
-  <h2>📢 Notification Manager</h2>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="description" placeholder="Enter notification description..."></textarea>
+      </div>
 
-  <form id="noticeForm">
-    <input type="text" name="title" placeholder="Title" required>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Attendance</label>
+          <select id="attendance">
+            <option value="all">All</option>
+            <option value="staff">Staff Only</option>
+            <option value="students">Students Only</option>
+            <option value="parents">Parents Only</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>File Attachment</label>
+          <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx">
+          <small>Max 10MB (Images, PDF, Word)</small>
+        </div>
+      </div>
 
-    <select name="type">
-      <option value="general">General</option>
-      <option value="exam">Exam</option>
-      <option value="holiday">Holiday</option>
-    </select>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-success" id="submitBtn">
+          <i class="fas fa-save"></i> Save Notification
+        </button>
+        <button type="button" class="btn btn-warning" onclick="cancelEdit()" style="display:none;" id="cancelBtn">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+    </form>
+  </div>
 
-    <textarea name="message" placeholder="Message" required></textarea>
+  <!-- TABLE -->
+  <div class="table-wrapper">
+    <div class="table-header">
+      <h2>All Notifications <span id="notificationCount">0</span></h2>
+      <div class="table-controls">
+        <button class="btn btn-sm btn-warning" onclick="toggleAllNotifications()">
+          <i class="fas fa-check-double"></i> Toggle All
+        </button>
+        <button class="btn btn-sm btn-danger" onclick="confirmBulkDelete()">
+          <i class="fas fa-trash-alt"></i> Bulk Delete
+        </button>
+      </div>
+    </div>
 
-    <label>
-      <input type="checkbox" name="isImportant" value="1">
-      Mark as Important Notice
-    </label>
-
-    <input type="file" name="file">
-
-    <button type="submit">➕ Add Notification</button>
-  </form>
-
-  <div class="notice-list" id="noticeList"></div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:40px;"><input type="checkbox" id="selectAll" onchange="toggleAllCheckboxes(this)"></th>
+          <th style="width:50px;">#</th>
+          <th>Title</th>
+          <th style="width:100px;">Target</th>
+          <th style="width:80px;">File</th>
+          <th style="width:90px;">Status</th>
+          <th style="width:130px;">Date</th>
+          <th style="width:150px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="notificationTableBody">
+        <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);">
+          <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-// ✅ Token globally define karo, localStorage se
-const token = localStorage.getItem("token");
+<!-- ============================================================
+   FOOTER
+============================================================ -->
+<footer class="footer">
+  <div class="footer-content">
+    <span>&copy; 2026 <a href="#">GSS School Shilla</a>. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="./privacy policy.html">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="./contact.html">Contact Support</a>
+    </div>
+  </div>
+</footer>
 
-if (!token) {
-  window.location.replace("login.html");
+<!-- ============================================================
+   TOAST
+============================================================ -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toastMessage">Success!</span>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURATION
+// ============================================================
+const API_BASE = "https://gsssshilla.onrender.com";
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast');
+  const toastMessage = document.getElementById('toastMessage');
+  toast.className = 'toast ' + type;
+  toastMessage.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(toast.timeout);
+  toast.timeout = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3500);
 }
 
-// Auth verify (optional double-check)
-fetch("https://gsssshilla.onrender.com/verify-admin", {
-  headers: { Authorization: `Bearer ${token}` }
-})
-.then(res => res.json())
-.then(data => {
-  if (!data.success) {
-    localStorage.removeItem("token");
-    window.location.replace("login.html");
-  }
-})
-.catch(() => {
-  localStorage.removeItem("token");
-  window.location.replace("login.html");
+// ============================================================
+// NAVBAR TOGGLE
+// ============================================================
+function toggleNav() {
+  document.getElementById('navLinks').classList.toggle('open');
+}
+
+// Close nav on link click (mobile)
+document.querySelectorAll('.nav-links a').forEach(link => {
+  link.addEventListener('click', () => {
+    document.getElementById('navLinks').classList.remove('open');
+  });
 });
 
-const API = "https://gsssshilla.onrender.com/notifications";
-let notices = [];
+// ============================================================
+// DOM ELEMENTS
+// ============================================================
+const notificationTableBody = document.getElementById('notificationTableBody');
+const notificationCount = document.getElementById('notificationCount');
+const totalCount = document.getElementById('totalCount');
+const activeCount = document.getElementById('activeCount');
+const inactiveCount = document.getElementById('inactiveCount');
+const withFileCount = document.getElementById('withFileCount');
+const form = document.getElementById('notificationForm');
+const editId = document.getElementById('editId');
+const title = document.getElementById('title');
+const description = document.getElementById('description');
+const attendance = document.getElementById('attendance');
+const fileInput = document.getElementById('fileInput');
+const submitBtn = document.getElementById('submitBtn');
+const cancelBtn = document.getElementById('cancelBtn');
+const formTitle = document.getElementById('formTitle');
 
-/* LOAD */
-async function load(){
+let currentNotifications = [];
+let selectedIds = [];
+
+// ============================================================
+// FETCH NOTIFICATIONS
+// ============================================================
+async function fetchNotifications() {
   try {
-    const res = await fetch(API);
-    notices = await res.json();
-    render();
-  } catch (e) {
-    document.getElementById("noticeList").innerHTML = `<div class="no-data">⚠️ Unable to load notifications</div>`;
+    const response = await fetch(`${API_BASE}/api/notifications/admin/all`);
+    if (!response.ok) throw new Error('Failed to fetch');
+    
+    const data = await response.json();
+    if (data.success) {
+      currentNotifications = data.data || [];
+      renderTable(currentNotifications);
+      updateStats(currentNotifications);
+      notificationCount.textContent = currentNotifications.length;
+    }
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    notificationTableBody.innerHTML = `
+      <tr><td colspan="8" style="text-align:center;padding:40px;color:#ef4444;">
+        <i class="fas fa-exclamation-circle"></i> Failed to load notifications
+      </td></tr>
+    `;
   }
 }
 
-/* RENDER */
-function render(){
-  const box = document.getElementById("noticeList");
-  box.innerHTML = "";
-
-  if (!notices || !notices.length) {
-    box.innerHTML = `<div class="no-data">No notifications added yet</div>`;
+// ============================================================
+// RENDER TABLE
+// ============================================================
+function renderTable(notifications) {
+  if (!notifications || notifications.length === 0) {
+    notificationTableBody.innerHTML = `
+      <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);">
+        <i class="fas fa-bell-slash"></i> No notifications found
+      </td></tr>
+    `;
     return;
   }
 
-  notices.forEach(n => {
-    box.innerHTML += `
-      <div class="card">
-        ${n.isImportant ? `<span class="important-badge">Important</span><br>` : ""}
-        <h3>${n.title}</h3>
-        <p>${n.message}</p>
-        <div class="meta">📅 ${new Date(n.created_at).toLocaleString()} | Type: ${n.type}</div>
-        <div class="actions">
-          ${n.file ? `<a class="file-link" href="${n.file}" target="_blank">📄 View File</a>` : ""}
-          <button class="delete-btn" onclick="del(${n.id})">🗑️ Delete</button>
+  notificationTableBody.innerHTML = notifications.map((item, index) => {
+    const isActive = item.is_active == 1;
+    const hasFile = item.file_url && item.file_url !== 'null';
+    const fileSize = item.file_size ? formatFileSize(parseInt(item.file_size)) : '';
+    const fileName = item.file_name || 'File';
+    const fileUrl = item.file_url;
+
+    return `
+    <tr>
+      <td><input type="checkbox" class="notification-checkbox" value="${item.id}" onchange="updateSelectedIds()"></td>
+      <td>${index + 1}</td>
+      <td>
+        <div class="title-cell" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div>
+        ${item.description ? `<div class="desc-cell" title="${escapeHtml(item.description)}">${escapeHtml(item.description.substring(0, 60))}${item.description.length > 60 ? '...' : ''}</div>` : ''}
+      </td>
+      <td><span class="attendance-badge">${escapeHtml(item.attendance || 'all')}</span></td>
+      <td>
+        ${hasFile ? `
+          <a href="${fileUrl}" target="_blank" class="file-link" title="${escapeHtml(fileName)}">
+            <i class="fas fa-paperclip"></i> ${escapeHtml(fileName.substring(0, 15))}
+          </a>
+          <div class="file-size">${fileSize}</div>
+        ` : '<span style="color:var(--text-muted);font-size:12px;">No file</span>'}
+      </td>
+      <td><span class="status-badge ${isActive ? 'active' : 'inactive'}">${isActive ? 'Active' : 'Inactive'}</span></td>
+      <td style="font-size:12px;color:var(--text-secondary);">
+        ${item.created_at_ist || item.created_at || 'N/A'}
+      </td>
+      <td>
+        <div class="action-btns">
+          <button class="btn btn-sm btn-primary" onclick="editNotification(${item.id})">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="btn btn-sm btn-danger" onclick="deleteNotification(${item.id})">
+            <i class="fas fa-trash-alt"></i>
+          </button>
         </div>
-      </div>
-    `;
+      </td>
+    </tr>
+  `}).join('');
+}
+
+// ============================================================
+// UPDATE STATS
+// ============================================================
+function updateStats(notifications) {
+  const total = notifications.length;
+  const active = notifications.filter(n => n.is_active == 1).length;
+  const inactive = notifications.filter(n => n.is_active == 0).length;
+  const withFile = notifications.filter(n => n.file_url && n.file_url !== 'null').length;
+
+  totalCount.textContent = total;
+  activeCount.textContent = active;
+  inactiveCount.textContent = inactive;
+  withFileCount.textContent = withFile;
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function toggleAllCheckboxes(master) {
+  document.querySelectorAll('.notification-checkbox').forEach(cb => {
+    cb.checked = master.checked;
+  });
+  updateSelectedIds();
+}
+
+function updateSelectedIds() {
+  selectedIds = [];
+  document.querySelectorAll('.notification-checkbox:checked').forEach(cb => {
+    selectedIds.push(parseInt(cb.value));
   });
 }
 
-/* ADD */
-document.getElementById("noticeForm").addEventListener("submit", async (e) => {
+// ============================================================
+// TOGGLE ALL NOTIFICATIONS
+// ============================================================
+async function toggleAllNotifications() {
+  if (currentNotifications.length === 0) {
+    showToast('No notifications to toggle', 'error');
+    return;
+  }
+
+  const allActive = currentNotifications.every(n => n.is_active == 1);
+  const newStatus = allActive ? 0 : 1;
+
+  if (!confirm(`Are you sure you want to ${newStatus ? 'activate' : 'deactivate'} all notifications?`)) return;
+
+  let success = 0;
+  for (const item of currentNotifications) {
+    try {
+      const response = await fetch(`${API_BASE}/api/notifications/admin/update/${item.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: item.title,
+          description: item.description || '',
+          attendance: item.attendance || 'all',
+          is_active: newStatus
+        })
+      });
+      if (response.ok) success++;
+    } catch (e) {}
+  }
+
+  showToast(`✅ ${success} notifications ${newStatus ? 'activated' : 'deactivated'}!`, 'success');
+  fetchNotifications();
+}
+
+// ============================================================
+// ADD / EDIT NOTIFICATION
+// ============================================================
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const form = new FormData(e.target);
+  const id = editId.value;
+  const titleVal = title.value.trim();
+  const descriptionVal = description.value.trim();
+  const attendanceVal = attendance.value;
+  const file = fileInput.files[0];
 
-  const res = await fetch(API + "/add", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-    body: form
-  });
+  if (!titleVal) {
+    showToast('Please enter a title', 'error');
+    return;
+  }
 
-  const data = await res.json();
-  alert(data.message || "Added");
+  const formData = new FormData();
+  formData.append('title', titleVal);
+  formData.append('description', descriptionVal);
+  formData.append('attendance', attendanceVal);
+  if (file) formData.append('file', file);
 
-  e.target.reset();
-  load();
-});
+  const isEdit = id !== '';
+  const url = isEdit 
+    ? `${API_BASE}/api/notifications/admin/update/${id}`
+    : `${API_BASE}/api/notifications/admin/add`;
+  const method = isEdit ? 'PUT' : 'POST';
 
-/* DELETE */
-async function del(id){
-  if (!confirm("Delete this notification?")) return;
+  try {
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    submitBtn.disabled = true;
 
-  await fetch(API + "/" + id, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` }
-  });
+    const response = await fetch(url, {
+      method: method,
+      body: formData
+    });
 
-  load();
-}
-
-/* MOBILE MENU */
-const menuToggle = document.getElementById("menuToggle");
-const navLinks = document.getElementById("navLinks");
-
-menuToggle.addEventListener("click", () => {
-  navLinks.classList.toggle("active");
-  menuToggle.innerHTML = navLinks.classList.contains("active") ? "✕" : "☰";
-});
-
-function logout(){
-  navLinks.classList.remove("active");
-  menuToggle.innerHTML = "☰";
-
-  Swal.fire({
-    title: "Logout?",
-    text: "Do you really want to logout from Admin Panel?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#D4AF37",
-    cancelButtonColor: "#123A7A",
-    confirmButtonText: "Yes, Logout",
-    cancelButtonText: "Cancel"
-  }).then((result) => {
-    if (result.isConfirmed) {
-      localStorage.removeItem("token");
-      sessionStorage.clear();
-      window.location.replace("login.html");
+    const data = await response.json();
+    if (data.success) {
+      showToast(isEdit ? '✅ Notification updated!' : '✅ Notification added!', 'success');
+      resetForm();
+      fetchNotifications();
+    } else {
+      showToast(data.message || 'Failed to save', 'error');
     }
-  });
+  } catch (error) {
+    showToast('Error saving notification', 'error');
+  } finally {
+    submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Notification';
+    submitBtn.disabled = false;
+  }
+});
+
+// ============================================================
+// EDIT NOTIFICATION
+// ============================================================
+function editNotification(id) {
+  const item = currentNotifications.find(n => n.id === id);
+  if (!item) return;
+
+  editId.value = item.id;
+  title.value = item.title;
+  description.value = item.description || '';
+  attendance.value = item.attendance || 'all';
+  fileInput.value = '';
+
+  formTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Notification';
+  submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Notification';
+  cancelBtn.style.display = 'inline-flex';
+
+  document.getElementById('formSection').scrollIntoView({ behavior: 'smooth' });
 }
 
-load();
+// ============================================================
+// CANCEL EDIT
+// ============================================================
+function cancelEdit() {
+  resetForm();
+  showToast('Edit cancelled', 'warning');
+}
+
+function resetForm() {
+  editId.value = '';
+  title.value = '';
+  description.value = '';
+  attendance.value = 'all';
+  fileInput.value = '';
+  formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Add New Notification';
+  submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Notification';
+  cancelBtn.style.display = 'none';
+}
+
+// ============================================================
+// DELETE NOTIFICATION
+// ============================================================
+async function deleteNotification(id) {
+  if (!confirm('Are you sure you want to delete this notification?')) return;
+
+  try {
+    const response = await fetch(`${API_BASE}/api/notifications/admin/delete/${id}`, {
+      method: 'DELETE'
+    });
+    const data = await response.json();
+    if (data.success) {
+      showToast('✅ Notification deleted!', 'success');
+      fetchNotifications();
+    } else {
+      showToast(data.message || 'Failed to delete', 'error');
+    }
+  } catch (error) {
+    showToast('Error deleting notification', 'error');
+  }
+}
+
+// ============================================================
+// BULK DELETE
+// ============================================================
+async function confirmBulkDelete() {
+  updateSelectedIds();
+  if (selectedIds.length === 0) {
+    showToast('Please select notifications to delete', 'error');
+    return;
+  }
+
+  if (!confirm(`Delete ${selectedIds.length} selected notifications?`)) return;
+
+  try {
+    const response = await fetch(`${API_BASE}/api/notifications/admin/bulk-delete`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: selectedIds })
+    });
+    const data = await response.json();
+    if (data.success) {
+      showToast(data.message, 'success');
+      fetchNotifications();
+    } else {
+      showToast('Failed to delete', 'error');
+    }
+  } catch (error) {
+    showToast('Error deleting notifications', 'error');
+  }
+}
+
+// ============================================================
+// REFRESH
+// ============================================================
+function refreshNotifications() {
+  showToast('🔄 Refreshing...', 'success');
+  fetchNotifications();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Admin name from localStorage
+  const adminData = localStorage.getItem('adminData');
+  if (adminData) {
+    try {
+      const data = JSON.parse(adminData);
+      const name = data.name || data.username || 'Admin';
+      document.getElementById('adminName').textContent = name;
+      document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
+    } catch (e) {}
+  }
+
+  fetchNotifications();
+  // Auto refresh every 60 seconds
+  setInterval(fetchNotifications, 60000);
+});
 </script>
+
 </body>
 </html>
