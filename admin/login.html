@@ -7,11 +7,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Inter', sans-serif;
@@ -179,12 +175,8 @@ body {
 }
 
 @media (max-width: 480px) {
-  .login-card {
-    padding: 28px 20px;
-  }
-  .login-card .logo h2 {
-    font-size: 18px;
-  }
+  .login-card { padding: 28px 20px; }
+  .login-card .logo h2 { font-size: 18px; }
 }
 </style>
 </head>
@@ -227,11 +219,9 @@ body {
 </div>
 
 <script>
-const API_BASE = 'https://gsssshilla.onrender.com/api/admin';
+const API_BASE = 'http://localhost:5000/api/admin';
 
-// ============================================================
-// CHECK IF ALREADY LOGGED IN
-// ============================================================
+// Check if already logged in
 const token = localStorage.getItem('adminToken');
 if (token) {
   fetch(`${API_BASE}/verify`, {
@@ -240,15 +230,12 @@ if (token) {
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      window.location.href = 'admin-dashboard.html';
+      window.location.href = 'dashboard.html';
     }
   })
   .catch(() => {});
 }
 
-// ============================================================
-// HANDLE LOGIN
-// ============================================================
 async function handleLogin(e) {
   e.preventDefault();
   
@@ -257,7 +244,6 @@ async function handleLogin(e) {
   const btn = document.getElementById('loginBtn');
   const message = document.getElementById('message');
 
-  // Clear previous message
   message.className = 'message';
   message.textContent = '';
 
@@ -266,7 +252,6 @@ async function handleLogin(e) {
     return;
   }
 
-  // Show loading
   btn.disabled = true;
   btn.innerHTML = '<span class="loading"></span> Logging in...';
 
@@ -280,14 +265,13 @@ async function handleLogin(e) {
     const data = await response.json();
 
     if (data.success) {
-      // Store token
       localStorage.setItem('adminToken', data.token);
       localStorage.setItem('adminData', JSON.stringify(data.data));
       
       showMessage('✅ Login successful! Redirecting...', 'success');
       
       setTimeout(() => {
-        window.location.href = 'admin-dashboard.html';
+        window.location.href = 'dashboard.html';
       }, 1000);
     } else {
       showMessage('❌ ' + data.message, 'error');
@@ -301,18 +285,12 @@ async function handleLogin(e) {
   }
 }
 
-// ============================================================
-// SHOW MESSAGE
-// ============================================================
 function showMessage(text, type) {
   const message = document.getElementById('message');
   message.textContent = text;
   message.className = 'message ' + type;
 }
 
-// ============================================================
-// ENTER KEY SUPPORT
-// ============================================================
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Enter') {
     document.getElementById('loginForm').dispatchEvent(new Event('submit'));
