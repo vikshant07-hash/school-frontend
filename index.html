@@ -1692,7 +1692,9 @@ body {
      PRINCIPAL SPOTLIGHT - WITH IMAGE UPLOAD SUPPORT
 ============================================================ -->
 
-   <!-- ============================================================
+   
+    
+<!-- ============================================================
      PRINCIPAL SECTION - HTML
 ============================================================ -->
 <div class="principal-wrapper" id="principalSection">
@@ -1701,7 +1703,6 @@ body {
         <div style="width:48px; height:48px; border-radius:50%; border:3px solid rgba(255,255,255,0.08); border-top:3px solid #c8963e; border-right:3px solid rgba(201,151,43,0.35); animation:spin 0.75s linear infinite; margin:0 auto 16px;"></div>
         <p style="color:rgba(255,255,255,0.4); font-size:14px;">Loading Principal...</p>
     </div>
-    <!-- Content will be rendered here -->
 </div>
 
 <style>
@@ -1974,7 +1975,7 @@ body {
 
 
 <!-- ============================================================
-     PRINCIPAL SECTION - JAVASCRIPT (Only API Fetch)
+     PRINCIPAL SECTION - JAVASCRIPT (Faculty API se fetch)
 ============================================================ -->
 <script>
 // ============================================================
@@ -1983,7 +1984,7 @@ body {
 const API_BASE = 'https://gsssshilla.onrender.com';
 
 // ============================================================
-// FETCH PRINCIPAL FROM API
+// FETCH PRINCIPAL FROM FACULTY API
 // ============================================================
 async function fetchPrincipal() {
     const container = document.getElementById('principalSection');
@@ -1997,14 +1998,16 @@ async function fetchPrincipal() {
             </div>
         `;
 
-        // API Call
-        const response = await fetch(`${API_BASE}/api/faculty/principal`, {
+        // ============================================================
+        // METHOD 1: Faculty API se fetch (Jaisa aapke faculty page mein hai)
+        // ============================================================
+        const response = await fetch(`${API_BASE}/api/faculty`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            signal: AbortSignal.timeout(10000) // 10 seconds timeout
+            signal: AbortSignal.timeout(10000)
         });
 
         if (!response.ok) {
@@ -2014,16 +2017,23 @@ async function fetchPrincipal() {
         const data = await response.json();
 
         if (!data.success || !data.data) {
-            throw new Error('No principal data found');
+            throw new Error('No faculty data found');
+        }
+
+        // Principal data extract karein
+        const principal = data.data.principal;
+
+        if (!principal) {
+            throw new Error('Principal not found in faculty data');
         }
 
         // Render principal
-        renderPrincipal(data.data);
+        renderPrincipal(principal);
 
     } catch (error) {
         console.error('❌ Error fetching principal:', error);
         
-        // Show error state
+        // Show error state with retry
         container.innerHTML = `
             <div class="principal-error">
                 <div class="error-icon">⚠️</div>
@@ -2102,28 +2112,73 @@ function renderPrincipal(p) {
                 
                 ${p.message ? `<div class="quote">"${p.message}"</div>` : ''}
                 
-                <div class="principal-meta">
-                    ${metaItems.join('')}
-                </div>
+                
             </div>
         </div>
     `;
 }
 
 // ============================================================
-// LOAD ON PAGE READY
+// ALTERNATIVE: PRINCIPAL ENDPOINT (Agar kaam kare toh)
+// ============================================================
+async function fetchPrincipalFromEndpoint() {
+    const container = document.getElementById('principalSection');
+    
+    try {
+        container.innerHTML = `
+            <div style="text-align:center; padding:60px 20px;">
+                <div style="width:48px; height:48px; border-radius:50%; border:3px solid rgba(255,255,255,0.08); border-top:3px solid #c8963e; border-right:3px solid rgba(201,151,43,0.35); animation:spin 0.75s linear infinite; margin:0 auto 16px;"></div>
+                <p style="color:rgba(255,255,255,0.4); font-size:14px;">Loading Principal...</p>
+            </div>
+        `;
+
+        const response = await fetch(`${API_BASE}/api/faculty/principal`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            signal: AbortSignal.timeout(10000)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.success && data.data) {
+            renderPrincipal(data.data);
+        } else {
+            // Fallback to faculty API
+            console.log('Principal endpoint failed, trying faculty API...');
+            await fetchPrincipal();
+        }
+
+    } catch (error) {
+        console.error('❌ Principal endpoint error:', error);
+        // Try faculty API as fallback
+        await fetchPrincipal();
+    }
+}
+
+// ============================================================
+// LOAD ON PAGE READY - PREFER PRINCIPAL ENDPOINT
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-    fetchPrincipal();
+    // Method 1: Direct principal endpoint (Preferred)
+    fetchPrincipalFromEndpoint();
+    
+    // Method 2: Agar principal endpoint fail ho toh faculty API se fetch
+    // fetchPrincipal();
 });
 
 // ============================================================
 // EXPOSE FOR RETRY BUTTON
 // ============================================================
 window.fetchPrincipal = fetchPrincipal;
+window.fetchPrincipalFromEndpoint = fetchPrincipalFromEndpoint;
 </script>
-    
-
 <!-- ============================================================
      STATS
 ============================================================ -->
