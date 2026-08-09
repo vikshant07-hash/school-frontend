@@ -1,682 +1,1459 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Gallery - Our Memories</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.css" />
-    <style>
-        :root {
-            --primary: #1a3a6b;
-            --secondary: #d4a843;
-            --light: #f8f9fa;
-            --dark: #0a1628;
-            --gray: #6c757d;
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background: #f5f5f5; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery - GSS School Shilla</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.css" />
+<link rel="shortcut icon" href="logo.png" type="image/x-icon">
+<style>
+:root {
+  --primary: #0d1b2a;
+  --primary-light: #1b3a5c;
+  --secondary: #2d5a8a;
+  --accent: #e8b84b;
+  --accent-light: #f5d78a;
+  --accent-dark: #c9972b;
+  --white: #ffffff;
+  --off-white: #f0f4f8;
+  --gray-light: #e2e8f0;
+  --gray: #94a3b8;
+  --text: #1a2332;
+  --text-light: #5a6a7e;
+  --shadow-sm: 0 4px 20px rgba(0,0,0,0.06);
+  --shadow-md: 0 8px 40px rgba(0,0,0,0.10);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
+  --radius: 20px;
+  --radius-sm: 12px;
+  --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
 
-        /* ========== NAVBAR ========== */
-        .navbar {
-            background: var(--primary);
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-        }
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: white;
-            font-size: 22px;
-            font-weight: 700;
-        }
-        .nav-brand i { color: var(--secondary); font-size: 28px; }
-        .nav-brand span { color: var(--secondary); }
-        .nav-menu {
-            display: flex;
-            gap: 30px;
-            list-style: none;
-        }
-        .nav-menu a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: 0.3s;
-            font-size: 15px;
-        }
-        .nav-menu a:hover { color: var(--secondary); }
-        .nav-menu a.active { color: var(--secondary); font-weight: 600; }
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-        }
-        .hamburger span {
-            width: 25px;
-            height: 3px;
-            background: white;
-            border-radius: 3px;
-        }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
-        /* ========== HERO SLIDER ========== */
-        .hero-slider {
-            position: relative;
-            width: 100%;
-            height: 60vh;
-            min-height: 400px;
-            max-height: 600px;
-            overflow: hidden;
-        }
-        .slider-track {
-            display: flex;
-            height: 100%;
-            transition: transform 0.5s ease-in-out;
-        }
-        .slider-slide {
-            min-width: 100%;
-            height: 100%;
-            position: relative;
-        }
-        .slider-slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .slider-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.7));
-            padding: 40px 60px;
-            color: white;
-        }
-        .slider-overlay h2 { font-size: 28px; font-weight: 700; margin-bottom: 5px; }
-        .slider-overlay p { font-size: 14px; opacity: 0.9; }
-        .slider-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 20px;
-            z-index: 10;
-        }
-        .slider-nav button {
-            background: rgba(255,255,255,0.3);
-            backdrop-filter: blur(5px);
-            border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .slider-nav button:hover { background: rgba(255,255,255,0.6); }
-        .slider-dots {
-            position: absolute;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-            z-index: 10;
-        }
-        .slider-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.5);
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .slider-dot.active { background: white; width: 25px; border-radius: 5px; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--off-white);
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-        /* ========== MAIN CONTENT ========== */
-        .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-        .section-title {
-            text-align: center;
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
-        .section-subtitle {
-            text-align: center;
-            color: var(--gray);
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
 
-        /* ========== YEAR FILTER ========== */
-        .year-filter {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-        .year-btn {
-            padding: 8px 20px;
-            border: 2px solid var(--primary);
-            background: transparent;
-            color: var(--primary);
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
-            font-family: inherit;
-        }
-        .year-btn.active, .year-btn:hover {
-            background: var(--primary);
-            color: white;
-        }
+/* ============================================================
+   NAVBAR
+============================================================ */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 60px;
+  height: 70px;
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-light);
+  transition: var(--transition);
+}
 
-        /* ========== MONTH SECTIONS ========== */
-        .month-section {
-            margin-bottom: 40px;
-        }
-        .month-header {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--primary);
-            padding: 12px 20px;
-            background: white;
-            border-left: 4px solid var(--secondary);
-            margin-bottom: 16px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .month-header .count {
-            background: var(--primary);
-            color: white;
-            padding: 2px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-        }
-        .image-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 16px;
-        }
-        .image-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            transition: 0.3s;
-            cursor: pointer;
-        }
-        .image-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        }
-        .image-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-        .image-info {
-            padding: 12px 16px;
-        }
-        .image-info h4 {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 4px;
-        }
-        .image-info p {
-            font-size: 12px;
-            color: var(--gray);
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .image-info .date {
-            font-size: 11px;
-            color: var(--secondary);
-            font-weight: 500;
-            margin-top: 4px;
-        }
-        .no-images {
-            text-align: center;
-            padding: 40px;
-            color: var(--gray);
-            font-size: 14px;
-        }
-        .no-images i { font-size: 40px; margin-bottom: 10px; display: block; opacity: 0.5; }
+.navbar.scrolled {
+  box-shadow: var(--shadow-sm);
+}
 
-        /* ========== FOOTER ========== */
-        .footer {
-            background: var(--dark);
-            color: white;
-            padding: 40px 0 20px;
-            margin-top: 60px;
-        }
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-        .footer-section h4 {
-            font-size: 16px;
-            margin-bottom: 15px;
-            color: var(--secondary);
-        }
-        .footer-section p, .footer-section a {
-            font-size: 13px;
-            color: #adb5bd;
-            line-height: 1.8;
-            text-decoration: none;
-            display: block;
-        }
-        .footer-section a:hover { color: var(--secondary); }
-        .footer-bottom {
-            text-align: center;
-            padding-top: 20px;
-            margin-top: 30px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            font-size: 12px;
-            color: #adb5bd;
-        }
-        .social-links {
-            display: flex;
-            gap: 12px;
-            margin-top: 10px;
-        }
-        .social-links a {
-            width: 35px;
-            height: 35px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.3s;
-        }
-        .social-links a:hover { background: var(--secondary); }
+body { padding-top: 70px; }
 
-        /* ========== LOADING ========== */
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--gray);
-        }
-        .loading i { font-size: 30px; animation: spin 1s infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
 
-        /* ========== RESPONSIVE ========== */
-        @media (max-width: 768px) {
-            .hero-slider { height: 40vh; min-height: 250px; }
-            .slider-overlay { padding: 20px 30px; }
-            .slider-overlay h2 { font-size: 20px; }
-            .nav-menu { display: none; }
-            .nav-menu.active {
-                display: flex;
-                flex-direction: column;
-                position: absolute;
-                top: 70px;
-                left: 0;
-                right: 0;
-                background: var(--primary);
-                padding: 20px;
-                gap: 15px;
-            }
-            .hamburger { display: flex; }
-            .image-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-        }
-        @media (max-width: 480px) {
-            .hero-slider { height: 30vh; min-height: 200px; }
-            .section-title { font-size: 22px; }
-            .image-grid { grid-template-columns: 1fr 1fr; }
-        }
-    </style>
+.logo img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  object-fit: cover;
+  padding: 2px;
+  background: var(--white);
+}
+
+.logo-text .school-name {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.15;
+}
+
+.logo-text .school-name span { color: var(--accent-dark); }
+
+.logo-text .school-tagline {
+  display: block;
+  font-size: 9px;
+  color: var(--gray);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-links > li {
+  position: relative;
+}
+
+.nav-links > li > a {
+  color: var(--text-light);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-links > li > a:hover {
+  color: var(--primary);
+  background: var(--off-white);
+}
+
+.nav-links > li > a.active {
+  color: var(--accent-dark);
+  background: #fef8ed;
+}
+
+.nav-links > li > a i.fa-chevron-down {
+  font-size: 10px;
+  opacity: 0.5;
+}
+
+.dropdown-menu-nav {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 200px;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--gray-light);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: var(--transition);
+  padding: 6px 0;
+  z-index: 100;
+}
+
+.nav-links > li:hover .dropdown-menu-nav {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-menu-nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  transition: var(--transition);
+}
+
+.dropdown-menu-nav a:hover {
+  background: var(--off-white);
+  color: var(--accent-dark);
+  padding-left: 24px;
+}
+
+.dropdown-menu-nav a i {
+  width: 18px;
+  color: var(--accent-dark);
+  font-size: 14px;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.login-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 50px;
+  background: var(--accent);
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: 'Inter', sans-serif;
+}
+
+.login-btn:hover {
+  background: var(--accent-dark);
+  transform: translateY(-2px);
+}
+
+.login-dropdown { position: relative; }
+
+.login-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 200px;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--gray-light);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: var(--transition);
+}
+
+.login-dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.login-dropdown-menu a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  border-bottom: 1px solid var(--gray-light);
+  transition: var(--transition);
+}
+
+.login-dropdown-menu a:last-child { border-bottom: none; }
+.login-dropdown-menu a:hover {
+  background: var(--off-white);
+  color: var(--accent-dark);
+}
+
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.menu-toggle .bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--primary);
+  transition: var(--transition);
+  border-radius: 50px;
+}
+
+.menu-toggle.active .bar:nth-child(1) {
+  transform: rotate(45deg) translate(4px, 4px);
+}
+.menu-toggle.active .bar:nth-child(2) { opacity: 0; }
+.menu-toggle.active .bar:nth-child(3) {
+  transform: rotate(-45deg) translate(4px, -4px);
+}
+
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 9998;
+}
+
+.mobile-overlay.active { display: block; }
+
+/* Mobile Menu */
+@media (max-width: 900px) {
+  .navbar { padding: 0 20px; height: 64px; }
+  body { padding-top: 64px; }
+
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    background: var(--white);
+    flex-direction: column;
+    padding: 20px;
+    gap: 2px;
+    transition: right 0.3s ease;
+    box-shadow: -8px 0 40px rgba(0,0,0,0.1);
+    z-index: 10000;
+    overflow-y: auto;
+  }
+
+  .nav-links.active { right: 0; }
+
+  .mobile-menu-header {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--gray-light);
+    margin-bottom: 12px;
+  }
+
+  .mobile-menu-header .mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mobile-menu-header .mobile-brand img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    object-fit: cover;
+    padding: 2px;
+  }
+
+  .mobile-menu-header .mobile-brand span {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .mobile-close-btn {
+    display: flex !important;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: var(--off-white);
+    border-radius: 50%;
+    color: var(--text);
+    font-size: 18px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-close-btn:hover { background: var(--gray-light); }
+
+  .dropdown-menu-nav {
+    position: static;
+    width: 100%;
+    box-shadow: none;
+    border: none;
+    padding: 0 0 0 16px;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    display: none;
+    background: transparent;
+  }
+
+  .dropdown-menu-nav.show-mobile {
+    display: block;
+  }
+
+  .dropdown-menu-nav a {
+    padding: 8px 14px;
+    color: var(--text-light);
+  }
+
+  .dropdown-menu-nav a:hover {
+    background: var(--off-white);
+    padding-left: 20px;
+  }
+
+  .nav-links > li > a {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: var(--text-light);
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: space-between;
+  }
+
+  .nav-links > li > a .dropdown-arrow {
+    font-size: 12px;
+    transition: var(--transition);
+  }
+
+  .nav-links > li > a .dropdown-arrow.rotated {
+    transform: rotate(180deg);
+  }
+
+  .nav-links > li > a:hover {
+    background: var(--off-white);
+    color: var(--primary);
+  }
+
+  .nav-links > li > a.active {
+    background: #fef8ed;
+    color: var(--accent-dark);
+  }
+
+  .nav-links > li > a i:not(.dropdown-arrow) {
+    width: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--accent-dark);
+  }
+
+  .mobile-login-item {
+    display: block !important;
+    width: 100%;
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--gray-light);
+  }
+
+  .mobile-login-item .login-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .desktop-login { display: none !important; }
+  .menu-toggle { display: flex; }
+}
+
+.mobile-close-btn { display: none; }
+.mobile-menu-header { display: none; }
+.mobile-login-item { display: none; }
+
+@media (max-width: 480px) {
+  .logo-text .school-name { font-size: 14px; }
+  .logo img { width: 38px; height: 38px; }
+  .navbar { padding: 0 14px; height: 60px; }
+  body { padding-top: 60px; }
+}
+
+/* ============================================================
+   PAGE HEADER
+============================================================ */
+.page-header {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  padding: 50px 20px 40px;
+  text-align: center;
+  border-bottom: 3px solid var(--accent);
+  position: relative;
+  overflow: hidden;
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(232, 184, 75, 0.05), transparent 60%);
+}
+
+.page-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--white);
+  position: relative;
+  z-index: 1;
+}
+
+.page-header h1 i {
+  color: var(--accent-light);
+}
+
+.page-header p {
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 8px;
+  font-size: 15px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   HERO SLIDER
+============================================================ */
+.hero-slider {
+  position: relative;
+  width: 100%;
+  height: 55vh;
+  min-height: 350px;
+  max-height: 550px;
+  overflow: hidden;
+  background: var(--primary);
+}
+
+.slider-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.6s ease-in-out;
+}
+
+.slider-slide {
+  min-width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.slider-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slider-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(13, 27, 42, 0.85));
+  padding: 40px 60px;
+  color: var(--white);
+}
+
+.slider-overlay h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.slider-overlay p {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.slider-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.slider-nav button {
+  pointer-events: auto;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.15);
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.slider-nav button:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.05);
+}
+
+.slider-dots {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.slider-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.slider-dot.active {
+  background: var(--accent);
+  width: 28px;
+  border-radius: 5px;
+}
+
+/* ============================================================
+   CONTAINER
+============================================================ */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px 60px;
+  flex: 1;
+}
+
+/* ============================================================
+   YEAR FILTER
+============================================================ */
+.year-filter {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.year-btn {
+  padding: 8px 24px;
+  border: 2px solid var(--gray-light);
+  background: var(--white);
+  color: var(--text-light);
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  transition: var(--transition);
+}
+
+.year-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+
+.year-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--white);
+}
+
+/* ============================================================
+   MONTH SECTIONS
+============================================================ */
+.month-section {
+  margin-bottom: 40px;
+}
+
+.month-header {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary);
+  padding: 14px 22px;
+  background: var(--white);
+  border-left: 4px solid var(--accent);
+  margin-bottom: 18px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Playfair Display', serif;
+}
+
+.month-header .count {
+  background: var(--primary);
+  color: var(--white);
+  padding: 2px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ============================================================
+   IMAGE GRID
+============================================================ */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.image-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  border: 1px solid var(--gray-light);
+}
+
+.image-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent);
+}
+
+.image-card a {
+  display: block;
+  overflow: hidden;
+}
+
+.image-card img {
+  width: 100%;
+  height: 210px;
+  object-fit: cover;
+  transition: var(--transition);
+}
+
+.image-card:hover img {
+  transform: scale(1.05);
+}
+
+.image-info {
+  padding: 14px 18px 18px;
+}
+
+.image-info h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.image-info p {
+  font-size: 13px;
+  color: var(--text-light);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+.image-info .date {
+  font-size: 12px;
+  color: var(--accent-dark);
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+.image-info .date i {
+  margin-right: 4px;
+}
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 2px dashed var(--gray-light);
+}
+
+.empty-state i {
+  font-size: 48px;
+  color: var(--gray-light);
+  margin-bottom: 12px;
+  display: block;
+}
+
+.empty-state h3 {
+  font-size: 20px;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.empty-state p {
+  color: var(--gray);
+}
+
+.loading-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--gray);
+}
+
+.loading-state i {
+  font-size: 36px;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+.footer {
+  background: var(--primary);
+  color: var(--white);
+  padding: 50px 20px 0;
+  margin-top: auto;
+}
+
+.footer-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 36px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+@media (max-width: 992px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 540px) { .footer-grid { grid-template-columns: 1fr; } }
+
+.footer-brand .brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.footer-brand .brand-row img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid rgba(232, 184, 75, 0.2);
+  background: var(--white);
+  object-fit: cover;
+  padding: 2px;
+}
+
+.footer-brand .brand-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.footer-brand p {
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.8;
+  max-width: 280px;
+}
+
+.footer-col h4 {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--accent-light);
+  font-weight: 700;
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.footer-col h4::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 25px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 50px;
+}
+
+.footer-col a {
+  display: block;
+  font-size: 13px;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 8px;
+  transition: var(--transition);
+}
+
+.footer-col a:hover { color: var(--white); padding-left: 6px; }
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin: 24px auto 20px;
+  flex-wrap: wrap;
+}
+
+.social-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: rgba(255,255,255,0.4);
+  font-size: 18px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: var(--transition);
+}
+
+.social-icon:hover {
+  transform: translateY(-4px) scale(1.05);
+  color: var(--white);
+}
+
+.facebook:hover { background: #1877F2; border-color: #1877F2; }
+.instagram:hover { background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); border-color: transparent; }
+.youtube:hover { background: #FF0000; border-color: #FF0000; }
+.twitter:hover { background: #000; border-color: #000; }
+.whatsapp:hover { background: #25D366; border-color: #25D366; }
+
+.footer-bottom {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px 0;
+}
+
+.footer-bottom p, .footer-bottom a {
+  font-size: 12px;
+  color: rgba(255,255,255,0.25);
+}
+
+.footer-bottom a:hover { color: var(--accent-light); }
+
+.dev {
+  font-size: 12px;
+  color: rgba(255,255,255,0.25);
+  text-align: center;
+  padding: 12px 0 16px;
+}
+
+.dev b { color: var(--accent-light); }
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 992px) {
+  .image-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .page-header { padding: 40px 20px 30px; }
+  .page-header h1 { font-size: 26px; }
+  
+  .hero-slider { height: 40vh; min-height: 250px; }
+  .slider-overlay { padding: 20px 30px; }
+  .slider-overlay h2 { font-size: 20px; }
+  .slider-overlay p { font-size: 12px; }
+  .slider-dots { bottom: 60px; }
+  
+  .image-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+  .image-card img { height: 160px; }
+  .image-info h4 { font-size: 13px; }
+  .image-info p { font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+  .page-header h1 { font-size: 22px; }
+  .page-header p { font-size: 13px; }
+  
+  .hero-slider { height: 30vh; min-height: 200px; }
+  .slider-overlay { padding: 14px 18px; }
+  .slider-overlay h2 { font-size: 16px; }
+  .slider-overlay p { font-size: 11px; }
+  .slider-nav button { width: 36px; height: 36px; font-size: 14px; }
+  .slider-dots { bottom: 45px; gap: 6px; }
+  .slider-dot { width: 8px; height: 8px; }
+  .slider-dot.active { width: 20px; }
+  
+  .image-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .image-card { border-radius: var(--radius-sm); }
+  .image-card img { height: 130px; }
+  .image-info { padding: 10px 12px 14px; }
+  .image-info h4 { font-size: 12px; }
+  .image-info p { display: none; }
+  
+  .container { padding: 16px 12px 40px; }
+  .month-header { font-size: 16px; padding: 10px 16px; }
+  
+  .footer-grid { gap: 20px; }
+  .footer-bottom { flex-direction: column; text-align: center; }
+}
+</style>
 </head>
 <body>
 
-<!-- ===== NAVBAR ===== -->
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="#" class="nav-brand">
-            <i class="fas fa-school"></i>
-            <div>School <span>Gallery</span></div>
-        </a>
-        <ul class="nav-menu" id="navMenu">
-            <li><a href="#" class="active">Home</a></li>
-            <li><a href="#gallery">Gallery</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-        <div class="hamburger" onclick="toggleMenu()">
-            <span></span><span></span><span></span>
-        </div>
-    </div>
-</nav>
+<!-- ============================================================
+     MOBILE OVERLAY
+============================================================ -->
+<div class="mobile-overlay" id="mobileOverlay"></div>
 
-<!-- ===== HERO SLIDER ===== -->
+<!-- ============================================================
+     NAVBAR
+============================================================ -->
+<header class="navbar" id="navbar">
+  <div class="logo">
+    <img src="logo.png" alt="School Logo">
+    <div class="logo-text">
+      <span class="school-name">GSS <span>School</span> Shilla</span>
+      <span class="school-tagline">Est. Himachal Pradesh</span>
+    </div>
+  </div>
+
+  <ul class="nav-links" id="navLinks">
+    <div class="mobile-menu-header">
+      <div class="mobile-brand">
+        <img src="logo.png" alt="Logo">
+        <span>GSSS <small>Shilla</small></span>
+      </div>
+      <button class="mobile-close-btn" id="mobileCloseBtn">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <li><a href="../index.html"> Home</a></li>
+    <li><a href="pub-gallery.html" class="active"> Gallery</a></li>
+   
+    
+
+    
+
+  </ul>
+
+  
+</header>
+
+<!-- ============================================================
+     HERO SLIDER
+============================================================ -->
 <div class="hero-slider" id="heroSlider">
-    <div class="slider-track" id="sliderTrack"></div>
-    <div class="slider-nav">
-        <button onclick="prevSlide()"><i class="fas fa-chevron-left"></i></button>
-        <button onclick="nextSlide()"><i class="fas fa-chevron-right"></i></button>
+  <div class="slider-track" id="sliderTrack">
+    <div class="slider-slide">
+      <img src="https://via.placeholder.com/1200x600/1a3a6b/ffffff?text=GSS+School+Shilla" alt="School">
+      <div class="slider-overlay">
+        <h2>Welcome to Our Gallery</h2>
+        <p>Capturing memories that last a lifetime</p>
+      </div>
     </div>
-    <div class="slider-dots" id="sliderDots"></div>
+  </div>
+  <div class="slider-nav">
+    <button onclick="prevSlide()"><i class="fas fa-chevron-left"></i></button>
+    <button onclick="nextSlide()"><i class="fas fa-chevron-right"></i></button>
+  </div>
+  <div class="slider-dots" id="sliderDots"></div>
 </div>
 
-<!-- ===== MAIN CONTENT ===== -->
-<div class="main-container" id="gallery">
-    <h2 class="section-title">📸 Our Gallery</h2>
-    <p class="section-subtitle">Memories captured throughout the years</p>
+<!-- ============================================================
+     CONTAINER
+============================================================ -->
+<div class="container">
+  
+  <div style="text-align:center;margin-bottom:20px;">
+    <h2 style="font-family:'Playfair Display',serif;font-size:28px;color:var(--primary);font-weight:800;">
+      <i class="fas fa-images" style="color:var(--accent-dark);"></i> Our Gallery
+    </h2>
+    <p style="color:var(--gray);font-size:14px;">Memories captured throughout the years</p>
+  </div>
 
-    <!-- Year Filter -->
-    <div class="year-filter" id="yearFilter"></div>
+  <!-- Year Filter -->
+  <div class="year-filter" id="yearFilter">
+    <button class="year-btn active" onclick="filterByYear(2026)">2026</button>
+    <button class="year-btn" onclick="filterByYear(2025)">2025</button>
+  </div>
 
-    <!-- Gallery Content -->
-    <div id="galleryContent">
-        <div class="loading"><i class="fas fa-spinner"></i><p>Loading gallery...</p></div>
+  <!-- Gallery Content -->
+  <div id="galleryContent">
+    <div class="loading-state">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Loading gallery...</p>
     </div>
+  </div>
+
 </div>
 
-<!-- ===== FOOTER ===== -->
-<footer class="footer" id="contact">
-    <div class="footer-container">
-        <div class="footer-section">
-            <h4>🏫 About School</h4>
-            <p>We are committed to providing quality education and nurturing young minds for a brighter future.</p>
-            <div class="social-links">
-                <a href="#"><i class="fab fa-facebook-f"></i></a>
-                <a href="#"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-youtube"></i></a>
-                <a href="#"><i class="fab fa-whatsapp"></i></a>
-            </div>
-        </div>
-        <div class="footer-section">
-            <h4>Quick Links</h4>
-            <a href="#">Admissions</a>
-            <a href="#">Academic Calendar</a>
-            <a href="#">Results</a>
-            <a href="#">Events</a>
-            <a href="#">Gallery</a>
-        </div>
-        <div class="footer-section">
-            <h4>Contact Us</h4>
-            <p><i class="fas fa-map-marker-alt"></i> Village & Post Office, District</p>
-            <p><i class="fas fa-phone"></i> +91 98765 43210</p>
-            <p><i class="fas fa-envelope"></i> info@school.edu.in</p>
-        </div>
+<!-- ============================================================
+     FOOTER
+============================================================ -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="brand-row">
+        <img src="logo.png" alt="School Logo">
+        <div class="brand-name">Govt. Sr. Sec. School Shilla</div>
+      </div>
+      <p>Empowering students with quality education, discipline and a vision for a brighter India.</p>
     </div>
-    <div class="footer-bottom">
-        <p>&copy; 2026 School Name. All rights reserved. | Made with ❤️</p>
-    </div>
+
+    
+
+  <div class="social-links">
+    <a href="https://www.facebook.com/share/1BgkMoxXp3/" target="_blank" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
+    <a href="https://instagram.com/YOUR_PAGE" target="_blank" class="social-icon instagram"><i class="fab fa-instagram"></i></a>
+    <a href="https://youtube.com/YOUR_CHANNEL" target="_blank" class="social-icon youtube"><i class="fab fa-youtube"></i></a>
+    <a href="https://x.com/YOUR_ACCOUNT" target="_blank" class="social-icon twitter"><i class="fab fa-x-twitter"></i></a>
+    <a href="https://wa.me/919999999999" target="_blank" class="social-icon whatsapp"><i class="fab fa-whatsapp"></i></a>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2026 Govt. Sr. Sec. School Shilla · All Rights Reserved</p>
+    <a href="school_privacy_policy.pdf"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+    <a href="#"><i class="fas fa-clock"></i> Last Update: 08 Aug, 2026</a>
+  </div>
+
+  <div class="dev">Session: 2026-2027 &nbsp; | &nbsp; Developer: <b>Vikshant Kralta</b></div>
 </footer>
 
 <!-- Fancybox -->
 <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.umd.js"></script>
 
+<!-- ============================================================
+     SCRIPTS
+============================================================ -->
 <script>
-    // ============================================================
-    // CONFIG
-    // ============================================================
-    const API_BASE = 'https://gsssshilla.onrender.com';
-    let currentSlide = 0;
-    let sliderImages = [];
-    let slideInterval;
-    let currentYear = new Date().getFullYear();
+// ============================================================
+// NAVBAR
+// ============================================================
+var navbar = document.getElementById("navbar");
+window.addEventListener("scroll", function() {
+  if (window.scrollY > 50) {
+    navbar.classList.add("scrolled");
+  } else {
+    navbar.classList.remove("scrolled");
+  }
+});
 
-    // ============================================================
-    // NAVIGATION
-    // ============================================================
-    function toggleMenu() {
-        document.getElementById('navMenu').classList.toggle('active');
+// MOBILE MENU
+var menuToggle = document.getElementById("menuToggle");
+var navLinks = document.getElementById("navLinks");
+var mobileOverlay = document.getElementById("mobileOverlay");
+var mobileCloseBtn = document.getElementById("mobileCloseBtn");
+
+function openMobileMenu() {
+  navLinks.classList.add("active");
+  mobileOverlay.classList.add("active");
+  menuToggle.classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+
+function closeMobileMenu() {
+  navLinks.classList.remove("active");
+  mobileOverlay.classList.remove("active");
+  menuToggle.classList.remove("active");
+  document.body.style.overflow = "";
+}
+
+menuToggle.addEventListener("click", function(e) {
+  e.stopPropagation();
+  if (navLinks.classList.contains("active")) {
+    closeMobileMenu();
+  } else {
+    openMobileMenu();
+  }
+});
+
+mobileCloseBtn.addEventListener("click", closeMobileMenu);
+mobileOverlay.addEventListener("click", closeMobileMenu);
+
+navLinks.querySelectorAll("a:not(.dropdown-toggle)").forEach(function(link) {
+  link.addEventListener("click", function() {
+    closeMobileMenu();
+  });
+});
+
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") {
+    closeMobileMenu();
+  }
+});
+
+// DROPDOWN TOGGLE (Mobile)
+function toggleMobileDropdown(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  
+  var parent = e.currentTarget.parentElement;
+  var dropdown = parent.querySelector('.dropdown-menu-nav');
+  var arrow = e.currentTarget.querySelector('.dropdown-arrow');
+  
+  if (dropdown) {
+    dropdown.classList.toggle('show-mobile');
+    if (arrow) {
+      arrow.classList.toggle('rotated');
+    }
+  }
+}
+
+// LOGIN DROPDOWNS
+function setupDropdown(btnId, menuId) {
+  var btn = document.getElementById(btnId);
+  var menu = document.getElementById(menuId);
+  if (!btn || !menu) return;
+  btn.addEventListener("click", function(e) {
+    e.stopPropagation();
+    menu.classList.toggle("show");
+  });
+  document.addEventListener("click", function(e) {
+    if (!menu.contains(e.target) && !btn.contains(e.target)) {
+      menu.classList.remove("show");
+    }
+  });
+}
+
+setupDropdown("loginBtn", "loginDropdown");
+setupDropdown("loginBtnMobile", "loginDropdownMobile");
+
+// ============================================================
+// CONFIG
+// ============================================================
+const API_BASE = 'https://gsssshilla.onrender.com';
+let currentSlide = 0;
+let sliderImages = [];
+let slideInterval;
+let currentYear = new Date().getFullYear();
+
+// ============================================================
+// HERO SLIDER
+// ============================================================
+async function loadSlider() {
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/slider`);
+    const data = await res.json();
+    sliderImages = data.data || data || [];
+    
+    const track = document.getElementById('sliderTrack');
+    const dots = document.getElementById('sliderDots');
+    
+    if (!sliderImages || sliderImages.length === 0) {
+      track.innerHTML = `
+        <div class="slider-slide">
+          <img src="https://via.placeholder.com/1200x600/0d1b2a/e8b84b?text=GSS+School+Shilla" alt="School">
+          <div class="slider-overlay">
+            <h2>Welcome to Our Gallery</h2>
+            <p>Capturing memories that last a lifetime</p>
+          </div>
+        </div>`;
+      return;
+    }
+    
+    track.innerHTML = sliderImages.map(img => `
+      <div class="slider-slide">
+        <img src="${img.file_path || img.image_url || 'https://via.placeholder.com/1200x600/0d1b2a/e8b84b?text=Image'}" alt="${img.title || 'Slider'}">
+        <div class="slider-overlay">
+          <h2>${img.title || ''}</h2>
+          <p>${img.description || ''}</p>
+        </div>
+      </div>
+    `).join('');
+    
+    dots.innerHTML = sliderImages.map((_, i) => `
+      <div class="slider-dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></div>
+    `).join('');
+    
+    startAutoSlide();
+  } catch (error) {
+    console.error('Slider error:', error);
+  }
+}
+
+function startAutoSlide() {
+  clearInterval(slideInterval);
+  if (sliderImages.length > 1) {
+    slideInterval = setInterval(nextSlide, 5000);
+  }
+}
+
+function nextSlide() {
+  if (sliderImages.length === 0) return;
+  currentSlide = (currentSlide + 1) % sliderImages.length;
+  updateSlider();
+}
+
+function prevSlide() {
+  if (sliderImages.length === 0) return;
+  currentSlide = (currentSlide - 1 + sliderImages.length) % sliderImages.length;
+  updateSlider();
+}
+
+function goToSlide(index) {
+  currentSlide = index;
+  updateSlider();
+  startAutoSlide();
+}
+
+function updateSlider() {
+  document.getElementById('sliderTrack').style.transform = `translateX(-${currentSlide * 100}%)`;
+  document.querySelectorAll('.slider-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === currentSlide);
+  });
+}
+
+// ============================================================
+// GALLERY IMAGES
+// ============================================================
+async function loadGalleryImages(year) {
+  currentYear = year;
+  const container = document.getElementById('galleryContent');
+  container.innerHTML = '<div class="loading-state"><i class="fas fa-spinner fa-spin"></i><p>Loading gallery...</p></div>';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/images/public?year=${year}`);
+    const data = await res.json();
+    
+    if (!data.success || !data.data || data.data.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-image"></i>
+          <h3>No images found for ${year}</h3>
+          <p>Check back later for new memories</p>
+        </div>`;
+      return;
     }
 
-    // ============================================================
-    // HERO SLIDER
-    // ============================================================
-    async function loadSlider() {
-        try {
-            const res = await fetch(`${API_BASE}/api/gallery/slider`);
-            sliderImages = await res.json();
-            
-            const track = document.getElementById('sliderTrack');
-            const dots = document.getElementById('sliderDots');
-            
-            if (!sliderImages || sliderImages.length === 0) {
-                track.innerHTML = `
-                    <div class="slider-slide">
-                        <img src="https://via.placeholder.com/1200x600/1a3a6b/ffffff?text=Welcome+to+Our+Gallery" alt="Default">
-                        <div class="slider-overlay">
-                            <h2>Welcome to Our Gallery</h2>
-                            <p>Capturing precious moments</p>
-                        </div>
-                    </div>`;
-                return;
-            }
-            
-            track.innerHTML = sliderImages.map(img => `
-                <div class="slider-slide">
-                    <img src="${img.file_path || img.image_url}" alt="${img.title || 'Slider'}">
-                    <div class="slider-overlay">
-                        <h2>${img.title || ''}</h2>
-                        <p>${img.description || ''}</p>
-                    </div>
+    renderGalleryByMonth(data.data);
+  } catch (error) {
+    console.error('Gallery error:', error);
+    container.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-exclamation-circle" style="color:#ef4444;"></i>
+        <h3>Failed to load gallery</h3>
+        <p>Please try again later</p>
+      </div>`;
+  }
+}
+
+function renderGalleryByMonth(images) {
+  const container = document.getElementById('galleryContent');
+  
+  const grouped = {};
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                     'July', 'August', 'September', 'October', 'November', 'December'];
+  
+  images.forEach(img => {
+    const date = new Date(img.image_date || img.created_at);
+    const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+    if (!grouped[monthKey]) {
+      grouped[monthKey] = {
+        month: monthNames[date.getMonth()],
+        year: date.getFullYear(),
+        images: []
+      };
+    }
+    grouped[monthKey].images.push(img);
+  });
+
+  const sortedMonths = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+
+  if (sortedMonths.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-image"></i>
+        <h3>No images found for ${currentYear}</h3>
+        <p>Check back later for new memories</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = sortedMonths.map(key => {
+    const month = grouped[key];
+    return `
+      <div class="month-section">
+        <div class="month-header">
+          <i class="fas fa-calendar-alt" style="color:var(--accent-dark);"></i>
+          ${month.month} ${month.year}
+          <span class="count">${month.images.length} photos</span>
+        </div>
+        <div class="image-grid">
+          ${month.images.map(img => `
+            <div class="image-card">
+              <a data-fancybox="gallery-${key}" href="${img.file_path || img.image_url}" 
+                 data-caption="${img.title || ''} - ${img.description || ''}">
+                <img src="${img.file_path || img.image_url}" 
+                     alt="${img.title || 'Gallery Image'}" 
+                     onerror="this.src='https://via.placeholder.com/400x300/0d1b2a/e8b84b?text=Image'">
+              </a>
+              <div class="image-info">
+                <h4>${img.title || 'Untitled'}</h4>
+                ${img.description ? `<p>${img.description}</p>` : ''}
+                <div class="date">
+                  <i class="far fa-calendar-alt"></i> 
+                  ${new Date(img.image_date || img.created_at).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'})}
                 </div>
-            `).join('');
-            
-            dots.innerHTML = sliderImages.map((_, i) => `
-                <div class="slider-dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></div>
-            `).join('');
-            
-            startAutoSlide();
-        } catch (error) {
-            console.error('Slider error:', error);
-        }
-    }
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
 
-    function startAutoSlide() {
-        clearInterval(slideInterval);
-        if (sliderImages.length > 1) {
-            slideInterval = setInterval(nextSlide, 5000);
-        }
-    }
+// ============================================================
+// YEAR FILTER
+// ============================================================
+async function loadYearFilter() {
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/years`);
+    const data = await res.json();
+    const filter = document.getElementById('yearFilter');
+    
+    let years = data.years || [currentYear];
+    if (!years.includes(currentYear)) years.unshift(currentYear);
+    years.sort((a, b) => b - a);
+    
+    filter.innerHTML = years.map(year => `
+      <button class="year-btn ${year === currentYear ? 'active' : ''}" 
+              onclick="filterByYear(${year})">${year}</button>
+    `).join('');
+  } catch (error) {
+    console.error('Year filter error:', error);
+  }
+}
 
-    function nextSlide() {
-        if (sliderImages.length === 0) return;
-        currentSlide = (currentSlide + 1) % sliderImages.length;
-        updateSlider();
-    }
+function filterByYear(year) {
+  document.querySelectorAll('.year-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  loadGalleryImages(year);
+}
 
-    function prevSlide() {
-        if (sliderImages.length === 0) return;
-        currentSlide = (currentSlide - 1 + sliderImages.length) % sliderImages.length;
-        updateSlider();
-    }
+// ============================================================
+// TOUCH SWIPE FOR SLIDER
+// ============================================================
+let touchStartX = 0;
+document.getElementById('heroSlider').addEventListener('touchstart', (e) => {
+  touchStartX = e.touches[0].clientX;
+});
+document.getElementById('heroSlider').addEventListener('touchend', (e) => {
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) {
+    diff > 0 ? nextSlide() : prevSlide();
+  }
+});
 
-    function goToSlide(index) {
-        currentSlide = index;
-        updateSlider();
-        startAutoSlide();
-    }
-
-    function updateSlider() {
-        document.getElementById('sliderTrack').style.transform = `translateX(-${currentSlide * 100}%)`;
-        document.querySelectorAll('.slider-dot').forEach((dot, i) => {
-            dot.classList.toggle('active', i === currentSlide);
-        });
-    }
-
-    // ============================================================
-    // GALLERY IMAGES
-    // ============================================================
-    async function loadGalleryImages(year) {
-        currentYear = year;
-        const container = document.getElementById('galleryContent');
-        container.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i><p>Loading gallery...</p></div>';
-
-        try {
-            const res = await fetch(`${API_BASE}/api/gallery/images/public?year=${year}`);
-            const data = await res.json();
-            
-            if (!data.success || !data.data || data.data.length === 0) {
-                container.innerHTML = `
-                    <div class="no-images">
-                        <i class="fas fa-image"></i>
-                        <h3>No images found for ${year}</h3>
-                    </div>`;
-                return;
-            }
-
-            renderGalleryByMonth(data.data);
-        } catch (error) {
-            console.error('Gallery error:', error);
-            container.innerHTML = '<div class="no-images"><i class="fas fa-exclamation-circle"></i><h3>Failed to load gallery</h3></div>';
-        }
-    }
-
-    function renderGalleryByMonth(images) {
-        const container = document.getElementById('galleryContent');
-        
-        // Group by month
-        const grouped = {};
-        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                           'July', 'August', 'September', 'October', 'November', 'December'];
-        
-        images.forEach(img => {
-            const date = new Date(img.image_date || img.created_at);
-            const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
-            if (!grouped[monthKey]) {
-                grouped[monthKey] = {
-                    month: monthNames[date.getMonth()],
-                    year: date.getFullYear(),
-                    images: []
-                };
-            }
-            grouped[monthKey].images.push(img);
-        });
-
-        // Sort by month (newest first)
-        const sortedMonths = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
-
-        if (sortedMonths.length === 0) {
-            container.innerHTML = `<div class="no-images"><i class="fas fa-image"></i><h3>No images found for ${currentYear}</h3></div>`;
-            return;
-        }
-
-        container.innerHTML = sortedMonths.map(key => {
-            const month = grouped[key];
-            return `
-                <div class="month-section">
-                    <div class="month-header">
-                        <i class="fas fa-calendar-alt"></i>
-                        ${month.month} ${month.year}
-                        <span class="count">${month.images.length} photos</span>
-                    </div>
-                    <div class="image-grid">
-                        ${month.images.map(img => `
-                            <div class="image-card">
-                                <a data-fancybox="gallery-${key}" href="${img.file_path || img.image_url}" 
-                                   data-caption="${img.title || ''} - ${img.description || ''}">
-                                    <img src="${img.file_path || img.image_url}" 
-                                         alt="${img.title || 'Gallery Image'}" 
-                                         onerror="this.src='https://via.placeholder.com/400x300/1a3a6b/ffffff?text=Image'">
-                                </a>
-                                <div class="image-info">
-                                    <h4>${img.title || 'Untitled'}</h4>
-                                    ${img.description ? `<p>${img.description}</p>` : ''}
-                                    <div class="date">
-                                        <i class="far fa-calendar"></i> 
-                                        ${new Date(img.image_date || img.created_at).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'})}
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    // ============================================================
-    // YEAR FILTER
-    // ============================================================
-    async function loadYearFilter() {
-        try {
-            const res = await fetch(`${API_BASE}/api/gallery/years`);
-            const data = await res.json();
-            const filter = document.getElementById('yearFilter');
-            
-            let years = data.years || [currentYear];
-            if (!years.includes(currentYear)) years.unshift(currentYear);
-            
-            filter.innerHTML = years.map(year => `
-                <button class="year-btn ${year === currentYear ? 'active' : ''}" 
-                        onclick="filterByYear(${year})">${year}</button>
-            `).join('');
-        } catch (error) {
-            console.error('Year filter error:', error);
-            document.getElementById('yearFilter').innerHTML = `
-                <button class="year-btn active" onclick="filterByYear(${currentYear})">${currentYear}</button>
-            `;
-        }
-    }
-
-    function filterByYear(year) {
-        document.querySelectorAll('.year-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-        loadGalleryImages(year);
-    }
-
-    // ============================================================
-    // INIT
-    // ============================================================
-    window.addEventListener('DOMContentLoaded', () => {
-        console.log('🚀 Gallery Loaded');
-        loadSlider();
-        loadGalleryImages(currentYear);
-        loadYearFilter();
-    });
-
-    // Touch swipe for slider
-    let touchStartX = 0;
-    document.getElementById('heroSlider').addEventListener('touchstart', (e) => {
-        touchStartX = e.touches[0].clientX;
-    });
-    document.getElementById('heroSlider').addEventListener('touchend', (e) => {
-        const diff = touchStartX - e.changedTouches[0].clientX;
-        if (Math.abs(diff) > 50) {
-            diff > 0 ? nextSlide() : prevSlide();
-        }
-    });
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  loadSlider();
+  loadGalleryImages(currentYear);
+  loadYearFilter();
+});
 </script>
 
 </body>
