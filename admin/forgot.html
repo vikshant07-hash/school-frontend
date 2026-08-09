@@ -539,16 +539,33 @@ body {
   font-weight: 400;
 }
 
-/* OTP Input */
+/* ============================================================
+   OTP INPUT - Alphanumeric with Uppercase
+============================================================ */
 #resetOTP {
   font-size: 18px !important;
-  letter-spacing: 4px;
+  letter-spacing: 6px;
   text-align: center;
   font-weight: 700 !important;
+  text-transform: uppercase;
 }
 
 #resetOTP:focus {
-  letter-spacing: 6px;
+  letter-spacing: 8px;
+}
+
+.otp-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: #95a5a6;
+}
+
+.otp-hint i {
+  color: #e67e22;
+  font-size: 12px;
 }
 
 /* ============================================================
@@ -732,6 +749,7 @@ body {
   .step-label { font-size: 8px; }
   .form-group .input-wrap input { padding: 12px 14px 12px 42px; font-size: 14px; }
   .btn-primary { padding: 14px; font-size: 14px; }
+  #resetOTP { font-size: 16px !important; letter-spacing: 4px; }
 }
 
 @media (max-width: 400px) {
@@ -743,6 +761,7 @@ body {
   .form-group .input-wrap input { padding: 10px 12px 10px 36px; font-size: 13px; }
   .form-group .input-wrap i { left: 12px; font-size: 14px; }
   .security-badge { font-size: 8px; padding: 3px 10px; }
+  #resetOTP { font-size: 14px !important; letter-spacing: 3px; }
 }
 </style>
 </head>
@@ -801,7 +820,7 @@ body {
   <div class="logo">
     <img src="logo(1).png" alt="GSS School Shilla Logo" class="logo-img" 
          onerror="this.src='https://ui-avatars.com/api/?name=GSS&size=85&background=3498db&color=fff&bold=true'">
-    <h2>Govt. Sr. Sec. <span class="highlight">School Shilla</span></h2>
+    <h2>GSS <span class="highlight">School Shilla</span></h2>
     <div class="subtitle">Forgot Password</div>
     <p>Enter your email to reset your password</p>
   </div>
@@ -841,7 +860,10 @@ body {
       <label><i class="fas fa-key"></i> Enter OTP</label>
       <div class="input-wrap">
         <i class="fas fa-key"></i>
-        <input type="text" id="resetOTP" placeholder="6-digit OTP" maxlength="6" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+        <input type="text" id="resetOTP" placeholder="Enter OTP" maxlength="6" autocomplete="off">
+      </div>
+      <div class="otp-hint">
+        <i class="fas fa-info-circle"></i> Enter 6-character OTP (Letters & Numbers)
       </div>
     </div>
     <div class="form-group">
@@ -966,7 +988,7 @@ async function sendResetOTP() {
 // ============================================================
 async function resetPassword() {
   const email = document.getElementById('resetEmail').value.trim();
-  const otp = document.getElementById('resetOTP').value.trim();
+  const otp = document.getElementById('resetOTP').value.trim().toUpperCase();
   const newPassword = document.getElementById('newPassword').value.trim();
   const confirmPassword = document.getElementById('confirmPassword').value.trim();
   const btn = document.querySelector('#otpSection .btn-primary');
@@ -976,7 +998,7 @@ async function resetPassword() {
   message.textContent = '';
 
   if (otp.length !== 6) {
-    showMessage('Please enter valid 6-digit OTP', 'error');
+    showMessage('Please enter valid 6-character OTP', 'error');
     document.getElementById('resetOTP').focus();
     return;
   }
@@ -1000,7 +1022,7 @@ async function resetPassword() {
     const response = await fetch(`${API_BASE}/reset-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, otp: otp.toUpperCase(), newPassword, confirmPassword })
+      body: JSON.stringify({ email, otp, newPassword, confirmPassword })
     });
 
     const data = await response.json();
@@ -1036,11 +1058,12 @@ function showMessage(text, type) {
 }
 
 // ============================================================
-// OTP INPUT HANDLING
+// OTP INPUT HANDLING - Alphanumeric (A-Z, 0-9)
 // ============================================================
 const otpInput = document.getElementById('resetOTP');
 otpInput.addEventListener('input', function(e) {
-  this.value = this.value.replace(/[^0-9]/g, '');
+  // Allow only alphanumeric (A-Z, a-z, 0-9) and convert to uppercase
+  this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
 });
 
 // ============================================================
