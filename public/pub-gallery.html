@@ -1029,15 +1029,15 @@ body { padding-top: 70px; }
     </div>
 
     <li><a href="../index.html"> Home</a></li>
-    <li><a href="pub-gallery.html" class="active"> Gallery</a></li>
-   
+    <li><a href="pub-gallery.html"> Gallery</a></li>
+    
     
 
     
-
+    
   </ul>
 
-  
+
 </header>
 
 <!-- ============================================================
@@ -1074,8 +1074,8 @@ body { padding-top: 70px; }
 
   <!-- Year Filter -->
   <div class="year-filter" id="yearFilter">
-    <button class="year-btn active" onclick="filterByYear(2026)">2026</button>
-    <button class="year-btn" onclick="filterByYear(2025)">2025</button>
+    <button class="year-btn active" onclick="filterByYear(2026, this)">2026</button>
+    <button class="year-btn" onclick="filterByYear(2025, this)">2025</button>
   </div>
 
   <!-- Gallery Content -->
@@ -1100,6 +1100,8 @@ body { padding-top: 70px; }
       </div>
       <p>Empowering students with quality education, discipline and a vision for a brighter India.</p>
     </div>
+
+    
 
     
 
@@ -1405,7 +1407,7 @@ function renderGalleryByMonth(images) {
 }
 
 // ============================================================
-// YEAR FILTER
+// YEAR FILTER - FIXED
 // ============================================================
 async function loadYearFilter() {
   try {
@@ -1419,16 +1421,22 @@ async function loadYearFilter() {
     
     filter.innerHTML = years.map(year => `
       <button class="year-btn ${year === currentYear ? 'active' : ''}" 
-              onclick="filterByYear(${year})">${year}</button>
+              onclick="filterByYear(${year}, this)">${year}</button>
     `).join('');
   } catch (error) {
     console.error('Year filter error:', error);
   }
 }
 
-function filterByYear(year) {
+// FIXED: Accepts the button element as parameter
+function filterByYear(year, btnElement) {
+  // Remove active class from all year buttons
   document.querySelectorAll('.year-btn').forEach(btn => btn.classList.remove('active'));
-  event.target.classList.add('active');
+  // Add active class to clicked button
+  if (btnElement) {
+    btnElement.classList.add('active');
+  }
+  // Load gallery for selected year
   loadGalleryImages(year);
 }
 
