@@ -633,6 +633,52 @@ body {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+/* OTP Expiry Timer Badge */
+.timer-badge {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: #fef9e7;
+  border: 1px solid #f9e79f;
+  color: #e67e22;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  animation: timerPulse 2s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.01); }
+}
+
+.timer-badge i { font-size: 16px; color: #e67e22; }
+
+/* Resend Timer Badge */
+.resend-timer-badge {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: #e8f0fe;
+  border: 1px solid #b3cff5;
+  color: #2563eb;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 10px;
+  animation: fadeIn 0.4s ease;
+}
+
+.resend-timer-badge i { font-size: 14px; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 #otpSection .form-group {
   animation: slideUp 0.6s ease 0.15s both;
 }
@@ -856,6 +902,11 @@ body {
 
   <!-- ===== STEP 2: OTP + NEW PASSWORD ===== -->
   <div id="otpSection">
+    <!-- OTP Expiry Timer -->
+    <div class="timer-badge" id="timerBadge">
+      <i class="fas fa-clock"></i> OTP expires in: <span id="timerDisplay">05:00</span>
+    </div>
+    
     <div class="form-group">
       <label><i class="fas fa-key"></i> Enter OTP</label>
       <div class="input-wrap">
@@ -883,6 +934,12 @@ body {
     <button class="btn-primary" onclick="resetPassword()">
       <i class="fas fa-save"></i> Reset Password
     </button>
+    
+    <!-- Resend Timer Badge -->
+    <div class="resend-timer-badge" id="resendTimerBadge">
+      <i class="fas fa-clock"></i>
+      Wait <span id="resendTimerDisplay">02:00</span> before resending
+    </div>
   </div>
 
   <!-- Message -->
@@ -899,6 +956,14 @@ body {
 // BACKEND URL
 // ============================================================
 const API_BASE = 'https://gsssshilla.onrender.com/api/admin';
+
+// ============================================================
+// VARIABLES
+// ============================================================
+let otpTimer = null;
+let otpTimeLeft = 300;
+let resendTimer = null;
+let resendTimeLeft = 120; // 2 minutes
 
 // ============================================================
 // UPDATE STEPS
@@ -927,6 +992,63 @@ function updateSteps(step) {
     label2.className = 'step-label active';
     line.className = 'step-line done';
   }
+}
+
+// ============================================================
+// START OTP TIMER (5 Minutes)
+// ============================================================
+function startOtpTimer() {
+  clearInterval(otpTimer);
+  otpTimeLeft = 300;
+  const badge = document.getElementById('timerBadge');
+  badge.style.display = 'flex';
+
+  otpTimer = setInterval(() => {
+    otpTimeLeft--;
+    const m = String(Math.floor(otpTimeLeft / 60)).padStart(2, '0');
+    const s = String(otpTimeLeft % 60).padStart(2, '0');
+    document.getElementById('timerDisplay').innerText = `${m}:${s}`;
+    
+    if (otpTimeLeft <= 0) {
+      clearInterval(otpTimer);
+      badge.style.display = 'none';
+      showMessage('⏰ OTP expired. Please send again.', 'error');
+    }
+  }, 1000);
+}
+
+// ============================================================
+// START RESEND TIMER (2 Minutes)
+// ============================================================
+function startResendTimer() {
+  const btn = document.querySelector('#otpSection .btn-primary');
+  const timerBadge = document.getElementById('resendTimerBadge');
+  const timerDisplay = document.getElementById('resendTimerDisplay');
+  
+  resendTimeLeft = 120;
+  // Disable the Reset Password button during cooldown
+  btn.disabled = true;
+  btn.style.opacity = '0.5';
+  btn.style.cursor = 'not-allowed';
+  timerBadge.style.display = 'flex';
+  
+  clearInterval(resendTimer);
+  
+  resendTimer = setInterval(() => {
+    resendTimeLeft--;
+    const m = String(Math.floor(resendTimeLeft / 60)).padStart(2, '0');
+    const s = String(resendTimeLeft % 60).padStart(2, '0');
+    timerDisplay.innerText = `${m}:${s}`;
+    
+    if (resendTimeLeft <= 0) {
+      clearInterval(resendTimer);
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+      timerBadge.style.display = 'none';
+      timerDisplay.innerText = '02:00';
+    }
+  }, 1000);
 }
 
 // ============================================================
@@ -968,6 +1090,10 @@ async function sendResetOTP() {
       document.getElementById('otpSection').style.display = 'block';
       updateSteps(2);
       
+      // Start both timers
+      startOtpTimer();
+      startResendTimer();
+      
       setTimeout(() => {
         document.getElementById('resetOTP').focus();
       }, 300);
@@ -996,6 +1122,12 @@ async function resetPassword() {
 
   message.className = 'message';
   message.textContent = '';
+
+  // Check if button is disabled (cooldown period)
+  if (btn.disabled) {
+    showMessage('⏳ Please wait for the cooldown period to end', 'info');
+    return;
+  }
 
   if (otp.length !== 6) {
     showMessage('Please enter valid 6-character OTP', 'error');
@@ -1033,16 +1165,21 @@ async function resetPassword() {
       document.getElementById('stepCircle2').className = 'circle done';
       document.getElementById('stepCircle2').innerHTML = '<i class="fas fa-check"></i>';
       
+      // Clear timers
+      clearInterval(otpTimer);
+      clearInterval(resendTimer);
+      
       setTimeout(() => {
         window.location.href = 'login.html';
       }, 2000);
     } else {
       showMessage('❌ ' + data.message, 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-save"></i> Reset Password';
     }
 
   } catch (error) {
     showMessage('❌ Server error. Please try again.', 'error');
-  } finally {
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-save"></i> Reset Password';
   }
@@ -1062,7 +1199,6 @@ function showMessage(text, type) {
 // ============================================================
 const otpInput = document.getElementById('resetOTP');
 otpInput.addEventListener('input', function(e) {
-  // Allow only alphanumeric (A-Z, a-z, 0-9) and convert to uppercase
   this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
 });
 
