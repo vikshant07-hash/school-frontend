@@ -940,6 +940,9 @@ table .empty-msg {
 // ============================================================
 const API_BASE = "https://gsssshilla.onrender.com";
 
+// Global array to store messages
+let currentMessages = [];
+
 // ============================================================
 // TOAST
 // ============================================================
@@ -979,10 +982,10 @@ async function loadMessages() {
         const data = await response.json();
 
         if (data.success) {
-            const messages = data.data || [];
-            renderTable(messages);
-            updateStats(messages);
-            document.getElementById('msgCount').textContent = messages.length;
+            currentMessages = data.data || [];
+            renderTable(currentMessages);
+            updateStats(currentMessages);
+            document.getElementById('msgCount').textContent = currentMessages.length;
         } else {
             tbody.innerHTML = `<tr><td colspan="6" class="empty-msg"><i class="fas fa-exclamation-circle"></i> ${data.message || 'Failed to load'}</td></tr>`;
         }
@@ -1068,22 +1071,28 @@ async function loadContactInfoStatus() {
 }
 
 // ============================================================
-// VIEW MESSAGE
+// VIEW MESSAGE - FIXED
 // ============================================================
 function viewMessage(id) {
+    // Find the message from the global currentMessages array
     const item = currentMessages.find(m => m.id === id);
-    if (!item) return;
+    if (!item) {
+        showToast('Message not found!', 'error');
+        return;
+    }
 
     window.currentViewId = id;
-    document.getElementById('viewName').textContent = item.name;
-    document.getElementById('viewEmail').textContent = item.email;
+    document.getElementById('viewName').textContent = item.name || 'N/A';
+    document.getElementById('viewEmail').textContent = item.email || 'N/A';
     document.getElementById('viewDate').textContent = item.created_at_ist || item.created_at || 'N/A';
-    document.getElementById('viewMessage').textContent = item.message;
+    document.getElementById('viewMessage').textContent = item.message || 'No message content';
     document.getElementById('viewModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
 }
 
 function closeViewModal() {
     document.getElementById('viewModal').classList.remove('active');
+    document.body.style.overflow = '';
     window.currentViewId = null;
 }
 
@@ -1131,6 +1140,7 @@ async function openEditInfoModal() {
         document.getElementById('editEmail').value = data.email || '';
 
         document.getElementById('editInfoModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
     } catch (error) {
         showToast('Failed to load contact info', 'error');
     }
@@ -1138,6 +1148,7 @@ async function openEditInfoModal() {
 
 function closeEditInfoModal() {
     document.getElementById('editInfoModal').classList.remove('active');
+    document.body.style.overflow = '';
 }
 
 async function updateContactInfo() {
@@ -1193,8 +1204,6 @@ function escapeHtml(text) {
 // ============================================================
 // INIT
 // ============================================================
-let currentMessages = [];
-
 document.addEventListener('DOMContentLoaded', function() {
     // Admin name from localStorage
     const adminData = localStorage.getItem('adminData');
