@@ -449,6 +449,64 @@
       box-shadow: var(--shadow-lg);
       border-color: var(--accent);
     }
+
+    /* Video Card Styles */
+    .image-card .video-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 75%;
+      background: #0a1628;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .image-card .video-wrapper video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #0a1628;
+    }
+    .image-card .video-wrapper .play-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 64px;
+      height: 64px;
+      background: rgba(232, 184, 75, 0.92);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 28px;
+      pointer-events: none;
+      box-shadow: 0 4px 20px rgba(232, 184, 75, 0.4);
+      border: 2px solid rgba(255,255,255,0.3);
+      transition: all 0.3s ease;
+      z-index: 5;
+    }
+    .image-card .video-wrapper:hover .play-overlay {
+      transform: translate(-50%, -50%) scale(1.1);
+      background: #d4a843;
+      box-shadow: 0 6px 30px rgba(232, 184, 75, 0.6);
+    }
+    .image-card .video-wrapper .video-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.75);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      backdrop-filter: blur(4px);
+      z-index: 5;
+    }
+
     .image-card a {
       display: block;
       overflow: hidden;
@@ -663,6 +721,7 @@
         gap: 28px;
       }
       .image-card img { height: 280px; }
+      .image-card .video-wrapper { padding-top: 75%; }
     }
     @media (max-width: 992px) {
       .image-grid {
@@ -685,6 +744,7 @@
         gap: 22px;
       }
       .image-card img { height: 240px; }
+      .image-card .video-wrapper { padding-top: 75%; }
       .image-info { padding: 18px 20px 22px; }
       .image-info h4 { font-size: 17px; }
       .image-info p { font-size: 14px; }
@@ -695,6 +755,7 @@
         gap: 18px;
       }
       .image-card img { height: 210px; }
+      .image-card .video-wrapper { padding-top: 75%; }
       .image-info { padding: 14px 16px 18px; }
       .image-info h4 { font-size: 16px; }
       .image-info p { font-size: 13px; -webkit-line-clamp: 1; }
@@ -720,6 +781,14 @@
       }
       .image-card img { 
         height: 180px; 
+      }
+      .image-card .video-wrapper { 
+        padding-top: 100%; 
+      }
+      .image-card .video-wrapper .play-overlay {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
       }
       .image-info { 
         padding: 12px 14px 16px; 
@@ -749,8 +818,14 @@
         gap: 12px;
       }
       .image-card img { height: 140px; }
+      .image-card .video-wrapper { padding-top: 100%; }
       .image-info h4 { font-size: 12px; }
       .image-info .date { font-size: 10px; }
+      .image-card .video-wrapper .play-overlay {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+      }
     }
   </style>
 </head>
@@ -855,7 +930,7 @@
   <div class="footer-bottom">
     <p>© 2026 Govt. Sr. Sec. School Shilla · All Rights Reserved</p>
     <a href="../school_privacy_policy.pdf"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
-    <a href="#"><i class="fas fa-clock"></i> Last Update: 08 Aug, 2026</a>
+    <a href="#"><i class="fas fa-clock"></i> Last Update: 12 Aug, 2026</a>
   </div>
   <div class="dev">Session: 2026-2027</div>
 </footer>
@@ -914,6 +989,29 @@
     let sliderImages = [];
     let slideInterval;
     let currentYear = new Date().getFullYear();
+
+    // ============================================================
+    // VIDEO DETECTION FUNCTIONS
+    // ============================================================
+    function isVideoItem(item) {
+      if (item.media_type === 'video') return true;
+      if (item.mime_type && item.mime_type.startsWith('video/')) return true;
+      if (item.file_path) {
+        const videoExtensions = ['.mp4', '.mov', '.avi', '.webm', '.mkv', '.mpeg', '.3gp', '.m4v'];
+        const lower = item.file_path.toLowerCase();
+        if (videoExtensions.some(ext => lower.includes(ext))) return true;
+      }
+      if (item.video_thumbnail) return true;
+      return false;
+    }
+
+    function getVideoThumbnail(item) {
+      if (item.video_thumbnail) return item.video_thumbnail;
+      if (item.file_path) {
+        return item.file_path.replace(/\.[^.]+$/, '.jpg');
+      }
+      return null;
+    }
 
     // ===== HERO SLIDER =====
     async function loadSlider() {
@@ -1004,7 +1102,9 @@
       });
     }
 
-    // ===== GALLERY IMAGES =====
+    // ============================================================
+    // GALLERY IMAGES WITH VIDEO SUPPORT
+    // ============================================================
     async function loadGalleryImages(year) {
       currentYear = year;
       const container = document.getElementById('galleryContent');
@@ -1074,31 +1174,107 @@
             <div class="month-header">
               <i class="fas fa-calendar-alt" style="color:var(--accent-dark);"></i>
               ${month.month} ${month.year}
-              <span class="count">${month.images.length} photos</span>
+              <span class="count">${month.images.length} items</span>
             </div>
             <div class="image-grid">
-              ${month.images.map(img => `
-                <div class="image-card">
-                  <a data-fancybox="gallery-${key}" href="${img.file_path || img.image_url}" 
-                     data-caption="${img.title || ''} - ${img.description || ''}">
-                    <img src="${img.file_path || img.image_url}" 
-                         alt="${img.title || 'Gallery Image'}" 
-                         onerror="this.src='https://via.placeholder.com/400x300/0d1b2a/e8b84b?text=Image'">
-                  </a>
-                  <div class="image-info">
-                    <h4>${img.title || 'Untitled'}</h4>
-                    ${img.description ? `<p>${img.description}</p>` : ''}
-                    <div class="date">
-                      <i class="far fa-calendar-alt"></i> 
-                      ${new Date(img.image_date || img.created_at).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'})}
+              ${month.images.map((img, idx) => {
+                const isVideo = isVideoItem(img);
+                const mediaUrl = img.file_path || img.image_url || '';
+                const thumbUrl = isVideo ? (getVideoThumbnail(img) || mediaUrl) : mediaUrl;
+                const uniqueId = `media-${key}-${idx}`;
+                const date = new Date(img.image_date || img.created_at);
+                const dateStr = date.toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'});
+                
+                if (isVideo) {
+                  return `
+                    <div class="image-card video-card">
+                      <div class="video-wrapper">
+                        <video muted preload="metadata" poster="${thumbUrl}" id="video-${uniqueId}">
+                          <source src="${mediaUrl}" type="${img.mime_type || 'video/mp4'}">
+                          Your browser does not support the video tag.
+                        </video>
+                        <div class="play-overlay" id="playOverlay-${uniqueId}">
+                          <i class="fas fa-play" style="margin-left:4px;"></i>
+                        </div>
+                        <span class="video-badge"><i class="fas fa-video"></i> Video</span>
+                      </div>
+                      <div class="image-info">
+                        <h4>${img.title || 'Untitled'}</h4>
+                        ${img.description ? `<p>${img.description}</p>` : ''}
+                        <div class="date">
+                          <i class="far fa-calendar-alt"></i> ${dateStr}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              `).join('')}
+                  `;
+                } else {
+                  return `
+                    <div class="image-card">
+                      <a data-fancybox="gallery-${key}" href="${mediaUrl}" 
+                         data-caption="${img.title || ''} - ${img.description || ''}">
+                        <img src="${thumbUrl}" 
+                             alt="${img.title || 'Gallery Image'}" 
+                             onerror="this.src='https://via.placeholder.com/400x300/0d1b2a/e8b84b?text=Image'">
+                      </a>
+                      <div class="image-info">
+                        <h4>${img.title || 'Untitled'}</h4>
+                        ${img.description ? `<p>${img.description}</p>` : ''}
+                        <div class="date">
+                          <i class="far fa-calendar-alt"></i> ${dateStr}
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }
+              }).join('')}
             </div>
           </div>
         `;
       }).join('');
+
+      // ===== VIDEO HOVER CONTROLS =====
+      document.querySelectorAll('.video-card video').forEach(video => {
+        const card = video.closest('.video-card');
+        const overlay = card?.querySelector('.play-overlay');
+        
+        video.addEventListener('mouseenter', () => {
+          video.play().catch(() => {});
+          if (overlay) {
+            overlay.innerHTML = '<i class="fas fa-pause"></i>';
+            overlay.style.opacity = '0.7';
+          }
+        });
+        
+        video.addEventListener('mouseleave', () => {
+          video.pause();
+          video.currentTime = 0;
+          if (overlay) {
+            overlay.innerHTML = '<i class="fas fa-play" style="margin-left:4px;"></i>';
+            overlay.style.opacity = '1';
+          }
+        });
+        
+        video.addEventListener('play', () => {
+          if (overlay) {
+            overlay.innerHTML = '<i class="fas fa-pause"></i>';
+          }
+        });
+        
+        video.addEventListener('pause', () => {
+          if (overlay) {
+            overlay.innerHTML = '<i class="fas fa-play" style="margin-left:4px;"></i>';
+          }
+        });
+      });
+
+      // Initialize Fancybox for images only
+      Fancybox.bind('[data-fancybox]', {
+        // Video support
+        Video: {
+          autoPlay: true,
+          controls: true
+        }
+      });
     }
 
     // ===== YEAR FILTER =====
