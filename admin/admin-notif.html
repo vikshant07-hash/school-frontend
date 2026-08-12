@@ -418,7 +418,7 @@
       .toast { left: 16px; right: 16px; bottom: 16px; max-width: none; }
     }
 
-    /* ----- PRINT STYLES (landscape, report layout) - FIXED DOUBLE PAGE ----- */
+    /* ----- PRINT STYLES (landscape, report layout) - DOUBLE PAGE FIXED ----- */
     @media print {
       /* Reset body to avoid double page */
       html, body {
@@ -428,11 +428,16 @@
         height: 100% !important;
         background: #fff !important;
       }
-      
-      body * { visibility: hidden; }
-      #printReportArea, #printReportArea * { visibility: visible; }
-      
+
+      /* FIX: use display:none (removes from layout flow) instead of
+         visibility:hidden (which keeps the hidden element's height and
+         causes a second blank/duplicate page to be printed). */
+      body > *:not(#printReportArea) {
+        display: none !important;
+      }
+
       #printReportArea {
+        display: block !important;
         position: fixed;
         left: 0;
         top: 0;
@@ -442,55 +447,63 @@
         padding: 15px 25px 10px 25px;
         font-family: 'Inter', sans-serif;
         color: #1a2332;
-        overflow: auto;
-        display: block !important;
-        visibility: visible !important;
+        overflow: hidden;
         box-sizing: border-box;
       }
-      
+
+      /* Force single page with proper sizing */
+      #printReportArea .report-content {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
       /* header: logo + school name centered, logo bigger */
       #printReportArea .report-header {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        margin-bottom: 6px;
-        padding-bottom: 4px;
+        margin-bottom: 4px;
+        padding-bottom: 2px;
+        flex-shrink: 0;
       }
       #printReportArea .report-header img {
-        height: 75px;
+        height: 65px;
         width: auto;
         object-fit: contain;
         background: #fff;
-        padding: 4px;
-        margin-bottom: 2px;
+        padding: 2px;
+        margin-bottom: 0px;
       }
       #printReportArea .report-header .school-name {
-        font-size: 30px;
+        font-size: 28px;
         font-weight: 800;
         color: #1a2332;
         letter-spacing: -0.5px;
         text-align: center;
-        line-height: 1.2;
+        line-height: 1.1;
       }
       #printReportArea .report-header .school-name span {
         color: #c9972b;
       }
-      
+
       /* heading inside a box */
       #printReportArea .report-heading-box {
         border: 2px solid #c9972b;
-        border-radius: 8px;
-        padding: 6px 20px;
-        margin: 6px auto 10px auto;
+        border-radius: 6px;
+        padding: 4px 16px;
+        margin: 4px auto 8px auto;
         display: inline-block;
         background: #fefcf5;
         text-align: center;
         width: auto;
-        min-width: 35%;
+        min-width: 30%;
+        flex-shrink: 0;
       }
       #printReportArea .report-heading-box .report-heading {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 700;
         color: #1a2332;
         letter-spacing: 0.5px;
@@ -498,92 +511,107 @@
       }
       #printReportArea .report-heading-box .report-heading i {
         color: #c9972b;
-        margin-right: 8px;
+        margin-right: 6px;
       }
-      
+
       #printReportArea .report-sub {
         display: flex;
         justify-content: space-between;
-        font-size: 12px;
+        font-size: 11px;
         color: #5a6a7e;
-        margin-bottom: 8px;
-        margin-top: 4px;
+        margin-bottom: 6px;
+        margin-top: 2px;
+        flex-shrink: 0;
       }
-      
+
+      /* Table - flexible to fill remaining space */
+      #printReportArea .table-wrap {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
       #printReportArea table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 11px;
-        margin-top: 6px;
+        font-size: 10.5px;
+        flex: 1;
       }
       #printReportArea table th {
         background: #f1f4f9;
         text-align: left;
-        padding: 6px 8px;
+        padding: 5px 6px;
         border: 1px solid #bcc3cf;
         font-weight: 700;
         color: #1a2332;
         text-transform: uppercase;
-        font-size: 10px;
+        font-size: 9.5px;
         letter-spacing: 0.3px;
       }
       #printReportArea table td {
-        padding: 5px 8px;
+        padding: 4px 6px;
         border: 1px solid #bcc3cf;
         vertical-align: middle;
-        font-size: 10.5px;
+        font-size: 10px;
       }
-      
+
       /* footer */
       #printReportArea .report-footer {
-        margin-top: 14px;
+        margin-top: 10px;
         border-top: 2px solid #c9972b;
-        padding-top: 8px;
+        padding-top: 6px;
         display: flex;
         justify-content: space-between;
-        font-size: 11.5px;
+        font-size: 11px;
         color: #1a2332;
         font-weight: 500;
+        flex-shrink: 0;
       }
       #printReportArea .report-footer .left span { font-weight: 400; color: #3a4a5e; }
       #printReportArea .report-footer .right span { font-weight: 400; color: #3a4a5e; }
-      
+
       /* page number */
       #printReportArea .page-number {
         text-align: right;
-        font-size: 10.5px;
+        font-size: 10px;
         color: #5a6a7e;
-        margin-top: 3px;
+        margin-top: 2px;
         font-weight: 500;
+        flex-shrink: 0;
       }
       #printReportArea .page-number:after {
         content: "Page " counter(page);
       }
       #printReportArea { counter-reset: page; }
       #printReportArea .page-number { counter-increment: page; }
-      
+
       /* end of report chain line */
       #printReportArea .end-line {
-        margin-top: 12px;
+        margin-top: 8px;
         text-align: center;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 600;
         color: #5a6a7e;
         letter-spacing: 2px;
         border-top: 1px dashed #bcc3cf;
-        padding-top: 10px;
+        padding-top: 6px;
+        flex-shrink: 0;
       }
-      #printReportArea .end-line i { color: #c9972b; margin: 0 8px; }
-      
+      #printReportArea .end-line i { color: #c9972b; margin: 0 6px; }
+
       .center-box { text-align: center; }
       .no-print { display: none !important; }
-      
-      /* Prevent page breaks inside rows */
+
+      /* Ensure table rows don't break across pages */
       #printReportArea table tr {
         page-break-inside: avoid;
       }
       #printReportArea table thead {
         display: table-header-group;
+      }
+      #printReportArea table tbody {
+        display: table-row-group;
       }
     }
   </style>
@@ -717,54 +745,58 @@
 
 <!-- ===== PRINT REPORT AREA (hidden, used for printing) ===== -->
 <div id="printReportArea" style="display:none;">
-  <!-- header: logo + school name centered, logo bigger -->
-  <div class="report-header">
-    <img src="logo(1).png" alt="Logo">
-    <div class="school-name">GSSS<span> SHILLA</span></div>
-  </div>
-  
-  <!-- heading inside a box -->
-  <div class="center-box">
-    <div class="report-heading-box">
-      <div class="report-heading"><i class="fas fa-bell"></i> Report of Notifications</div>
+  <div class="report-content">
+    <!-- header: logo + school name centered, logo bigger -->
+    <div class="report-header">
+      <img src="logo(1).png" alt="Logo">
+      <div class="school-name">GSSS<span> SHILLA</span></div>
     </div>
+
+    <!-- heading inside a box -->
+    <div class="center-box">
+      <div class="report-heading-box">
+        <div class="report-heading"><i class="fas fa-bell"></i> Report of Notifications</div>
+      </div>
+    </div>
+
+    <!-- sub: generated on left, downloaded by on right -->
+    <div class="report-sub">
+      <span><strong>Generated on:</strong> <span id="printDate"></span></span>
+      <span><strong>Downloaded by:</strong> <span id="printAdminName">Admin</span></span>
+    </div>
+
+    <!-- table wrapper -->
+    <div class="table-wrap">
+      <table id="printTable">
+        <thead>
+          <tr>
+            <th style="width:6%;">Sr. No.</th>
+            <th style="width:16%;">Date &amp; Time</th>
+            <th style="width:22%;">Title</th>
+            <th style="width:22%;">Description</th>
+            <th style="width:10%;">Target</th>
+            <th style="width:12%;">File Type</th>
+            <th style="width:12%;">Remarks</th>
+          </tr>
+        </thead>
+        <tbody id="printTableBody">
+          <!-- filled by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- footer -->
+    <div class="report-footer">
+      <div class="left"><span>Downloaded on:</span> <span id="printTimestamp"></span></div>
+      <div class="right"><span>Downloaded by:</span> <span id="printAdminNameFooter">Admin</span></div>
+    </div>
+
+    <!-- page number -->
+    <div class="page-number"></div>
+
+    <!-- end of report chain line -->
+    <div class="end-line"><i class="fas fa-link"></i> End of Report <i class="fas fa-link"></i></div>
   </div>
-  
-  <!-- sub: generated on left, downloaded by on right -->
-  <div class="report-sub">
-    <span><strong>Generated on:</strong> <span id="printDate"></span></span>
-    <span><strong>Downloaded by:</strong> <span id="printAdminName">Admin</span></span>
-  </div>
-  
-  <!-- table -->
-  <table id="printTable">
-    <thead>
-      <tr>
-        <th style="width:6%;">Sr. No.</th>
-        <th style="width:16%;">Date &amp; Time</th>
-        <th style="width:22%;">Title</th>
-        <th style="width:22%;">Description</th>
-        <th style="width:10%;">Target</th>
-        <th style="width:12%;">File Type</th>
-        <th style="width:12%;">Remarks</th>
-      </tr>
-    </thead>
-    <tbody id="printTableBody">
-      <!-- filled by JS -->
-    </tbody>
-  </table>
-  
-  <!-- footer -->
-  <div class="report-footer">
-    <div class="left"><span>Downloaded on:</span> <span id="printTimestamp"></span></div>
-    <div class="right"><span>Downloaded by:</span> <span id="printAdminNameFooter">Admin</span></div>
-  </div>
-  
-  <!-- page number -->
-  <div class="page-number"></div>
-  
-  <!-- end of report chain line -->
-  <div class="end-line"><i class="fas fa-link"></i> End of Report <i class="fas fa-link"></i></div>
 </div>
 
 <script>
