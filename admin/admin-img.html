@@ -448,6 +448,22 @@
             font-size: 20px;
         }
 
+        .media-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .media-badge.video {
+            background: var(--purple-bg);
+            color: var(--purple);
+        }
+        .media-badge.image {
+            background: var(--blue-bg);
+            color: var(--blue);
+        }
+
         /* ============================================================
            TOAST
         ============================================================ */
@@ -597,17 +613,15 @@
 ============================================================ -->
 <nav class="navbar">
     <a href="#" class="brand">
-    <div class="logo-placeholder">
-      <img src="logo(1).png" alt="Logo" 
-           style="width:46px; height:46px; border-radius:10px; object-fit:contain; background:#fff; padding:4px;">
-    </div>
-    <div class="name">GSSS<span> SHILLA</span></div>
-  </a>
-
+        <div class="logo-placeholder">
+            <img src="logo(1).png" alt="Logo" 
+                 style="width:46px; height:46px; border-radius:10px; object-fit:contain; background:#fff; padding:4px;">
+        </div>
+        <div class="name">GSSS<span> SHILLA</span></div>
+    </a>
 
     <ul class="nav-links" id="navLinks">
         <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        
         <li><a href="add-image.html" class="active"><i class="fas fa-photo-video"></i> Gallery</a></li>
     </ul>
 
@@ -682,33 +696,34 @@
         </div>
     </div>
 
-    <!-- ===== SECTION 2: GALLERY IMAGES ===== -->
+    <!-- ===== SECTION 2: GALLERY IMAGES & VIDEOS ===== -->
     <div class="card">
-        <h2><i class="fas fa-images"></i> Add Gallery Images</h2>
-        <p class="sub-text">These images are organized by month/year on the public page</p>
+        <h2><i class="fas fa-images"></i> Add Gallery Media (Images & Videos)</h2>
+        <p class="sub-text">These media items are organized by month/year on the public page. Supports images and videos.</p>
 
         <form id="galleryForm" enctype="multipart/form-data">
             <div class="form-row">
                 <div class="form-group">
-                    <label>Image Title <span class="required">*</span></label>
+                    <label>Title <span class="required">*</span></label>
                     <input type="text" id="galleryTitle" class="form-control" placeholder="e.g., Science Exhibition" required>
                 </div>
                 <div class="form-group">
-                    <label>Image Date <span class="required">*</span></label>
+                    <label>Date <span class="required">*</span></label>
                     <input type="date" id="galleryDate" class="form-control" required>
                 </div>
             </div>
             <div class="form-group">
                 <label>Description</label>
-                <textarea id="galleryDesc" class="form-control" rows="2" placeholder="Describe this image..."></textarea>
+                <textarea id="galleryDesc" class="form-control" rows="2" placeholder="Describe this media..."></textarea>
             </div>
             <div class="form-group">
-                <label>Select Images <span class="required">*</span> (You can select multiple)</label>
-                <input type="file" id="galleryFiles" class="form-control" accept="image/*" multiple required>
+                <label>Select Media <span class="required">*</span> (Images: JPG, PNG, GIF, WebP | Videos: MP4, MOV, AVI, WebM)</label>
+                <input type="file" id="galleryFiles" class="form-control" accept="image/*,video/*" multiple required>
+                <small style="color:var(--text-muted);font-size:12px;">You can select multiple images and videos at once</small>
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn btn-success" id="gallerySubmitBtn">
-                    <i class="fas fa-upload"></i> Upload Images
+                    <i class="fas fa-upload"></i> Upload Media
                 </button>
             </div>
         </form>
@@ -716,15 +731,15 @@
         <!-- Recent Uploads -->
         <div style="margin-top:20px;">
             <h3 style="font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:12px;">
-                <i class="fas fa-clock" style="color:var(--gold);"></i> Recently Uploaded Images
+                <i class="fas fa-clock" style="color:var(--gold);"></i> Recently Uploaded Media
             </h3>
             <div class="table-wrapper">
                 <table>
                     <thead>
-                        <tr><th>#</th><th>Image</th><th>Title</th><th>Date</th><th>Description</th><th>Actions</th></tr>
+                        <tr><th>#</th><th>Media</th><th>Type</th><th>Title</th><th>Date</th><th>Description</th><th>Actions</th></tr>
                     </thead>
                     <tbody id="galleryTableBody">
-                        <tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted);">
+                        <tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-muted);">
                             <i class="fas fa-spinner fa-spin"></i> Loading...
                         </td></tr>
                     </tbody>
@@ -738,14 +753,11 @@
 <!-- ============================================================
    FOOTER
 ============================================================ -->
-
 <footer class="footer">
-  <div class="footer-content">
-    <span>&copy; 2026 <a href="#">Govt. Sr. Sec. School Shilla</a>. All rights reserved.</span>
-    
-  </div>
+    <div class="footer-content">
+        <span>&copy; 2026 <a href="#">Govt. Sr. Sec. School Shilla</a>. All rights reserved.</span>
+    </div>
 </footer>
-    
 
 <!-- ============================================================
    TOAST
@@ -786,31 +798,40 @@ document.querySelectorAll('.nav-links a').forEach(link => {
 });
 
 // ============================================================
-// GET IMAGE URL - FIXED
+// GET IMAGE URL
 // ============================================================
-function getImageUrl(item) {
+function getMediaUrl(item) {
     if (!item) return null;
-    
-    // Check file_path (Cloudinary URL)
     if (item.file_path && (item.file_path.startsWith('http://') || item.file_path.startsWith('https://'))) {
         return item.file_path;
     }
-    
-    // Check public_id
     if (item.public_id && (item.public_id.startsWith('http://') || item.public_id.startsWith('https://'))) {
         return item.public_id;
     }
-    
-    // If file_path is a relative path
     if (item.file_path && item.file_path.startsWith('/')) {
         return API_BASE + item.file_path;
     }
-    
     return null;
 }
 
 // ============================================================
-// LOAD SLIDER IMAGES - FIXED
+// GET VIDEO THUMBNAIL
+// ============================================================
+function getVideoThumbnail(item) {
+    if (!item) return null;
+    // If video_thumbnail exists, use it
+    if (item.video_thumbnail) {
+        return item.video_thumbnail;
+    }
+    // Otherwise generate from file_path
+    if (item.file_path && (item.file_path.startsWith('http://') || item.file_path.startsWith('https://'))) {
+        return item.file_path.replace(/\.[^.]+$/, '.jpg');
+    }
+    return null;
+}
+
+// ============================================================
+// LOAD SLIDER IMAGES
 // ============================================================
 async function loadSliderImages() {
     const tbody = document.getElementById('sliderTableBody');
@@ -820,7 +841,7 @@ async function loadSliderImages() {
 
         if (data.success && data.data && data.data.length > 0) {
             tbody.innerHTML = data.data.map((item, i) => {
-                const imgUrl = getImageUrl(item);
+                const imgUrl = getMediaUrl(item);
                 return `
                     <tr>
                         <td>${i + 1}</td>
@@ -915,7 +936,7 @@ async function deleteSlider(id) {
 }
 
 // ============================================================
-// LOAD GALLERY IMAGES - FIXED
+// LOAD GALLERY MEDIA (Images & Videos)
 // ============================================================
 async function loadGalleryImages() {
     const tbody = document.getElementById('galleryTableBody');
@@ -925,17 +946,32 @@ async function loadGalleryImages() {
 
         if (data.success && data.data && data.data.length > 0) {
             tbody.innerHTML = data.data.map((item, i) => {
-                const imgUrl = getImageUrl(item);
+                const isVideo = item.media_type === 'video';
+                const mediaUrl = getMediaUrl(item);
+                const thumbUrl = isVideo ? getVideoThumbnail(item) : mediaUrl;
                 const date = item.image_date ? new Date(item.image_date).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'}) : '-';
+                
+                // For videos, show video icon overlay
+                const mediaDisplay = isVideo ? `
+                    <div style="position:relative;display:inline-block;">
+                        ${thumbUrl ? 
+                            `<img src="${thumbUrl}" class="thumb" onerror="this.style.display='none'" style="border:2px solid var(--purple);">` :
+                            `<div class="thumb-placeholder" style="border:2px solid var(--purple);"><i class="fas fa-video"></i></div>`
+                        }
+                        <div style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,0.7);color:#fff;border-radius:4px;padding:1px 6px;font-size:10px;">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                ` : (mediaUrl ? 
+                    `<img src="${mediaUrl}" class="thumb" onerror="this.style.display='none'">` :
+                    `<div class="thumb-placeholder"><i class="fas fa-image"></i></div>`
+                );
+
                 return `
                     <tr>
                         <td>${i + 1}</td>
-                        <td>
-                            ${imgUrl ? 
-                                `<img src="${imgUrl}" class="thumb" onerror="this.style.display='none'">` :
-                                `<div class="thumb-placeholder"><i class="fas fa-image"></i></div>`
-                            }
-                        </td>
+                        <td>${mediaDisplay}</td>
+                        <td><span class="media-badge ${isVideo ? 'video' : 'image'}">${isVideo ? '🎬 Video' : '🖼️ Image'}</span></td>
                         <td>${item.title || 'Untitled'}</td>
                         <td>${date}</td>
                         <td>${item.description || '-'}</td>
@@ -948,16 +984,16 @@ async function loadGalleryImages() {
                 `;
             }).join('');
         } else {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted);">📭 No images uploaded yet</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-muted);">📭 No media uploaded yet</td></tr>';
         }
     } catch (error) {
         console.error('Gallery load error:', error);
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--red);">❌ Failed to load</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--red);">❌ Failed to load</td></tr>';
     }
 }
 
 // ============================================================
-// ADD GALLERY IMAGES
+// ADD GALLERY MEDIA (Images & Videos)
 // ============================================================
 document.getElementById('galleryForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -968,7 +1004,7 @@ document.getElementById('galleryForm').addEventListener('submit', async function
     const description = document.getElementById('galleryDesc').value.trim();
 
     if (!files.length) {
-        showToast('Please select images', 'error');
+        showToast('Please select media files', 'error');
         return;
     }
     if (!title) {
@@ -985,7 +1021,7 @@ document.getElementById('galleryForm').addEventListener('submit', async function
     formData.append('image_date', imageDate);
     formData.append('description', description);
     for (let file of files) {
-        formData.append('images', file);
+        formData.append('media', file);
     }
 
     const btn = document.getElementById('gallerySubmitBtn');
@@ -1000,7 +1036,7 @@ document.getElementById('galleryForm').addEventListener('submit', async function
         const data = await res.json();
 
         if (data.success) {
-            showToast(`✅ ${data.uploaded?.length || files.length} images uploaded!`, 'success');
+            showToast(`✅ ${data.uploaded?.length || files.length} media items uploaded!`, 'success');
             document.getElementById('galleryForm').reset();
             document.getElementById('galleryDate').value = new Date().toISOString().split('T')[0];
             loadGalleryImages();
@@ -1010,7 +1046,7 @@ document.getElementById('galleryForm').addEventListener('submit', async function
     } catch (error) {
         showToast('Upload failed: ' + error.message, 'error');
     } finally {
-        btn.innerHTML = '<i class="fas fa-upload"></i> Upload Images';
+        btn.innerHTML = '<i class="fas fa-upload"></i> Upload Media';
         btn.disabled = false;
     }
 });
@@ -1019,7 +1055,7 @@ document.getElementById('galleryForm').addEventListener('submit', async function
 // DELETE GALLERY IMAGE
 // ============================================================
 async function deleteGalleryImage(id) {
-    if (!confirm('Delete this image?')) return;
+    if (!confirm('Delete this media item?')) return;
     try {
         const res = await fetch(`${API_BASE}/api/gallery/images/delete/${id}`, {
             method: 'DELETE'
@@ -1063,7 +1099,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set default date to today
     document.getElementById('galleryDate').value = new Date().toISOString().split('T')[0];
 
-    console.log('🚀 Gallery Admin Panel Loaded');
+    console.log('🚀 Gallery Admin Panel Loaded (with Video Support)');
     loadSliderImages();
     loadGalleryImages();
 
