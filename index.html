@@ -2265,6 +2265,62 @@ body { padding-top: 70px; }
   .glow-ring { width: 180px; height: 180px; }
   .glow-ring:nth-child(2) { width: 230px; height: 230px; }
 }
+
+
+   /* ============================================================
+   TYPEWRITER ANIMATION
+============================================================ */
+.typewriter-wrapper {
+  display: inline-block;
+  position: relative;
+}
+
+.typewriter-text {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(34px, 6.5vw, 72px);
+  font-weight: 900;
+  color: var(--white);
+  line-height: 1.08;
+  display: inline;
+}
+
+.typewriter-text .highlight {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Cursor Blinking */
+.typewriter-cursor {
+  display: inline-block;
+  width: 4px;
+  height: clamp(34px, 6.5vw, 72px);
+  background: var(--accent);
+  margin-left: 4px;
+  vertical-align: text-bottom;
+  animation: cursorBlink 0.8s step-end infinite;
+  border-radius: 2px;
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Responsive Cursor Height */
+@media (max-width: 768px) {
+  .typewriter-cursor {
+    height: clamp(28px, 5vw, 40px);
+  }
+}
+
+@media (max-width: 480px) {
+  .typewriter-cursor {
+    height: clamp(22px, 4vw, 32px);
+  }
+}
 </style>
 </head>
 <body>
@@ -2387,9 +2443,9 @@ body { padding-top: 70px; }
     </div>
 
     <h1>
-      Welcome to <br>
-      <span class="highlight">Govt. Sr. Sec. School Shilla</span>
-    </h1>
+  Welcome to <br>
+  <span class="highlight">Govt. Sr. Sec. School Shilla</span>
+</h1>
 
     <p class="hero-sub">
       Nurturing excellence, discipline, and character since decades.
@@ -2541,6 +2597,8 @@ function renderPrincipal(p) {
 document.addEventListener('DOMContentLoaded', fetchPrincipal);
 window.fetchPrincipal = fetchPrincipal;
 </script>
+
+
 
 <!-- ============================================================
      RECENT UPDATES
@@ -2902,6 +2960,68 @@ function createFloatingParticles() {
     container.appendChild(particle);
   }
 }
+      // ============================================================
+// TYPEWRITER ANIMATION WITH CURSOR
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  const textElement = document.getElementById('typewriterText');
+  const cursorElement = document.getElementById('typewriterCursor');
+  
+  // The full text to type
+  const fullText = "Govt. Sr. Sec. School Shilla";
+  let currentIndex = 0;
+  let isDeleting = false;
+  let typeSpeed = 80; // Typing speed in ms
+  let deleteSpeed = 40; // Deleting speed in ms
+  let pauseBeforeDelete = 2000; // Pause before deleting
+  let pauseBeforeType = 500; // Pause before retyping
+  
+  let timeoutId = null;
+  
+  function typeWriter() {
+    // Get the current text (without the highlight span)
+    const currentText = fullText.substring(0, currentIndex);
+    
+    // Update the inner HTML with highlight span
+    textElement.innerHTML = `<span class="highlight">${currentText}</span>`;
+    
+    // Cursor stays visible
+    cursorElement.style.display = 'inline-block';
+    
+    if (!isDeleting) {
+      // TYPING MODE
+      if (currentIndex < fullText.length) {
+        currentIndex++;
+        timeoutId = setTimeout(typeWriter, typeSpeed);
+      } else {
+        // Typing complete - pause then delete
+        isDeleting = true;
+        timeoutId = setTimeout(typeWriter, pauseBeforeDelete);
+      }
+    } else {
+      // DELETING MODE
+      if (currentIndex > 0) {
+        currentIndex--;
+        timeoutId = setTimeout(typeWriter, deleteSpeed);
+      } else {
+        // Deletion complete - pause then retype
+        isDeleting = false;
+        timeoutId = setTimeout(typeWriter, pauseBeforeType);
+      }
+    }
+  }
+  
+  // Start the typewriter after a small delay
+  setTimeout(typeWriter, 800);
+  
+  // Cleanup timeout on page unload
+  window.addEventListener('beforeunload', function() {
+    if (timeoutId) {
+      r4(timeoutId);
+    }
+  });
+});
+
 
 // ============================================================
 // CONFETTI
