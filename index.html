@@ -2444,7 +2444,12 @@ body { padding-top: 70px; }
 
     <h1>
   Welcome to <br>
-  <span class="highlight">Govt. Sr. Sec. School Shilla</span>
+  <span class="typewriter-wrapper">
+    <span class="typewriter-text" id="typewriterText">
+      <span class="highlight">Govt. Sr. Sec. School Shilla</span>
+    </span>
+    <span class="typewriter-cursor" id="typewriterCursor"></span>
+  </span>
 </h1>
 
     <p class="hero-sub">
@@ -2963,66 +2968,61 @@ function createFloatingParticles() {
       // ============================================================
 // TYPEWRITER ANIMATION WITH CURSOR
 // ============================================================
+
+// ============================================================
+// TYPEWRITER ANIMATION WITH CURSOR
+// ============================================================
 document.addEventListener('DOMContentLoaded', function() {
   const textElement = document.getElementById('typewriterText');
   const cursorElement = document.getElementById('typewriterCursor');
+  
+  // Check if elements exist
+  if (!textElement || !cursorElement) {
+    console.warn('Typewriter elements not found');
+    return;
+  }
   
   // The full text to type
   const fullText = "Govt. Sr. Sec. School Shilla";
   let currentIndex = 0;
   let isDeleting = false;
-  let typeSpeed = 80; // Typing speed in ms
-  let deleteSpeed = 40; // Deleting speed in ms
-  let pauseBeforeDelete = 2000; // Pause before deleting
-  let pauseBeforeType = 500; // Pause before retyping
-  
+  let typeSpeed = 80;
+  let deleteSpeed = 40;
+  let pauseBeforeDelete = 2000;
+  let pauseBeforeType = 500;
   let timeoutId = null;
   
   function typeWriter() {
-    // Get the current text (without the highlight span)
     const currentText = fullText.substring(0, currentIndex);
-    
-    // Update the inner HTML with highlight span
     textElement.innerHTML = `<span class="highlight">${currentText}</span>`;
-    
-    // Cursor stays visible
     cursorElement.style.display = 'inline-block';
     
     if (!isDeleting) {
-      // TYPING MODE
       if (currentIndex < fullText.length) {
         currentIndex++;
         timeoutId = setTimeout(typeWriter, typeSpeed);
       } else {
-        // Typing complete - pause then delete
         isDeleting = true;
         timeoutId = setTimeout(typeWriter, pauseBeforeDelete);
       }
     } else {
-      // DELETING MODE
       if (currentIndex > 0) {
         currentIndex--;
         timeoutId = setTimeout(typeWriter, deleteSpeed);
       } else {
-        // Deletion complete - pause then retype
         isDeleting = false;
         timeoutId = setTimeout(typeWriter, pauseBeforeType);
       }
     }
   }
   
-  // Start the typewriter after a small delay
+  // Start after small delay
   setTimeout(typeWriter, 800);
   
-  // Cleanup timeout on page unload
   window.addEventListener('beforeunload', function() {
-    if (timeoutId) {
-      r4(timeoutId);
-    }
+    if (timeoutId) clearTimeout(timeoutId);
   });
 });
-
-
 // ============================================================
 // CONFETTI
 // ============================================================
