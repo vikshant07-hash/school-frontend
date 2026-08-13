@@ -49,6 +49,165 @@
       flex-direction: column;
     }
 
+    /* ============================================================
+       SESSION EXPIRED / INVALID ACCESS POPUP - FULLSCREEN OVERLAY
+    ============================================================ */
+    .session-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.4s ease;
+    }
+    .session-overlay.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+
+    .session-popup {
+      background: var(--bg-white);
+      border-radius: 24px;
+      padding: 48px 40px 40px;
+      max-width: 440px;
+      width: 92%;
+      text-align: center;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+      position: relative;
+      animation: fadeIn 0.5s ease;
+      border: 1px solid rgba(201, 151, 43, 0.15);
+    }
+
+    .session-popup .school-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: var(--gold-bg);
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      border: 2px solid var(--gold);
+    }
+    .session-popup .school-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 12px;
+    }
+
+    .session-popup .icon-box {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      border: 2px solid #fecaca;
+      animation: pulse 2s infinite;
+    }
+    .session-popup .icon-box.expired {
+      background: #fef2f2;
+      color: var(--red);
+    }
+    .session-popup .icon-box.invalid {
+      background: #fef2f2;
+      color: var(--red);
+    }
+    .session-popup .icon-box.invalid {
+      animation: shake 0.5s ease, pulse 2s infinite 0.5s;
+    }
+
+    .session-popup .icon-box .fa-lock {
+      color: var(--red);
+    }
+
+    .session-popup h2 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .session-popup h2 span {
+      color: var(--gold);
+    }
+
+    .session-popup .sub-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+
+    .session-popup .session-timer {
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--bg);
+      padding: 8px 16px;
+      border-radius: 50px;
+      display: inline-block;
+      margin: 8px 0 20px;
+      font-weight: 500;
+    }
+
+    .session-popup .school-name-popup {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+      padding: 6px 14px;
+      background: var(--gold-bg);
+      border-radius: 50px;
+      display: inline-block;
+    }
+
+    .session-popup .login-again-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 40px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Inter', sans-serif;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(201, 151, 43, 0.3);
+    }
+    .session-popup .login-again-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 35px rgba(201, 151, 43, 0.4);
+    }
+    .session-popup .login-again-btn i {
+      font-size: 18px;
+    }
+
     /* ----- NAVBAR (unchanged) ----- */
     .navbar {
       background: var(--bg-white);
@@ -407,6 +566,18 @@
       .action-btns .btn-sm { font-size: 10px; padding: 3px 8px; }
       .footer .footer-content { flex-direction: column; text-align: center; }
       .footer .footer-links { justify-content: center; flex-wrap: wrap; }
+      
+      .session-popup {
+        padding: 32px 20px 28px;
+      }
+      .session-popup h2 {
+        font-size: 22px;
+      }
+      .session-popup .icon-box {
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+      }
     }
     @media (max-width: 480px) {
       .stats-row { grid-template-columns: 1fr; }
@@ -589,479 +760,668 @@
       #printReportArea table thead {
         display: table-header-group;
       }
+      
+      /* Hide session overlay on print */
+      .session-overlay { display: none !important; }
     }
   </style>
 </head>
 <body>
 
-<!-- ===== NAVBAR ===== -->
-<nav class="navbar">
-  <a href="#" class="brand">
-    <div class="logo-placeholder" style="background:transparent;box-shadow:none;border:none;padding:0;">
-      <img src="logo(1).png" alt="Logo" style="width:46px;height:46px;border-radius:10px;object-fit:contain;background:#fff;padding:4px;">
-    </div>
-    <div class="name">GSSS<span> SHILLA</span></div>
-  </a>
-  <ul class="nav-links" id="navLinks">
-    <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-    <li><a href="admin-notif.html" class="active"><i class="fas fa-bell"></i> Notifications</a></li>
-  </ul>
-  <div class="nav-right">
-    <div class="admin-badge">
-      <span class="avatar" id="adminAvatar">🛡️</span>
-      <span id="adminName">Admin</span>
-      <span class="online-dot"></span>
-    </div>
-    <button class="hamburger" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
-  </div>
-</nav>
-
-<!-- ===== MAIN ===== -->
-<div class="main-container">
-
-  <!-- PAGE HEADER -->
-  <div class="page-header">
-    <h1><i class="fas fa-bell"></i> Notification Manager</h1>
-    <div class="header-actions">
-      <!-- PRINT BUTTON -->
-      <button class="btn btn-print" onclick="printReport()">
-        <i class="fas fa-print"></i> Print Report
-      </button>
-      <a href="https://gsssshilla07.pages.dev/" target="_blank" class="btn btn-outline">
-        <i class="fas fa-eye"></i> View Website
-      </a>
-      <button class="btn btn-primary" onclick="refreshNotifications()">
-        <i class="fas fa-sync-alt"></i> Refresh
-      </button>
-    </div>
-  </div>
-
-  <!-- STATS -->
-  <div class="stats-row" id="statsRow">
-    <div class="stat-box"><div class="icon-box blue"><i class="fas fa-bell"></i></div><div class="info"><div class="number" id="totalCount">0</div><div class="label">Total</div></div></div>
-    <div class="stat-box"><div class="icon-box green"><i class="fas fa-check-circle"></i></div><div class="info"><div class="number" id="activeCount">0</div><div class="label">Active</div></div></div>
-    <div class="stat-box"><div class="icon-box red"><i class="fas fa-times-circle"></i></div><div class="info"><div class="number" id="inactiveCount">0</div><div class="label">Inactive</div></div></div>
-    <div class="stat-box"><div class="icon-box purple"><i class="fas fa-paperclip"></i></div><div class="info"><div class="number" id="withFileCount">0</div><div class="label">With Files</div></div></div>
-  </div>
-
-  <!-- FORM -->
-  <div class="form-section" id="formSection">
-    <h2 id="formTitle"><i class="fas fa-plus-circle"></i> Add New Notification</h2>
-    <form id="notificationForm">
-      <input type="hidden" id="editId" value="">
-      <div class="form-group">
-        <label>Title <span class="required">*</span></label>
-        <input type="text" id="title" placeholder="Enter notification title..." required>
+  <!-- ============================================================
+     SESSION EXPIRED / INVALID ACCESS OVERLAY
+  ============================================================ -->
+  <div class="session-overlay" id="sessionOverlay">
+    <div class="session-popup">
+      <!-- School Logo -->
+      <div class="school-logo">
+        <img src="logo(1).png" alt="GSSS SHILLA Logo">
       </div>
-      <div class="form-group">
-        <label>Description</label>
-        <textarea id="description" placeholder="Enter notification description..."></textarea>
+      
+      <!-- School Name -->
+      <div class="school-name-popup">
+        <i class="fas fa-school" style="margin-right: 6px;"></i>
+        Govt. Sr. Sec. School Shilla
       </div>
-      <div class="form-row">
+
+      <!-- Icon - Changes based on type -->
+      <div class="icon-box expired" id="popupIconBox">
+        <i class="fas fa-clock" id="popupIcon"></i>
+      </div>
+
+      <!-- Title -->
+      <h2 id="popupTitle">Session <span>Expired</span></h2>
+      
+      <!-- Sub Text -->
+      <p class="sub-text" id="popupSubText">
+        Your session has been expired due to inactivity.<br>
+        Please login again to continue.
+      </p>
+
+      <!-- Timer / Info -->
+      <div class="session-timer" id="popupTimer">
+        <i class="fas fa-shield-alt" style="margin-right: 6px;"></i>
+        <span id="popupStatusText">Secure session ended</span>
+      </div>
+
+      <!-- Login Again Button -->
+      <button class="login-again-btn" onclick="redirectToLogin()">
+        <i class="fas fa-sign-in-alt"></i>
+        <span id="popupBtnText">Login Again</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <a href="#" class="brand">
+      <div class="logo-placeholder" style="background:transparent;box-shadow:none;border:none;padding:0;">
+        <img src="logo(1).png" alt="Logo" style="width:46px;height:46px;border-radius:10px;object-fit:contain;background:#fff;padding:4px;">
+      </div>
+      <div class="name">GSSS<span> SHILLA</span></div>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+      <li><a href="admin-notif.html" class="active"><i class="fas fa-bell"></i> Notifications</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="admin-badge">
+        <span class="avatar" id="adminAvatar">🛡️</span>
+        <span id="adminName">Admin</span>
+        <span class="online-dot"></span>
+      </div>
+      <button class="hamburger" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main-container">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <h1><i class="fas fa-bell"></i> Notification Manager</h1>
+      <div class="header-actions">
+        <!-- PRINT BUTTON -->
+        <button class="btn btn-print" onclick="printReport()">
+          <i class="fas fa-print"></i> Print Report
+        </button>
+        <a href="https://gsssshilla07.pages.dev/" target="_blank" class="btn btn-outline">
+          <i class="fas fa-eye"></i> View Website
+        </a>
+        <button class="btn btn-primary" onclick="refreshNotifications()">
+          <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row" id="statsRow">
+      <div class="stat-box"><div class="icon-box blue"><i class="fas fa-bell"></i></div><div class="info"><div class="number" id="totalCount">0</div><div class="label">Total</div></div></div>
+      <div class="stat-box"><div class="icon-box green"><i class="fas fa-check-circle"></i></div><div class="info"><div class="number" id="activeCount">0</div><div class="label">Active</div></div></div>
+      <div class="stat-box"><div class="icon-box red"><i class="fas fa-times-circle"></i></div><div class="info"><div class="number" id="inactiveCount">0</div><div class="label">Inactive</div></div></div>
+      <div class="stat-box"><div class="icon-box purple"><i class="fas fa-paperclip"></i></div><div class="info"><div class="number" id="withFileCount">0</div><div class="label">With Files</div></div></div>
+    </div>
+
+    <!-- FORM -->
+    <div class="form-section" id="formSection">
+      <h2 id="formTitle"><i class="fas fa-plus-circle"></i> Add New Notification</h2>
+      <form id="notificationForm">
+        <input type="hidden" id="editId" value="">
         <div class="form-group">
-          <label>Target</label>
-          <select id="attendance">
-            <option value="all">All</option>
-            <option value="staff">Staff Only</option>
-            <option value="students">Students Only</option>
-            <option value="parents">Parents Only</option>
-          </select>
+          <label>Title <span class="required">*</span></label>
+          <input type="text" id="title" placeholder="Enter notification title..." required>
         </div>
         <div class="form-group">
-          <label>File Attachment</label>
-          <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx">
-          <small>Max 10MB (Images, PDF, Word)</small>
+          <label>Description</label>
+          <textarea id="description" placeholder="Enter notification description..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Target</label>
+            <select id="attendance">
+              <option value="all">All</option>
+              <option value="staff">Staff Only</option>
+              <option value="students">Students Only</option>
+              <option value="parents">Parents Only</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>File Attachment</label>
+            <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx">
+            <small>Max 10MB (Images, PDF, Word)</small>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-success" id="submitBtn"><i class="fas fa-save"></i> PUBLISH</button>
+          <button type="button" class="btn btn-warning" onclick="cancelEdit()" style="display:none;" id="cancelBtn"><i class="fas fa-times"></i> Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrapper">
+      <div class="table-header">
+        <h2>All Notifications <span id="notificationCount">0</span></h2>
+        <div class="table-controls">
+          <button class="btn btn-sm btn-warning" onclick="toggleAllNotifications()"><i class="fas fa-check-double"></i> Deactivate All</button>
+          <button class="btn btn-sm btn-danger" onclick="confirmBulkDelete()"><i class="fas fa-trash-alt"></i> Bulk Delete</button>
         </div>
       </div>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-success" id="submitBtn"><i class="fas fa-save"></i> PUBLISH</button>
-        <button type="button" class="btn btn-warning" onclick="cancelEdit()" style="display:none;" id="cancelBtn"><i class="fas fa-times"></i> Cancel</button>
-      </div>
-    </form>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:40px;"><input type="checkbox" id="selectAll" onchange="toggleAllCheckboxes(this)"></th>
+            <th style="width:50px;">#</th>
+            <th>Title</th>
+            <th style="width:100px;">Target</th>
+            <th style="width:80px;">File</th>
+            <th style="width:90px;">Status</th>
+            <th style="width:130px;">Date & Time</th>
+            <th style="width:150px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="notificationTableBody">
+          <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Loading notifications...</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <!-- TABLE -->
-  <div class="table-wrapper">
-    <div class="table-header">
-      <h2>All Notifications <span id="notificationCount">0</span></h2>
-      <div class="table-controls">
-        <button class="btn btn-sm btn-warning" onclick="toggleAllNotifications()"><i class="fas fa-check-double"></i> Deactivate All</button>
-        <button class="btn btn-sm btn-danger" onclick="confirmBulkDelete()"><i class="fas fa-trash-alt"></i> Bulk Delete</button>
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="footer-content">
+      <span>&copy; 2026 <a href="#">Govt Sr. Sec. School Shilla</a>. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <!-- ===== TOAST ===== -->
+  <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMessage">Success!</span></div>
+
+  <!-- ===== PRINT REPORT AREA (hidden, used for printing) ===== -->
+  <div id="printReportArea" style="display:none;">
+    <!-- header: logo + school name centered -->
+    <div class="report-header">
+      <img src="logo(1).png" alt="Logo">
+      <div class="school-name">GSSS<span> SHILLA</span></div>
+    </div>
+    <!-- heading inside a box -->
+    <div class="center-box">
+      <div class="report-heading-box">
+        <div class="report-heading"><i class="fas fa-bell"></i> Report of Notifications</div>
       </div>
     </div>
-    <table>
+
+    <!-- table -->
+    <table id="printTable">
       <thead>
         <tr>
-          <th style="width:40px;"><input type="checkbox" id="selectAll" onchange="toggleAllCheckboxes(this)"></th>
-          <th style="width:50px;">#</th>
-          <th>Title</th>
-          <th style="width:100px;">Target</th>
-          <th style="width:80px;">File</th>
-          <th style="width:90px;">Status</th>
-          <th style="width:130px;">Date & Time</th>
-          <th style="width:150px;">Actions</th>
+          <th style="width:7%;">Sr. No.</th>
+          <th style="width:15%;">Date &amp; Time</th>
+          <th style="width:20%;">Title</th>
+          <th style="width:20%;">Description</th>
+          <th style="width:10%;">Target</th>
+          <th style="width:13%;">File Type</th>
+          <th style="width:15%;">Status</th>
         </tr>
       </thead>
-      <tbody id="notificationTableBody">
-        <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Loading notifications...</td></tr>
+      <tbody id="printTableBody">
+        <!-- filled by JS -->
       </tbody>
     </table>
-  </div>
-</div>
 
-<!-- ===== FOOTER ===== -->
-<footer class="footer">
-  <div class="footer-content">
-    <span>&copy; 2026 <a href="#">Govt Sr. Sec. School Shilla</a>. All rights reserved.</span>
-  </div>
-</footer>
-
-<!-- ===== TOAST ===== -->
-<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMessage">Success!</span></div>
-
-<!-- ===== PRINT REPORT AREA (hidden, used for printing) ===== -->
-<div id="printReportArea" style="display:none;">
-  <!-- header: logo + school name centered -->
-  <div class="report-header">
-    <img src="logo(1).png" alt="Logo">
-    <div class="school-name">GSSS<span> SHILLA</span></div>
-  </div>
-  <!-- heading inside a box -->
-  <div class="center-box">
-    <div class="report-heading-box">
-      <div class="report-heading"><i class="fas fa-bell"></i> Report of Notifications</div>
+    <div class="end-line"><i class="fas fa-link"></i> End of Report <i class="fas fa-link"></i></div>
+    <!-- footer -->
+    <div class="report-footer">
+      <div class="left"><span>Downloaded on:</span> <span id="printTimestamp"></span></div>
+      <div class="right"><span>Downloaded by:</span> <span id="printAdminNameFooter">Admin</span></div>
     </div>
+    <!-- page number -->
+    <div class="page-number"></div>
+    <!-- end of report chain line -->
+    
   </div>
-  <!-- sub: generated on left, downloaded by on right -->
 
-  <!-- table -->
-  <table id="printTable">
-    <thead>
-      <tr>
-        <th style="width:7%;">Sr. No.</th>
-        <th style="width:15%;">Date &amp; Time</th>
-        <th style="width:20%;">Title</th>
-        <th style="width:20%;">Description</th>
-        <th style="width:10%;">Target</th>
-        <th style="width:13%;">File Type</th>
-        <th style="width:15%;">Status</th>
-      </tr>
-    </thead>
-    <tbody id="printTableBody">
-      <!-- filled by JS -->
-    </tbody>
-  </table>
+  <script>
+  // ============================================================
+  // CONFIG
+  // ============================================================
+  const API_BASE = "https://gsssshilla.onrender.com";
 
-  <div class="end-line"><i class="fas fa-link"></i> End of Report <i class="fas fa-link"></i></div>
-  <!-- footer -->
-  <div class="report-footer">
-    <div class="left"><span>Downloaded on:</span> <span id="printTimestamp"></span></div>
-    <div class="right"><span>Downloaded by:</span> <span id="printAdminNameFooter">Admin</span></div>
-  </div>
-  <!-- page number -->
-  <div class="page-number"></div>
-  <!-- end of report chain line -->
-  
-</div>
+  // ============================================================
+  // SESSION EXPIRED / INVALID ACCESS - SHOW POPUP
+  // ============================================================
+  function showPopup(type = 'expired') {
+    const overlay = document.getElementById('sessionOverlay');
+    const iconBox = document.getElementById('popupIconBox');
+    const icon = document.getElementById('popupIcon');
+    const title = document.getElementById('popupTitle');
+    const subText = document.getElementById('popupSubText');
+    const statusText = document.getElementById('popupStatusText');
+    const btnText = document.getElementById('popupBtnText');
 
-<script>
-// ============================================================
-// CONFIG
-// ============================================================
-const API_BASE = "https://gsssshilla.onrender.com";
+    // Remove existing classes
+    iconBox.className = 'icon-box';
 
-// ============================================================
-// TOAST
-// ============================================================
-function showToast(message, type = 'success') {
-  const toast = document.getElementById('toast');
-  const toastMessage = document.getElementById('toastMessage');
-  toast.className = 'toast ' + type;
-  toastMessage.textContent = message;
-  toast.classList.add('show');
-  clearTimeout(toast.timeout);
-  toast.timeout = setTimeout(() => toast.classList.remove('show'), 3500);
-}
-
-// ============================================================
-// NAV TOGGLE
-// ============================================================
-function toggleNav() {
-  document.getElementById('navLinks').classList.toggle('open');
-}
-document.querySelectorAll('.nav-links a').forEach(link => {
-  link.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
-});
-
-// ============================================================
-// DOM REFS
-// ============================================================
-const notificationTableBody = document.getElementById('notificationTableBody');
-const notificationCount = document.getElementById('notificationCount');
-const totalCount = document.getElementById('totalCount');
-const activeCount = document.getElementById('activeCount');
-const inactiveCount = document.getElementById('inactiveCount');
-const withFileCount = document.getElementById('withFileCount');
-const form = document.getElementById('notificationForm');
-const editId = document.getElementById('editId');
-const title = document.getElementById('title');
-const description = document.getElementById('description');
-const attendance = document.getElementById('attendance');
-const fileInput = document.getElementById('fileInput');
-const submitBtn = document.getElementById('submitBtn');
-const cancelBtn = document.getElementById('cancelBtn');
-const formTitle = document.getElementById('formTitle');
-
-let currentNotifications = [];
-let selectedIds = [];
-
-// ============================================================
-// FETCH NOTIFICATIONS
-// ============================================================
-async function fetchNotifications() {
-  try {
-    const response = await fetch(`${API_BASE}/api/notifications/admin/all`);
-    if (!response.ok) throw new Error('Failed to fetch');
-    const data = await response.json();
-    if (data.success) {
-      currentNotifications = data.data || [];
-      renderTable(currentNotifications);
-      updateStats(currentNotifications);
-      notificationCount.textContent = currentNotifications.length;
+    if (type === 'expired') {
+      iconBox.classList.add('expired');
+      icon.className = 'fas fa-clock';
+      title.innerHTML = 'Session <span>Expired</span>';
+      subText.innerHTML = 'Your session has been expired due to inactivity.<br>Please login again to continue.';
+      statusText.textContent = 'Secure session ended';
+      btnText.textContent = 'Login Again';
+    } else if (type === 'invalid') {
+      iconBox.classList.add('invalid');
+      icon.className = 'fas fa-lock';
+      title.innerHTML = 'Invalid <span>Access</span>';
+      subText.innerHTML = 'You are not authorized to access this page.<br>Please login with valid credentials.';
+      statusText.textContent = 'Access denied';
+      btnText.textContent = 'Go to Login';
     }
-  } catch (error) {
-    console.error('Error fetching notifications:', error);
-    notificationTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#ef4444;"><i class="fas fa-exclamation-circle"></i> Failed to load</td></tr>`;
+
+    overlay.classList.add('active');
+    
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.height = '100%';
+    
+    // Clear any existing token
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminData');
   }
-}
 
-// ============================================================
-// RENDER TABLE
-// ============================================================
-function renderTable(notifications) {
-  if (!notifications || notifications.length === 0) {
-    notificationTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-bell-slash"></i> No notifications</td></tr>`;
-    return;
+  function redirectToLogin() {
+    const overlay = document.getElementById('sessionOverlay');
+    overlay.classList.remove('active');
+    
+    // Restore body scroll
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+    document.body.style.height = '';
+    
+    // Redirect to login
+    window.location.replace("login.html");
   }
-  notificationTableBody.innerHTML = notifications.map((item, index) => {
-    const isActive = item.is_active == 1;
-    const hasFile = item.file_url && item.file_url !== 'null';
-    const fileSize = item.file_size ? formatFileSize(parseInt(item.file_size)) : '';
-    const fileName = item.file_name || 'File';
-    const fileUrl = item.file_url;
-    return `
-    <tr>
-      <td><input type="checkbox" class="notification-checkbox" value="${item.id}" onchange="updateSelectedIds()"></td>
-      <td>${index + 1}</td>
-      <td><div class="title-cell" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div>${item.description ? `<div class="desc-cell" title="${escapeHtml(item.description)}">${escapeHtml(item.description.substring(0,60))}${item.description.length>60?'...':''}</div>` : ''}</td>
-      <td><span class="attendance-badge">${escapeHtml(item.attendance || 'all')}</span></td>
-      <td>${hasFile ? `<a href="${fileUrl}" target="_blank" class="file-link" title="${escapeHtml(fileName)}"><i class="fas fa-paperclip"></i> ${escapeHtml(fileName.substring(0,15))}</a><div class="file-size">${fileSize}</div>` : '<span style="color:var(--text-muted);font-size:12px;">No file</span>'}</td>
-      <td><span class="status-badge ${isActive?'active':'inactive'}">${isActive?'Active':'Inactive'}</span></td>
-      <td style="font-size:12px;color:var(--text-secondary);">${item.created_at_ist || item.created_at || 'N/A'}</td>
-      <td><div class="action-btns"><button class="btn btn-sm btn-primary" onclick="editNotification(${item.id})"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger" onclick="deleteNotification(${item.id})"><i class="fas fa-trash-alt"></i></button></div></td>
-    </tr>`;
-  }).join('');
-}
 
-// ============================================================
-// UPDATE STATS
-// ============================================================
-function updateStats(notifications) {
-  const total = notifications.length;
-  const active = notifications.filter(n => n.is_active == 1).length;
-  const inactive = notifications.filter(n => n.is_active == 0).length;
-  const withFile = notifications.filter(n => n.file_url && n.file_url !== 'null').length;
-  totalCount.textContent = total;
-  activeCount.textContent = active;
-  inactiveCount.textContent = inactive;
-  withFileCount.textContent = withFile;
-}
+  // ============================================================
+  // AUTH CHECK - WITH SESSION EXPIRY & INVALID ACCESS
+  // ============================================================
+  async function checkAuth() {
+    const token = localStorage.getItem('adminToken');
+    
+    // If no token - show invalid access popup
+    if (!token) {
+      showPopup('invalid');
+      return false;
+    }
 
-// ============================================================
-// HELPERS
-// ============================================================
-function formatFileSize(bytes) {
-  if (bytes === 0) return '0 B';
-  const k = 1024;
-  const sizes = ['B','KB','MB','GB'];
-  const i = Math.floor(Math.log(bytes)/Math.log(k));
-  return parseFloat((bytes/Math.pow(k,i)).toFixed(2)) + ' ' + sizes[i];
-}
-function escapeHtml(text) { if (!text) return ''; const d = document.createElement('div'); d.textContent = text; return d.innerHTML; }
-function toggleAllCheckboxes(master) { document.querySelectorAll('.notification-checkbox').forEach(cb => cb.checked = master.checked); updateSelectedIds(); }
-function updateSelectedIds() { selectedIds = []; document.querySelectorAll('.notification-checkbox:checked').forEach(cb => selectedIds.push(parseInt(cb.value))); }
-
-// ============================================================
-// TOGGLE ALL
-// ============================================================
-async function toggleAllNotifications() {
-  if (currentNotifications.length === 0) { showToast('No notifications', 'error'); return; }
-  const allActive = currentNotifications.every(n => n.is_active == 1);
-  const newStatus = allActive ? 0 : 1;
-  if (!confirm(`${newStatus ? 'Activate' : 'Deactivate'} all notifications?`)) return;
-  let success = 0;
-  for (const item of currentNotifications) {
     try {
-      const resp = await fetch(`${API_BASE}/api/notifications/admin/update/${item.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: item.title, description: item.description || '', attendance: item.attendance || 'all', is_active: newStatus })
+      const response = await fetch(`${API_BASE}/api/admin/verify`, {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      if (resp.ok) success++;
-    } catch(e) {}
-  }
-  showToast(`✅ ${success} notifications ${newStatus?'activated':'deactivated'}!`,'success');
-  fetchNotifications();
-}
+      const data = await response.json();
 
-// ============================================================
-// ADD/EDIT
-// ============================================================
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const id = editId.value;
-  const titleVal = title.value.trim();
-  const descriptionVal = description.value.trim();
-  const attendanceVal = attendance.value;
-  const file = fileInput.files[0];
-  if (!titleVal) { showToast('Please enter a title','error'); return; }
-  const formData = new FormData();
-  formData.append('title', titleVal);
-  formData.append('description', descriptionVal);
-  formData.append('attendance', attendanceVal);
-  if (file) formData.append('file', file);
-  const isEdit = id !== '';
-  const url = isEdit ? `${API_BASE}/api/notifications/admin/update/${id}` : `${API_BASE}/api/notifications/admin/add`;
-  const method = isEdit ? 'PUT' : 'POST';
-  try {
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-    submitBtn.disabled = true;
-    const response = await fetch(url, { method, body: formData });
-    const data = await response.json();
-    if (data.success) {
-      showToast(isEdit ? '✅ Updated!' : '✅ Added!','success');
-      resetForm();
-      fetchNotifications();
-    } else {
-      showToast(data.message || 'Failed','error');
+      if (data.success) {
+        // Token is valid
+        if (data.admin && data.admin.username) {
+          const initial = data.admin.username.charAt(0).toUpperCase();
+          document.getElementById('adminAvatar').textContent = initial;
+          document.getElementById('adminName').textContent = data.admin.username;
+        }
+        return true;
+      } else {
+        // Token invalid - session expired
+        showPopup('expired');
+        return false;
+      }
+    } catch (err) {
+      console.error("Auth check error:", err);
+      // Network error or server down - treat as session expired
+      showPopup('expired');
+      return false;
     }
-  } catch (error) { showToast('Error saving','error'); }
-  finally { submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Notification'; submitBtn.disabled = false; }
-});
-
-function editNotification(id) {
-  const item = currentNotifications.find(n => n.id === id);
-  if (!item) return;
-  editId.value = item.id;
-  title.value = item.title;
-  description.value = item.description || '';
-  attendance.value = item.attendance || 'all';
-  fileInput.value = '';
-  formTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Notification';
-  submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Notification';
-  cancelBtn.style.display = 'inline-flex';
-  document.getElementById('formSection').scrollIntoView({ behavior: 'smooth' });
-}
-function cancelEdit() { resetForm(); showToast('Edit cancelled','warning'); }
-function resetForm() {
-  editId.value = '';
-  title.value = '';
-  description.value = '';
-  attendance.value = 'all';
-  fileInput.value = '';
-  formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Add New Notification';
-  submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Notification';
-  cancelBtn.style.display = 'none';
-}
-
-// ============================================================
-// DELETE / BULK DELETE
-// ============================================================
-async function deleteNotification(id) {
-  if (!confirm('Delete this notification?')) return;
-  try {
-    const resp = await fetch(`${API_BASE}/api/notifications/admin/delete/${id}`, { method: 'DELETE' });
-    const data = await resp.json();
-    if (data.success) { showToast('✅ Deleted!','success'); fetchNotifications(); }
-    else showToast(data.message || 'Failed','error');
-  } catch(e) { showToast('Error','error'); }
-}
-async function confirmBulkDelete() {
-  updateSelectedIds();
-  if (selectedIds.length === 0) { showToast('Select notifications','error'); return; }
-  if (!confirm(`Delete ${selectedIds.length} selected?`)) return;
-  try {
-    const resp = await fetch(`${API_BASE}/api/notifications/admin/bulk-delete`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ids: selectedIds })
-    });
-    const data = await resp.json();
-    if (data.success) { showToast(data.message,'success'); fetchNotifications(); }
-    else showToast('Failed','error');
-  } catch(e) { showToast('Error','error'); }
-}
-function refreshNotifications() { showToast('🔄 Refreshing...','success'); fetchNotifications(); }
-
-// ============================================================
-// PRINT REPORT
-// ============================================================
-function printReport() {
-  if (currentNotifications.length === 0) {
-    showToast('No notifications to print','error');
-    return;
   }
-  // fill print area
-  const tbody = document.getElementById('printTableBody');
-  tbody.innerHTML = currentNotifications.map((item, idx) => {
-    const hasFile = item.file_url && item.file_url !== 'null';
-    const fileType = hasFile ? (item.file_name || 'File') : '—';
-    const remarks = item.is_active == 1 ? 'Active' : 'Inactive';
-    return `<tr>
-      <td>${idx+1}</td>
-      <td>${item.created_at_ist || item.created_at || 'N/A'}</td>
-      <td>${escapeHtml(item.title)}</td>
-      <td>${escapeHtml(item.description || '—')}</td>
-      <td>${escapeHtml(item.attendance || 'all')}</td>
-      <td>${escapeHtml(fileType)}</td>
-      <td>${remarks}</td>
-    </tr>`;
-  }).join('');
 
-  // set date, admin name
-  const now = new Date();
-  const dateStr = now.toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true });
+  // ============================================================
+  // TOAST
+  // ============================================================
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    toast.className = 'toast ' + type;
+    toastMessage.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toast.timeout);
+    toast.timeout = setTimeout(() => toast.classList.remove('show'), 3500);
+  }
 
-  document.getElementById('printTimestamp').textContent = dateStr;
+  // ============================================================
+  // NAV TOGGLE
+  // ============================================================
+  function toggleNav() {
+    document.getElementById('navLinks').classList.toggle('open');
+  }
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
+  });
 
-  const adminName = document.getElementById('adminName').textContent || 'Admin';
-  
-  document.getElementById('printAdminNameFooter').textContent = adminName;
+  // ============================================================
+  // DOM REFS
+  // ============================================================
+  const notificationTableBody = document.getElementById('notificationTableBody');
+  const notificationCount = document.getElementById('notificationCount');
+  const totalCount = document.getElementById('totalCount');
+  const activeCount = document.getElementById('activeCount');
+  const inactiveCount = document.getElementById('inactiveCount');
+  const withFileCount = document.getElementById('withFileCount');
+  const form = document.getElementById('notificationForm');
+  const editId = document.getElementById('editId');
+  const title = document.getElementById('title');
+  const description = document.getElementById('description');
+  const attendance = document.getElementById('attendance');
+  const fileInput = document.getElementById('fileInput');
+  const submitBtn = document.getElementById('submitBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const formTitle = document.getElementById('formTitle');
 
-  // show print area and trigger print
-  const printArea = document.getElementById('printReportArea');
-  printArea.style.display = 'block';
-  window.print();
-  // after print, hide again
-  setTimeout(() => { printArea.style.display = 'none'; }, 1000);
-}
+  let currentNotifications = [];
+  let selectedIds = [];
 
-// ============================================================
-// INIT
-// ============================================================
-document.addEventListener('DOMContentLoaded', () => {
-  const adminData = localStorage.getItem('adminData');
-  if (adminData) {
+  // ============================================================
+  // FETCH NOTIFICATIONS
+  // ============================================================
+  async function fetchNotifications() {
     try {
-      const data = JSON.parse(adminData);
-      const name = data.name || data.username || 'Admin';
-      document.getElementById('adminName').textContent = name;
-      document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
-    } catch(e) {}
+      const response = await fetch(`${API_BASE}/api/notifications/admin/all`);
+      if (!response.ok) throw new Error('Failed to fetch');
+      const data = await response.json();
+      if (data.success) {
+        currentNotifications = data.data || [];
+        renderTable(currentNotifications);
+        updateStats(currentNotifications);
+        notificationCount.textContent = currentNotifications.length;
+      }
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      notificationTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#ef4444;"><i class="fas fa-exclamation-circle"></i> Failed to load</td></tr>`;
+    }
   }
-  fetchNotifications();
-  setInterval(fetchNotifications, 60000);
-});
-</script>
+
+  // ============================================================
+  // RENDER TABLE
+  // ============================================================
+  function renderTable(notifications) {
+    if (!notifications || notifications.length === 0) {
+      notificationTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-bell-slash"></i> No notifications</td></tr>`;
+      return;
+    }
+    notificationTableBody.innerHTML = notifications.map((item, index) => {
+      const isActive = item.is_active == 1;
+      const hasFile = item.file_url && item.file_url !== 'null';
+      const fileSize = item.file_size ? formatFileSize(parseInt(item.file_size)) : '';
+      const fileName = item.file_name || 'File';
+      const fileUrl = item.file_url;
+      return `
+      <tr>
+        <td><input type="checkbox" class="notification-checkbox" value="${item.id}" onchange="updateSelectedIds()"></td>
+        <td>${index + 1}</td>
+        <td><div class="title-cell" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div>${item.description ? `<div class="desc-cell" title="${escapeHtml(item.description)}">${escapeHtml(item.description.substring(0,60))}${item.description.length>60?'...':''}</div>` : ''}</td>
+        <td><span class="attendance-badge">${escapeHtml(item.attendance || 'all')}</span></td>
+        <td>${hasFile ? `<a href="${fileUrl}" target="_blank" class="file-link" title="${escapeHtml(fileName)}"><i class="fas fa-paperclip"></i> ${escapeHtml(fileName.substring(0,15))}</a><div class="file-size">${fileSize}</div>` : '<span style="color:var(--text-muted);font-size:12px;">No file</span>'}</td>
+        <td><span class="status-badge ${isActive?'active':'inactive'}">${isActive?'Active':'Inactive'}</span></td>
+        <td style="font-size:12px;color:var(--text-secondary);">${item.created_at_ist || item.created_at || 'N/A'}</td>
+        <td><div class="action-btns"><button class="btn btn-sm btn-primary" onclick="editNotification(${item.id})"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger" onclick="deleteNotification(${item.id})"><i class="fas fa-trash-alt"></i></button></div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ============================================================
+  // UPDATE STATS
+  // ============================================================
+  function updateStats(notifications) {
+    const total = notifications.length;
+    const active = notifications.filter(n => n.is_active == 1).length;
+    const inactive = notifications.filter(n => n.is_active == 0).length;
+    const withFile = notifications.filter(n => n.file_url && n.file_url !== 'null').length;
+    totalCount.textContent = total;
+    activeCount.textContent = active;
+    inactiveCount.textContent = inactive;
+    withFileCount.textContent = withFile;
+  }
+
+  // ============================================================
+  // HELPERS
+  // ============================================================
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B','KB','MB','GB'];
+    const i = Math.floor(Math.log(bytes)/Math.log(k));
+    return parseFloat((bytes/Math.pow(k,i)).toFixed(2)) + ' ' + sizes[i];
+  }
+  function escapeHtml(text) { if (!text) return ''; const d = document.createElement('div'); d.textContent = text; return d.innerHTML; }
+  function toggleAllCheckboxes(master) { document.querySelectorAll('.notification-checkbox').forEach(cb => cb.checked = master.checked); updateSelectedIds(); }
+  function updateSelectedIds() { selectedIds = []; document.querySelectorAll('.notification-checkbox:checked').forEach(cb => selectedIds.push(parseInt(cb.value))); }
+
+  // ============================================================
+  // TOGGLE ALL
+  // ============================================================
+  async function toggleAllNotifications() {
+    if (currentNotifications.length === 0) { showToast('No notifications', 'error'); return; }
+    const allActive = currentNotifications.every(n => n.is_active == 1);
+    const newStatus = allActive ? 0 : 1;
+    if (!confirm(`${newStatus ? 'Activate' : 'Deactivate'} all notifications?`)) return;
+    let success = 0;
+    for (const item of currentNotifications) {
+      try {
+        const resp = await fetch(`${API_BASE}/api/notifications/admin/update/${item.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: item.title, description: item.description || '', attendance: item.attendance || 'all', is_active: newStatus })
+        });
+        if (resp.ok) success++;
+      } catch(e) {}
+    }
+    showToast(`✅ ${success} notifications ${newStatus?'activated':'deactivated'}!`,'success');
+    fetchNotifications();
+  }
+
+  // ============================================================
+  // ADD/EDIT
+  // ============================================================
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = editId.value;
+    const titleVal = title.value.trim();
+    const descriptionVal = description.value.trim();
+    const attendanceVal = attendance.value;
+    const file = fileInput.files[0];
+    if (!titleVal) { showToast('Please enter a title','error'); return; }
+    const formData = new FormData();
+    formData.append('title', titleVal);
+    formData.append('description', descriptionVal);
+    formData.append('attendance', attendanceVal);
+    if (file) formData.append('file', file);
+    const isEdit = id !== '';
+    const url = isEdit ? `${API_BASE}/api/notifications/admin/update/${id}` : `${API_BASE}/api/notifications/admin/add`;
+    const method = isEdit ? 'PUT' : 'POST';
+    try {
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+      submitBtn.disabled = true;
+      const response = await fetch(url, { method, body: formData });
+      const data = await response.json();
+      if (data.success) {
+        showToast(isEdit ? '✅ Updated!' : '✅ Added!','success');
+        resetForm();
+        fetchNotifications();
+      } else {
+        showToast(data.message || 'Failed','error');
+      }
+    } catch (error) { showToast('Error saving','error'); }
+    finally { submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Notification'; submitBtn.disabled = false; }
+  });
+
+  function editNotification(id) {
+    const item = currentNotifications.find(n => n.id === id);
+    if (!item) return;
+    editId.value = item.id;
+    title.value = item.title;
+    description.value = item.description || '';
+    attendance.value = item.attendance || 'all';
+    fileInput.value = '';
+    formTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Notification';
+    submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Notification';
+    cancelBtn.style.display = 'inline-flex';
+    document.getElementById('formSection').scrollIntoView({ behavior: 'smooth' });
+  }
+  function cancelEdit() { resetForm(); showToast('Edit cancelled','warning'); }
+  function resetForm() {
+    editId.value = '';
+    title.value = '';
+    description.value = '';
+    attendance.value = 'all';
+    fileInput.value = '';
+    formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Add New Notification';
+    submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Notification';
+    cancelBtn.style.display = 'none';
+  }
+
+  // ============================================================
+  // DELETE / BULK DELETE
+  // ============================================================
+  async function deleteNotification(id) {
+    if (!confirm('Delete this notification?')) return;
+    try {
+      const resp = await fetch(`${API_BASE}/api/notifications/admin/delete/${id}`, { method: 'DELETE' });
+      const data = await resp.json();
+      if (data.success) { showToast('✅ Deleted!','success'); fetchNotifications(); }
+      else showToast(data.message || 'Failed','error');
+    } catch(e) { showToast('Error','error'); }
+  }
+  async function confirmBulkDelete() {
+    updateSelectedIds();
+    if (selectedIds.length === 0) { showToast('Select notifications','error'); return; }
+    if (!confirm(`Delete ${selectedIds.length} selected?`)) return;
+    try {
+      const resp = await fetch(`${API_BASE}/api/notifications/admin/bulk-delete`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedIds })
+      });
+      const data = await resp.json();
+      if (data.success) { showToast(data.message,'success'); fetchNotifications(); }
+      else showToast('Failed','error');
+    } catch(e) { showToast('Error','error'); }
+  }
+  function refreshNotifications() { showToast('🔄 Refreshing...','success'); fetchNotifications(); }
+
+  // ============================================================
+  // PRINT REPORT
+  // ============================================================
+  function printReport() {
+    if (currentNotifications.length === 0) {
+      showToast('No notifications to print','error');
+      return;
+    }
+    // fill print area
+    const tbody = document.getElementById('printTableBody');
+    tbody.innerHTML = currentNotifications.map((item, idx) => {
+      const hasFile = item.file_url && item.file_url !== 'null';
+      const fileType = hasFile ? (item.file_name || 'File') : '—';
+      const remarks = item.is_active == 1 ? 'Active' : 'Inactive';
+      return `<tr>
+        <td>${idx+1}</td>
+        <td>${item.created_at_ist || item.created_at || 'N/A'}</td>
+        <td>${escapeHtml(item.title)}</td>
+        <td>${escapeHtml(item.description || '—')}</td>
+        <td>${escapeHtml(item.attendance || 'all')}</td>
+        <td>${escapeHtml(fileType)}</td>
+        <td>${remarks}</td>
+      </tr>`;
+    }).join('');
+
+    // set date, admin name
+    const now = new Date();
+    const dateStr = now.toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true });
+
+    document.getElementById('printTimestamp').textContent = dateStr;
+
+    const adminName = document.getElementById('adminName').textContent || 'Admin';
+    
+    document.getElementById('printAdminNameFooter').textContent = adminName;
+
+    // show print area and trigger print
+    const printArea = document.getElementById('printReportArea');
+    printArea.style.display = 'block';
+    window.print();
+    // after print, hide again
+    setTimeout(() => { printArea.style.display = 'none'; }, 1000);
+  }
+
+  // ============================================================
+  // SESSION TIMER - AUTO CHECK EVERY 30 SECONDS
+  // ============================================================
+  let sessionCheckInterval = setInterval(async function() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      // Already logged out - no need to check
+      return;
+    }
+    
+    // Don't check if session overlay is already showing
+    const overlay = document.getElementById('sessionOverlay');
+    if (overlay.classList.contains('active')) {
+      return;
+    }
+    
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/verify`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      
+      if (!data.success) {
+        showPopup('expired');
+      }
+    } catch (err) {
+      // If network error, show session expired
+      showPopup('expired');
+    }
+  }, 30000); // Check every 30 seconds
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  document.addEventListener('DOMContentLoaded', async () => {
+    // First check authentication
+    const isAuth = await checkAuth();
+    
+    if (isAuth) {
+      // Load admin data from localStorage
+      const adminData = localStorage.getItem('adminData');
+      if (adminData) {
+        try {
+          const data = JSON.parse(adminData);
+          const name = data.name || data.username || 'Admin';
+          document.getElementById('adminName').textContent = name;
+          document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
+        } catch(e) {}
+      }
+      // Load notifications
+      fetchNotifications();
+    }
+    // If not authenticated, popup already shown by checkAuth()
+  });
+
+  // ============================================================
+  // BACK BUTTON BLOCK
+  // ============================================================
+  window.history.pushState(null, null, window.location.href);
+  window.onpopstate = function() {
+    window.history.pushState(null, null, window.location.href);
+  };
+  </script>
 </body>
 </html>
