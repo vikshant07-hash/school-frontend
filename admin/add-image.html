@@ -942,38 +942,25 @@ body {
 ============================================================ -->
 <div class="session-overlay" id="sessionOverlay">
     <div class="session-popup">
-        <!-- School Logo -->
         <div class="school-logo">
             <img src="logo(1).png" alt="GSSS SHILLA Logo">
         </div>
-        
-        <!-- School Name -->
         <div class="school-name-popup">
             <i class="fas fa-school" style="margin-right: 6px;"></i>
             Govt. Sr. Sec. School Shilla
         </div>
-
-        <!-- Icon - Changes based on type -->
         <div class="icon-box expired" id="popupIconBox">
             <i class="fas fa-clock" id="popupIcon"></i>
         </div>
-
-        <!-- Title -->
         <h2 id="popupTitle">Session <span>Expired</span></h2>
-        
-        <!-- Sub Text -->
         <p class="sub-text" id="popupSubText">
             Your session has been expired due to inactivity.<br>
             Please login again to continue.
         </p>
-
-        <!-- Timer / Info -->
         <div class="session-timer" id="popupTimer">
             <i class="fas fa-shield-alt" style="margin-right: 6px;"></i>
             <span id="popupStatusText">Secure session ended</span>
         </div>
-
-        <!-- Login Again Button -->
         <button class="login-again-btn" onclick="redirectToLogin()">
             <i class="fas fa-sign-in-alt"></i>
             <span id="popupBtnText">Login Again</span>
@@ -1019,7 +1006,6 @@ body {
 ============================================================ -->
 <div class="main-container">
 
-  <!-- PAGE HEADER -->
   <div class="page-header">
     <h1><i class="fas fa-images"></i> Slider Manager</h1>
     <div class="header-actions">
@@ -1117,7 +1103,6 @@ body {
 <footer class="footer">
   <div class="footer-content">
     <span>&copy; 2026 <a href="#">Govt. Sr. Sec. School Shilla</a>. All rights reserved.</span>
-    
   </div>
 </footer>
 
@@ -1319,17 +1304,17 @@ function getImageUrl(img) {
 }
 
 // ============================================================
-// FETCH IMAGES - WITH AUTH
+// FETCH IMAGES - UPDATED ROUTE
 // ============================================================
 async function fetchImages() {
   try {
-    const response = await fetchWithAuth(`${API_BASE}/images`);
+    const response = await fetchWithAuth(`${API_BASE}/api/admin/slider/all`);
     const data = await response.json();
 
-    if (Array.isArray(data) && data.length > 0) {
-      currentImages = data;
-      renderImages(data);
-      updateStats(data);
+    if (data.success && data.data && data.data.length > 0) {
+      currentImages = data.data;
+      renderImages(data.data);
+      updateStats(data.data);
     } else {
       showEmptyState();
       updateStats([]);
@@ -1389,7 +1374,7 @@ function renderImages(images) {
         <button class="btn btn-sm btn-primary" onclick="openEditModal(${img.id})">
           <i class="fas fa-edit"></i> Edit
         </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteImage('${img.filename || img.public_id}', ${img.id})">
+        <button class="btn btn-sm btn-danger" onclick="deleteImage(${img.id})">
           <i class="fas fa-trash-alt"></i> Delete
         </button>
       </div>
@@ -1426,7 +1411,7 @@ function updateStats(images) {
 }
 
 // ============================================================
-// UPLOAD IMAGES - WITH AUTH
+// UPLOAD IMAGES - UPDATED ROUTE
 // ============================================================
 async function uploadImages(files) {
   if (!files || files.length === 0) return;
@@ -1441,10 +1426,12 @@ async function uploadImages(files) {
   progressText.textContent = 'Uploading... 0%';
 
   try {
-    const response = await fetchWithAuth(`${API_BASE}/upload`, {
+    const response = await fetchWithAuth(`${API_BASE}/api/admin/slider/add`, {
       method: 'POST',
       body: formData,
     });
+
+    const result = await response.json();
 
     progressFill.style.width = '100%';
     progressText.textContent = '✅ Uploaded!';
@@ -1454,7 +1441,6 @@ async function uploadImages(files) {
       progressFill.style.width = '0%';
     }, 1000);
 
-    const result = await response.json();
     showToast(`✅ ${result.uploaded?.length || files.length} images uploaded!`, 'success');
     setTimeout(fetchImages, 500);
 
@@ -1467,20 +1453,23 @@ async function uploadImages(files) {
 }
 
 // ============================================================
-// DELETE IMAGE - WITH AUTH
+// DELETE IMAGE - UPDATED ROUTE
 // ============================================================
-async function deleteImage(filename, id) {
+async function deleteImage(id) {
   if (!confirm('Delete this image?')) return;
 
   try {
-    const response = await fetchWithAuth(`${API_BASE}/delete`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ filename }),
+    const response = await fetchWithAuth(`${API_BASE}/api/admin/slider/delete/${id}`, {
+      method: 'DELETE'
     });
 
-    showToast('✅ Image deleted!', 'success');
-    setTimeout(fetchImages, 300);
+    const data = await response.json();
+    if (data.success) {
+      showToast('✅ Image deleted!', 'success');
+      setTimeout(fetchImages, 300);
+    } else {
+      showToast('❌ Failed to delete', 'error');
+    }
 
   } catch (error) {
     if (error.message !== 'Session expired' && error.message !== 'No token found') {
@@ -1505,12 +1494,11 @@ function confirmBulkDelete() {
 
   currentImages.forEach(async (img) => {
     try {
-      const response = await fetchWithAuth(`${API_BASE}/delete`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: img.filename || img.public_id }),
+      const response = await fetchWithAuth(`${API_BASE}/api/admin/slider/delete/${img.id}`, {
+        method: 'DELETE'
       });
-      if (response.ok) deleted++;
+      const data = await response.json();
+      if (data.success) deleted++;
     } catch (e) {}
   });
 
@@ -1521,7 +1509,7 @@ function confirmBulkDelete() {
 }
 
 // ============================================================
-// REORDER IMAGES
+// REORDER IMAGES - UPDATED ROUTE
 // ============================================================
 function reorderImages() {
   if (currentImages.length < 2) {
@@ -1532,7 +1520,7 @@ function reorderImages() {
   const reversed = [...currentImages].reverse();
   const orders = reversed.map((img, index) => ({ id: img.id, order: index + 1 }));
 
-  fetchWithAuth(`${API_BASE}/images/reorder`, {
+  fetchWithAuth(`${API_BASE}/api/admin/slider/reorder`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ orders }),
@@ -1573,6 +1561,9 @@ function closeModal() {
   editingImageId = null;
 }
 
+// ============================================================
+// SAVE IMAGE EDIT - UPDATED ROUTE
+// ============================================================
 function saveImageEdit() {
   if (!editingImageId) { showToast('No image selected', 'error'); return; }
 
@@ -1582,7 +1573,7 @@ function saveImageEdit() {
 
   if (!title) { showToast('Please enter a title', 'error'); return; }
 
-  fetchWithAuth(`${API_BASE}/images/update/${editingImageId}`, {
+  fetchWithAuth(`${API_BASE}/api/admin/slider/update/${editingImageId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ title, alt_text, is_active }),
