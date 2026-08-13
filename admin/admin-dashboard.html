@@ -66,7 +66,56 @@
     .dashboard { display: flex; flex: 1; min-height: 100vh; }
 
     /* ============================================================
-       SESSION POPUP - FULLSCREEN OVERLAY (Expired + Invalid)
+       SESSION TIMER BAR - TOP OF PAGE
+    ============================================================ */
+    .session-timer-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--border);
+      z-index: 9997;
+      overflow: hidden;
+    }
+    .session-timer-bar .fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--gold), var(--orange), var(--red));
+      width: 100%;
+      transition: width 1s linear;
+    }
+    .session-timer-bar .fill.warning {
+      background: var(--orange);
+    }
+    .session-timer-bar .fill.danger {
+      background: var(--red);
+      animation: blink 0.5s ease infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .session-time-text {
+      position: fixed;
+      top: 8px;
+      right: 16px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      z-index: 9997;
+      background: rgba(255,255,255,0.9);
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(4px);
+    }
+    .session-time-text.warning { color: var(--orange); }
+    .session-time-text.danger { color: var(--red); animation: blink 0.5s ease infinite; }
+
+    /* ============================================================
+       SESSION OVERLAY - (Expired + Invalid Access)
     ============================================================ */
     .session-overlay {
       display: none;
@@ -225,55 +274,6 @@
     }
 
     /* ============================================================
-       SESSION TIMER BAR - TOP OF PAGE
-    ============================================================ */
-    .session-timer-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: var(--border);
-      z-index: 9997;
-      overflow: hidden;
-    }
-    .session-timer-bar .fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--green), var(--gold), var(--orange), var(--red));
-      width: 100%;
-      transition: width 1s linear;
-    }
-    .session-timer-bar .fill.warning {
-      background: var(--orange);
-    }
-    .session-timer-bar .fill.danger {
-      background: var(--red);
-      animation: blink 0.5s ease infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    .session-time-text {
-      position: fixed;
-      top: 8px;
-      right: 16px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-      z-index: 9997;
-      background: rgba(255,255,255,0.9);
-      padding: 4px 12px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      backdrop-filter: blur(4px);
-    }
-    .session-time-text.warning { color: var(--orange); }
-    .session-time-text.danger { color: var(--red); animation: blink 0.5s ease infinite; }
-
-    /* ============================================================
        SIDEBAR - CLEAN WHITE
     ============================================================ */
     .sidebar {
@@ -295,7 +295,6 @@
     .sidebar::-webkit-scrollbar { width: 4px; }
     .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 20px; }
 
-    /* Brand */
     .brand {
       display: flex;
       align-items: center;
@@ -336,7 +335,6 @@
       text-transform: uppercase;
     }
 
-    /* Navigation */
     .nav-group { margin-bottom: 20px; flex-shrink: 0; }
     .nav-label {
       font-size: 10px;
@@ -408,7 +406,6 @@
       border-radius: 20px;
     }
 
-    /* Admin Profile */
     .sidebar-bottom {
       margin-top: auto;
       padding-top: 16px;
@@ -593,6 +590,100 @@
     }
 
     /* ============================================================
+       SESSION TIMER BOX - Below Banner Stats
+    ============================================================ */
+    .session-box {
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+    .session-box:hover {
+      box-shadow: var(--shadow-hover);
+      border-color: var(--gold);
+    }
+    .session-box .left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .session-box .left .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-sm);
+      background: var(--gold-bg);
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .session-box .left .info .label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .session-box .left .info .time {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+    .session-box .left .info .time.warning { color: var(--orange); }
+    .session-box .left .info .time.danger { color: var(--red); animation: blink 0.5s ease infinite; }
+    
+    .session-box .right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .session-box .right .status {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 14px;
+      border-radius: 50px;
+    }
+    .session-box .right .status.active {
+      background: var(--green-bg);
+      color: var(--green);
+    }
+    .session-box .right .status.warning {
+      background: var(--orange-bg);
+      color: var(--orange);
+    }
+    .session-box .right .status.danger {
+      background: #fef2f2;
+      color: var(--red);
+      animation: blink 0.5s ease infinite;
+    }
+    .session-box .right .progress-wrap {
+      width: 120px;
+    }
+    .session-box .right .progress-wrap .bar {
+      width: 100%;
+      height: 4px;
+      background: var(--border);
+      border-radius: 50px;
+      overflow: hidden;
+    }
+    .session-box .right .progress-wrap .bar .fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 50px;
+      transition: width 1s linear;
+    }
+    .session-box .right .progress-wrap .bar .fill.warning { background: var(--orange); }
+    .session-box .right .progress-wrap .bar .fill.danger { background: var(--red); }
+
+    /* ============================================================
        STAT CARDS
     ============================================================ */
     .stat-grid {
@@ -657,59 +748,6 @@
       color: var(--text-secondary);
       font-weight: 500;
     }
-    .stat-change {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      margin-top: 10px;
-      padding: 3px 10px;
-      border-radius: 20px;
-    }
-    .stat-change.up { background: var(--green-bg); color: var(--green); }
-    .stat-change.down { background: #fef2f2; color: var(--red); }
-
-    /* ============================================================
-       QUICK ACTIONS
-    ============================================================ */
-    .quick-actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .q-btn {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 22px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      border: 1px solid var(--border);
-      font-family: 'Inter', sans-serif;
-      background: var(--bg-white);
-      color: var(--text-primary);
-    }
-    .q-btn:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-hover);
-      border-color: var(--gold);
-    }
-    .q-btn.gold {
-      background: linear-gradient(135deg, var(--gold), var(--gold-light));
-      color: #fff;
-      border-color: var(--gold);
-    }
-    .q-btn.gold:hover { box-shadow: 0 8px 28px rgba(201, 151, 43, 0.35); }
-    .q-btn.blue {
-      background: linear-gradient(135deg, var(--blue), #3b7ad4);
-      color: #fff;
-      border-color: var(--blue);
-    }
-    .q-btn.blue:hover { box-shadow: 0 8px 28px rgba(74, 138, 244, 0.35); }
 
     /* ============================================================
        MODULES
@@ -970,18 +1008,18 @@
       .bstat .val {
         font-size: 18px;
       }
-      .quick-actions {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
+      .session-box {
+        padding: 16px 20px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
       }
-      .q-btn {
-        justify-content: center;
+      .session-box .left .info .time {
+        font-size: 22px;
+      }
+      .session-box .right .progress-wrap {
         width: 100%;
-        padding: 10px;
-        font-size: 12px;
       }
-      .q-btn .lbl { display: none; }
       .logout-btn .lbl { display: none; }
       .logout-btn { padding: 10px 16px; }
       .topbar-title h3 { font-size: 18px; }
@@ -990,7 +1028,6 @@
     @media (max-width: 480px) {
       .stat-grid { grid-template-columns: 1fr; }
       .modules-grid { grid-template-columns: 1fr; }
-      .quick-actions { grid-template-columns: 1fr; }
       .main { padding: 10px; }
       .welcome-banner { padding: 16px; }
       .banner-text h1 { font-size: 20px; }
@@ -999,6 +1036,9 @@
       .topbar-title h3 { font-size: 16px; }
       .topbar { padding: 12px 16px; }
       .footer { padding: 16px; }
+      .session-box .left .info .time {
+        font-size: 20px;
+      }
       
       .session-popup {
         padding: 32px 20px 28px;
@@ -1029,38 +1069,25 @@
   ============================================================ -->
   <div class="session-overlay" id="sessionOverlay">
     <div class="session-popup">
-      <!-- School Logo -->
       <div class="school-logo">
         <img src="logo(1).png" alt="GSSS SHILLA Logo">
       </div>
-      
-      <!-- School Name -->
       <div class="school-name-popup">
         <i class="fas fa-school" style="margin-right: 6px;"></i>
         Govt. Sr. Sec. School Shilla
       </div>
-
-      <!-- Icon - Changes based on type -->
       <div class="icon-box expired" id="popupIconBox">
         <i class="fas fa-clock" id="popupIcon"></i>
       </div>
-
-      <!-- Title -->
       <h2 id="popupTitle">Session <span>Expired</span></h2>
-      
-      <!-- Sub Text -->
       <p class="sub-text" id="popupSubText">
         Your session has been expired due to inactivity.<br>
         Please login again to continue.
       </p>
-
-      <!-- Timer / Info -->
       <div class="session-timer" id="popupTimer">
         <i class="fas fa-shield-alt" style="margin-right: 6px;"></i>
         <span id="popupStatusText">Secure session ended</span>
       </div>
-
-      <!-- Login Again Button -->
       <button class="login-again-btn" onclick="redirectToLogin()">
         <i class="fas fa-sign-in-alt"></i>
         <span id="popupBtnText">Login Again</span>
@@ -1071,7 +1098,6 @@
   <!-- ============================================================
      DASHBOARD
   ============================================================ -->
-  <!-- Overlay -->
   <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
   <div class="dashboard">
@@ -1163,6 +1189,27 @@
         <div class="banner-stats">
           <div class="bstat"><div class="val gold" id="statStudents">—</div><div class="lbl">Students</div></div>
           <div class="bstat"><div class="val" id="statFaculty">—</div><div class="lbl">Faculty</div></div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+         SESSION TIMER BOX - BELOW BANNER STATS
+      ============================================================ -->
+      <div class="session-box" id="sessionBox">
+        <div class="left">
+          <div class="icon"><i class="fas fa-clock"></i></div>
+          <div class="info">
+            <div class="label">Session Remaining</div>
+            <div class="time" id="sessionBoxTime">30:00</div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="status active" id="sessionStatus">Active</div>
+          <div class="progress-wrap">
+            <div class="bar">
+              <div class="fill" id="sessionBoxFill" style="width:100%"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1264,182 +1311,236 @@
     // ============================================================
     const API_BASE = 'https://gsssshilla.onrender.com/api/admin';
     const SESSION_DURATION = 30 * 60; // 30 minutes in seconds
+    const SESSION_START_KEY = 'sessionStartTime';
+    
     let sessionRemaining = SESSION_DURATION;
     let sessionTimerInterval = null;
-    let sessionCheckInterval = null;
 
     // ============================================================
-    // SESSION POPUP - (Expired + Invalid)
+    // SESSION TIMER - WITH PERSISTENCE (Page reload par bhi same)
     // ============================================================
-    function showPopup(type = 'expired') {
-      const overlay = document.getElementById('sessionOverlay');
-      const iconBox = document.getElementById('popupIconBox');
-      const icon = document.getElementById('popupIcon');
-      const title = document.getElementById('popupTitle');
-      const subText = document.getElementById('popupSubText');
-      const statusText = document.getElementById('popupStatusText');
-      const btnText = document.getElementById('popupBtnText');
-
-      // Remove existing classes
-      iconBox.className = 'icon-box';
-
-      if (type === 'expired') {
-        iconBox.classList.add('expired');
-        icon.className = 'fas fa-clock';
-        title.innerHTML = 'Session <span>Expired</span>';
-        subText.innerHTML = 'Your session has been expired due to inactivity.<br>Please login again to continue.';
-        statusText.textContent = 'Secure session ended';
-        btnText.textContent = 'Login Again';
-      } else if (type === 'invalid') {
-        iconBox.classList.add('invalid');
-        icon.className = 'fas fa-lock';
-        title.innerHTML = 'Invalid <span>Access</span>';
-        subText.innerHTML = 'You are not authorized to access this page.<br>Please login with valid credentials.';
-        statusText.textContent = 'Access denied';
-        btnText.textContent = 'Go to Login';
-      }
-
-      overlay.classList.add('active');
-      
-      // Prevent body scroll
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-      document.body.style.height = '100%';
-      
-      // Clear any existing token
-      localStorage.removeItem('adminToken');
-      localStorage.removeItem('adminData');
-      
-      // Stop session timer
-      if (sessionTimerInterval) {
-        clearInterval(sessionTimerInterval);
-        sessionTimerInterval = null;
-      }
+    function getSessionRemaining() {
+        const startTime = localStorage.getItem(SESSION_START_KEY);
+        
+        if (!startTime) {
+            // No session started, return full duration
+            return SESSION_DURATION;
+        }
+        
+        const elapsed = Math.floor((Date.now() - parseInt(startTime)) / 1000);
+        const remaining = SESSION_DURATION - elapsed;
+        
+        return Math.max(0, remaining);
     }
 
-    function redirectToLogin() {
-      const overlay = document.getElementById('sessionOverlay');
-      overlay.classList.remove('active');
-      
-      // Restore body scroll
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-      document.body.style.height = '';
-      
-      // Redirect to login
-      window.location.replace("login.html");
-    }
-
-    // ============================================================
-    // SESSION TIMER
-    // ============================================================
     function startSessionTimer() {
-      sessionRemaining = SESSION_DURATION;
-      updateTimerDisplay();
-
-      if (sessionTimerInterval) {
-        clearInterval(sessionTimerInterval);
-      }
-
-      sessionTimerInterval = setInterval(function() {
-        sessionRemaining--;
+        // Check if session already started
+        let startTime = localStorage.getItem(SESSION_START_KEY);
+        
+        if (!startTime) {
+            // First time - start new session
+            startTime = Date.now();
+            localStorage.setItem(SESSION_START_KEY, startTime);
+        }
+        
+        // Get remaining time
+        sessionRemaining = getSessionRemaining();
+        
+        if (sessionRemaining <= 0) {
+            // Session expired
+            showPopup('expired');
+            return;
+        }
+        
         updateTimerDisplay();
 
-        // Show warning at 5 minutes remaining
-        if (sessionRemaining === 300) {
-          showToast('⚠️ Your session will expire in 5 minutes!', 'warning');
+        if (sessionTimerInterval) {
+            clearInterval(sessionTimerInterval);
         }
 
-        // Show danger at 1 minute remaining
-        if (sessionRemaining === 60) {
-          showToast('⛔ Your session will expire in 1 minute!', 'danger');
-        }
+        sessionTimerInterval = setInterval(function() {
+            sessionRemaining--;
+            updateTimerDisplay();
 
-        // Auto logout when session expires
-        if (sessionRemaining <= 0) {
-          clearInterval(sessionTimerInterval);
-          sessionTimerInterval = null;
-          showPopup('expired');
-        }
-      }, 1000);
+            if (sessionRemaining === 300) {
+                showToast('⚠️ Your session will expire in 5 minutes!', 'warning');
+            }
+            if (sessionRemaining === 60) {
+                showToast('⛔ Your session will expire in 1 minute!', 'danger');
+            }
+            if (sessionRemaining <= 0) {
+                clearInterval(sessionTimerInterval);
+                sessionTimerInterval = null;
+                localStorage.removeItem(SESSION_START_KEY);
+                showPopup('expired');
+            }
+        }, 1000);
     }
 
     function updateTimerDisplay() {
-      const minutes = Math.floor(sessionRemaining / 60);
-      const seconds = sessionRemaining % 60;
-      const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-      
-      const timeText = document.getElementById('sessionTimeText');
-      const fill = document.getElementById('sessionTimerFill');
-      
-      timeText.textContent = `⏱️ ${timeStr}`;
-      
-      const percentage = (sessionRemaining / SESSION_DURATION) * 100;
-      fill.style.width = percentage + '%';
+        const minutes = Math.floor(sessionRemaining / 60);
+        const seconds = sessionRemaining % 60;
+        const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        
+        // Top bar timer
+        const timeText = document.getElementById('sessionTimeText');
+        const fill = document.getElementById('sessionTimerFill');
+        
+        if (timeText) {
+            timeText.textContent = `⏱️ ${timeStr}`;
+        }
+        
+        if (fill) {
+            const percentage = (sessionRemaining / SESSION_DURATION) * 100;
+            fill.style.width = percentage + '%';
+        }
 
-      // Change colors based on remaining time
-      timeText.className = 'session-time-text';
-      fill.className = 'fill';
+        // Session Box timer
+        const boxTime = document.getElementById('sessionBoxTime');
+        const boxFill = document.getElementById('sessionBoxFill');
+        const status = document.getElementById('sessionStatus');
+        
+        if (boxTime) {
+            boxTime.textContent = timeStr;
+        }
+        
+        if (boxFill) {
+            const percentage = (sessionRemaining / SESSION_DURATION) * 100;
+            boxFill.style.width = percentage + '%';
+        }
 
-      if (sessionRemaining <= 60) {
-        timeText.classList.add('danger');
-        fill.classList.add('danger');
-      } else if (sessionRemaining <= 300) {
-        timeText.classList.add('warning');
-        fill.classList.add('warning');
-      }
+        // Change colors based on remaining time
+        const isWarning = sessionRemaining <= 300 && sessionRemaining > 60;
+        const isDanger = sessionRemaining <= 60;
+
+        // Top bar
+        if (timeText) {
+            timeText.className = 'session-time-text';
+        }
+        if (fill) {
+            fill.className = 'fill';
+        }
+
+        // Session Box
+        if (boxTime) {
+            boxTime.className = 'time';
+        }
+        if (boxFill) {
+            boxFill.className = 'fill';
+        }
+        if (status) {
+            status.className = 'status';
+        }
+
+        if (isDanger) {
+            if (timeText) timeText.classList.add('danger');
+            if (fill) fill.classList.add('danger');
+            if (boxTime) boxTime.classList.add('danger');
+            if (boxFill) boxFill.classList.add('danger');
+            if (status) status.classList.add('danger');
+            if (status) status.textContent = '⚠️ Expiring';
+        } else if (isWarning) {
+            if (timeText) timeText.classList.add('warning');
+            if (fill) fill.classList.add('warning');
+            if (boxTime) boxTime.classList.add('warning');
+            if (boxFill) boxFill.classList.add('warning');
+            if (status) status.classList.add('warning');
+            if (status) status.textContent = '⚠️ Warning';
+        } else {
+            if (status) status.textContent = '✅ Active';
+        }
     }
 
     // ============================================================
     // TOAST FOR SESSION WARNINGS
     // ============================================================
     function showToast(message, type = 'info') {
-      // Create toast element
-      const toast = document.createElement('div');
-      toast.style.cssText = `
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        padding: 16px 28px;
-        border-radius: 12px;
-        color: #fff;
-        font-weight: 600;
-        font-size: 14px;
-        z-index: 9998;
-        background: ${type === 'warning' ? '#f59e0b' : '#ef4444'};
-        box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-        animation: slideUp 0.4s ease;
-        max-width: 90%;
-        text-align: center;
-      `;
-      toast.textContent = message;
-      document.body.appendChild(toast);
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 16px 28px;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+            z-index: 9998;
+            background: ${type === 'warning' ? '#f59e0b' : '#ef4444'};
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            animation: slideUp 0.4s ease;
+            max-width: 90%;
+            text-align: center;
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
 
-      // Remove after 5 seconds
-      setTimeout(() => {
-        toast.style.animation = 'slideDown 0.4s ease';
         setTimeout(() => {
-          document.body.removeChild(toast);
-        }, 400);
-      }, 5000);
+            toast.style.animation = 'slideDown 0.4s ease';
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 400);
+        }, 5000);
     }
 
-    // Add animation styles for toast
-    const styleSheet = document.createElement("style");
-    styleSheet.textContent = `
-      @keyframes slideUp {
-        from { opacity: 0; transform: translateX(-50%) translateY(40px); }
-        to { opacity: 1; transform: translateX(-50%) translateY(0); }
-      }
-      @keyframes slideDown {
-        from { opacity: 1; transform: translateX(-50%) translateY(0); }
-        to { opacity: 0; transform: translateX(-50%) translateY(40px); }
-      }
-    `;
-    document.head.appendChild(styleSheet);
+    // ============================================================
+    // SESSION POPUP FUNCTIONS
+    // ============================================================
+    function showPopup(type = 'expired') {
+        const overlay = document.getElementById('sessionOverlay');
+        const iconBox = document.getElementById('popupIconBox');
+        const icon = document.getElementById('popupIcon');
+        const title = document.getElementById('popupTitle');
+        const subText = document.getElementById('popupSubText');
+        const statusText = document.getElementById('popupStatusText');
+        const btnText = document.getElementById('popupBtnText');
+
+        iconBox.className = 'icon-box';
+
+        if (type === 'expired') {
+            iconBox.classList.add('expired');
+            icon.className = 'fas fa-clock';
+            title.innerHTML = 'Session <span>Expired</span>';
+            subText.innerHTML = 'Your session has been expired due to inactivity.<br>Please login again to continue.';
+            statusText.textContent = 'Secure session ended';
+            btnText.textContent = 'Login Again';
+        } else if (type === 'invalid') {
+            iconBox.classList.add('invalid');
+            icon.className = 'fas fa-lock';
+            title.innerHTML = 'Invalid <span>Access</span>';
+            subText.innerHTML = 'You are not authorized to access this page.<br>Please login with valid credentials.';
+            statusText.textContent = 'Access denied';
+            btnText.textContent = 'Go to Login';
+        }
+
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100%';
+        document.body.style.height = '100%';
+        
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminData');
+        localStorage.removeItem('sessionStartTime');
+        
+        if (sessionTimerInterval) {
+            clearInterval(sessionTimerInterval);
+            sessionTimerInterval = null;
+        }
+    }
+
+    function redirectToLogin() {
+        const overlay = document.getElementById('sessionOverlay');
+        overlay.classList.remove('active');
+        
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.width = '';
+        document.body.style.height = '';
+        
+        window.location.replace("login.html");
+    }
 
     // ============================================================
     // DATE
@@ -1584,26 +1685,19 @@
     // ============================================================
     // SESSION CHECK - EVERY 30 SECONDS (For API Validation)
     // ============================================================
-    sessionCheckInterval = setInterval(async function() {
+    setInterval(async function() {
       const token = localStorage.getItem('adminToken');
-      if (!token) {
-        return;
-      }
+      if (!token) return;
       
       const overlay = document.getElementById('sessionOverlay');
-      if (overlay.classList.contains('active')) {
-        return;
-      }
+      if (overlay.classList.contains('active')) return;
       
       try {
         const res = await fetch(`${API_BASE}/verify`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();
-        
-        if (!data.success) {
-          showPopup('expired');
-        }
+        if (!data.success) showPopup('expired');
       } catch (err) {
         showPopup('expired');
       }
@@ -1645,6 +1739,7 @@
         if (result.isConfirmed) {
           localStorage.removeItem('adminToken');
           localStorage.removeItem('adminData');
+          localStorage.removeItem('sessionStartTime');
           if (sessionTimerInterval) {
             clearInterval(sessionTimerInterval);
             sessionTimerInterval = null;
