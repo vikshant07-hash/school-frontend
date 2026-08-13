@@ -40,6 +40,165 @@
 }
 
 /* ============================================================
+   SESSION EXPIRED / INVALID ACCESS POPUP - FULLSCREEN OVERLAY
+============================================================ */
+.session-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.4s ease;
+}
+.session-overlay.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+.session-popup {
+  background: var(--bg-white);
+  border-radius: 24px;
+  padding: 48px 40px 40px;
+  max-width: 440px;
+  width: 92%;
+  text-align: center;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: fadeIn 0.5s ease;
+  border: 1px solid rgba(201, 151, 43, 0.15);
+}
+
+.session-popup .school-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: var(--gold-bg);
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border: 2px solid var(--gold);
+}
+.session-popup .school-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.session-popup .icon-box {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  border: 2px solid #fecaca;
+  animation: pulse 2s infinite;
+}
+.session-popup .icon-box.expired {
+  background: #fef2f2;
+  color: var(--red);
+}
+.session-popup .icon-box.invalid {
+  background: #fef2f2;
+  color: var(--red);
+}
+.session-popup .icon-box.invalid {
+  animation: shake 0.5s ease, pulse 2s infinite 0.5s;
+}
+
+.session-popup .icon-box .fa-lock {
+  color: var(--red);
+}
+
+.session-popup h2 {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.session-popup h2 span {
+  color: var(--gold);
+}
+
+.session-popup .sub-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.session-popup .session-timer {
+  font-size: 13px;
+  color: var(--text-muted);
+  background: var(--bg);
+  padding: 8px 16px;
+  border-radius: 50px;
+  display: inline-block;
+  margin: 8px 0 20px;
+  font-weight: 500;
+}
+
+.session-popup .school-name-popup {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+  padding: 6px 14px;
+  background: var(--gold-bg);
+  border-radius: 50px;
+  display: inline-block;
+}
+
+.session-popup .login-again-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 40px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: 'Inter', sans-serif;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(201, 151, 43, 0.3);
+}
+.session-popup .login-again-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 35px rgba(201, 151, 43, 0.4);
+}
+.session-popup .login-again-btn i {
+  font-size: 18px;
+}
+
+/* ============================================================
    RESET
 ============================================================ */
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -751,6 +910,18 @@ body {
 
   .toast { left: 16px; right: 16px; bottom: 16px; max-width: none; }
   .modal { padding: 20px; }
+  
+  .session-popup {
+    padding: 32px 20px 28px;
+  }
+  .session-popup h2 {
+    font-size: 22px;
+  }
+  .session-popup .icon-box {
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+  }
 }
 @media (max-width: 480px) {
   .stats-row { grid-template-columns: 1fr; }
@@ -767,6 +938,37 @@ body {
 <body>
 
 <!-- ============================================================
+   SESSION EXPIRED / INVALID ACCESS OVERLAY
+============================================================ -->
+<div class="session-overlay" id="sessionOverlay">
+    <div class="session-popup">
+        <div class="school-logo">
+            <img src="logo(1).png" alt="GSSS SHILLA Logo">
+        </div>
+        <div class="school-name-popup">
+            <i class="fas fa-school" style="margin-right: 6px;"></i>
+            Govt. Sr. Sec. School Shilla
+        </div>
+        <div class="icon-box expired" id="popupIconBox">
+            <i class="fas fa-clock" id="popupIcon"></i>
+        </div>
+        <h2 id="popupTitle">Session <span>Expired</span></h2>
+        <p class="sub-text" id="popupSubText">
+            Your session has been expired due to inactivity.<br>
+            Please login again to continue.
+        </p>
+        <div class="session-timer" id="popupTimer">
+            <i class="fas fa-shield-alt" style="margin-right: 6px;"></i>
+            <span id="popupStatusText">Secure session ended</span>
+        </div>
+        <button class="login-again-btn" onclick="redirectToLogin()">
+            <i class="fas fa-sign-in-alt"></i>
+            <span id="popupBtnText">Login Again</span>
+        </button>
+    </div>
+</div>
+
+<!-- ============================================================
    NAVBAR
 ============================================================ -->
 <nav class="navbar">
@@ -780,6 +982,9 @@ body {
 
   <ul class="nav-links" id="navLinks">
     <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+    <li><a href="admin-faculity.html"><i class="fas fa-users"></i> Faculty</a></li>
+    <li><a href="admin-downl.html"><i class="fas fa-download"></i> Downloads</a></li>
+    <li><a href="add-image.html"><i class="fas fa-photo-video"></i> Gallery</a></li>
     <li><a href="admin-img.html" class="active"><i class="fas fa-images"></i> Slider</a></li>
   </ul>
 
@@ -800,7 +1005,6 @@ body {
 ============================================================ -->
 <div class="main-container">
 
-  <!-- PAGE HEADER -->
   <div class="page-header">
     <h1><i class="fas fa-images"></i> Slider Manager</h1>
     <div class="header-actions">
@@ -898,7 +1102,6 @@ body {
 <footer class="footer">
   <div class="footer-content">
     <span>&copy; 2026 <a href="#">Govt. Sr. Sec. School Shilla</a>. All rights reserved.</span>
-    
   </div>
 </footer>
 
@@ -946,6 +1149,119 @@ body {
 const API_BASE = "https://gsssshilla.onrender.com";
 
 // ============================================================
+// SESSION EXPIRED / INVALID ACCESS - SHOW POPUP
+// ============================================================
+function showPopup(type = 'expired') {
+    const overlay = document.getElementById('sessionOverlay');
+    const iconBox = document.getElementById('popupIconBox');
+    const icon = document.getElementById('popupIcon');
+    const title = document.getElementById('popupTitle');
+    const subText = document.getElementById('popupSubText');
+    const statusText = document.getElementById('popupStatusText');
+    const btnText = document.getElementById('popupBtnText');
+
+    iconBox.className = 'icon-box';
+
+    if (type === 'expired') {
+        iconBox.classList.add('expired');
+        icon.className = 'fas fa-clock';
+        title.innerHTML = 'Session <span>Expired</span>';
+        subText.innerHTML = 'Your session has been expired due to inactivity.<br>Please login again to continue.';
+        statusText.textContent = 'Secure session ended';
+        btnText.textContent = 'Login Again';
+    } else if (type === 'invalid') {
+        iconBox.classList.add('invalid');
+        icon.className = 'fas fa-lock';
+        title.innerHTML = 'Invalid <span>Access</span>';
+        subText.innerHTML = 'You are not authorized to access this page.<br>Please login with valid credentials.';
+        statusText.textContent = 'Access denied';
+        btnText.textContent = 'Go to Login';
+    }
+
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.height = '100%';
+    
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminData');
+}
+
+function redirectToLogin() {
+    const overlay = document.getElementById('sessionOverlay');
+    overlay.classList.remove('active');
+    
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+    document.body.style.height = '';
+    
+    window.location.replace("login.html");
+}
+
+// ============================================================
+// AUTH CHECK
+// ============================================================
+async function checkAuth() {
+    const token = localStorage.getItem('adminToken');
+    
+    if (!token) {
+        showPopup('invalid');
+        return false;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE}/api/admin/verify`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            if (data.admin && data.admin.username) {
+                const initial = data.admin.username.charAt(0).toUpperCase();
+                document.getElementById('adminAvatar').textContent = initial;
+                document.getElementById('adminName').textContent = data.admin.username;
+            }
+            return true;
+        } else {
+            showPopup('expired');
+            return false;
+        }
+    } catch (err) {
+        console.error("Auth check error:", err);
+        showPopup('expired');
+        return false;
+    }
+}
+
+// ============================================================
+// FETCH WITH AUTH
+// ============================================================
+async function fetchWithAuth(url, options = {}) {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        showPopup('invalid');
+        throw new Error('No token found');
+    }
+
+    const response = await fetch(url, {
+        ...options,
+        headers: {
+            ...options.headers,
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    if (response.status === 401) {
+        showPopup('expired');
+        throw new Error('Session expired');
+    }
+
+    return response;
+}
+
+// ============================================================
 // TOAST
 // ============================================================
 function showToast(message, type = 'success') {
@@ -987,12 +1303,11 @@ function getImageUrl(img) {
 }
 
 // ============================================================
-// FETCH IMAGES
+// FETCH IMAGES - WITH AUTH
 // ============================================================
 async function fetchImages() {
   try {
-    const response = await fetch(`${API_BASE}/images`);
-    if (!response.ok) throw new Error('Failed to fetch');
+    const response = await fetchWithAuth(`${API_BASE}/images`);
     const data = await response.json();
 
     if (Array.isArray(data) && data.length > 0) {
@@ -1005,7 +1320,9 @@ async function fetchImages() {
     }
   } catch (error) {
     console.error('Error:', error);
-    showToast('❌ Failed to load images', 'error');
+    if (error.message !== 'Session expired' && error.message !== 'No token found') {
+      showToast('❌ Failed to load images', 'error');
+    }
     showEmptyState();
   }
 }
@@ -1056,7 +1373,7 @@ function renderImages(images) {
         <button class="btn btn-sm btn-primary" onclick="openEditModal(${img.id})">
           <i class="fas fa-edit"></i> Edit
         </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteImage('${img.filename || img.public_id}', ${img.id})">
+        <button class="btn btn-sm btn-danger" onclick="deleteImage(${img.id})">
           <i class="fas fa-trash-alt"></i> Delete
         </button>
       </div>
@@ -1093,7 +1410,7 @@ function updateStats(images) {
 }
 
 // ============================================================
-// UPLOAD IMAGES
+// UPLOAD IMAGES - WITH AUTH
 // ============================================================
 async function uploadImages(files) {
   if (!files || files.length === 0) return;
@@ -1108,12 +1425,10 @@ async function uploadImages(files) {
   progressText.textContent = 'Uploading... 0%';
 
   try {
-    const response = await fetch(`${API_BASE}/upload`, {
+    const response = await fetchWithAuth(`${API_BASE}/upload`, {
       method: 'POST',
       body: formData,
     });
-
-    if (!response.ok) throw new Error('Upload failed');
 
     progressFill.style.width = '100%';
     progressText.textContent = '✅ Uploaded!';
@@ -1128,36 +1443,38 @@ async function uploadImages(files) {
     setTimeout(fetchImages, 500);
 
   } catch (error) {
-    showToast('❌ Upload failed: ' + error.message, 'error');
+    if (error.message !== 'Session expired' && error.message !== 'No token found') {
+      showToast('❌ Upload failed: ' + error.message, 'error');
+    }
     progressWrapper.style.display = 'none';
   }
 }
 
 // ============================================================
-// DELETE IMAGE
+// DELETE IMAGE - WITH AUTH
 // ============================================================
-async function deleteImage(filename, id) {
+async function deleteImage(id) {
   if (!confirm('Delete this image?')) return;
 
   try {
-    const response = await fetch(`${API_BASE}/delete`, {
+    const response = await fetchWithAuth(`${API_BASE}/delete`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ filename }),
+      body: JSON.stringify({ filename: currentImages.find(i => i.id === id)?.filename || currentImages.find(i => i.id === id)?.public_id }),
     });
-
-    if (!response.ok) throw new Error('Delete failed');
 
     showToast('✅ Image deleted!', 'success');
     setTimeout(fetchImages, 300);
 
   } catch (error) {
-    showToast('❌ Failed to delete', 'error');
+    if (error.message !== 'Session expired' && error.message !== 'No token found') {
+      showToast('❌ Failed to delete', 'error');
+    }
   }
 }
 
 // ============================================================
-// BULK DELETE
+// BULK DELETE - WITH AUTH
 // ============================================================
 function confirmBulkDelete() {
   if (currentImages.length === 0) {
@@ -1172,7 +1489,7 @@ function confirmBulkDelete() {
 
   currentImages.forEach(async (img) => {
     try {
-      const response = await fetch(`${API_BASE}/delete`, {
+      const response = await fetchWithAuth(`${API_BASE}/delete`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename: img.filename || img.public_id }),
@@ -1188,7 +1505,7 @@ function confirmBulkDelete() {
 }
 
 // ============================================================
-// REORDER IMAGES
+// REORDER IMAGES - WITH AUTH
 // ============================================================
 function reorderImages() {
   if (currentImages.length < 2) {
@@ -1199,7 +1516,7 @@ function reorderImages() {
   const reversed = [...currentImages].reverse();
   const orders = reversed.map((img, index) => ({ id: img.id, order: index + 1 }));
 
-  fetch(`${API_BASE}/images/reorder`, {
+  fetchWithAuth(`${API_BASE}/images/reorder`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ orders }),
@@ -1213,7 +1530,11 @@ function reorderImages() {
       showToast('❌ Failed', 'error');
     }
   })
-  .catch(() => showToast('❌ Failed', 'error'));
+  .catch((error) => {
+    if (error.message !== 'Session expired' && error.message !== 'No token found') {
+      showToast('❌ Failed', 'error');
+    }
+  });
 }
 
 // ============================================================
@@ -1236,6 +1557,9 @@ function closeModal() {
   editingImageId = null;
 }
 
+// ============================================================
+// SAVE IMAGE EDIT - WITH AUTH
+// ============================================================
 function saveImageEdit() {
   if (!editingImageId) { showToast('No image selected', 'error'); return; }
 
@@ -1245,7 +1569,7 @@ function saveImageEdit() {
 
   if (!title) { showToast('Please enter a title', 'error'); return; }
 
-  fetch(`${API_BASE}/images/update/${editingImageId}`, {
+  fetchWithAuth(`${API_BASE}/images/update/${editingImageId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ title, alt_text, is_active }),
@@ -1260,7 +1584,11 @@ function saveImageEdit() {
       showToast('❌ Failed', 'error');
     }
   })
-  .catch(() => showToast('❌ Failed', 'error'));
+  .catch((error) => {
+    if (error.message !== 'Session expired' && error.message !== 'No token found') {
+      showToast('❌ Failed', 'error');
+    }
+  });
 }
 
 // ============================================================
@@ -1311,6 +1639,27 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ============================================================
+// SESSION TIMER - AUTO CHECK EVERY 30 SECONDS
+// ============================================================
+let sessionCheckInterval = setInterval(async function() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+    
+    const overlay = document.getElementById('sessionOverlay');
+    if (overlay.classList.contains('active')) return;
+    
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/verify`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (!data.success) showPopup('expired');
+    } catch (err) {
+        showPopup('expired');
+    }
+}, 30000);
+
+// ============================================================
 // INIT
 // ============================================================
 let currentImages = [];
@@ -1326,23 +1675,31 @@ const imageGrid = document.getElementById('imageGrid');
 const progressWrapper = document.getElementById('progressWrapper');
 const progressFill = document.getElementById('progressFill');
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Admin name from localStorage
-    const adminData = localStorage.getItem('adminData');
-    if (adminData) {
-        try {
-            const data = JSON.parse(adminData);
-            const name = data.name || data.username || 'Admin';
-            document.getElementById('adminName').textContent = name;
-            document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
-        } catch (e) {}
+document.addEventListener('DOMContentLoaded', async function() {
+    const isAuth = await checkAuth();
+    
+    if (isAuth) {
+        const adminData = localStorage.getItem('adminData');
+        if (adminData) {
+            try {
+                const data = JSON.parse(adminData);
+                const name = data.name || data.username || 'Admin';
+                document.getElementById('adminName').textContent = name;
+                document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
+            } catch (e) {}
+        }
+        fetchImages();
+        setInterval(fetchImages, 60000);
     }
-
-    console.log('🏛️ Slider Manager Loaded');
-    fetchImages();
-    // Auto refresh every 60 seconds
-    setInterval(fetchImages, 60000);
 });
+
+// ============================================================
+// BACK BUTTON BLOCK
+// ============================================================
+window.history.pushState(null, null, window.location.href);
+window.onpopstate = function() {
+    window.history.pushState(null, null, window.location.href);
+};
 </script>
 </body>
 </html>
