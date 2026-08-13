@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
-   ROOT VARIABLES - CLEAN THEME
+   ROOT VARIABLES
 ============================================================ */
 :root {
   --bg: #f5f7fb;
@@ -40,7 +40,7 @@
 }
 
 /* ============================================================
-   SESSION EXPIRED / INVALID ACCESS POPUP - FULLSCREEN OVERLAY
+   SESSION EXPIRED / INVALID ACCESS POPUP
 ============================================================ */
 .session-overlay {
   display: none;
@@ -212,7 +212,7 @@ body {
 }
 
 /* ============================================================
-   NAVBAR - CLEAN WHITE
+   NAVBAR
 ============================================================ */
 .navbar {
   background: var(--bg-white);
@@ -1187,6 +1187,7 @@ function showPopup(type = 'expired') {
     
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminData');
+    localStorage.removeItem('csrfToken');
 }
 
 function redirectToLogin() {
@@ -1224,6 +1225,8 @@ async function checkAuth() {
                 document.getElementById('adminAvatar').textContent = initial;
                 document.getElementById('adminName').textContent = data.admin.username;
             }
+            // Get CSRF token
+            await getCsrfToken();
             return true;
         } else {
             showPopup('expired');
@@ -1237,26 +1240,76 @@ async function checkAuth() {
 }
 
 // ============================================================
+// GET CSRF TOKEN
+// ============================================================
+async function getCsrfToken() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) return null;
+
+    try {
+        const response = await fetch(`${API_BASE}/api/admin/csrf-token`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await response.json();
+        if (data.success && data.token) {
+            localStorage.setItem('csrfToken', data.token);
+            return data.token;
+        }
+        return null;
+    } catch (err) {
+        console.error('CSRF token fetch error:', err);
+        return null;
+    }
+}
+
+// ============================================================
 // FETCH WITH AUTH
 // ============================================================
 async function fetchWithAuth(url, options = {}) {
     const token = localStorage.getItem('adminToken');
+    const csrfToken = localStorage.getItem('csrfToken');
+    
     if (!token) {
         showPopup('invalid');
         throw new Error('No token found');
     }
 
+    const headers = {
+        ...options.headers,
+        'Authorization': `Bearer ${token}`
+    };
+
+    // Add CSRF token for non-GET requests
+    if (options.method && options.method !== 'GET' && csrfToken) {
+        headers['X-CSRF-Token'] = csrfToken;
+    }
+
     const response = await fetch(url, {
         ...options,
-        headers: {
-            ...options.headers,
-            'Authorization': `Bearer ${token}`
-        }
+        headers: headers
     });
 
     if (response.status === 401) {
         showPopup('expired');
         throw new Error('Session expired');
+    }
+
+    if (response.status === 403) {
+        // CSRF token expired, get new one and retry
+        await getCsrfToken();
+        const newCsrfToken = localStorage.getItem('csrfToken');
+        if (newCsrfToken && options.method && options.method !== 'GET') {
+            headers['X-CSRF-Token'] = newCsrfToken;
+            const retryResponse = await fetch(url, {
+                ...options,
+                headers: headers
+            });
+            if (retryResponse.status === 403) {
+                throw new Error('CSRF validation failed');
+            }
+            return retryResponse;
+        }
+        throw new Error('CSRF validation failed');
     }
 
     return response;
@@ -1304,7 +1357,7 @@ function getImageUrl(img) {
 }
 
 // ============================================================
-// FETCH IMAGES - UPDATED ROUTE
+// FETCH IMAGES
 // ============================================================
 async function fetchImages() {
   try {
@@ -1411,7 +1464,7 @@ function updateStats(images) {
 }
 
 // ============================================================
-// UPLOAD IMAGES - UPDATED ROUTE
+// UPLOAD IMAGES
 // ============================================================
 async function uploadImages(files) {
   if (!files || files.length === 0) return;
@@ -1453,7 +1506,7 @@ async function uploadImages(files) {
 }
 
 // ============================================================
-// DELETE IMAGE - UPDATED ROUTE
+// DELETE IMAGE
 // ============================================================
 async function deleteImage(id) {
   if (!confirm('Delete this image?')) return;
@@ -1509,7 +1562,7 @@ function confirmBulkDelete() {
 }
 
 // ============================================================
-// REORDER IMAGES - UPDATED ROUTE
+// REORDER IMAGES
 // ============================================================
 function reorderImages() {
   if (currentImages.length < 2) {
@@ -1562,7 +1615,7 @@ function closeModal() {
 }
 
 // ============================================================
-// SAVE IMAGE EDIT - UPDATED ROUTE
+// SAVE IMAGE EDIT
 // ============================================================
 function saveImageEdit() {
   if (!editingImageId) { showToast('No image selected', 'error'); return; }
