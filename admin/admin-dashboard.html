@@ -66,7 +66,7 @@
     .dashboard { display: flex; flex: 1; min-height: 100vh; }
 
     /* ============================================================
-       SESSION EXPIRED POPUP - FULLSCREEN OVERLAY
+       SESSION POPUP - FULLSCREEN OVERLAY (Expired + Invalid)
     ============================================================ */
     .session-overlay {
       display: none;
@@ -91,6 +91,12 @@
     @keyframes pulse {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.05); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
     }
 
     .session-popup {
@@ -129,15 +135,28 @@
       width: 72px;
       height: 72px;
       border-radius: 50%;
-      background: #fef2f2;
       margin: 0 auto 20px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 36px;
-      color: var(--red);
       border: 2px solid #fecaca;
       animation: pulse 2s infinite;
+    }
+    .session-popup .icon-box.expired {
+      background: #fef2f2;
+      color: var(--red);
+    }
+    .session-popup .icon-box.invalid {
+      background: #fef2f2;
+      color: var(--red);
+    }
+    .session-popup .icon-box.invalid {
+      animation: shake 0.5s ease, pulse 2s infinite 0.5s;
+    }
+
+    .session-popup .icon-box .fa-lock {
+      color: var(--red);
     }
 
     .session-popup h2 {
@@ -205,18 +224,57 @@
       font-size: 18px;
     }
 
-    /* Session Expired Animation */
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-8px); }
-      75% { transform: translateX(8px); }
+    /* ============================================================
+       SESSION TIMER BAR - TOP OF PAGE
+    ============================================================ */
+    .session-timer-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--border);
+      z-index: 9997;
+      overflow: hidden;
     }
-    .session-popup .icon-box.shake {
-      animation: shake 0.5s ease, pulse 2s infinite 0.5s;
+    .session-timer-bar .fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--gold), var(--orange), var(--red));
+      width: 100%;
+      transition: width 1s linear;
+    }
+    .session-timer-bar .fill.warning {
+      background: var(--orange);
+    }
+    .session-timer-bar .fill.danger {
+      background: var(--red);
+      animation: blink 0.5s ease infinite;
     }
 
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .session-time-text {
+      position: fixed;
+      top: 8px;
+      right: 16px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      z-index: 9997;
+      background: rgba(255,255,255,0.9);
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(4px);
+    }
+    .session-time-text.warning { color: var(--orange); }
+    .session-time-text.danger { color: var(--red); animation: blink 0.5s ease infinite; }
+
     /* ============================================================
-       SIDEBAR - CLEAN WHITE (Existing CSS - Keep as is)
+       SIDEBAR - CLEAN WHITE
     ============================================================ */
     .sidebar {
       width: 270px;
@@ -959,7 +1017,15 @@
 <body>
 
   <!-- ============================================================
-     SESSION EXPIRED OVERLAY - FULLSCREEN POPUP
+     SESSION TIMER BAR - TOP OF PAGE
+  ============================================================ -->
+  <div class="session-timer-bar" id="sessionTimerBar">
+    <div class="fill" id="sessionTimerFill"></div>
+  </div>
+  <div class="session-time-text" id="sessionTimeText">⏱️ 30:00</div>
+
+  <!-- ============================================================
+     SESSION OVERLAY - (Expired + Invalid Access)
   ============================================================ -->
   <div class="session-overlay" id="sessionOverlay">
     <div class="session-popup">
@@ -974,30 +1040,30 @@
         Govt. Sr. Sec. School Shilla
       </div>
 
-      <!-- Session Expired Icon -->
-      <div class="icon-box shake">
-        <i class="fas fa-clock"></i>
+      <!-- Icon - Changes based on type -->
+      <div class="icon-box expired" id="popupIconBox">
+        <i class="fas fa-clock" id="popupIcon"></i>
       </div>
 
       <!-- Title -->
-      <h2>Session <span>Expired</span></h2>
+      <h2 id="popupTitle">Session <span>Expired</span></h2>
       
       <!-- Sub Text -->
-      <p class="sub-text">
+      <p class="sub-text" id="popupSubText">
         Your session has been expired due to inactivity.<br>
         Please login again to continue.
       </p>
 
       <!-- Timer / Info -->
-      <div class="session-timer">
+      <div class="session-timer" id="popupTimer">
         <i class="fas fa-shield-alt" style="margin-right: 6px;"></i>
-        Secure session ended
+        <span id="popupStatusText">Secure session ended</span>
       </div>
 
       <!-- Login Again Button -->
       <button class="login-again-btn" onclick="redirectToLogin()">
         <i class="fas fa-sign-in-alt"></i>
-        Login Again
+        <span id="popupBtnText">Login Again</span>
       </button>
     </div>
   </div>
@@ -1197,15 +1263,42 @@
     // CONFIGURATION
     // ============================================================
     const API_BASE = 'https://gsssshilla.onrender.com/api/admin';
-    const token = localStorage.getItem('adminToken');
-
-    console.log("🔍 Token:", token ? "✅ Found" : "❌ Not found");
+    const SESSION_DURATION = 30 * 60; // 30 minutes in seconds
+    let sessionRemaining = SESSION_DURATION;
+    let sessionTimerInterval = null;
+    let sessionCheckInterval = null;
 
     // ============================================================
-    // SESSION EXPIRED - SHOW POPUP
+    // SESSION POPUP - (Expired + Invalid)
     // ============================================================
-    function showSessionExpired() {
+    function showPopup(type = 'expired') {
       const overlay = document.getElementById('sessionOverlay');
+      const iconBox = document.getElementById('popupIconBox');
+      const icon = document.getElementById('popupIcon');
+      const title = document.getElementById('popupTitle');
+      const subText = document.getElementById('popupSubText');
+      const statusText = document.getElementById('popupStatusText');
+      const btnText = document.getElementById('popupBtnText');
+
+      // Remove existing classes
+      iconBox.className = 'icon-box';
+
+      if (type === 'expired') {
+        iconBox.classList.add('expired');
+        icon.className = 'fas fa-clock';
+        title.innerHTML = 'Session <span>Expired</span>';
+        subText.innerHTML = 'Your session has been expired due to inactivity.<br>Please login again to continue.';
+        statusText.textContent = 'Secure session ended';
+        btnText.textContent = 'Login Again';
+      } else if (type === 'invalid') {
+        iconBox.classList.add('invalid');
+        icon.className = 'fas fa-lock';
+        title.innerHTML = 'Invalid <span>Access</span>';
+        subText.innerHTML = 'You are not authorized to access this page.<br>Please login with valid credentials.';
+        statusText.textContent = 'Access denied';
+        btnText.textContent = 'Go to Login';
+      }
+
       overlay.classList.add('active');
       
       // Prevent body scroll
@@ -1217,6 +1310,12 @@
       // Clear any existing token
       localStorage.removeItem('adminToken');
       localStorage.removeItem('adminData');
+      
+      // Stop session timer
+      if (sessionTimerInterval) {
+        clearInterval(sessionTimerInterval);
+        sessionTimerInterval = null;
+      }
     }
 
     function redirectToLogin() {
@@ -1232,6 +1331,115 @@
       // Redirect to login
       window.location.replace("login.html");
     }
+
+    // ============================================================
+    // SESSION TIMER
+    // ============================================================
+    function startSessionTimer() {
+      sessionRemaining = SESSION_DURATION;
+      updateTimerDisplay();
+
+      if (sessionTimerInterval) {
+        clearInterval(sessionTimerInterval);
+      }
+
+      sessionTimerInterval = setInterval(function() {
+        sessionRemaining--;
+        updateTimerDisplay();
+
+        // Show warning at 5 minutes remaining
+        if (sessionRemaining === 300) {
+          showToast('⚠️ Your session will expire in 5 minutes!', 'warning');
+        }
+
+        // Show danger at 1 minute remaining
+        if (sessionRemaining === 60) {
+          showToast('⛔ Your session will expire in 1 minute!', 'danger');
+        }
+
+        // Auto logout when session expires
+        if (sessionRemaining <= 0) {
+          clearInterval(sessionTimerInterval);
+          sessionTimerInterval = null;
+          showPopup('expired');
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(sessionRemaining / 60);
+      const seconds = sessionRemaining % 60;
+      const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      
+      const timeText = document.getElementById('sessionTimeText');
+      const fill = document.getElementById('sessionTimerFill');
+      
+      timeText.textContent = `⏱️ ${timeStr}`;
+      
+      const percentage = (sessionRemaining / SESSION_DURATION) * 100;
+      fill.style.width = percentage + '%';
+
+      // Change colors based on remaining time
+      timeText.className = 'session-time-text';
+      fill.className = 'fill';
+
+      if (sessionRemaining <= 60) {
+        timeText.classList.add('danger');
+        fill.classList.add('danger');
+      } else if (sessionRemaining <= 300) {
+        timeText.classList.add('warning');
+        fill.classList.add('warning');
+      }
+    }
+
+    // ============================================================
+    // TOAST FOR SESSION WARNINGS
+    // ============================================================
+    function showToast(message, type = 'info') {
+      // Create toast element
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 16px 28px;
+        border-radius: 12px;
+        color: #fff;
+        font-weight: 600;
+        font-size: 14px;
+        z-index: 9998;
+        background: ${type === 'warning' ? '#f59e0b' : '#ef4444'};
+        box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        animation: slideUp 0.4s ease;
+        max-width: 90%;
+        text-align: center;
+      `;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      // Remove after 5 seconds
+      setTimeout(() => {
+        toast.style.animation = 'slideDown 0.4s ease';
+        setTimeout(() => {
+          document.body.removeChild(toast);
+        }, 400);
+      }, 5000);
+    }
+
+    // Add animation styles for toast
+    const styleSheet = document.createElement("style");
+    styleSheet.textContent = `
+      @keyframes slideUp {
+        from { opacity: 0; transform: translateX(-50%) translateY(40px); }
+        to { opacity: 1; transform: translateX(-50%) translateY(0); }
+      }
+      @keyframes slideDown {
+        from { opacity: 1; transform: translateX(-50%) translateY(0); }
+        to { opacity: 0; transform: translateX(-50%) translateY(40px); }
+      }
+    `;
+    document.head.appendChild(styleSheet);
 
     // ============================================================
     // DATE
@@ -1254,11 +1462,13 @@
     setGreeting();
 
     // ============================================================
-    // AUTH CHECK - WITH SESSION EXPIRY
+    // AUTH CHECK
     // ============================================================
+    const token = localStorage.getItem('adminToken');
+
     async function checkAuth() {
       if (!token) {
-        showSessionExpired();
+        showPopup('invalid');
         return false;
       }
 
@@ -1273,16 +1483,16 @@
             const initial = data.admin.username.charAt(0).toUpperCase();
             document.getElementById('adminAvatar').textContent = initial;
           }
+          // Start session timer after successful auth
+          startSessionTimer();
           return true;
         } else {
-          // Token invalid - Session Expired
-          showSessionExpired();
+          showPopup('expired');
           return false;
         }
       } catch (err) {
         console.error("Auth check error:", err);
-        // Network error or server down - treat as session expired
-        showSessionExpired();
+        showPopup('expired');
         return false;
       }
     }
@@ -1372,16 +1582,14 @@
     });
 
     // ============================================================
-    // SESSION TIMER - AUTO CHECK EVERY 30 SECONDS
+    // SESSION CHECK - EVERY 30 SECONDS (For API Validation)
     // ============================================================
-    let sessionCheckInterval = setInterval(async function() {
+    sessionCheckInterval = setInterval(async function() {
       const token = localStorage.getItem('adminToken');
       if (!token) {
-        // Already logged out - no need to check
         return;
       }
       
-      // Don't check if session expired overlay is already showing
       const overlay = document.getElementById('sessionOverlay');
       if (overlay.classList.contains('active')) {
         return;
@@ -1394,13 +1602,12 @@
         const data = await res.json();
         
         if (!data.success) {
-          showSessionExpired();
+          showPopup('expired');
         }
       } catch (err) {
-        // If network error, show session expired
-        showSessionExpired();
+        showPopup('expired');
       }
-    }, 30000); // Check every 30 seconds
+    }, 30000);
 
     // ============================================================
     // INIT
@@ -1438,6 +1645,10 @@
         if (result.isConfirmed) {
           localStorage.removeItem('adminToken');
           localStorage.removeItem('adminData');
+          if (sessionTimerInterval) {
+            clearInterval(sessionTimerInterval);
+            sessionTimerInterval = null;
+          }
           window.location.replace("login.html");
         }
       });
