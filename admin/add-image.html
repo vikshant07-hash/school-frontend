@@ -995,6 +995,10 @@ body {
 
   <ul class="nav-links" id="navLinks">
     <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+    <li><a href="admin-faculity.html"><i class="fas fa-users"></i> Faculty</a></li>
+    <li><a href="admin-downl.html"><i class="fas fa-download"></i> Downloads</a></li>
+    <li><a href="add-image.html"><i class="fas fa-photo-video"></i> Gallery</a></li>
+    <li><a href="recent.html"><i class="fas fa-clock"></i> Recent</a></li>
     <li><a href="admin-img.html" class="active"><i class="fas fa-images"></i> Slider</a></li>
   </ul>
 
@@ -1172,7 +1176,6 @@ function showPopup(type = 'expired') {
     const statusText = document.getElementById('popupStatusText');
     const btnText = document.getElementById('popupBtnText');
 
-    // Remove existing classes
     iconBox.className = 'icon-box';
 
     if (type === 'expired') {
@@ -1192,14 +1195,11 @@ function showPopup(type = 'expired') {
     }
 
     overlay.classList.add('active');
-    
-    // Prevent body scroll
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
     document.body.style.width = '100%';
     document.body.style.height = '100%';
     
-    // Clear any existing token
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminData');
 }
@@ -1208,23 +1208,20 @@ function redirectToLogin() {
     const overlay = document.getElementById('sessionOverlay');
     overlay.classList.remove('active');
     
-    // Restore body scroll
     document.body.style.overflow = '';
     document.body.style.position = '';
     document.body.style.width = '';
     document.body.style.height = '';
     
-    // Redirect to login
     window.location.replace("login.html");
 }
 
 // ============================================================
-// AUTH CHECK - WITH SESSION EXPIRY & INVALID ACCESS
+// AUTH CHECK
 // ============================================================
 async function checkAuth() {
     const token = localStorage.getItem('adminToken');
     
-    // If no token - show invalid access popup
     if (!token) {
         showPopup('invalid');
         return false;
@@ -1237,7 +1234,6 @@ async function checkAuth() {
         const data = await response.json();
 
         if (data.success) {
-            // Token is valid
             if (data.admin && data.admin.username) {
                 const initial = data.admin.username.charAt(0).toUpperCase();
                 document.getElementById('adminAvatar').textContent = initial;
@@ -1245,16 +1241,40 @@ async function checkAuth() {
             }
             return true;
         } else {
-            // Token invalid - session expired
             showPopup('expired');
             return false;
         }
     } catch (err) {
         console.error("Auth check error:", err);
-        // Network error or server down - treat as session expired
         showPopup('expired');
         return false;
     }
+}
+
+// ============================================================
+// FETCH WITH AUTH
+// ============================================================
+async function fetchWithAuth(url, options = {}) {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        showPopup('invalid');
+        throw new Error('No token found');
+    }
+
+    const response = await fetch(url, {
+        ...options,
+        headers: {
+            ...options.headers,
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    if (response.status === 401) {
+        showPopup('expired');
+        throw new Error('Session expired');
+    }
+
+    return response;
 }
 
 // ============================================================
@@ -1299,12 +1319,11 @@ function getImageUrl(img) {
 }
 
 // ============================================================
-// FETCH IMAGES
+// FETCH IMAGES - WITH AUTH
 // ============================================================
 async function fetchImages() {
   try {
-    const response = await fetch(`${API_BASE}/images`);
-    if (!response.ok) throw new Error('Failed to fetch');
+    const response = await fetchWithAuth(`${API_BASE}/images`);
     const data = await response.json();
 
     if (Array.isArray(data) && data.length > 0) {
@@ -1317,7 +1336,9 @@ async function fetchImages() {
     }
   } catch (error) {
     console.error('Error:', error);
-    showToast('❌ Failed to load images', 'error');
+    if (error.message !== 'Session expired' && error.message !== 'No token found') {
+      showToast('❌ Failed to load images', 'error');
+    }
     showEmptyState();
   }
 }
@@ -1405,7 +1426,7 @@ function updateStats(images) {
 }
 
 // ============================================================
-// UPLOAD IMAGES
+// UPLOAD IMAGES - WITH AUTH
 // ============================================================
 async function uploadImages(files) {
   if (!files || files.length === 0) return;
@@ -1420,12 +1441,10 @@ async function uploadImages(files) {
   progressText.textContent = 'Uploading... 0%';
 
   try {
-    const response = await fetch(`${API_BASE}/upload`, {
+    const response = await fetchWithAuth(`${API_BASE}/upload`, {
       method: 'POST',
       body: formData,
     });
-
-    if (!response.ok) throw new Error('Upload failed');
 
     progressFill.style.width = '100%';
     progressText.textContent = '✅ Uploaded!';
@@ -1440,31 +1459,33 @@ async function uploadImages(files) {
     setTimeout(fetchImages, 500);
 
   } catch (error) {
-    showToast('❌ Upload failed: ' + error.message, 'error');
+    if (error.message !== 'Session expired' && error.message !== 'No token found') {
+      showToast('❌ Upload failed: ' + error.message, 'error');
+    }
     progressWrapper.style.display = 'none';
   }
 }
 
 // ============================================================
-// DELETE IMAGE
+// DELETE IMAGE - WITH AUTH
 // ============================================================
 async function deleteImage(filename, id) {
   if (!confirm('Delete this image?')) return;
 
   try {
-    const response = await fetch(`${API_BASE}/delete`, {
+    const response = await fetchWithAuth(`${API_BASE}/delete`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ filename }),
     });
 
-    if (!response.ok) throw new Error('Delete failed');
-
     showToast('✅ Image deleted!', 'success');
     setTimeout(fetchImages, 300);
 
   } catch (error) {
-    showToast('❌ Failed to delete', 'error');
+    if (error.message !== 'Session expired' && error.message !== 'No token found') {
+      showToast('❌ Failed to delete', 'error');
+    }
   }
 }
 
@@ -1484,7 +1505,7 @@ function confirmBulkDelete() {
 
   currentImages.forEach(async (img) => {
     try {
-      const response = await fetch(`${API_BASE}/delete`, {
+      const response = await fetchWithAuth(`${API_BASE}/delete`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename: img.filename || img.public_id }),
@@ -1511,7 +1532,7 @@ function reorderImages() {
   const reversed = [...currentImages].reverse();
   const orders = reversed.map((img, index) => ({ id: img.id, order: index + 1 }));
 
-  fetch(`${API_BASE}/images/reorder`, {
+  fetchWithAuth(`${API_BASE}/images/reorder`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ orders }),
@@ -1525,7 +1546,11 @@ function reorderImages() {
       showToast('❌ Failed', 'error');
     }
   })
-  .catch(() => showToast('❌ Failed', 'error'));
+  .catch((error) => {
+    if (error.message !== 'Session expired' && error.message !== 'No token found') {
+      showToast('❌ Failed', 'error');
+    }
+  });
 }
 
 // ============================================================
@@ -1557,7 +1582,7 @@ function saveImageEdit() {
 
   if (!title) { showToast('Please enter a title', 'error'); return; }
 
-  fetch(`${API_BASE}/images/update/${editingImageId}`, {
+  fetchWithAuth(`${API_BASE}/images/update/${editingImageId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ title, alt_text, is_active }),
@@ -1572,7 +1597,11 @@ function saveImageEdit() {
       showToast('❌ Failed', 'error');
     }
   })
-  .catch(() => showToast('❌ Failed', 'error'));
+  .catch((error) => {
+    if (error.message !== 'Session expired' && error.message !== 'No token found') {
+      showToast('❌ Failed', 'error');
+    }
+  });
 }
 
 // ============================================================
@@ -1627,31 +1656,21 @@ document.addEventListener('keydown', (e) => {
 // ============================================================
 let sessionCheckInterval = setInterval(async function() {
     const token = localStorage.getItem('adminToken');
-    if (!token) {
-        // Already logged out - no need to check
-        return;
-    }
+    if (!token) return;
     
-    // Don't check if session overlay is already showing
     const overlay = document.getElementById('sessionOverlay');
-    if (overlay.classList.contains('active')) {
-        return;
-    }
+    if (overlay.classList.contains('active')) return;
     
     try {
         const res = await fetch(`${API_BASE}/api/admin/verify`, {
             headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();
-        
-        if (!data.success) {
-            showPopup('expired');
-        }
+        if (!data.success) showPopup('expired');
     } catch (err) {
-        // If network error, show session expired
         showPopup('expired');
     }
-}, 30000); // Check every 30 seconds
+}, 30000);
 
 // ============================================================
 // INIT
@@ -1666,13 +1685,13 @@ const lastUploadEl = document.getElementById('lastUpload');
 const imageCountEl = document.getElementById('imageCount');
 const emptyState = document.getElementById('emptyState');
 const imageGrid = document.getElementById('imageGrid');
+const progressWrapper = document.getElementById('progressWrapper');
+const progressFill = document.getElementById('progressFill');
 
 document.addEventListener('DOMContentLoaded', async function() {
-    // First check authentication
     const isAuth = await checkAuth();
     
     if (isAuth) {
-        // Load admin data from localStorage
         const adminData = localStorage.getItem('adminData');
         if (adminData) {
             try {
@@ -1682,11 +1701,9 @@ document.addEventListener('DOMContentLoaded', async function() {
                 document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
             } catch (e) {}
         }
-        // Load images
         fetchImages();
         setInterval(fetchImages, 60000);
     }
-    // If not authenticated, popup already shown by checkAuth()
 });
 
 // ============================================================
