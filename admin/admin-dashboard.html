@@ -66,7 +66,157 @@
     .dashboard { display: flex; flex: 1; min-height: 100vh; }
 
     /* ============================================================
-       SIDEBAR - CLEAN WHITE
+       SESSION EXPIRED POPUP - FULLSCREEN OVERLAY
+    ============================================================ */
+    .session-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.4s ease;
+    }
+    .session-overlay.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .session-popup {
+      background: var(--bg-white);
+      border-radius: 24px;
+      padding: 48px 40px 40px;
+      max-width: 440px;
+      width: 92%;
+      text-align: center;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+      position: relative;
+      animation: fadeIn 0.5s ease;
+      border: 1px solid rgba(201, 151, 43, 0.15);
+    }
+
+    .session-popup .school-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: var(--gold-bg);
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      border: 2px solid var(--gold);
+    }
+    .session-popup .school-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 12px;
+    }
+
+    .session-popup .icon-box {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #fef2f2;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      color: var(--red);
+      border: 2px solid #fecaca;
+      animation: pulse 2s infinite;
+    }
+
+    .session-popup h2 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .session-popup h2 span {
+      color: var(--gold);
+    }
+
+    .session-popup .sub-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+
+    .session-popup .session-timer {
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--bg);
+      padding: 8px 16px;
+      border-radius: 50px;
+      display: inline-block;
+      margin: 8px 0 20px;
+      font-weight: 500;
+    }
+
+    .session-popup .school-name-popup {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+      padding: 6px 14px;
+      background: var(--gold-bg);
+      border-radius: 50px;
+      display: inline-block;
+    }
+
+    .session-popup .login-again-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 40px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Inter', sans-serif;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(201, 151, 43, 0.3);
+    }
+    .session-popup .login-again-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 35px rgba(201, 151, 43, 0.4);
+    }
+    .session-popup .login-again-btn i {
+      font-size: 18px;
+    }
+
+    /* Session Expired Animation */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+    .session-popup .icon-box.shake {
+      animation: shake 0.5s ease, pulse 2s infinite 0.5s;
+    }
+
+    /* ============================================================
+       SIDEBAR - CLEAN WHITE (Existing CSS - Keep as is)
     ============================================================ */
     .sidebar {
       width: 270px;
@@ -678,7 +828,7 @@
     }
 
     /* ============================================================
-       RESPONSIVE - PRODUCTION READY
+       RESPONSIVE
     ============================================================ */
     @media (max-width: 1200px) {
       .stat-grid { grid-template-columns: repeat(2, 1fr); }
@@ -695,7 +845,6 @@
     }
 
     @media (max-width: 768px) {
-      /* Sidebar - Fixed position on mobile */
       .sidebar {
         position: fixed;
         top: 0;
@@ -711,11 +860,7 @@
         box-shadow: 4px 0 30px rgba(0, 0, 0, 0.15);
         border-right: none;
       }
-      .sidebar.open {
-        transform: translateX(0);
-      }
-      
-      /* Sidebar close button - visible on mobile */
+      .sidebar.open { transform: translateX(0); }
       .sidebar-close {
         display: flex !important;
         align-items: center;
@@ -725,13 +870,11 @@
         right: 12px;
         z-index: 10;
       }
-      
       .menu-btn {
         display: flex !important;
         align-items: center;
         justify-content: center;
       }
-      
       .main {
         padding: 16px;
         gap: 16px;
@@ -739,123 +882,129 @@
         min-height: 100vh;
         width: 100%;
       }
-      
       .stat-grid {
         grid-template-columns: 1fr 1fr;
         gap: 12px;
       }
-      
       .modules-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
       }
-      
       .welcome-banner {
         padding: 20px;
         flex-direction: column;
         align-items: flex-start;
         gap: 16px;
       }
-      
       .banner-text h1 {
         font-size: 22px;
       }
-      
       .banner-stats {
         display: flex;
         width: 100%;
         gap: 10px;
       }
-      
       .bstat {
         flex: 1;
         padding: 10px;
         min-width: auto;
       }
-      
       .bstat .val {
         font-size: 18px;
       }
-      
       .quick-actions {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 10px;
       }
-      
       .q-btn {
         justify-content: center;
         width: 100%;
         padding: 10px;
         font-size: 12px;
       }
-      
-      .q-btn .lbl {
-        display: none;
-      }
-      
-      .logout-btn .lbl {
-        display: none;
-      }
-      
-      .logout-btn {
-        padding: 10px 16px;
-      }
-      
-      .topbar-title h3 {
-        font-size: 18px;
-      }
+      .q-btn .lbl { display: none; }
+      .logout-btn .lbl { display: none; }
+      .logout-btn { padding: 10px 16px; }
+      .topbar-title h3 { font-size: 18px; }
     }
 
     @media (max-width: 480px) {
-      .stat-grid {
-        grid-template-columns: 1fr;
-      }
+      .stat-grid { grid-template-columns: 1fr; }
+      .modules-grid { grid-template-columns: 1fr; }
+      .quick-actions { grid-template-columns: 1fr; }
+      .main { padding: 10px; }
+      .welcome-banner { padding: 16px; }
+      .banner-text h1 { font-size: 20px; }
+      .banner-stats { flex-direction: column; }
+      .bstat { width: 100%; }
+      .topbar-title h3 { font-size: 16px; }
+      .topbar { padding: 12px 16px; }
+      .footer { padding: 16px; }
       
-      .modules-grid {
-        grid-template-columns: 1fr;
+      .session-popup {
+        padding: 32px 20px 28px;
       }
-      
-      .quick-actions {
-        grid-template-columns: 1fr;
+      .session-popup h2 {
+        font-size: 22px;
       }
-      
-      .main {
-        padding: 10px;
-      }
-      
-      .welcome-banner {
-        padding: 16px;
-      }
-      
-      .banner-text h1 {
-        font-size: 20px;
-      }
-      
-      .banner-stats {
-        flex-direction: column;
-      }
-      
-      .bstat {
-        width: 100%;
-      }
-      
-      .topbar-title h3 {
-        font-size: 16px;
-      }
-      
-      .topbar {
-        padding: 12px 16px;
-      }
-      
-      .footer {
-        padding: 16px;
+      .session-popup .icon-box {
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
       }
     }
   </style>
 </head>
 <body>
 
+  <!-- ============================================================
+     SESSION EXPIRED OVERLAY - FULLSCREEN POPUP
+  ============================================================ -->
+  <div class="session-overlay" id="sessionOverlay">
+    <div class="session-popup">
+      <!-- School Logo -->
+      <div class="school-logo">
+        <img src="logo(1).png" alt="GSSS SHILLA Logo">
+      </div>
+      
+      <!-- School Name -->
+      <div class="school-name-popup">
+        <i class="fas fa-school" style="margin-right: 6px;"></i>
+        Govt. Sr. Sec. School Shilla
+      </div>
+
+      <!-- Session Expired Icon -->
+      <div class="icon-box shake">
+        <i class="fas fa-clock"></i>
+      </div>
+
+      <!-- Title -->
+      <h2>Session <span>Expired</span></h2>
+      
+      <!-- Sub Text -->
+      <p class="sub-text">
+        Your session has been expired due to inactivity.<br>
+        Please login again to continue.
+      </p>
+
+      <!-- Timer / Info -->
+      <div class="session-timer">
+        <i class="fas fa-shield-alt" style="margin-right: 6px;"></i>
+        Secure session ended
+      </div>
+
+      <!-- Login Again Button -->
+      <button class="login-again-btn" onclick="redirectToLogin()">
+        <i class="fas fa-sign-in-alt"></i>
+        Login Again
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+     DASHBOARD
+  ============================================================ -->
   <!-- Overlay -->
   <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
@@ -939,18 +1088,18 @@
         </div>
       </div>
 
-      
       <!-- WELCOME BANNER -->
-<div class="welcome-banner">
-  <div class="banner-text">
-    <h1><span id="greetingText" style="color: #000000; font-weight: 600;"></span> <span id="welcomeName">Admin</span></h1>
-    <p>Here's what's happening at your school today.</p>
-  </div>
-  <div class="banner-stats">
-    <div class="bstat"><div class="val gold" id="statStudents">—</div><div class="lbl">Students</div></div>
-    <div class="bstat"><div class="val" id="statFaculty">—</div><div class="lbl">Faculty</div></div>
-  </div>
-</div>
+      <div class="welcome-banner">
+        <div class="banner-text">
+          <h1><span id="greetingText" style="color: #000000; font-weight: 600;"></span> <span id="welcomeName">Admin</span></h1>
+          <p>Here's what's happening at your school today.</p>
+        </div>
+        <div class="banner-stats">
+          <div class="bstat"><div class="val gold" id="statStudents">—</div><div class="lbl">Students</div></div>
+          <div class="bstat"><div class="val" id="statFaculty">—</div><div class="lbl">Faculty</div></div>
+        </div>
+      </div>
+
       <!-- STAT CARDS -->
       <div class="stat-grid">
         <div class="stat-card c1">
@@ -1053,6 +1202,38 @@
     console.log("🔍 Token:", token ? "✅ Found" : "❌ Not found");
 
     // ============================================================
+    // SESSION EXPIRED - SHOW POPUP
+    // ============================================================
+    function showSessionExpired() {
+      const overlay = document.getElementById('sessionOverlay');
+      overlay.classList.add('active');
+      
+      // Prevent body scroll
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.height = '100%';
+      
+      // Clear any existing token
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminData');
+    }
+
+    function redirectToLogin() {
+      const overlay = document.getElementById('sessionOverlay');
+      overlay.classList.remove('active');
+      
+      // Restore body scroll
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+      
+      // Redirect to login
+      window.location.replace("login.html");
+    }
+
+    // ============================================================
     // DATE
     // ============================================================
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -1060,27 +1241,24 @@
     const now = new Date();
     document.getElementById('dateStr').textContent =
       `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-function setGreeting() {
-  const hour = new Date().getHours();
-  let greeting;
 
-  if (hour >= 5 && hour < 12) greeting = "Morning,";
-  else if (hour >= 12 && hour < 17) greeting = "Afternoon,";
-  else if (hour >= 17 && hour < 21) greeting = "Good Eve,";
-  else greeting = "Good Night,";
+    function setGreeting() {
+      const hour = new Date().getHours();
+      let greeting;
+      if (hour >= 5 && hour < 12) greeting = "Morning,";
+      else if (hour >= 12 && hour < 17) greeting = "Afternoon,";
+      else if (hour >= 17 && hour < 21) greeting = "Good Eve,";
+      else greeting = "Good Night,";
+      document.getElementById('greetingText').textContent = greeting;
+    }
+    setGreeting();
 
-  document.getElementById('greetingText').textContent = greeting;
-}
-
-setGreeting();
-
-    
     // ============================================================
-    // AUTH CHECK
+    // AUTH CHECK - WITH SESSION EXPIRY
     // ============================================================
     async function checkAuth() {
       if (!token) {
-        window.location.replace("login.html");
+        showSessionExpired();
         return false;
       }
 
@@ -1097,15 +1275,14 @@ setGreeting();
           }
           return true;
         } else {
-          localStorage.removeItem('adminToken');
-          localStorage.removeItem('adminData');
-          window.location.replace("login.html");
+          // Token invalid - Session Expired
+          showSessionExpired();
           return false;
         }
       } catch (err) {
-        localStorage.removeItem('adminToken');
-        localStorage.removeItem('adminData');
-        window.location.replace("login.html");
+        console.error("Auth check error:", err);
+        // Network error or server down - treat as session expired
+        showSessionExpired();
         return false;
       }
     }
@@ -1146,7 +1323,7 @@ setGreeting();
     }
 
     // ============================================================
-    // SIDEBAR TOGGLE - FIXED FOR PRODUCTION
+    // SIDEBAR TOGGLE
     // ============================================================
     function toggleSidebar() {
       var sidebar = document.getElementById('sidebar');
@@ -1182,19 +1359,48 @@ setGreeting();
       document.body.style.height = '';
     }
 
-    // Close sidebar on escape key
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         closeSidebar();
       }
     });
 
-    // Close sidebar on window resize (if window becomes larger than mobile)
     window.addEventListener('resize', function() {
       if (window.innerWidth > 768) {
         closeSidebar();
       }
     });
+
+    // ============================================================
+    // SESSION TIMER - AUTO CHECK EVERY 30 SECONDS
+    // ============================================================
+    let sessionCheckInterval = setInterval(async function() {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        // Already logged out - no need to check
+        return;
+      }
+      
+      // Don't check if session expired overlay is already showing
+      const overlay = document.getElementById('sessionOverlay');
+      if (overlay.classList.contains('active')) {
+        return;
+      }
+      
+      try {
+        const res = await fetch(`${API_BASE}/verify`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        if (!data.success) {
+          showSessionExpired();
+        }
+      } catch (err) {
+        // If network error, show session expired
+        showSessionExpired();
+      }
+    }, 30000); // Check every 30 seconds
 
     // ============================================================
     // INIT
@@ -1235,13 +1441,6 @@ setGreeting();
           window.location.replace("login.html");
         }
       });
-    }
-
-    // ============================================================
-    // TOAST
-    // ============================================================
-    function showToast(icon, msg) {
-      alert(icon + " " + msg);
     }
 
     // ============================================================
