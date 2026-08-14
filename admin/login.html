@@ -950,7 +950,6 @@ body {
   </a>
   <div class="status-dot">
     <span class="dot"></span>Secure
-    
   </div>
 </div>
 
@@ -1197,11 +1196,10 @@ async function getLoginStatus(username) {
 }
 
 // ============================================================
-// START RESEND TIMER (2 Minutes) - Button shows "Wait 02:00"
+// START RESEND TIMER (2 Minutes)
 // ============================================================
 function startResendTimer() {
   const resendBtn = document.getElementById('resendBtn');
-  const timerDisplay = document.getElementById('resendTimerDisplay');
   
   resendTimeLeft = 120;
   resendBtn.disabled = true;
@@ -1220,7 +1218,6 @@ function startResendTimer() {
       timerSpan.innerText = `${m}:${s}`;
     }
     
-    // Update button text
     resendBtn.innerHTML = `<i class="fas fa-clock"></i> Wait ${m}:${s}`;
     
     if (resendTimeLeft <= 0) {
@@ -1233,7 +1230,7 @@ function startResendTimer() {
 }
 
 // ============================================================
-// HANDLE LOGIN - SEND OTP (With Per-User Attempt Tracking)
+// HANDLE LOGIN - SEND OTP
 // ============================================================
 async function handleLogin(e) {
   e.preventDefault();
@@ -1381,10 +1378,14 @@ async function verifyOTP() {
     const data = await response.json();
 
     if (data.success) {
-      localStorage.setItem('adminToken', data.data.token);
-      localStorage.setItem('adminData', JSON.stringify(data.data.admin));
-      localStorage.setItem('refreshToken', data.data.refreshToken);
+      // ✅ Store token (for API calls)
+      localStorage.setItem('adminToken', data.token);
+      localStorage.setItem('adminData', JSON.stringify(data.data));
+      localStorage.setItem('refreshToken', data.refreshToken);
       localStorage.setItem('sessionStartTime', Date.now().toString());
+      
+      // ✅ Session automatically set on server side
+      // No need to store session data locally - server handles it via cookie
       
       localStorage.removeItem('tempUsername');
       localStorage.removeItem('tempPassword');
@@ -1561,7 +1562,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }, 500);
   
-  console.log('🚀 Login page loaded - Form unblocked!');
+  console.log('🚀 Login page loaded - Session-based authentication');
+  console.log('✅ Session will be set on server after OTP verification');
 });
 </script>
 
