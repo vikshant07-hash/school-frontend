@@ -1,83 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Result Management - Admin Panel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <title>Result Admin</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: Arial, sans-serif;
             background: #f0f4f8;
-            color: #1a2332;
             padding: 20px;
         }
-
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
         }
-
-        /* Header */
         .header {
-            background: linear-gradient(135deg, #0a1628, #1a3a6b);
-            padding: 20px 28px;
-            border-radius: 12px;
+            background: #1a3a6b;
             color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
+        }
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
             margin-bottom: 24px;
-            border-bottom: 4px solid #d4a843;
+            border: 1px solid #e2e8f0;
         }
-
-        .header h1 {
-            font-size: 22px;
+        .card h2 {
+            margin-bottom: 16px;
+            color: #1a3a6b;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        .stat .num {
+            font-size: 2rem;
             font-weight: 700;
+            color: #1a3a6b;
         }
-
-        .header h1 span {
-            color: #d4a843;
+        .stat .label {
+            color: #64748b;
+            font-size: 0.9rem;
         }
-
-        .header .subtitle {
-            font-size: 13px;
-            opacity: 0.7;
+        .form-group {
+            margin-bottom: 12px;
         }
-
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
         .btn {
-            padding: 10px 20px;
+            padding: 10px 24px;
             border: none;
             border-radius: 8px;
-            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            font-family: inherit;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 14px;
         }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
         .btn-primary {
             background: #3b82f6;
             color: white;
@@ -94,684 +104,158 @@
             background: #f59e0b;
             color: white;
         }
-        .btn-outline {
-            background: transparent;
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        .btn-sm {
-            padding: 6px 14px;
-            font-size: 12px;
-        }
-
-        /* Cards */
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 24px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-
-        .card h2 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1a3a6b;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .card h2 span {
-            font-weight: 400;
-            font-size: 14px;
-            color: #64748b;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            text-align: center;
-        }
-
-        .stat-card .number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #1a3a6b;
-        }
-
-        .stat-card .label {
-            color: #64748b;
-            font-size: 0.85rem;
-            margin-top: 4px;
-        }
-
-        /* Forms */
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 16px;
-        }
-
-        .form-group {
-            margin-bottom: 14px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: #475569;
-            margin-bottom: 4px;
-        }
-
-        .form-group label .required {
-            color: #ef4444;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.3s;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        select.form-control {
-            cursor: pointer;
-        }
-
-        textarea.form-control {
-            resize: vertical;
-        }
-
-        .form-control[type="file"] {
-            padding: 8px;
-            border: 2px dashed #e2e8f0;
-            background: #f8fafc;
-            cursor: pointer;
-        }
-
-        .form-control[type="file"]:hover {
-            border-color: #3b82f6;
-            background: #f1f5f9;
-        }
-
-        .file-preview {
-            margin-top: 8px;
-            padding: 8px 12px;
-            background: #f8fafc;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #475569;
-            display: none;
-        }
-
-        .file-preview.show {
-            display: block;
-        }
-
-        .file-preview span {
-            font-weight: 600;
-            color: #1a3a6b;
-        }
-
-        /* Bulk Upload */
-        .bulk-upload-area {
-            border: 2px dashed #e2e8f0;
-            padding: 30px;
-            text-align: center;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .bulk-upload-area:hover {
-            border-color: #3b82f6;
-            background: #f8fafc;
-        }
-
-        .bulk-upload-area input[type="file"] {
-            display: none;
-        }
-
-        .bulk-file-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 8px;
-        }
-
-        .bulk-file-list .file-tag {
-            background: #e2e8f0;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .bulk-file-list .file-tag .remove {
-            cursor: pointer;
-            color: #ef4444;
-            font-weight: 700;
-        }
-
-        /* Table */
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            font-size: 14px;
         }
-
         th {
             text-align: left;
-            padding: 10px 12px;
+            padding: 10px;
             background: #f8fafc;
-            font-weight: 600;
-            color: #475569;
             border-bottom: 2px solid #e2e8f0;
-            white-space: nowrap;
         }
-
         td {
-            padding: 10px 12px;
+            padding: 10px;
             border-bottom: 1px solid #f1f5f9;
         }
-
-        tr:hover {
-            background: #f8fafc;
-        }
-
         .badge {
-            display: inline-block;
-            padding: 3px 10px;
+            padding: 4px 12px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
         }
-
         .badge-success {
             background: #dcfce7;
             color: #16a34a;
         }
-
-        .badge-primary {
-            background: #dbeafe;
-            color: #3b82f6;
-        }
-
         .badge-warning {
             background: #fef3c7;
             color: #d97706;
         }
-
-        .badge-danger {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        /* Toast */
         .toast {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 20px;
+            right: 20px;
             padding: 14px 24px;
-            border-radius: 12px;
+            border-radius: 8px;
             color: white;
             font-weight: 600;
-            font-size: 14px;
-            z-index: 99999;
             display: none;
-            animation: slideIn 0.3s ease;
-            max-width: 400px;
+            z-index: 999;
         }
-
         .toast-success {
             background: #22c55e;
         }
         .toast-error {
             background: #ef4444;
         }
-        .toast-info {
-            background: #1a3a6b;
-        }
-        .toast-warning {
-            background: #f59e0b;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 20px;
-            background: #f1f5f9;
-            padding: 4px;
-            border-radius: 10px;
-        }
-
-        .tab {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: transparent;
-            color: #64748b;
-            font-family: inherit;
-            font-size: 14px;
-        }
-
-        .tab:hover {
-            background: rgba(255, 255, 255, 0.5);
-        }
-
-        .tab.active {
-            background: white;
-            color: #1a3a6b;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #e2e8f0;
-            border-top: 3px solid #3b82f6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .loading-text {
-            text-align: center;
-            padding: 40px;
-            color: #64748b;
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-grid {
+            .stats {
                 grid-template-columns: 1fr 1fr;
             }
-
-            .header {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 12px;
-            }
-
-            .header .btn {
-                align-self: flex-start;
-            }
-
-            .tabs {
-                flex-wrap: wrap;
-            }
-
-            .tab {
-                flex: 1;
-                text-align: center;
-                padding: 8px 12px;
-                font-size: 12px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .stats-grid {
+            .form-row {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
-
 <body>
 
     <div class="container">
 
         <!-- Header -->
-        <header class="header">
-            <div>
-                <h1>📊 <span>Result</span> Management</h1>
-                <div class="subtitle">Manage student results & marksheets</div>
-            </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                <button class="btn btn-outline" onclick="window.open('public-result.html', '_blank')">
-                    <i class="fas fa-eye"></i> View Public
-                </button>
-                <button class="btn btn-outline" onclick="checkServer()">
-                    <i class="fas fa-sync"></i> Check Server
-                </button>
-            </div>
-        </header>
-
-        <!-- Server Status -->
-        <div id="serverStatus" style="padding:12px 16px;border-radius:8px;margin-bottom:16px;display:none;"></div>
+        <div class="header">
+            <h1>📊 Result Management</h1>
+            <span>🟢 No Auth Required</span>
+        </div>
 
         <!-- Stats -->
-        <div class="stats-grid" id="statsGrid">
-            <div class="stat-card">
-                <div class="number" id="totalStudents">0</div>
+        <div class="stats" id="stats">
+            <div class="stat">
+                <div class="num" id="totalStudents">0</div>
                 <div class="label">Total Students</div>
             </div>
-            <div class="stat-card">
-                <div class="number" id="publishedResults">0</div>
+            <div class="stat">
+                <div class="num" id="publishedResults">0</div>
                 <div class="label">Published Results</div>
             </div>
-            <div class="stat-card">
-                <div class="number" id="unpublishedResults">0</div>
+            <div class="stat">
+                <div class="num" id="unpublishedResults">0</div>
                 <div class="label">Unpublished Results</div>
             </div>
-            <div class="stat-card">
-                <div class="number" id="totalResults">0</div>
+            <div class="stat">
+                <div class="num" id="totalResults">0</div>
                 <div class="label">Total Results</div>
             </div>
         </div>
 
-        <!-- Tabs -->
-        <div class="tabs">
-            <button class="tab active" data-tab="students">👨‍🎓 Students</button>
-            <button class="tab" data-tab="upload">📤 Upload Result</button>
-            <button class="tab" data-tab="manage">📋 Manage</button>
-            <button class="tab" data-tab="publish">✅ Publish</button>
-        </div>
-
-        <!-- ============================================
-        TAB 1: STUDENTS
-        ============================================ -->
-        <div class="tab-content active" id="tab-students">
-            <div class="card">
-                <h2>👨‍🎓 Add Student</h2>
-                <form id="studentForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Student ID <span class="required">*</span></label>
-                            <input type="text" id="sStudentId" class="form-control" placeholder="e.g., S001" required>
-                        </div>
-                        <div class="form-group">
-                            <label>APAAR ID <span class="required">*</span></label>
-                            <input type="text" id="sApaarId" class="form-control" placeholder="e.g., APAAR001" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Date of Birth <span class="required">*</span></label>
-                            <input type="date" id="sDob" class="form-control" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Student Name <span class="required">*</span></label>
-                            <input type="text" id="sName" class="form-control" placeholder="Full Name" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Father Name <span class="required">*</span></label>
-                            <input type="text" id="sFather" class="form-control" placeholder="Father's Name" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Class <span class="required">*</span></label>
-                            <select id="sClass" class="form-control" required>
-                                <option value="">Select Class</option>
-                                <option value="1">1</option><option value="2">2</option>
-                                <option value="3">3</option><option value="4">4</option>
-                                <option value="5">5</option><option value="6">6</option>
-                                <option value="7">7</option><option value="8">8</option>
-                                <option value="9">9</option><option value="10">10</option>
-                                <option value="11">11</option><option value="12">12</option>
-                            </select>
-                        </div>
+        <!-- Add Student -->
+        <div class="card">
+            <h2>👨‍🎓 Add Student</h2>
+            <form id="studentForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Student ID *</label>
+                        <input type="text" id="sId" placeholder="S001" required>
                     </div>
                     <div class="form-group">
-                        <label>Session <span class="required">*</span></label>
-                        <select id="sSession" class="form-control" required>
-                            <option value="">Select Session</option>
-                            <option value="2025-26">2025-26</option>
-                            <option value="2024-25">2024-25</option>
-                            <option value="2023-24">2023-24</option>
+                        <label>APAAR ID *</label>
+                        <input type="text" id="sApaar" placeholder="APAAR001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Date of Birth *</label>
+                        <input type="date" id="sDob" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Student Name *</label>
+                        <input type="text" id="sName" placeholder="Full Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Father Name *</label>
+                        <input type="text" id="sFather" placeholder="Father's Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Class *</label>
+                        <select id="sClass" required>
+                            <option value="">Select</option>
+                            <option value="1">1</option><option value="2">2</option>
+                            <option value="3">3</option><option value="4">4</option>
+                            <option value="5">5</option><option value="6">6</option>
+                            <option value="7">7</option><option value="8">8</option>
+                            <option value="9">9</option><option value="10">10</option>
+                            <option value="11">11</option><option value="12">12</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-user-plus"></i> Add Student
-                    </button>
-                </form>
-            </div>
-
-            <div class="card">
-                <h2>📋 All Students (<span id="studentCount">0</span>)</h2>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Student ID</th>
-                                <th>Name</th>
-                                <th>Class</th>
-                                <th>Session</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentTableBody">
-                            <tr><td colspan="6" class="loading-text"><div class="spinner"></div> Loading...</td></tr>
-                        </tbody>
-                    </table>
                 </div>
-            </div>
-        </div>
-
-        <!-- ============================================
-        TAB 2: UPLOAD RESULT
-        ============================================ -->
-        <div class="tab-content" id="tab-upload">
-            <div class="card">
-                <h2>📤 Upload Single Result</h2>
-                <form id="uploadSingleForm" enctype="multipart/form-data">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Student ID <span class="required">*</span></label>
-                            <input type="text" id="uStudentId" class="form-control" placeholder="e.g., S001" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Class <span class="required">*</span></label>
-                            <select id="uClass" class="form-control" required>
-                                <option value="">Select Class</option>
-                                <option value="1">1</option><option value="2">2</option>
-                                <option value="3">3</option><option value="4">4</option>
-                                <option value="5">5</option><option value="6">6</option>
-                                <option value="7">7</option><option value="8">8</option>
-                                <option value="9">9</option><option value="10">10</option>
-                                <option value="11">11</option><option value="12">12</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Session <span class="required">*</span></label>
-                            <select id="uSession" class="form-control" required>
-                                <option value="">Select Session</option>
-                                <option value="2025-26">2025-26</option>
-                                <option value="2024-25">2024-25</option>
-                                <option value="2023-24">2023-24</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Marksheet (PDF) <span class="required">*</span></label>
-                        <input type="file" id="uFile" class="form-control" accept=".pdf" required>
-                        <div class="file-preview" id="uFilePreview">📄 <span></span></div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-upload"></i> Upload Result
-                    </button>
-                </form>
-            </div>
-
-            <div class="card">
-                <h2>📤 Bulk Upload</h2>
-                <form id="bulkUploadForm" enctype="multipart/form-data">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Class <span class="required">*</span></label>
-                            <select id="bClass" class="form-control" required>
-                                <option value="">Select Class</option>
-                                <option value="1">1</option><option value="2">2</option>
-                                <option value="3">3</option><option value="4">4</option>
-                                <option value="5">5</option><option value="6">6</option>
-                                <option value="7">7</option><option value="8">8</option>
-                                <option value="9">9</option><option value="10">10</option>
-                                <option value="11">11</option><option value="12">12</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Session <span class="required">*</span></label>
-                            <select id="bSession" class="form-control" required>
-                                <option value="">Select Session</option>
-                                <option value="2025-26">2025-26</option>
-                                <option value="2024-25">2024-25</option>
-                                <option value="2023-24">2023-24</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Student ID Prefix</label>
-                            <input type="text" id="bPrefix" class="form-control" placeholder="e.g., S" value="S">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Select PDF Files <span class="required">*</span></label>
-                        <div class="bulk-upload-area" id="bulkDropArea">
-                            <p style="font-size:1.5rem;">📁</p>
-                            <p><strong>Drag & drop PDF files here</strong></p>
-                            <p style="font-size:0.85rem;color:#64748b;">or click to select multiple files</p>
-                            <input type="file" id="bFiles" multiple accept=".pdf">
-                        </div>
-                        <div class="bulk-file-list" id="bulkFileList"></div>
-                    </div>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-upload"></i> Upload All
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- ============================================
-        TAB 3: MANAGE RESULTS
-        ============================================ -->
-        <div class="tab-content" id="tab-manage">
-            <div class="card">
-                <h2>📋 Manage Results</h2>
-                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
-                    <select id="filterClass" class="form-control" style="width:auto;">
-                        <option value="">All Classes</option>
-                        <option value="1">1</option><option value="2">2</option>
-                        <option value="3">3</option><option value="4">4</option>
-                        <option value="5">5</option><option value="6">6</option>
-                        <option value="7">7</option><option value="8">8</option>
-                        <option value="9">9</option><option value="10">10</option>
-                        <option value="11">11</option><option value="12">12</option>
-                    </select>
-                    <select id="filterSession" class="form-control" style="width:auto;">
-                        <option value="">All Sessions</option>
+                <div class="form-group">
+                    <label>Session *</label>
+                    <select id="sSession" required>
+                        <option value="">Select</option>
                         <option value="2025-26">2025-26</option>
                         <option value="2024-25">2024-25</option>
                         <option value="2023-24">2023-24</option>
                     </select>
-                    <select id="filterStatus" class="form-control" style="width:auto;">
-                        <option value="">All Status</option>
-                        <option value="published">Published</option>
-                        <option value="unpublished">Unpublished</option>
-                    </select>
-                    <button class="btn btn-primary btn-sm" onclick="loadResults()">
-                        <i class="fas fa-sync"></i> Refresh
-                    </button>
                 </div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Student ID</th>
-                                <th>Name</th>
-                                <th>Class</th>
-                                <th>Session</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="resultTableBody">
-                            <tr><td colspan="7" class="loading-text"><div class="spinner"></div> Loading...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                <button type="submit" class="btn btn-success">➕ Add Student</button>
+            </form>
         </div>
 
-        <!-- ============================================
-        TAB 4: PUBLISH
-        ============================================ -->
-        <div class="tab-content" id="tab-publish">
-            <div class="card">
-                <h2>✅ Publish / Unpublish Results</h2>
+        <!-- Upload Result -->
+        <div class="card">
+            <h2>📤 Upload Result</h2>
+            <form id="resultForm" enctype="multipart/form-data">
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Class <span class="required">*</span></label>
-                        <select id="pClass" class="form-control" required>
-                            <option value="">Select Class</option>
+                        <label>Student ID *</label>
+                        <input type="text" id="rId" placeholder="S001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Class *</label>
+                        <select id="rClass" required>
+                            <option value="">Select</option>
                             <option value="1">1</option><option value="2">2</option>
                             <option value="3">3</option><option value="4">4</option>
                             <option value="5">5</option><option value="6">6</option>
@@ -781,27 +265,43 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Session <span class="required">*</span></label>
-                        <select id="pSession" class="form-control" required>
-                            <option value="">Select Session</option>
+                        <label>Session *</label>
+                        <select id="rSession" required>
+                            <option value="">Select</option>
                             <option value="2025-26">2025-26</option>
                             <option value="2024-25">2024-25</option>
                             <option value="2023-24">2023-24</option>
                         </select>
                     </div>
-                    <div class="form-group" style="display:flex;align-items:flex-end;gap:8px;">
-                        <button class="btn btn-success" onclick="publishAll()">
-                            <i class="fas fa-check-circle"></i> Publish All
-                        </button>
-                        <button class="btn btn-warning" onclick="unpublishAll()">
-                            <i class="fas fa-times-circle"></i> Unpublish All
-                        </button>
-                        <button class="btn btn-danger" onclick="deleteAllResults()">
-                            <i class="fas fa-trash"></i> Delete All
-                        </button>
-                    </div>
                 </div>
-                <div id="publishStatus" style="margin-top:16px;"></div>
+                <div class="form-group">
+                    <label>Marksheet (PDF) *</label>
+                    <input type="file" id="rFile" accept=".pdf" required>
+                </div>
+                <button type="submit" class="btn btn-primary">📤 Upload</button>
+            </form>
+        </div>
+
+        <!-- Results List -->
+        <div class="card">
+            <h2>📋 Results</h2>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Class</th>
+                            <th>Session</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody">
+                        <tr><td colspan="7" style="text-align:center;padding:30px;">Loading...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -810,576 +310,201 @@
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
-    <!-- ============================================
-    JAVASCRIPT - COMPLETE
-    ============================================ -->
     <script>
-        // ============================================
-        // CONFIGURATION
-        // ============================================
-        const API_BASE = 'https://gsssshilla.onrender.com/api/result';
-        // For local testing, use: http://localhost:3000/api/result
+        const API = 'https://gsssshilla.onrender.com/api/result';
 
-        // Token - isko aapke login system se set karna hoga
-        const TOKEN = localStorage.getItem('adminToken') || '';
-
-        // ============================================
-        // DOM REFS
-        // ============================================
-        const toast = document.getElementById('toast');
-
-        // ============================================
-        // TOAST
-        // ============================================
         function showToast(msg, type = 'success') {
-            toast.textContent = msg;
-            toast.className = `toast toast-${type}`;
-            toast.style.display = 'block';
-            clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => toast.style.display = 'none', 4000);
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = `toast toast-${type}`;
+            t.style.display = 'block';
+            clearTimeout(t._timeout);
+            t._timeout = setTimeout(() => t.style.display = 'none', 4000);
         }
 
-        // ============================================
-        // API CALL
-        // ============================================
-        async function apiCall(endpoint, options = {}) {
-            const url = API_BASE + endpoint;
-            const headers = {
-                'Content-Type': 'application/json',
-                ...(options.headers || {})
-            };
-
-            if (TOKEN) {
-                headers['Authorization'] = 'Bearer ' + TOKEN;
-            }
-
+        // Load Stats
+        async function loadStats() {
             try {
-                const response = await fetch(url, {
-                    ...options,
-                    headers: headers
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('API Error:', error);
-                showToast('❌ ' + error.message, 'error');
-                return { success: false, message: error.message };
-            }
-        }
-
-        // ============================================
-        // CHECK SERVER
-        // ============================================
-        async function checkServer() {
-            const statusDiv = document.getElementById('serverStatus');
-            statusDiv.style.display = 'block';
-            statusDiv.style.background = '#fef3c7';
-            statusDiv.style.color = '#92400e';
-            statusDiv.innerHTML = '⏳ Checking server connection...';
-
-            try {
-                const response = await fetch('https://gsssshilla.onrender.com/test');
-                if (response.ok) {
-                    statusDiv.style.background = '#dcfce7';
-                    statusDiv.style.color = '#16a34a';
-                    statusDiv.innerHTML = '✅ Server is online!';
-                    showToast('✅ Server connected successfully!', 'success');
-                    loadDashboard();
-                    loadStudents();
-                    loadResults();
-                } else {
-                    statusDiv.style.background = '#fee2e2';
-                    statusDiv.style.color = '#dc2626';
-                    statusDiv.innerHTML = '❌ Server error: ' + response.status;
-                    showToast('❌ Server error: ' + response.status, 'error');
-                }
-            } catch (error) {
-                statusDiv.style.background = '#fee2e2';
-                statusDiv.style.color = '#dc2626';
-                statusDiv.innerHTML = '❌ Cannot connect to server. Make sure server is running.';
-                showToast('❌ Cannot connect to server', 'error');
-                console.error('Server check error:', error);
-            }
-
-            setTimeout(() => {
-                statusDiv.style.display = 'none';
-            }, 5000);
-        }
-
-        // ============================================
-        // TABS
-        // ============================================
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-
-                const tabId = this.dataset.tab;
-                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-                document.getElementById('tab-' + tabId).classList.add('active');
-
-                if (tabId === 'manage') loadResults();
-            });
-        });
-
-        // ============================================
-        // FILE PREVIEW
-        // ============================================
-        document.getElementById('uFile').addEventListener('change', function() {
-            const preview = document.getElementById('uFilePreview');
-            if (this.files && this.files[0]) {
-                preview.innerHTML = `📄 <span>${this.files[0].name}</span> (${(this.files[0].size/1024).toFixed(1)} KB)`;
-                preview.classList.add('show');
-            } else {
-                preview.classList.remove('show');
-            }
-        });
-
-        // ============================================
-        // BULK UPLOAD
-        // ============================================
-        const bulkDropArea = document.getElementById('bulkDropArea');
-        const bulkFiles = document.getElementById('bFiles');
-
-        bulkDropArea.addEventListener('click', () => bulkFiles.click());
-
-        bulkDropArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            bulkDropArea.style.borderColor = '#3b82f6';
-            bulkDropArea.style.background = '#f1f5f9';
-        });
-
-        bulkDropArea.addEventListener('dragleave', () => {
-            bulkDropArea.style.borderColor = '#e2e8f0';
-            bulkDropArea.style.background = 'transparent';
-        });
-
-        bulkDropArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            bulkDropArea.style.borderColor = '#e2e8f0';
-            bulkDropArea.style.background = 'transparent';
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                bulkFiles.files = files;
-                updateBulkFileList(files);
-            }
-        });
-
-        bulkFiles.addEventListener('change', function() {
-            updateBulkFileList(this.files);
-        });
-
-        function updateBulkFileList(files) {
-            const list = document.getElementById('bulkFileList');
-            if (files.length === 0) {
-                list.innerHTML = '';
-                return;
-            }
-            list.innerHTML = Array.from(files).map(f =>
-                `<span class="file-tag">📄 ${f.name} (${(f.size/1024).toFixed(1)}KB)</span>`
-            ).join('');
-        }
-
-        // ============================================
-        // DASHBOARD
-        // ============================================
-        async function loadDashboard() {
-            try {
-                const data = await apiCall('/admin/stats');
+                const res = await fetch(API + '/stats');
+                const data = await res.json();
                 if (data.success) {
                     document.getElementById('totalStudents').textContent = data.data.totalStudents || 0;
                     document.getElementById('publishedResults').textContent = data.data.publishedResults || 0;
                     document.getElementById('unpublishedResults').textContent = data.data.unpublishedResults || 0;
                     document.getElementById('totalResults').textContent = data.data.totalResults || 0;
                 }
-            } catch (error) {
-                console.error('Dashboard error:', error);
+            } catch (err) {
+                console.error('Stats error:', err);
             }
         }
 
-        // ============================================
-        // STUDENTS
-        // ============================================
-        async function loadStudents() {
-            const tbody = document.getElementById('studentTableBody');
+        // Load Results
+        async function loadResults() {
+            const tbody = document.getElementById('resultsBody');
             try {
-                const data = await apiCall('/admin/students');
+                const res = await fetch(API + '/results');
+                const data = await res.json();
                 if (data.success && data.data) {
-                    document.getElementById('studentCount').textContent = data.data.length;
                     if (data.data.length === 0) {
-                        tbody.innerHTML =
-                            '<tr><td colspan="6" style="text-align:center;padding:30px;color:#64748b;">No students found</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#64748b;">No results found</td></tr>';
                         return;
                     }
-                    tbody.innerHTML = data.data.map((s, i) => `
-                                <tr>
-                                    <td>${i + 1}</td>
-                                    <td><strong>${s.student_id}</strong></td>
-                                    <td>${s.student_name}</td>
-                                    <td><span class="badge badge-primary">${s.class}</span></td>
-                                    <td>${s.session_year}</td>
-                                    <td>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteStudent('${s.student_id}')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            `).join('');
+                    tbody.innerHTML = data.data.map((r, i) => `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td><strong>${r.student_id}</strong></td>
+                            <td>${r.student_name}</td>
+                            <td><span class="badge badge-primary">${r.class}</span></td>
+                            <td>${r.session_year}</td>
+                            <td>
+                                <span class="badge ${r.status === 'published' ? 'badge-success' : 'badge-warning'}">
+                                    ${r.status}
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn btn-success" style="padding:4px 12px;font-size:12px;" onclick="publishResult(${r.id})" ${r.status === 'published' ? 'disabled' : ''}>
+                                    ✅ Publish
+                                </button>
+                                <button class="btn btn-warning" style="padding:4px 12px;font-size:12px;color:white;" onclick="unpublishResult(${r.id})" ${r.status === 'unpublished' ? 'disabled' : ''}>
+                                    📌 Unpublish
+                                </button>
+                                <button class="btn btn-danger" style="padding:4px 12px;font-size:12px;" onclick="deleteResult(${r.id})">
+                                    🗑️ Delete
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
                 }
-            } catch (error) {
-                console.error('Load students error:', error);
-                tbody.innerHTML =
-                    '<tr><td colspan="6" style="text-align:center;color:red;">Failed to load students</td></tr>';
+            } catch (err) {
+                console.error('Results error:', err);
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:red;">Failed to load</td></tr>';
             }
         }
 
-        document.getElementById('studentForm').addEventListener('submit', async function(e) {
+        // Add Student
+        document.getElementById('studentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const data = {
-                studentId: document.getElementById('sStudentId').value.trim(),
+                studentId: document.getElementById('sId').value.trim(),
                 studentName: document.getElementById('sName').value.trim(),
                 fatherName: document.getElementById('sFather').value.trim(),
-                apaarId: document.getElementById('sApaarId').value.trim(),
+                apaarId: document.getElementById('sApaar').value.trim(),
                 dob: document.getElementById('sDob').value,
                 class: document.getElementById('sClass').value,
                 session: document.getElementById('sSession').value
             };
 
-            const result = await apiCall('/admin/students', {
-                method: 'POST',
-                body: JSON.stringify(data)
-            });
-
-            if (result.success) {
-                showToast('✅ Student added successfully!', 'success');
-                this.reset();
-                loadStudents();
-                loadDashboard();
-            } else {
-                showToast('❌ ' + (result.message || 'Failed to add student'), 'error');
+            try {
+                const res = await fetch(API + '/students', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    showToast('✅ Student added!', 'success');
+                    e.target.reset();
+                    loadStats();
+                    loadResults();
+                } else {
+                    showToast('❌ ' + result.message, 'error');
+                }
+            } catch (err) {
+                showToast('❌ Error: ' + err.message, 'error');
             }
         });
 
-        async function deleteStudent(studentId) {
-            if (!confirm(`Delete student ${studentId} and all their results?`)) return;
-            const result = await apiCall('/admin/students/' + studentId, { method: 'DELETE' });
-            if (result.success) {
-                showToast('✅ Student deleted!', 'success');
-                loadStudents();
-                loadDashboard();
-                loadResults();
-            } else {
-                showToast('❌ ' + result.message, 'error');
-            }
-        }
-
-        // ============================================
-        // UPLOAD SINGLE
-        // ============================================
-        document.getElementById('uploadSingleForm').addEventListener('submit', async function(e) {
+        // Upload Result
+        document.getElementById('resultForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            const file = document.getElementById('uFile').files[0];
+            const file = document.getElementById('rFile').files[0];
             if (!file) {
                 showToast('Please select a PDF file', 'error');
                 return;
             }
 
             const formData = new FormData();
-            formData.append('studentId', document.getElementById('uStudentId').value.trim());
-            formData.append('class', document.getElementById('uClass').value);
-            formData.append('session', document.getElementById('uSession').value);
+            formData.append('studentId', document.getElementById('rId').value.trim());
+            formData.append('class', document.getElementById('rClass').value);
+            formData.append('session', document.getElementById('rSession').value);
             formData.append('marksheet', file);
 
-            const btn = this.querySelector('button[type="submit"]');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
-            btn.disabled = true;
-
             try {
-                const response = await fetch(API_BASE + '/admin/results/upload', {
+                const res = await fetch(API + '/results/upload', {
                     method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + TOKEN },
                     body: formData
                 });
-                const data = await response.json();
-
-                if (data.success) {
-                    showToast('✅ Result uploaded successfully!', 'success');
-                    this.reset();
-                    document.getElementById('uFilePreview').classList.remove('show');
+                const result = await res.json();
+                if (result.success) {
+                    showToast('✅ Result uploaded!', 'success');
+                    e.target.reset();
+                    loadStats();
                     loadResults();
-                    loadDashboard();
                 } else {
-                    showToast('❌ ' + data.message, 'error');
+                    showToast('❌ ' + result.message, 'error');
                 }
-            } catch (error) {
-                showToast('❌ Error: ' + error.message, 'error');
-            } finally {
-                btn.innerHTML = '<i class="fas fa-upload"></i> Upload Result';
-                btn.disabled = false;
+            } catch (err) {
+                showToast('❌ Error: ' + err.message, 'error');
             }
         });
 
-        // ============================================
-        // BULK UPLOAD
-        // ============================================
-        document.getElementById('bulkUploadForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const files = document.getElementById('bFiles').files;
-            if (files.length === 0) {
-                showToast('Please select PDF files', 'error');
-                return;
-            }
-
-            const cls = document.getElementById('bClass').value;
-            const session = document.getElementById('bSession').value;
-            const prefix = document.getElementById('bPrefix').value.trim() || 'S';
-
-            if (!cls || !session) {
-                showToast('Please select Class and Session', 'error');
-                return;
-            }
-
-            const formData = new FormData();
-
-            // Add each file with student ID
-            for (let i = 0; i < files.length; i++) {
-                const studentId = prefix + String(i + 1).padStart(3, '0');
-                formData.append('studentId', studentId);
-                formData.append('marksheets', files[i]);
-            }
-
-            formData.append('class', cls);
-            formData.append('session', session);
-
-            const btn = this.querySelector('button[type="submit"]');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
-            btn.disabled = true;
-
-            try {
-                const response = await fetch(API_BASE + '/admin/results/bulk-upload', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + TOKEN },
-                    body: formData
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    showToast(`✅ ${data.data.results.length} results uploaded!`, 'success');
-                    this.reset();
-                    document.getElementById('bulkFileList').innerHTML = '';
-                    loadResults();
-                    loadDashboard();
-                } else {
-                    showToast('❌ ' + data.message, 'error');
-                }
-            } catch (error) {
-                showToast('❌ Error: ' + error.message, 'error');
-            } finally {
-                btn.innerHTML = '<i class="fas fa-upload"></i> Upload All';
-                btn.disabled = false;
-            }
-        });
-
-        // ============================================
-        // MANAGE RESULTS
-        // ============================================
-        async function loadResults() {
-            const tbody = document.getElementById('resultTableBody');
-            tbody.innerHTML =
-                '<tr><td colspan="7" class="loading-text"><div class="spinner"></div> Loading...</td></tr>';
-
-            const classFilter = document.getElementById('filterClass').value;
-            const sessionFilter = document.getElementById('filterSession').value;
-            const statusFilter = document.getElementById('filterStatus').value;
-
-            let url = '/admin/results?';
-            if (classFilter) url += 'class=' + classFilter + '&';
-            if (sessionFilter) url += 'session=' + sessionFilter + '&';
-            if (statusFilter) url += 'status=' + statusFilter + '&';
-
-            try {
-                const data = await apiCall(url);
-                if (data.success && data.data) {
-                    const results = data.data;
-                    if (results.length === 0) {
-                        tbody.innerHTML =
-                            '<tr><td colspan="7" style="text-align:center;padding:30px;color:#64748b;">No results found</td></tr>';
-                        return;
-                    }
-
-                    tbody.innerHTML = results.map((r, i) => `
-                                <tr>
-                                    <td>${i + 1}</td>
-                                    <td><strong>${r.student_id}</strong></td>
-                                    <td>${r.student_name}</td>
-                                    <td><span class="badge badge-primary">${r.class}</span></td>
-                                    <td>${r.session_year}</td>
-                                    <td>
-                                        <span class="badge ${r.status === 'published' ? 'badge-success' : 'badge-warning'}">
-                                            ${r.status}
-                                        </span>
-                                    </td>
-                                    <td style="display:flex;gap:4px;flex-wrap:wrap;">
-                                        <button class="btn btn-success btn-sm" onclick="publishSingle(${r.id})" ${r.status === 'published' ? 'disabled' : ''}>
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                        <button class="btn btn-warning btn-sm" onclick="unpublishSingle(${r.id})" ${r.status === 'unpublished' ? 'disabled' : ''}>
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteSingle(${r.id})">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            `).join('');
-                }
-            } catch (error) {
-                console.error('Load results error:', error);
-                tbody.innerHTML =
-                    '<tr><td colspan="7" style="text-align:center;color:red;">Failed to load results</td></tr>';
-            }
-        }
-
-        document.getElementById('filterClass').addEventListener('change', loadResults);
-        document.getElementById('filterSession').addEventListener('change', loadResults);
-        document.getElementById('filterStatus').addEventListener('change', loadResults);
-
-        // ============================================
-        // RESULT ACTIONS
-        // ============================================
-        async function publishSingle(id) {
+        // Publish Result
+        async function publishResult(id) {
             if (!confirm('Publish this result?')) return;
-            const data = await apiCall('/admin/results/' + id + '/publish', { method: 'PUT' });
-            if (data.success) {
-                showToast('✅ Result published!', 'success');
-                loadResults();
-                loadDashboard();
-            } else {
-                showToast('❌ ' + data.message, 'error');
+            try {
+                const res = await fetch(API + '/results/' + id + '/publish', { method: 'PUT' });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('✅ Published!', 'success');
+                    loadStats();
+                    loadResults();
+                } else {
+                    showToast('❌ ' + data.message, 'error');
+                }
+            } catch (err) {
+                showToast('❌ Error', 'error');
             }
         }
 
-        async function unpublishSingle(id) {
+        // Unpublish Result
+        async function unpublishResult(id) {
             if (!confirm('Unpublish this result?')) return;
-            const data = await apiCall('/admin/results/' + id + '/unpublish', { method: 'PUT' });
-            if (data.success) {
-                showToast('📌 Result unpublished!', 'success');
-                loadResults();
-                loadDashboard();
-            } else {
-                showToast('❌ ' + data.message, 'error');
+            try {
+                const res = await fetch(API + '/results/' + id + '/unpublish', { method: 'PUT' });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('📌 Unpublished!', 'success');
+                    loadStats();
+                    loadResults();
+                } else {
+                    showToast('❌ ' + data.message, 'error');
+                }
+            } catch (err) {
+                showToast('❌ Error', 'error');
             }
         }
 
-        async function deleteSingle(id) {
+        // Delete Result
+        async function deleteResult(id) {
             if (!confirm('Delete this result permanently?')) return;
-            const data = await apiCall('/admin/results/' + id, { method: 'DELETE' });
-            if (data.success) {
-                showToast('🗑️ Result deleted!', 'success');
-                loadResults();
-                loadDashboard();
-            } else {
-                showToast('❌ ' + data.message, 'error');
+            try {
+                const res = await fetch(API + '/results/' + id, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('🗑️ Deleted!', 'success');
+                    loadStats();
+                    loadResults();
+                } else {
+                    showToast('❌ ' + data.message, 'error');
+                }
+            } catch (err) {
+                showToast('❌ Error', 'error');
             }
         }
 
-        // ============================================
-        // PUBLISH ALL / UNPUBLISH ALL / DELETE ALL
-        // ============================================
-        async function publishAll() {
-            const cls = document.getElementById('pClass').value;
-            const session = document.getElementById('pSession').value;
-            if (!cls || !session) {
-                showToast('Please select Class and Session', 'error');
-                return;
-            }
-            if (!confirm(`Publish ALL results for Class ${cls} (${session})?`)) return;
-
-            const data = await apiCall('/admin/results/publish-all', {
-                method: 'PUT',
-                body: JSON.stringify({ class: cls, session: session })
-            });
-
-            if (data.success) {
-                showToast('✅ ' + data.message, 'success');
-                document.getElementById('publishStatus').innerHTML =
-                    `<div style="background:#dcfce7;padding:12px;border-radius:8px;color:#16a34a;">✅ ${data.message}</div>`;
-                loadResults();
-                loadDashboard();
-            } else {
-                showToast('❌ ' + data.message, 'error');
-            }
-        }
-
-        async function unpublishAll() {
-            const cls = document.getElementById('pClass').value;
-            const session = document.getElementById('pSession').value;
-            if (!cls || !session) {
-                showToast('Please select Class and Session', 'error');
-                return;
-            }
-            if (!confirm(`Unpublish ALL results for Class ${cls} (${session})?`)) return;
-
-            const data = await apiCall('/admin/results/unpublish-all', {
-                method: 'PUT',
-                body: JSON.stringify({ class: cls, session: session })
-            });
-
-            if (data.success) {
-                showToast('📌 ' + data.message, 'success');
-                document.getElementById('publishStatus').innerHTML =
-                    `<div style="background:#fef3c7;padding:12px;border-radius:8px;color:#92400e;">📌 ${data.message}</div>`;
-                loadResults();
-                loadDashboard();
-            } else {
-                showToast('❌ ' + data.message, 'error');
-            }
-        }
-
-        async function deleteAllResults() {
-            const cls = document.getElementById('pClass').value;
-            const session = document.getElementById('pSession').value;
-            if (!cls || !session) {
-                showToast('Please select Class and Session', 'error');
-                return;
-            }
-            if (!confirm(`⚠️ DELETE ALL results for Class ${cls} (${session})? This cannot be undone!`)) return;
-
-            const data = await apiCall('/admin/results/delete-all', {
-                method: 'DELETE',
-                body: JSON.stringify({ class: cls, session: session })
-            });
-
-            if (data.success) {
-                showToast('🗑️ ' + data.message, 'success');
-                document.getElementById('publishStatus').innerHTML =
-                    `<div style="background:#fee2e2;padding:12px;border-radius:8px;color:#dc2626;">🗑️ ${data.message}</div>`;
-                loadResults();
-                loadDashboard();
-            } else {
-                showToast('❌ ' + data.message, 'error');
-            }
-        }
-
-        // ============================================
-        // INIT
-        // ============================================
-        loadDashboard();
-        loadStudents();
+        // Init
+        loadStats();
         loadResults();
-        checkServer();
-
-        console.log('📊 Result Admin Panel loaded');
-        console.log('📡 API Base:', API_BASE);
-        console.log('🔑 Token:', TOKEN ? '✅ Set' : '❌ Not Set');
     </script>
 
 </body>
