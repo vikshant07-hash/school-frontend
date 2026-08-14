@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Result Management</title>
+    <style>
+        /* ============================================
+           COMPLETE ADMIN DASHBOARD STYLES
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --primary-light: #818CF8;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --gray-900: #111827;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --radius: 8px;
+            --radius-lg: 12px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gray-100);
+            color: var(--gray-800);
+        }
+
+        /* ============================================
+           ADMIN LAYOUT
+           ============================================ */
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--gray-900);
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            padding: 20px 24px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-brand span {
+            color: var(--primary-light);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-menu li {
+            padding: 0;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            gap: 12px;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: var(--primary-light);
+        }
+
+        .sidebar-menu li a .icon {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 24px;
+            width: 100%;
+        }
+
+        /* Top Bar */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .topbar h2 {
+            font-size: 1.4rem;
+            color: var(--gray-800);
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #DC2626;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #D97706;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--gray-600);
+            border: 2px solid var(--gray-300);
+        }
+        .btn-outline:hover {
+            background: var(--gray-100);
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.8rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-card .label {
+            color: var(--gray-500);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        /* ============================================
+           SECTIONS (Show/Hide)
+           ============================================ */
+        .section {
+            display: none;
+            background: white;
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--gray-800);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group input[type="file"] {
+            padding: 8px;
+            border: 2px dashed var(--gray-300);
+            background: var(--gray-50);
+            cursor: pointer;
+        }
+
+        /* Table */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        table thead {
+            background: var(--gray-50);
+        }
+
+        table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-600);
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        table tr:hover {
+            background: var(--gray-50);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+        }
+
+        .alert-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid #FCA5A5;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--gray-200);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .topbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .topbar-actions {
+                flex-wrap: wrap;
+            }
+            .menu-toggle {
+                display: block !important;
+            }
+        }
+
+        .menu-toggle {
+            display: none;
+            background: var(--gray-900);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        /* File Upload Preview */
+        .file-preview {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            color: var(--gray-600);
+        }
+
+        .file-preview span {
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        /* Bulk Upload */
+        .bulk-upload-area {
+            border: 2px dashed var(--gray-300);
+            padding: 30px;
+            text-align: center;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .bulk-upload-area:hover {
+            border-color: var(--primary);
+            background: var(--gray-50);
+        }
+
+        .bulk-upload-area input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-container">
+
+        <!-- ============================================
+        SIDEBAR
+        ============================================ -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                📚 Result <span>Admin</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active" data-section="dashboard">
+                        <span class="icon">📊</span> Dashboard
+                    </a></li>
+                <li><a href="#" data-section="add-student">
+                        <span class="icon">👨‍🎓</span> Add Student
+                    </a></li>
+                <li><a href="#" data-section="upload-result">
+                        <span class="icon">📤</span> Upload Result
+                    </a></li>
+                <li><a href="#" data-section="manage-results">
+                        <span class="icon">📋</span> Manage Results
+                    </a></li>
+                <li><a href="#" data-section="publish">
+                        <span class="icon">✅</span> Publish Results
+                    </a></li>
+            </ul>
+        </aside>
+
+        <!-- ============================================
+        MAIN CONTENT
+        ============================================ -->
+        <main class="main-content">
+
+            <!-- Top Bar -->
+            <div class="topbar">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button class="menu-toggle" id="menuToggle">☰</button>
+                    <h2 id="pageTitle">📊 Dashboard</h2>
+                </div>
+                <div class="topbar-actions">
+                    <span id="statusText" style="color:var(--gray-500);font-size:0.9rem;">🟢 Online</span>
+                    <button class="btn btn-danger btn-sm" onclick="logout()">🚪 Logout</button>
+                </div>
+            </div>
+
+            <!-- Alert -->
+            <div class="alert" id="alert"></div>
+
+            <!-- ============================================
+            SECTION: DASHBOARD
+            ============================================ -->
+            <div class="section active" id="section-dashboard">
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="number" id="totalStudents">0</div>
+                        <div class="label">Total Students</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="publishedResults">0</div>
+                        <div class="label">Published Results</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="unpublishedResults">0</div>
+                        <div class="label">Unpublished Results</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="totalResults">0</div>
+                        <div class="label">Total Results</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom:12px;">📋 Available Classes</h3>
+                <div id="classList" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+            </div>
+
+            <!-- ============================================
+            SECTION: ADD STUDENT
+            ============================================ -->
+            <div class="section" id="section-add-student">
+                <h3 class="section-title">👨‍🎓 Add New Student</h3>
+                <form id="addStudentForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Student ID *</label>
+                            <input type="text" id="studentId" placeholder="e.g., S001" required />
+                        </div>
+                        <div class="form-group">
+                            <label>APAAR ID *</label>
+                            <input type="text" id="apaarId" placeholder="e.g., APAAR001" required />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Student Name *</label>
+                            <input type="text" id="studentName" placeholder="Full Name" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Father Name *</label>
+                            <input type="text" id="fatherName" placeholder="Father's Name" required />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date of Birth *</label>
+                            <input type="date" id="dob" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Class *</label>
+                            <select id="classSelect" required>
+                                <option value="">Select Class</option>
+                                <option value="1">1</option><option value="2">2</option>
+                                <option value="3">3</option><option value="4">4</option>
+                                <option value="5">5</option><option value="6">6</option>
+                                <option value="7">7</option><option value="8">8</option>
+                                <option value="9">9</option><option value="10">10</option>
+                                <option value="11">11</option><option value="12">12</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Session Year *</label>
+                        <select id="sessionSelect" required>
+                            <option value="">Select Session</option>
+                            <option value="2025-26">2025-26</option>
+                            <option value="2024-25">2024-25</option>
+                            <option value="2023-24">2023-24</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">➕ Add Student</button>
+                </form>
+            </div>
+
+            <!-- ============================================
+            SECTION: UPLOAD RESULT
+            ============================================ -->
+            <div class="section" id="section-upload-result">
+                <h3 class="section-title">📤 Upload Result</h3>
+
+                <h4 style="margin-bottom:12px;">Single Upload</h4>
+                <form id="uploadResultForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Student ID *</label>
+                            <input type="text" id="uploadStudentId" placeholder="e.g., S001" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Class *</label>
+                            <select id="uploadClass" required>
+                                <option value="">Select</option>
+                                <option value="1">1</option><option value="2">2</option>
+                                <option value="3">3</option><option value="4">4</option>
+                                <option value="5">5</option><option value="6">6</option>
+                                <option value="7">7</option><option value="8">8</option>
+                                <option value="9">9</option><option value="10">10</option>
+                                <option value="11">11</option><option value="12">12</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Session *</label>
+                            <select id="uploadSession" required>
+                                <option value="">Select</option>
+                                <option value="2025-26">2025-26</option>
+                                <option value="2024-25">2024-25</option>
+                                <option value="2023-24">2023-24</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Marksheet (PDF) *</label>
+                            <input type="file" id="marksheetFile" accept=".pdf" required />
+                            <div class="file-preview" id="filePreview">No file selected</div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">📤 Upload Result</button>
+                </form>
+
+                <hr style="margin:30px 0;" />
+
+                <h4 style="margin-bottom:12px;">Bulk Upload</h4>
+                <form id="bulkUploadForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Class *</label>
+                            <select id="bulkClass" required>
+                                <option value="">Select</option>
+                                <option value="1">1</option><option value="2">2</option>
+                                <option value="3">3</option><option value="4">4</option>
+                                <option value="5">5</option><option value="6">6</option>
+                                <option value="7">7</option><option value="8">8</option>
+                                <option value="9">9</option><option value="10">10</option>
+                                <option value="11">11</option><option value="12">12</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Session *</label>
+                            <select id="bulkSession" required>
+                                <option value="">Select</option>
+                                <option value="2025-26">2025-26</option>
+                                <option value="2024-25">2024-25</option>
+                                <option value="2023-24">2023-24</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Multiple PDFs *</label>
+                        <div class="bulk-upload-area" id="bulkDropArea">
+                            <p>📁 Drag & drop PDF files here or click to select</p>
+                            <p style="font-size:0.85rem;color:var(--gray-400);">Select multiple PDF files</p>
+                            <input type="file" id="bulkFiles" multiple accept=".pdf" />
+                        </div>
+                        <div id="bulkFileList" style="margin-top:8px;"></div>
+                    </div>
+                    <button type="submit" class="btn btn-success">📤 Upload All</button>
+                </form>
+            </div>
+
+            <!-- ============================================
+            SECTION: MANAGE RESULTS
+            ============================================ -->
+            <div class="section" id="section-manage-results">
+                <h3 class="section-title">📋 Manage Results</h3>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+                    <select id="filterClass" style="padding:8px 12px;border:2px solid var(--gray-200);border-radius:var(--radius);">
+                        <option value="">All Classes</option>
+                        <option value="1">1</option><option value="2">2</option>
+                        <option value="3">3</option><option value="4">4</option>
+                        <option value="5">5</option><option value="6">6</option>
+                        <option value="7">7</option><option value="8">8</option>
+                        <option value="9">9</option><option value="10">10</option>
+                        <option value="11">11</option><option value="12">12</option>
+                    </select>
+                    <select id="filterSession" style="padding:8px 12px;border:2px solid var(--gray-200);border-radius:var(--radius);">
+                        <option value="">All Sessions</option>
+                        <option value="2025-26">2025-26</option>
+                        <option value="2024-25">2024-25</option>
+                        <option value="2023-24">2023-24</option>
+                    </select>
+                    <select id="filterStatus" style="padding:8px 12px;border:2px solid var(--gray-200);border-radius:var(--radius);">
+                        <option value="">All Status</option>
+                        <option value="published">Published</option>
+                        <option value="unpublished">Unpublished</option>
+                    </select>
+                    <button class="btn btn-primary btn-sm" onclick="loadResults()">🔄 Refresh</button>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Class</th>
+                                <th>Session</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                            <tr><td colspan="7" style="text-align:center;padding:40px;">Loading results...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================
+            SECTION: PUBLISH RESULTS
+            ============================================ -->
+            <div class="section" id="section-publish">
+                <h3 class="section-title">✅ Publish / Unpublish Results</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Class *</label>
+                        <select id="publishClass" required>
+                            <option value="">Select Class</option>
+                            <option value="1">1</option><option value="2">2</option>
+                            <option value="3">3</option><option value="4">4</option>
+                            <option value="5">5</option><option value="6">6</option>
+                            <option value="7">7</option><option value="8">8</option>
+                            <option value="9">9</option><option value="10">10</option>
+                            <option value="11">11</option><option value="12">12</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Session *</label>
+                        <select id="publishSession" required>
+                            <option value="">Select Session</option>
+                            <option value="2025-26">2025-26</option>
+                            <option value="2024-25">2024-25</option>
+                            <option value="2023-24">2023-24</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:16px;">
+                    <button class="btn btn-success" onclick="publishAll()">✅ Publish All</button>
+                    <button class="btn btn-warning" onclick="unpublishAll()">📌 Unpublish All</button>
+                    <button class="btn btn-danger" onclick="deleteAll()">🗑️ Delete All</button>
+                </div>
+                <div id="publishStatus" style="margin-top:16px;"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ============================================
+    JAVASCRIPT
+    ============================================ -->
+    <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        const API_BASE = 'http://localhost:3000/api/result';
+        const TOKEN = localStorage.getItem('adminToken') || '';
+
+        // ============================================
+        // SIDEBAR NAVIGATION
+        // ============================================
+        document.querySelectorAll('.sidebar-menu a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const section = this.dataset.section;
+
+                // Update active link
+                document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+                this.classList.add('active');
+
+                // Show section
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.getElementById('section-' + section).classList.add('active');
+
+                // Update title
+                const titles = {
+                    dashboard: '📊 Dashboard',
+                    'add-student': '👨‍🎓 Add Student',
+                    'upload-result': '📤 Upload Result',
+                    'manage-results': '📋 Manage Results',
+                    publish: '✅ Publish Results'
+                };
+                document.getElementById('pageTitle').textContent = titles[section] || section;
+
+                // Load data based on section
+                if (section === 'dashboard') loadDashboard();
+                if (section === 'manage-results') loadResults();
+            });
+        });
+
+        // Mobile menu toggle
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        // ============================================
+        // ALERT HELPER
+        // ============================================
+        function showAlert(message, type = 'success') {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = 'alert alert-' + type + ' show';
+            setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+
+        // ============================================
+        // API HELPERS
+        // ============================================
+        async function apiCall(endpoint, options = {}) {
+            const url = API_BASE + endpoint;
+            const headers = {
+                'Content-Type': 'application/json',
+                ...(options.headers || {})
+            };
+            if (TOKEN) {
+                headers['Authorization'] = 'Bearer ' + TOKEN;
+            }
+
+            const config = {
+                ...options,
+                headers: headers
+            };
+
+            try {
+                const response = await fetch(url, config);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                showAlert('Network error: ' + error.message, 'danger');
+                return { success: false, message: error.message };
+            }
+        }
+
+        // ============================================
+        // DASHBOARD
+        // ============================================
+        async function loadDashboard() {
+            try {
+                const data = await apiCall('/stats');
+                if (data.success) {
+                    document.getElementById('totalStudents').textContent = data.data.totalStudents || 0;
+                    document.getElementById('publishedResults').textContent = data.data.publishedResults || 0;
+                    document.getElementById('unpublishedResults').textContent = data.data.unpublishedResults || 0;
+                    document.getElementById('totalResults').textContent = data.data.totalResults || 0;
+
+                    // Show classes
+                    const classList = document.getElementById('classList');
+                    classList.innerHTML = '';
+                    if (data.data.classes && data.data.classes.length > 0) {
+                        data.data.classes.forEach(cls => {
+                            const badge = document.createElement('span');
+                            badge.style.cssText =
+                                'background:var(--gray-200);padding:4px 12px;border-radius:20px;font-size:0.85rem;';
+                            badge.textContent = `📚 ${cls.class} (${cls.session_year})`;
+                            classList.appendChild(badge);
+                        });
+                    } else {
+                        classList.innerHTML = '<p style="color:var(--gray-500);">No classes found</p>';
+                    }
+                }
+            } catch (error) {
+                console.error('Dashboard error:', error);
+            }
+        }
+
+        // ============================================
+        // ADD STUDENT
+        // ============================================
+        document.getElementById('addStudentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const data = {
+                studentId: document.getElementById('studentId').value.trim(),
+                studentName: document.getElementById('studentName').value.trim(),
+                fatherName: document.getElementById('fatherName').value.trim(),
+                apaarId: document.getElementById('apaarId').value.trim(),
+                dob: document.getElementById('dob').value,
+                class: document.getElementById('classSelect').value,
+                session: document.getElementById('sessionSelect').value
+            };
+
+            const result = await apiCall('/students', {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+
+            if (result.success) {
+                showAlert('✅ Student added successfully!', 'success');
+                this.reset();
+                loadDashboard();
+            } else {
+                showAlert('❌ ' + result.message, 'danger');
+            }
+        });
+
+        // ============================================
+        // UPLOAD RESULT (Single)
+        // ============================================
+        document.getElementById('marksheetFile').addEventListener('change', function() {
+            const preview = document.getElementById('filePreview');
+            if (this.files && this.files[0]) {
+                preview.innerHTML = `📄 <span>${this.files[0].name}</span> (${(this.files[0].size/1024).toFixed(1)} KB)`;
+            } else {
+                preview.textContent = 'No file selected';
+            }
+        });
+
+        document.getElementById('uploadResultForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const file = document.getElementById('marksheetFile').files[0];
+            if (!file) {
+                showAlert('Please select a PDF file', 'danger');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('studentId', document.getElementById('uploadStudentId').value.trim());
+            formData.append('class', document.getElementById('uploadClass').value);
+            formData.append('session', document.getElementById('uploadSession').value);
+            formData.append('marksheet', file);
+
+            try {
+                const response = await fetch(API_BASE + '/results/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + TOKEN },
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('✅ Result uploaded successfully!', 'success');
+                    this.reset();
+                    document.getElementById('filePreview').textContent = 'No file selected';
+                    loadResults();
+                } else {
+                    showAlert('❌ ' + data.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'danger');
+            }
+        });
+
+        // ============================================
+        // BULK UPLOAD
+        // ============================================
+        const bulkDropArea = document.getElementById('bulkDropArea');
+        const bulkFiles = document.getElementById('bulkFiles');
+
+        bulkDropArea.addEventListener('click', () => bulkFiles.click());
+
+        bulkDropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            bulkDropArea.style.borderColor = 'var(--primary)';
+            bulkDropArea.style.background = 'var(--gray-50)';
+        });
+
+        bulkDropArea.addEventListener('dragleave', () => {
+            bulkDropArea.style.borderColor = 'var(--gray-300)';
+            bulkDropArea.style.background = 'transparent';
+        });
+
+        bulkDropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            bulkDropArea.style.borderColor = 'var(--gray-300)';
+            bulkDropArea.style.background = 'transparent';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                bulkFiles.files = files;
+                updateBulkFileList(files);
+            }
+        });
+
+        bulkFiles.addEventListener('change', function() {
+            updateBulkFileList(this.files);
+        });
+
+        function updateBulkFileList(files) {
+            const list = document.getElementById('bulkFileList');
+            if (files.length === 0) {
+                list.innerHTML = '';
+                return;
+            }
+            let html = '<div style="display:flex;flex-wrap:wrap;gap:4px;">';
+            for (let i = 0; i < files.length; i++) {
+                html += `<span style="background:var(--gray-100);padding:4px 10px;border-radius:4px;font-size:0.85rem;">
+                            📄 ${files[i].name}
+                        </span>`;
+            }
+            html += '</div>';
+            list.innerHTML = html;
+        }
+
+        document.getElementById('bulkUploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const files = document.getElementById('bulkFiles').files;
+            if (files.length === 0) {
+                showAlert('Please select PDF files', 'danger');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('class', document.getElementById('bulkClass').value);
+            formData.append('session', document.getElementById('bulkSession').value);
+
+            let studentId = prompt('Enter Student ID prefix (e.g., S) or press Cancel to skip:');
+            if (studentId === null) {
+                showAlert('Bulk upload cancelled', 'warning');
+                return;
+            }
+
+            // Add each file with student ID
+            for (let i = 0; i < files.length; i++) {
+                const id = studentId + String(i + 1).padStart(3, '0');
+                formData.append('studentId', id);
+                formData.append('marksheets', files[i]);
+            }
+
+            try {
+                const response = await fetch(API_BASE + '/results/bulk-upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + TOKEN },
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(`✅ ${data.data.results.length} results uploaded successfully!`, 'success');
+                    this.reset();
+                    document.getElementById('bulkFileList').innerHTML = '';
+                    loadResults();
+                } else {
+                    showAlert('❌ ' + data.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'danger');
+            }
+        });
+
+        // ============================================
+        // MANAGE RESULTS
+        // ============================================
+        async function loadResults() {
+            const tbody = document.getElementById('resultsTableBody');
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;"><div class="spinner"></div></td></tr>';
+
+            const classFilter = document.getElementById('filterClass').value;
+            const sessionFilter = document.getElementById('filterSession').value;
+            const statusFilter = document.getElementById('filterStatus').value;
+
+            let url = '/results?';
+            if (classFilter) url += 'class=' + classFilter + '&';
+            if (sessionFilter) url += 'session=' + sessionFilter + '&';
+            if (statusFilter) url += 'status=' + statusFilter + '&';
+
+            const data = await apiCall(url);
+
+            if (data.success && data.data) {
+                const results = data.data;
+                if (results.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-500);">No results found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = results.map((r, i) => `
+                            <tr>
+                                <td>${i + 1}</td>
+                                <td><strong>${r.student_id}</strong></td>
+                                <td>${r.student_name}</td>
+                                <td>${r.class}</td>
+                                <td>${r.session_year}</td>
+                                <td>
+                                    <span class="badge ${r.status === 'published' ? 'badge-success' : 'badge-warning'}">
+                                        ${r.status}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-success btn-sm" onclick="publishSingle(${r.id})" ${r.status === 'published' ? 'disabled' : ''}>
+                                        ✅ Publish
+                                    </button>
+                                    <button class="btn btn-warning btn-sm" onclick="unpublishSingle(${r.id})" ${r.status === 'unpublished' ? 'disabled' : ''}>
+                                        📌 Unpublish
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteSingle(${r.id})">
+                                        🗑️ Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-500);">Failed to load results</td></tr>';
+            }
+        }
+
+        // Filter change
+        document.getElementById('filterClass').addEventListener('change', loadResults);
+        document.getElementById('filterSession').addEventListener('change', loadResults);
+        document.getElementById('filterStatus').addEventListener('change', loadResults);
+
+        // ============================================
+        // RESULT ACTIONS (Single)
+        // ============================================
+        async function publishSingle(id) {
+            if (!confirm('Publish this result?')) return;
+            const data = await apiCall('/results/' + id + '/publish', { method: 'PUT' });
+            if (data.success) {
+                showAlert('✅ Result published!', 'success');
+                loadResults();
+            } else {
+                showAlert('❌ ' + data.message, 'danger');
+            }
+        }
+
+        async function unpublishSingle(id) {
+            if (!confirm('Unpublish this result?')) return;
+            const data = await apiCall('/results/' + id + '/unpublish', { method: 'PUT' });
+            if (data.success) {
+                showAlert('📌 Result unpublished!', 'success');
+                loadResults();
+            } else {
+                showAlert('❌ ' + data.message, 'danger');
+            }
+        }
+
+        async function deleteSingle(id) {
+            if (!confirm('Delete this result permanently?')) return;
+            const data = await apiCall('/results/' + id, { method: 'DELETE' });
+            if (data.success) {
+                showAlert('🗑️ Result deleted!', 'success');
+                loadResults();
+                loadDashboard();
+            } else {
+                showAlert('❌ ' + data.message, 'danger');
+            }
+        }
+
+        // ============================================
+        // PUBLISH / UNPUBLISH / DELETE ALL
+        // ============================================
+        async function publishAll() {
+            const classVal = document.getElementById('publishClass').value;
+            const sessionVal = document.getElementById('publishSession').value;
+            if (!classVal || !sessionVal) {
+                showAlert('Please select Class and Session', 'danger');
+                return;
+            }
+            if (!confirm(`Publish ALL results for Class ${classVal} (${sessionVal})?`)) return;
+
+            const data = await apiCall('/results/publish-all', {
+                method: 'PUT',
+                body: JSON.stringify({ class: classVal, session: sessionVal })
+            });
+
+            if (data.success) {
+                showAlert('✅ ' + data.message, 'success');
+                document.getElementById('publishStatus').innerHTML =
+                    `<div class="alert alert-success show">✅ ${data.message}</div>`;
+                loadResults();
+                loadDashboard();
+            } else {
+                showAlert('❌ ' + data.message, 'danger');
+            }
+        }
+
+        async function unpublishAll() {
+            const classVal = document.getElementById('publishClass').value;
+            const sessionVal = document.getElementById('publishSession').value;
+            if (!classVal || !sessionVal) {
+                showAlert('Please select Class and Session', 'danger');
+                return;
+            }
+            if (!confirm(`Unpublish ALL results for Class ${classVal} (${sessionVal})?`)) return;
+
+            const data = await apiCall('/results/unpublish-all', {
+                method: 'PUT',
+                body: JSON.stringify({ class: classVal, session: sessionVal })
+            });
+
+            if (data.success) {
+                showAlert('📌 ' + data.message, 'success');
+                document.getElementById('publishStatus').innerHTML =
+                    `<div class="alert alert-success show">📌 ${data.message}</div>`;
+                loadResults();
+                loadDashboard();
+            } else {
+                showAlert('❌ ' + data.message, 'danger');
+            }
+        }
+
+        async function deleteAll() {
+            const classVal = document.getElementById('publishClass').value;
+            const sessionVal = document.getElementById('publishSession').value;
+            if (!classVal || !sessionVal) {
+                showAlert('Please select Class and Session', 'danger');
+                return;
+            }
+            if (!confirm(`⚠️ Delete ALL results for Class ${classVal} (${sessionVal})? This cannot be undone!`)) return;
+
+            const data = await apiCall('/results/delete-all', {
+                method: 'DELETE',
+                body: JSON.stringify({ class: classVal, session: sessionVal })
+            });
+
+            if (data.success) {
+                showAlert('🗑️ ' + data.message, 'success');
+                document.getElementById('publishStatus').innerHTML =
+                    `<div class="alert alert-success show">🗑️ ${data.message}</div>`;
+                loadResults();
+                loadDashboard();
+            } else {
+                showAlert('❌ ' + data.message, 'danger');
+            }
+        }
+
+        // ============================================
+        // LOGOUT
+        // ============================================
+        function logout() {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUser');
+            window.location.href = 'login.html';
+        }
+
+        // ============================================
+        // INIT - Load Dashboard on start
+        // ============================================
+        loadDashboard();
+
+        // Check if token exists
+        if (!TOKEN) {
+            showAlert('⚠️ Please login first', 'danger');
+        }
+    </script>
+
+</body>
+</html>
