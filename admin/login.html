@@ -587,6 +587,38 @@ body {
 }
 
 /* ============================================================
+   ATTEMPT WARNING MESSAGE
+============================================================ */
+.message.warning {
+  display: block;
+  background: #fef9e7;
+  border: 1px solid #f9e79f;
+  color: #e67e22;
+}
+
+.message.warning i {
+  color: #e67e22;
+  margin-right: 8px;
+}
+
+.message.error i {
+  margin-right: 8px;
+}
+
+/* Blocked State */
+.input-disabled {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
+.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
+/* ============================================================
    BUTTONS
 ============================================================ */
 .btn-primary {
@@ -1061,7 +1093,7 @@ if (token) {
 let otpTimer = null;
 let otpTimeLeft = 300;
 let resendTimer = null;
-let resendTimeLeft = 120; // 2 minutes in seconds
+let resendTimeLeft = 120;
 
 // ============================================================
 // UPDATE STEPS
@@ -1093,6 +1125,38 @@ function updateSteps(step) {
 }
 
 // ============================================================
+// GET LOGIN STATUS (Remaining attempts)
+// ============================================================
+async function getLoginStatus() {
+  try {
+    const response = await fetch(`${API_BASE}/login-status`);
+    const data = await response.json();
+    
+    if (data.success && data.blocked) {
+      let timeText = '';
+      if (data.remainingHours >= 1) {
+        timeText = `${data.remainingHours} hour${data.remainingHours > 1 ? 's' : ''}`;
+      } else {
+        timeText = `${data.remainingMinutes || 1} minute${data.remainingMinutes > 1 ? 's' : ''}`;
+      }
+      
+      showMessage(`🔒 Account Locked! Too many failed attempts. Please try again after ${timeText}.`, 'error');
+      
+      document.getElementById('username').disabled = true;
+      document.getElementById('password').disabled = true;
+      document.getElementById('loginBtn').disabled = true;
+      document.getElementById('loginBtn').innerHTML = '<i class="fas fa-lock"></i> Blocked';
+      
+    } else if (data.success && data.attempts > 0 && data.attempts < 5) {
+      const remaining = 5 - data.attempts;
+      showMessage(`⚠️ ${remaining} attempt${remaining > 1 ? 's' : ''} remaining. After 5 failed attempts, your account will be locked for 12 hours.`, 'warning');
+    }
+  } catch (error) {
+    console.error('Status check error:', error);
+  }
+}
+
+// ============================================================
 // START RESEND TIMER (2 Minutes)
 // ============================================================
 function startResendTimer() {
@@ -1100,7 +1164,7 @@ function startResendTimer() {
   const timerBadge = document.getElementById('resendTimerBadge');
   const timerDisplay = document.getElementById('resendTimerDisplay');
   
-  resendTimeLeft = 120; // 2 minutes
+  resendTimeLeft = 120;
   resendBtn.disabled = true;
   timerBadge.style.display = 'flex';
   
@@ -1122,7 +1186,7 @@ function startResendTimer() {
 }
 
 // ============================================================
-// HANDLE LOGIN - SEND OTP
+// HANDLE LOGIN - SEND OTP (With Attempt Tracking)
 // ============================================================
 async function handleLogin(e) {
   e.preventDefault();
@@ -1131,6 +1195,8 @@ async function handleLogin(e) {
   const password = document.getElementById('password').value.trim();
   const btn = document.getElementById('loginBtn');
   const message = document.getElementById('message');
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
 
   message.className = 'message';
   message.textContent = '';
@@ -1152,6 +1218,42 @@ async function handleLogin(e) {
 
     const data = await response.json();
 
+    // Check if account is blocked (12 hours)
+    if (data.blocked) {
+      let timeText = '';
+      if (data.remainingHours >= 1) {
+        timeText = `${data.remainingHours} hour${data.remainingHours > 1 ? 's' : ''}`;
+      } else if (data.remainingMinutes) {
+        timeText = `${data.remainingMinutes} minute${data.remainingMinutes > 1 ? 's' : ''}`;
+      } else {
+        timeText = 'some time';
+      }
+      
+      showMessage(`🔒 Account Locked! Too many failed attempts. Please try again after ${timeText}.`, 'error');
+      
+      usernameInput.disabled = true;
+      passwordInput.disabled = true;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-lock"></i> Blocked';
+      
+      return;
+    }
+
+    // Check rate limit (429)
+    if (response.status === 429) {
+      let timeText = '';
+      if (data.remainingHours >= 1) {
+        timeText = `${data.remainingHours} hour${data.remainingHours > 1 ? 's' : ''}`;
+      } else if (data.remainingMinutes) {
+        timeText = `${data.remainingMinutes} minute${data.remainingMinutes > 1 ? 's' : ''}`;
+      } else {
+        timeText = 'some time';
+      }
+      
+      showMessage(`🔒 Too many attempts. Please try again after ${timeText}.`, 'error');
+      return;
+    }
+
     if (data.success) {
       localStorage.setItem('tempUsername', username);
       localStorage.setItem('tempPassword', password);
@@ -1164,14 +1266,20 @@ async function handleLogin(e) {
       updateSteps(2);
       
       startOtpTimer();
-      startResendTimer(); // Start 2 minute resend timer
+      startResendTimer();
       
       setTimeout(() => {
         document.getElementById('otp').focus();
       }, 300);
       
       btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+      
+      usernameInput.disabled = false;
+      passwordInput.disabled = false;
+      
     } else {
+      // Failed attempt - show remaining attempts
+      await getLoginStatus();
       showMessage('❌ ' + data.message, 'error');
       btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
     }
@@ -1185,7 +1293,7 @@ async function handleLogin(e) {
 }
 
 // ============================================================
-// VERIFY OTP - Alphanumeric
+// VERIFY OTP
 // ============================================================
 async function verifyOTP() {
   const otpInput = document.getElementById('otp');
@@ -1218,8 +1326,8 @@ async function verifyOTP() {
     const data = await response.json();
 
     if (data.success) {
-      localStorage.setItem('adminToken', data.token);
-      localStorage.setItem('adminData', JSON.stringify(data.data));
+      localStorage.setItem('adminToken', data.data.token);
+      localStorage.setItem('adminData', JSON.stringify(data.data.admin));
       
       localStorage.removeItem('tempUsername');
       localStorage.removeItem('tempPassword');
@@ -1249,7 +1357,7 @@ async function verifyOTP() {
 }
 
 // ============================================================
-// RESEND OTP - With Timer
+// RESEND OTP
 // ============================================================
 async function resendOTP() {
   const username = localStorage.getItem('tempUsername');
@@ -1257,7 +1365,6 @@ async function resendOTP() {
   const btn = document.getElementById('resendBtn');
   const message = document.getElementById('message');
 
-  // Check if resend is allowed (timer should be finished)
   if (btn.disabled) {
     showMessage('⏳ Please wait before resending OTP', 'info');
     return;
@@ -1283,7 +1390,7 @@ async function resendOTP() {
     if (data.success) {
       showMessage('✅ OTP resent successfully!', 'success');
       startOtpTimer();
-      startResendTimer(); // Restart 2 minute timer
+      startResendTimer();
       document.getElementById('otp').value = '';
       document.getElementById('otp').focus();
     } else {
@@ -1336,14 +1443,11 @@ function showMessage(text, type) {
 }
 
 // ============================================================
-// OTP INPUT HANDLING - Alphanumeric (A-Z, 0-9)
+// OTP INPUT HANDLING
 // ============================================================
 const otpInput = document.getElementById('otp');
 otpInput.addEventListener('input', function(e) {
-  // Allow only alphanumeric (A-Z, a-z, 0-9) and convert to uppercase
   this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-  
-  // Auto-submit when 6 characters entered
   if (this.value.length === 6) {
     verifyOTP();
   }
@@ -1369,9 +1473,12 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ============================================================
-// INIT
+// INIT - Check Login Status on Page Load
 // ============================================================
-updateSteps(1);
+document.addEventListener('DOMContentLoaded', function() {
+  updateSteps(1);
+  getLoginStatus();
+});
 </script>
 
 </body>
