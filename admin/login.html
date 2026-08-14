@@ -696,6 +696,17 @@ body {
   transform: none !important;
 }
 
+/* Resend Button - Waiting State */
+.btn-secondary.waiting {
+  background: #e8f0fe;
+  border-color: #b3cff5;
+  color: #2563eb;
+}
+
+.btn-secondary.waiting i {
+  animation: spin 1s linear infinite;
+}
+
 /* ============================================================
    OTP SECTION
 ============================================================ */
@@ -734,29 +745,7 @@ body {
 
 .timer-badge i { font-size: 16px; color: #e67e22; }
 
-/* Resend Timer Badge */
-.resend-timer-badge {
-  display: none;
-  align-items: center;
-  gap: 8px;
-  background: #e8f0fe;
-  border: 1px solid #b3cff5;
-  color: #2563eb;
-  padding: 8px 16px;
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: 600;
-  margin-top: 10px;
-  animation: fadeIn 0.4s ease;
-}
-
-.resend-timer-badge i { font-size: 14px; }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
+/* Resend Timer Badge - Removed, now button shows wait */
 #otpSection .form-group {
   animation: slideUp 0.6s ease 0.15s both;
 }
@@ -1044,14 +1033,9 @@ body {
     <button class="btn-primary" id="verifyBtn" onclick="verifyOTP()">
       <i class="fas fa-check-circle"></i> Verify & Login
     </button>
-    <button class="btn-secondary" id="resendBtn" onclick="resendOTP()">
-      <i class="fas fa-redo"></i> Resend OTP
+    <button class="btn-secondary waiting" id="resendBtn" onclick="resendOTP()" disabled>
+      <i class="fas fa-clock"></i> Wait <span id="resendTimerDisplay">02:00</span>
     </button>
-    <!-- Resend Timer Badge -->
-    <div class="resend-timer-badge" id="resendTimerBadge">
-      <i class="fas fa-clock"></i>
-      Wait <span id="resendTimerDisplay">02:00</span> before resending
-    </div>
   </div>
 
   <!-- Message -->
@@ -1125,11 +1109,15 @@ function updateSteps(step) {
 }
 
 // ============================================================
-// GET LOGIN STATUS (Remaining attempts)
+// GET LOGIN STATUS - PER USER
 // ============================================================
-async function getLoginStatus() {
+async function getLoginStatus(username) {
   try {
-    const response = await fetch(`${API_BASE}/login-status`);
+    const url = username 
+      ? `${API_BASE}/login-status?username=${encodeURIComponent(username)}`
+      : `${API_BASE}/login-status`;
+      
+    const response = await fetch(url);
     const data = await response.json();
     
     if (data.success && data.blocked) {
@@ -1149,7 +1137,7 @@ async function getLoginStatus() {
       
     } else if (data.success && data.attempts > 0 && data.attempts < 5) {
       const remaining = 5 - data.attempts;
-      showMessage(`⚠️ ${remaining} attempt${remaining > 1 ? 's' : ''} remaining. After 5 failed attempts, your account will be locked for 12 hours.`, 'warning');
+      showMessage(`⚠️ ${remaining} attempt${remaining > 1 ? 's' : ''} remaining for this account. After 5 failed attempts, this account will be locked for 12 hours.`, 'warning');
     }
   } catch (error) {
     console.error('Status check error:', error);
@@ -1157,16 +1145,16 @@ async function getLoginStatus() {
 }
 
 // ============================================================
-// START RESEND TIMER (2 Minutes)
+// START RESEND TIMER (2 Minutes) - Button shows "Wait 02:00"
 // ============================================================
 function startResendTimer() {
   const resendBtn = document.getElementById('resendBtn');
-  const timerBadge = document.getElementById('resendTimerBadge');
   const timerDisplay = document.getElementById('resendTimerDisplay');
   
   resendTimeLeft = 120;
   resendBtn.disabled = true;
-  timerBadge.style.display = 'flex';
+  resendBtn.className = 'btn-secondary waiting';
+  resendBtn.innerHTML = `<i class="fas fa-clock"></i> Wait <span id="resendTimerDisplay">02:00</span>`;
   
   clearInterval(resendTimer);
   
@@ -1174,19 +1162,26 @@ function startResendTimer() {
     resendTimeLeft--;
     const m = String(Math.floor(resendTimeLeft / 60)).padStart(2, '0');
     const s = String(resendTimeLeft % 60).padStart(2, '0');
-    timerDisplay.innerText = `${m}:${s}`;
+    
+    const timerSpan = document.getElementById('resendTimerDisplay');
+    if (timerSpan) {
+      timerSpan.innerText = `${m}:${s}`;
+    }
+    
+    // Update button text
+    resendBtn.innerHTML = `<i class="fas fa-clock"></i> Wait ${m}:${s}`;
     
     if (resendTimeLeft <= 0) {
       clearInterval(resendTimer);
       resendBtn.disabled = false;
-      timerBadge.style.display = 'none';
-      timerDisplay.innerText = '02:00';
+      resendBtn.className = 'btn-secondary';
+      resendBtn.innerHTML = '<i class="fas fa-redo"></i> Resend OTP';
     }
   }, 1000);
 }
 
 // ============================================================
-// HANDLE LOGIN - SEND OTP (With Attempt Tracking)
+// HANDLE LOGIN - SEND OTP (With Per-User Attempt Tracking)
 // ============================================================
 async function handleLogin(e) {
   e.preventDefault();
@@ -1278,8 +1273,8 @@ async function handleLogin(e) {
       passwordInput.disabled = false;
       
     } else {
-      // Failed attempt - show remaining attempts
-      await getLoginStatus();
+      // Failed attempt - show remaining attempts for this user
+      await getLoginStatus(username);
       showMessage('❌ ' + data.message, 'error');
       btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
     }
@@ -1365,6 +1360,7 @@ async function resendOTP() {
   const btn = document.getElementById('resendBtn');
   const message = document.getElementById('message');
 
+  // Check if resend is allowed (timer should be finished)
   if (btn.disabled) {
     showMessage('⏳ Please wait before resending OTP', 'info');
     return;
@@ -1396,15 +1392,18 @@ async function resendOTP() {
     } else {
       showMessage('❌ ' + data.message, 'error');
       btn.disabled = false;
+      btn.className = 'btn-secondary';
       btn.innerHTML = '<i class="fas fa-redo"></i> Resend OTP';
     }
 
   } catch (error) {
     showMessage('❌ Server error. Please try again.', 'error');
     btn.disabled = false;
+    btn.className = 'btn-secondary';
     btn.innerHTML = '<i class="fas fa-redo"></i> Resend OTP';
   } finally {
     if (!btn.disabled) {
+      btn.className = 'btn-secondary';
       btn.innerHTML = '<i class="fas fa-redo"></i> Resend OTP';
     }
   }
@@ -1450,6 +1449,16 @@ otpInput.addEventListener('input', function(e) {
   this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
   if (this.value.length === 6) {
     verifyOTP();
+  }
+});
+
+// ============================================================
+// USERNAME BLUR - CHECK LOGIN STATUS FOR THIS USER
+// ============================================================
+document.getElementById('username').addEventListener('blur', function() {
+  const username = this.value.trim();
+  if (username) {
+    getLoginStatus(username);
   }
 });
 
