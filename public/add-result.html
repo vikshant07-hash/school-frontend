@@ -1633,13 +1633,19 @@
     </div>
 
     <!-- ============================================
-    JAVASCRIPT - COMPLETE WORKING
+    JAVASCRIPT - COMPLETE WORKING WITH CORS PROXY
     ============================================ -->
     <script>
         // ============================================
-        // CONFIGURATION
+        // 🔥 IMPORTANT: CORS PROXY USE KAREIN
         // ============================================
-        const API_BASE = 'https://gsssshilla.onrender.com/api/result';
+        // OPTION 1: corsproxy.io (Recommended)
+        const API_BASE = 'https://corsproxy.io/?https://gsssshilla.onrender.com/api/result';
+
+        // OPTION 2: allorigins.win (Alternative)
+        // const API_BASE = 'https://api.allorigins.win/raw?url=https://gsssshilla.onrender.com/api/result';
+
+        console.log('📡 API Base:', API_BASE);
 
         // ============================================
         // STATE
@@ -1673,21 +1679,31 @@
         }
 
         // ============================================
-        // API CALL
+        // API CALL WITH CORS PROXY
         // ============================================
         async function apiCall(endpoint, options = {}) {
             try {
-                const response = await fetch(API_BASE + endpoint, {
+                const url = API_BASE + endpoint;
+                console.log('📡 Calling:', url);
+
+                const response = await fetch(url, {
                     ...options,
                     headers: {
                         'Content-Type': 'application/json',
                         ...(options.headers || {})
                     }
                 });
-                return await response.json();
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('✅ Response:', data);
+                return data;
             } catch (error) {
-                console.error('API Error:', error);
-                showToast('Network error: ' + error.message, 'error');
+                console.error('❌ API Error:', error);
+                showToast('❌ ' + error.message, 'error');
                 return { success: false, message: error.message };
             }
         }
@@ -1768,11 +1784,15 @@
 
                     document.getElementById('statusDot').className = 'dot online';
                     document.getElementById('serverStatus').textContent = 'Connected';
+                } else {
+                    document.getElementById('statusDot').className = 'dot offline';
+                    document.getElementById('serverStatus').textContent = 'Error';
                 }
             } catch (error) {
                 console.error('Dashboard error:', error);
                 document.getElementById('statusDot').className = 'dot offline';
                 document.getElementById('serverStatus').textContent = 'Offline';
+                showToast('Cannot connect to server', 'error');
             }
         }
 
@@ -2259,7 +2279,7 @@
         });
 
         // ============================================
-        // UPLOADED RESULTS (Only uploaded, not published)
+        // UPLOADED RESULTS
         // ============================================
         async function loadUploadedResults() {
             try {
@@ -2334,14 +2354,13 @@
         }
 
         // ============================================
-        // NOT UPLOADED (Students without any result)
+        // NOT UPLOADED
         // ============================================
         async function loadNotUploaded() {
             const container = document.getElementById('notUploadedContainer');
             try {
                 const data = await apiCall('/students');
                 if (data.success) {
-                    // Students who have NO result at all
                     const noResult = data.data.filter(s => !s.has_result);
                     updateNotUploadedCounts(noResult);
                     renderNotUploaded(noResult);
