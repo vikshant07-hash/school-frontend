@@ -872,6 +872,21 @@
 const API_BASE = 'https://gsssshilla.onrender.com';
 
 // ============================================================
+// ✅ GET AUTH HEADERS
+// ============================================================
+function getAuthHeaders() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        showPopup('invalid');
+        return null;
+    }
+    return {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    };
+}
+
+// ============================================================
 // SESSION EXPIRED / INVALID ACCESS - SHOW POPUP
 // ============================================================
 function showPopup(type = 'expired') {
@@ -994,12 +1009,28 @@ document.querySelectorAll('.nav-links a').forEach(link => {
 });
 
 // ============================================================
-// LOAD DOWNLOADS
+// ✅ LOAD DOWNLOADS - WITH TOKEN
 // ============================================================
 async function loadDownloads() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        showPopup('invalid');
+        return;
+    }
+    
     const tbody = document.getElementById('tableBody');
     try {
-        const res = await fetch(`${API_BASE}/admin/downloads`);
+        const res = await fetch(`${API_BASE}/admin/downloads`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (res.status === 401) {
+            showPopup('expired');
+            return;
+        }
+        
         const data = await res.json();
         if (data.success) {
             document.getElementById('totalCount').textContent = data.data.length;
@@ -1049,10 +1080,16 @@ function escapeHtml(text) {
 }
 
 // ============================================================
-// FORM SUBMIT
+// ✅ FORM SUBMIT - WITH TOKEN
 // ============================================================
 document.getElementById('downloadForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        showPopup('invalid');
+        return;
+    }
 
     const editId = document.getElementById('editId').value;
     const fileInput = document.getElementById('file');
@@ -1082,7 +1119,19 @@ document.getElementById('downloadForm').addEventListener('submit', async functio
         const url = editId ? `${API_BASE}/admin/downloads/update/${editId}` : `${API_BASE}/admin/downloads/add`;
         const method = editId ? 'PUT' : 'POST';
 
-        const res = await fetch(url, { method, body: formData });
+        const res = await fetch(url, {
+            method: method,
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
+        
+        if (res.status === 401) {
+            showPopup('expired');
+            return;
+        }
+        
         const data = await res.json();
 
         if (data.success) {
@@ -1101,11 +1150,27 @@ document.getElementById('downloadForm').addEventListener('submit', async functio
 });
 
 // ============================================================
-// EDIT DOWNLOAD
+// ✅ EDIT DOWNLOAD - WITH TOKEN
 // ============================================================
 async function editDownload(id) {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        showPopup('invalid');
+        return;
+    }
+    
     try {
-        const res = await fetch(`${API_BASE}/api/downloads/${id}`);
+        const res = await fetch(`${API_BASE}/api/downloads/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (res.status === 401) {
+            showPopup('expired');
+            return;
+        }
+        
         const data = await res.json();
         if (data.success) {
             const item = data.data;
@@ -1143,12 +1208,29 @@ function cancelEdit() {
 }
 
 // ============================================================
-// DELETE DOWNLOAD
+// ✅ DELETE DOWNLOAD - WITH TOKEN
 // ============================================================
 async function deleteDownload(id) {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        showPopup('invalid');
+        return;
+    }
+    
     if (!confirm('Delete this download?')) return;
     try {
-        const res = await fetch(`${API_BASE}/admin/downloads/delete/${id}`, { method: 'DELETE' });
+        const res = await fetch(`${API_BASE}/admin/downloads/delete/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (res.status === 401) {
+            showPopup('expired');
+            return;
+        }
+        
         const data = await res.json();
         if (data.success) {
             showToast('✅ Deleted!');
