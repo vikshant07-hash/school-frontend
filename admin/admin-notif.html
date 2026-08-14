@@ -988,6 +988,21 @@
   const API_BASE = "https://gsssshilla.onrender.com";
 
   // ============================================================
+  // ✅ GET AUTH HEADERS - FIXED
+  // ============================================================
+  function getAuthHeaders() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      showPopup('invalid');
+      return null;
+    }
+    return {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+  }
+
+  // ============================================================
   // SESSION EXPIRED / INVALID ACCESS - SHOW POPUP
   // ============================================================
   function showPopup(type = 'expired') {
@@ -1130,12 +1145,30 @@
   let selectedIds = [];
 
   // ============================================================
-  // FETCH NOTIFICATIONS
+  // ✅ FETCH NOTIFICATIONS - WITH TOKEN
   // ============================================================
   async function fetchNotifications() {
     try {
-      const response = await fetch(`${API_BASE}/api/notifications/admin/all`);
-      if (!response.ok) throw new Error('Failed to fetch');
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        showPopup('invalid');
+        return;
+      }
+
+      const response = await fetch(`${API_BASE}/api/notifications/admin/all`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          showPopup('expired');
+          return;
+        }
+        throw new Error('Failed to fetch');
+      }
+      
       const data = await response.json();
       if (data.success) {
         currentNotifications = data.data || [];
@@ -1206,19 +1239,26 @@
   function updateSelectedIds() { selectedIds = []; document.querySelectorAll('.notification-checkbox:checked').forEach(cb => selectedIds.push(parseInt(cb.value))); }
 
   // ============================================================
-  // TOGGLE ALL
+  // ✅ TOGGLE ALL - WITH TOKEN
   // ============================================================
   async function toggleAllNotifications() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) { showPopup('invalid'); return; }
+    
     if (currentNotifications.length === 0) { showToast('No notifications', 'error'); return; }
     const allActive = currentNotifications.every(n => n.is_active == 1);
     const newStatus = allActive ? 0 : 1;
     if (!confirm(`${newStatus ? 'Activate' : 'Deactivate'} all notifications?`)) return;
+    
     let success = 0;
     for (const item of currentNotifications) {
       try {
         const resp = await fetch(`${API_BASE}/api/notifications/admin/update/${item.id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({ title: item.title, description: item.description || '', attendance: item.attendance || 'all', is_active: newStatus })
         });
         if (resp.ok) success++;
@@ -1229,28 +1269,44 @@
   }
 
   // ============================================================
-  // ADD/EDIT
+  // ✅ ADD/EDIT - WITH TOKEN
   // ============================================================
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    const token = localStorage.getItem('adminToken');
+    if (!token) { showPopup('invalid'); return; }
+    
     const id = editId.value;
     const titleVal = title.value.trim();
     const descriptionVal = description.value.trim();
     const attendanceVal = attendance.value;
     const file = fileInput.files[0];
+    
     if (!titleVal) { showToast('Please enter a title','error'); return; }
+    
     const formData = new FormData();
     formData.append('title', titleVal);
     formData.append('description', descriptionVal);
     formData.append('attendance', attendanceVal);
     if (file) formData.append('file', file);
+    
     const isEdit = id !== '';
     const url = isEdit ? `${API_BASE}/api/notifications/admin/update/${id}` : `${API_BASE}/api/notifications/admin/add`;
     const method = isEdit ? 'PUT' : 'POST';
+    
     try {
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
       submitBtn.disabled = true;
-      const response = await fetch(url, { method, body: formData });
+      
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      
       const data = await response.json();
       if (data.success) {
         showToast(isEdit ? '✅ Updated!' : '✅ Added!','success');
@@ -1259,8 +1315,12 @@
       } else {
         showToast(data.message || 'Failed','error');
       }
-    } catch (error) { showToast('Error saving','error'); }
-    finally { submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Notification'; submitBtn.disabled = false; }
+    } catch (error) { 
+      showToast('Error saving','error'); 
+    } finally { 
+      submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Notification'; 
+      submitBtn.disabled = false; 
+    }
   });
 
   function editNotification(id) {
@@ -1289,25 +1349,40 @@
   }
 
   // ============================================================
-  // DELETE / BULK DELETE
+  // ✅ DELETE / BULK DELETE - WITH TOKEN
   // ============================================================
   async function deleteNotification(id) {
+    const token = localStorage.getItem('adminToken');
+    if (!token) { showPopup('invalid'); return; }
+    
     if (!confirm('Delete this notification?')) return;
     try {
-      const resp = await fetch(`${API_BASE}/api/notifications/admin/delete/${id}`, { method: 'DELETE' });
+      const resp = await fetch(`${API_BASE}/api/notifications/admin/delete/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const data = await resp.json();
       if (data.success) { showToast('✅ Deleted!','success'); fetchNotifications(); }
       else showToast(data.message || 'Failed','error');
     } catch(e) { showToast('Error','error'); }
   }
+  
   async function confirmBulkDelete() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) { showPopup('invalid'); return; }
+    
     updateSelectedIds();
     if (selectedIds.length === 0) { showToast('Select notifications','error'); return; }
     if (!confirm(`Delete ${selectedIds.length} selected?`)) return;
     try {
       const resp = await fetch(`${API_BASE}/api/notifications/admin/bulk-delete`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ ids: selectedIds })
       });
       const data = await resp.json();
@@ -1315,6 +1390,7 @@
       else showToast('Failed','error');
     } catch(e) { showToast('Error','error'); }
   }
+  
   function refreshNotifications() { showToast('🔄 Refreshing...','success'); fetchNotifications(); }
 
   // ============================================================
@@ -1365,31 +1441,21 @@
   // ============================================================
   let sessionCheckInterval = setInterval(async function() {
     const token = localStorage.getItem('adminToken');
-    if (!token) {
-      // Already logged out - no need to check
-      return;
-    }
+    if (!token) return;
     
-    // Don't check if session overlay is already showing
     const overlay = document.getElementById('sessionOverlay');
-    if (overlay.classList.contains('active')) {
-      return;
-    }
+    if (overlay.classList.contains('active')) return;
     
     try {
       const res = await fetch(`${API_BASE}/api/admin/verify`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
-      
-      if (!data.success) {
-        showPopup('expired');
-      }
+      if (!data.success) showPopup('expired');
     } catch (err) {
-      // If network error, show session expired
       showPopup('expired');
     }
-  }, 30000); // Check every 30 seconds
+  }, 30000);
 
   // ============================================================
   // INIT
@@ -1412,7 +1478,6 @@
       // Load notifications
       fetchNotifications();
     }
-    // If not authenticated, popup already shown by checkAuth()
   });
 
   // ============================================================
