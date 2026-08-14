@@ -82,10 +82,6 @@
             padding: 0;
         }
 
-        .sidebar-menu li {
-            padding: 0;
-        }
-
         .sidebar-menu li a {
             display: flex;
             align-items: center;
@@ -95,6 +91,7 @@
             transition: all 0.3s ease;
             border-left: 3px solid transparent;
             gap: 12px;
+            cursor: pointer;
         }
 
         .sidebar-menu li a:hover,
@@ -140,8 +137,10 @@
             display: flex;
             gap: 12px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
+        /* Buttons */
         .btn {
             padding: 10px 20px;
             border: none;
@@ -207,7 +206,7 @@
         /* Stats Cards */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 16px;
             margin-bottom: 24px;
         }
@@ -228,13 +227,11 @@
 
         .stat-card .label {
             color: var(--gray-500);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-top: 4px;
         }
 
-        /* ============================================
-           SECTIONS (Show/Hide)
-           ============================================ */
+        /* Sections */
         .section {
             display: none;
             background: white;
@@ -269,8 +266,7 @@
         }
 
         .form-group input,
-        .form-group select,
-        .form-group textarea {
+        .form-group select {
             width: 100%;
             padding: 10px 14px;
             border: 2px solid var(--gray-200);
@@ -280,11 +276,17 @@
         }
 
         .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
+        .form-group select:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-group input[type="file"] {
+            padding: 8px;
+            border: 2px dashed var(--gray-300);
+            background: var(--gray-50);
+            cursor: pointer;
         }
 
         .form-row {
@@ -293,11 +295,36 @@
             gap: 16px;
         }
 
-        .form-group input[type="file"] {
-            padding: 8px;
-            border: 2px dashed var(--gray-300);
+        .file-preview {
+            margin-top: 8px;
+            padding: 8px 12px;
             background: var(--gray-50);
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            color: var(--gray-600);
+        }
+
+        .file-preview span {
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .bulk-upload-area {
+            border: 2px dashed var(--gray-300);
+            padding: 30px;
+            text-align: center;
+            border-radius: var(--radius);
             cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .bulk-upload-area:hover {
+            border-color: var(--primary);
+            background: var(--gray-50);
+        }
+
+        .bulk-upload-area input[type="file"] {
+            display: none;
         }
 
         /* Table */
@@ -379,7 +406,7 @@
             border: 1px solid #FCA5A5;
         }
 
-        /* Loading Spinner */
+        /* Spinner */
         .spinner {
             display: inline-block;
             width: 20px;
@@ -397,6 +424,17 @@
             100% {
                 transform: rotate(360deg);
             }
+        }
+
+        .menu-toggle {
+            display: none;
+            background: var(--gray-900);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            font-size: 1.2rem;
+            cursor: pointer;
         }
 
         /* Responsive */
@@ -424,58 +462,14 @@
                 flex-wrap: wrap;
             }
             .menu-toggle {
-                display: block !important;
+                display: block;
             }
-        }
-
-        .menu-toggle {
-            display: none;
-            background: var(--gray-900);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: var(--radius);
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-
-        /* File Upload Preview */
-        .file-preview {
-            margin-top: 8px;
-            padding: 8px 12px;
-            background: var(--gray-50);
-            border-radius: var(--radius);
-            font-size: 0.85rem;
-            color: var(--gray-600);
-        }
-
-        .file-preview span {
-            font-weight: 600;
-            color: var(--gray-800);
-        }
-
-        /* Bulk Upload */
-        .bulk-upload-area {
-            border: 2px dashed var(--gray-300);
-            padding: 30px;
-            text-align: center;
-            border-radius: var(--radius);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .bulk-upload-area:hover {
-            border-color: var(--primary);
-            background: var(--gray-50);
-        }
-
-        .bulk-upload-area input[type="file"] {
-            display: none;
         }
     </style>
 </head>
 
 <body>
+
     <div class="admin-container">
 
         <!-- ============================================
@@ -486,19 +480,19 @@
                 📚 Result <span>Admin</span>
             </div>
             <ul class="sidebar-menu">
-                <li><a href="#" class="active" data-section="dashboard">
+                <li><a class="active" data-section="dashboard">
                         <span class="icon">📊</span> Dashboard
                     </a></li>
-                <li><a href="#" data-section="add-student">
+                <li><a data-section="add-student">
                         <span class="icon">👨‍🎓</span> Add Student
                     </a></li>
-                <li><a href="#" data-section="upload-result">
+                <li><a data-section="upload-result">
                         <span class="icon">📤</span> Upload Result
                     </a></li>
-                <li><a href="#" data-section="manage-results">
+                <li><a data-section="manage-results">
                         <span class="icon">📋</span> Manage Results
                     </a></li>
-                <li><a href="#" data-section="publish">
+                <li><a data-section="publish">
                         <span class="icon">✅</span> Publish Results
                     </a></li>
             </ul>
@@ -516,7 +510,7 @@
                     <h2 id="pageTitle">📊 Dashboard</h2>
                 </div>
                 <div class="topbar-actions">
-                    <span id="statusText" style="color:var(--gray-500);font-size:0.9rem;">🟢 Online</span>
+                    <span id="statusText" style="color:var(--gray-500);font-size:0.85rem;">🟢 Online</span>
                     <button class="btn btn-danger btn-sm" onclick="logout()">🚪 Logout</button>
                 </div>
             </div>
@@ -791,55 +785,19 @@
         const TOKEN = localStorage.getItem('adminToken') || '';
 
         // ============================================
-        // SIDEBAR NAVIGATION
+        // DOM REFERENCES
         // ============================================
-        document.querySelectorAll('.sidebar-menu a').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const section = this.dataset.section;
-
-                // Update active link
-                document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
-                this.classList.add('active');
-
-                // Show section
-                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-                document.getElementById('section-' + section).classList.add('active');
-
-                // Update title
-                const titles = {
-                    dashboard: '📊 Dashboard',
-                    'add-student': '👨‍🎓 Add Student',
-                    'upload-result': '📤 Upload Result',
-                    'manage-results': '📋 Manage Results',
-                    publish: '✅ Publish Results'
-                };
-                document.getElementById('pageTitle').textContent = titles[section] || section;
-
-                // Load data based on section
-                if (section === 'dashboard') loadDashboard();
-                if (section === 'manage-results') loadResults();
-            });
-        });
-
-        // Mobile menu toggle
-        document.getElementById('menuToggle').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('open');
-        });
+        const alertDiv = document.getElementById('alert');
 
         // ============================================
-        // ALERT HELPER
+        // HELPERS
         // ============================================
         function showAlert(message, type = 'success') {
-            const alert = document.getElementById('alert');
-            alert.textContent = message;
-            alert.className = 'alert alert-' + type + ' show';
-            setTimeout(() => alert.classList.remove('show'), 5000);
+            alertDiv.textContent = message;
+            alertDiv.className = 'alert alert-' + type + ' show';
+            setTimeout(() => alertDiv.classList.remove('show'), 5000);
         }
 
-        // ============================================
-        // API HELPERS
-        // ============================================
         async function apiCall(endpoint, options = {}) {
             const url = API_BASE + endpoint;
             const headers = {
@@ -850,13 +808,11 @@
                 headers['Authorization'] = 'Bearer ' + TOKEN;
             }
 
-            const config = {
-                ...options,
-                headers: headers
-            };
-
             try {
-                const response = await fetch(url, config);
+                const response = await fetch(url, {
+                    ...options,
+                    headers: headers
+                });
                 const data = await response.json();
                 return data;
             } catch (error) {
@@ -867,18 +823,49 @@
         }
 
         // ============================================
+        // SIDEBAR NAVIGATION
+        // ============================================
+        document.querySelectorAll('.sidebar-menu a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const section = this.dataset.section;
+
+                document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+                this.classList.add('active');
+
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.getElementById('section-' + section).classList.add('active');
+
+                const titles = {
+                    dashboard: '📊 Dashboard',
+                    'add-student': '👨‍🎓 Add Student',
+                    'upload-result': '📤 Upload Result',
+                    'manage-results': '📋 Manage Results',
+                    publish: '✅ Publish Results'
+                };
+                document.getElementById('pageTitle').textContent = titles[section] || section;
+
+                if (section === 'dashboard') loadDashboard();
+                if (section === 'manage-results') loadResults();
+            });
+        });
+
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        // ============================================
         // DASHBOARD
         // ============================================
         async function loadDashboard() {
             try {
-                const data = await apiCall('/stats');
+                const data = await apiCall('/admin/stats');
                 if (data.success) {
                     document.getElementById('totalStudents').textContent = data.data.totalStudents || 0;
                     document.getElementById('publishedResults').textContent = data.data.publishedResults || 0;
                     document.getElementById('unpublishedResults').textContent = data.data.unpublishedResults || 0;
                     document.getElementById('totalResults').textContent = data.data.totalResults || 0;
 
-                    // Show classes
                     const classList = document.getElementById('classList');
                     classList.innerHTML = '';
                     if (data.data.classes && data.data.classes.length > 0) {
@@ -914,7 +901,7 @@
                 session: document.getElementById('sessionSelect').value
             };
 
-            const result = await apiCall('/students', {
+            const result = await apiCall('/admin/students', {
                 method: 'POST',
                 body: JSON.stringify(data)
             });
@@ -929,7 +916,7 @@
         });
 
         // ============================================
-        // UPLOAD RESULT (Single)
+        // UPLOAD RESULT
         // ============================================
         document.getElementById('marksheetFile').addEventListener('change', function() {
             const preview = document.getElementById('filePreview');
@@ -956,7 +943,7 @@
             formData.append('marksheet', file);
 
             try {
-                const response = await fetch(API_BASE + '/results/upload', {
+                const response = await fetch(API_BASE + '/admin/results/upload', {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + TOKEN },
                     body: formData
@@ -1018,9 +1005,8 @@
             }
             let html = '<div style="display:flex;flex-wrap:wrap;gap:4px;">';
             for (let i = 0; i < files.length; i++) {
-                html += `<span style="background:var(--gray-100);padding:4px 10px;border-radius:4px;font-size:0.85rem;">
-                            📄 ${files[i].name}
-                        </span>`;
+                html +=
+                    `<span style="background:var(--gray-100);padding:4px 10px;border-radius:4px;font-size:0.85rem;">📄 ${files[i].name}</span>`;
             }
             html += '</div>';
             list.innerHTML = html;
@@ -1036,24 +1022,25 @@
             }
 
             const formData = new FormData();
-            formData.append('class', document.getElementById('bulkClass').value);
-            formData.append('session', document.getElementById('bulkSession').value);
+            const cls = document.getElementById('bulkClass').value;
+            const session = document.getElementById('bulkSession').value;
 
-            let studentId = prompt('Enter Student ID prefix (e.g., S) or press Cancel to skip:');
-            if (studentId === null) {
-                showAlert('Bulk upload cancelled', 'warning');
-                return;
-            }
-
-            // Add each file with student ID
             for (let i = 0; i < files.length; i++) {
-                const id = studentId + String(i + 1).padStart(3, '0');
+                const id = prompt(`Enter Student ID for file ${i+1}: ${files[i].name}`, 'S' + String(i + 1).padStart(3,
+                '0'));
+                if (!id) {
+                    showAlert('Bulk upload cancelled', 'warning');
+                    return;
+                }
                 formData.append('studentId', id);
                 formData.append('marksheets', files[i]);
             }
 
+            formData.append('class', cls);
+            formData.append('session', session);
+
             try {
-                const response = await fetch(API_BASE + '/results/bulk-upload', {
+                const response = await fetch(API_BASE + '/admin/results/bulk-upload', {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + TOKEN },
                     body: formData
@@ -1061,7 +1048,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showAlert(`✅ ${data.data.results.length} results uploaded successfully!`, 'success');
+                    showAlert(`✅ ${data.data.results.length} results uploaded!`, 'success');
                     this.reset();
                     document.getElementById('bulkFileList').innerHTML = '';
                     loadResults();
@@ -1078,13 +1065,14 @@
         // ============================================
         async function loadResults() {
             const tbody = document.getElementById('resultsTableBody');
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;"><div class="spinner"></div></td></tr>';
+            tbody.innerHTML =
+                '<tr><td colspan="7" style="text-align:center;padding:40px;"><div class="spinner"></div></td></tr>';
 
             const classFilter = document.getElementById('filterClass').value;
             const sessionFilter = document.getElementById('filterSession').value;
             const statusFilter = document.getElementById('filterStatus').value;
 
-            let url = '/results?';
+            let url = '/admin/results?';
             if (classFilter) url += 'class=' + classFilter + '&';
             if (sessionFilter) url += 'session=' + sessionFilter + '&';
             if (statusFilter) url += 'status=' + statusFilter + '&';
@@ -1094,7 +1082,8 @@
             if (data.success && data.data) {
                 const results = data.data;
                 if (results.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-500);">No results found</td></tr>';
+                    tbody.innerHTML =
+                        '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-500);">No results found</td></tr>';
                     return;
                 }
 
@@ -1124,24 +1113,25 @@
                             </tr>
                         `).join('');
             } else {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-500);">Failed to load results</td></tr>';
+                tbody.innerHTML =
+                    '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-500);">Failed to load results</td></tr>';
             }
         }
 
-        // Filter change
         document.getElementById('filterClass').addEventListener('change', loadResults);
         document.getElementById('filterSession').addEventListener('change', loadResults);
         document.getElementById('filterStatus').addEventListener('change', loadResults);
 
         // ============================================
-        // RESULT ACTIONS (Single)
+        // RESULT ACTIONS
         // ============================================
         async function publishSingle(id) {
             if (!confirm('Publish this result?')) return;
-            const data = await apiCall('/results/' + id + '/publish', { method: 'PUT' });
+            const data = await apiCall('/admin/results/' + id + '/publish', { method: 'PUT' });
             if (data.success) {
                 showAlert('✅ Result published!', 'success');
                 loadResults();
+                loadDashboard();
             } else {
                 showAlert('❌ ' + data.message, 'danger');
             }
@@ -1149,10 +1139,11 @@
 
         async function unpublishSingle(id) {
             if (!confirm('Unpublish this result?')) return;
-            const data = await apiCall('/results/' + id + '/unpublish', { method: 'PUT' });
+            const data = await apiCall('/admin/results/' + id + '/unpublish', { method: 'PUT' });
             if (data.success) {
                 showAlert('📌 Result unpublished!', 'success');
                 loadResults();
+                loadDashboard();
             } else {
                 showAlert('❌ ' + data.message, 'danger');
             }
@@ -1160,7 +1151,7 @@
 
         async function deleteSingle(id) {
             if (!confirm('Delete this result permanently?')) return;
-            const data = await apiCall('/results/' + id, { method: 'DELETE' });
+            const data = await apiCall('/admin/results/' + id, { method: 'DELETE' });
             if (data.success) {
                 showAlert('🗑️ Result deleted!', 'success');
                 loadResults();
@@ -1182,7 +1173,7 @@
             }
             if (!confirm(`Publish ALL results for Class ${classVal} (${sessionVal})?`)) return;
 
-            const data = await apiCall('/results/publish-all', {
+            const data = await apiCall('/admin/results/publish-all', {
                 method: 'PUT',
                 body: JSON.stringify({ class: classVal, session: sessionVal })
             });
@@ -1207,7 +1198,7 @@
             }
             if (!confirm(`Unpublish ALL results for Class ${classVal} (${sessionVal})?`)) return;
 
-            const data = await apiCall('/results/unpublish-all', {
+            const data = await apiCall('/admin/results/unpublish-all', {
                 method: 'PUT',
                 body: JSON.stringify({ class: classVal, session: sessionVal })
             });
@@ -1232,7 +1223,7 @@
             }
             if (!confirm(`⚠️ Delete ALL results for Class ${classVal} (${sessionVal})? This cannot be undone!`)) return;
 
-            const data = await apiCall('/results/delete-all', {
+            const data = await apiCall('/admin/results/delete-all', {
                 method: 'DELETE',
                 body: JSON.stringify({ class: classVal, session: sessionVal })
             });
@@ -1258,14 +1249,13 @@
         }
 
         // ============================================
-        // INIT - Load Dashboard on start
+        // INIT
         // ============================================
-        loadDashboard();
-
-        // Check if token exists
         if (!TOKEN) {
-            showAlert('⚠️ Please login first', 'danger');
+            showAlert('⚠️ Please login first. Use token: your_jwt_token', 'warning');
         }
+
+        loadDashboard();
     </script>
 
 </body>
