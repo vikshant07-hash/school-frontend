@@ -1055,6 +1055,39 @@ body {
 const API_BASE = 'https://gsssshilla.onrender.com/api/admin';
 
 // ============================================================
+// FORCE UNBLOCK FORM - Fix stuck form
+// ============================================================
+function forceUnblockForm() {
+    console.log('🔓 Force unblocking form...');
+    
+    const username = document.getElementById('username');
+    const password = document.getElementById('password');
+    const loginBtn = document.getElementById('loginBtn');
+    const message = document.getElementById('message');
+    
+    if (username) {
+        username.disabled = false;
+        username.classList.remove('input-disabled');
+    }
+    if (password) {
+        password.disabled = false;
+        password.classList.remove('input-disabled');
+    }
+    if (loginBtn) {
+        loginBtn.disabled = false;
+        loginBtn.classList.remove('btn-disabled');
+        loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> VERIFY';
+    }
+    if (message) {
+        message.style.display = 'none';
+        message.textContent = '';
+        message.className = 'message';
+    }
+    
+    console.log('✅ Form unblocked successfully!');
+}
+
+// ============================================================
 // CHECK IF ALREADY LOGGED IN
 // ============================================================
 const token = localStorage.getItem('adminToken');
@@ -1120,27 +1153,47 @@ async function getLoginStatus(username) {
     const response = await fetch(url);
     const data = await response.json();
     
+    console.log('📊 Login Status:', data);
+    
+    // If backend says not blocked, force unblock
+    if (data.success && !data.blocked) {
+        forceUnblockForm();
+        return false;
+    }
+    
     if (data.success && data.blocked) {
-      let timeText = '';
-      if (data.remainingHours >= 1) {
-        timeText = `${data.remainingHours} hour${data.remainingHours > 1 ? 's' : ''}`;
-      } else {
-        timeText = `${data.remainingMinutes || 1} minute${data.remainingMinutes > 1 ? 's' : ''}`;
+      let timeText = data.timeMessage || '';
+      if (!timeText && data.remainingMinutes) {
+        if (data.remainingMinutes >= 60) {
+          const hours = Math.floor(data.remainingMinutes / 60);
+          const mins = data.remainingMinutes % 60;
+          timeText = `${hours} hour${hours > 1 ? 's' : ''}`;
+          if (mins > 0) timeText += ` ${mins} minute${mins > 1 ? 's' : ''}`;
+        } else {
+          timeText = `${data.remainingMinutes} minute${data.remainingMinutes > 1 ? 's' : ''}`;
+        }
       }
       
-      showMessage(`🔒 Account Locked! Too many failed attempts. Please try again after ${timeText}.`, 'error');
+      showMessage(`🔒 Account Locked! Too many failed attempts. Please try again after ${timeText || 'some time'}.`, 'error');
       
       document.getElementById('username').disabled = true;
       document.getElementById('password').disabled = true;
       document.getElementById('loginBtn').disabled = true;
       document.getElementById('loginBtn').innerHTML = '<i class="fas fa-lock"></i> Blocked';
-      
-    } else if (data.success && data.attempts > 0 && data.attempts < 5) {
+      return true;
+    }
+    
+    if (data.success && data.attempts > 0 && data.attempts < 5) {
       const remaining = 5 - data.attempts;
       showMessage(`⚠️ ${remaining} attempt${remaining > 1 ? 's' : ''} remaining for this account. After 5 failed attempts, this account will be locked for 12 hours.`, 'warning');
     }
+    
+    return false;
   } catch (error) {
     console.error('Status check error:', error);
+    // On error, force unblock to allow login
+    forceUnblockForm();
+    return false;
   }
 }
 
@@ -1195,9 +1248,16 @@ async function handleLogin(e) {
 
   message.className = 'message';
   message.textContent = '';
+  message.style.display = 'none';
 
   if (!username || !password) {
     showMessage('Please enter User Id and Password', 'error');
+    return;
+  }
+
+  // FIRST: Check if user is blocked
+  const isBlocked = await getLoginStatus(username);
+  if (isBlocked) {
     return;
   }
 
@@ -1300,6 +1360,7 @@ async function verifyOTP() {
 
   message.className = 'message';
   message.textContent = '';
+  message.style.display = 'none';
 
   if (otp.length !== 6) {
     showMessage('Please enter valid One Time Password (OTP)', 'error');
@@ -1439,6 +1500,7 @@ function showMessage(text, type) {
   const message = document.getElementById('message');
   message.textContent = text;
   message.className = 'message ' + type;
+  message.style.display = 'block';
 }
 
 // ============================================================
@@ -1486,7 +1548,19 @@ document.addEventListener('keydown', function(e) {
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
   updateSteps(1);
-  getLoginStatus();
+  
+  // FORCE UNBLOCK - Ensures form is always enabled on load
+  setTimeout(function() {
+    forceUnblockForm();
+    
+    // Also check if any user is blocked
+    const username = document.getElementById('username').value.trim();
+    if (username) {
+      getLoginStatus(username);
+    }
+  }, 500);
+  
+  console.log('🚀 Login page loaded - Form unblocked!');
 });
 </script>
 
