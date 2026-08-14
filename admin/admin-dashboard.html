@@ -1316,41 +1316,8 @@
     let sessionTimerInterval = null;
 
     // ============================================================
-    // FORCE BYPASS - ADDED AT TOP
+    // ✅ BYPASS REMOVED - NO BYPASS ALLOWED
     // ============================================================
-    (function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const forceLoad = urlParams.get('force') === '1' || urlParams.get('bypass') === '1';
-        
-        if (forceLoad) {
-            console.log('🔓 FORCE BYPASS MODE ENABLED');
-            window.history.replaceState({}, document.title, window.location.pathname);
-            
-            if (!localStorage.getItem('adminData')) {
-                localStorage.setItem('adminData', JSON.stringify({
-                    name: 'Admin',
-                    username: 'admin@shilla171210',
-                    role: 'Super Admin'
-                }));
-            }
-            
-            // Override checkAuth
-            window.checkAuth = async function() {
-                console.log('✅ BYPASS: Auth successful');
-                const adminData = JSON.parse(localStorage.getItem('adminData') || '{"name":"Admin"}');
-                document.getElementById('adminName').textContent = adminData.name || 'Admin';
-                document.getElementById('welcomeName').textContent = adminData.name || 'Admin';
-                document.getElementById('adminAvatar').textContent = (adminData.name || 'A').charAt(0).toUpperCase();
-                startSessionTimer();
-                return true;
-            };
-            
-            // Block showPopup
-            window.showPopup = function() {
-                console.log('🔒 Popup blocked by bypass mode');
-            };
-        }
-    })();
 
     // ============================================================
     // SESSION TIMER - WITH PERSISTENCE
@@ -1588,26 +1555,9 @@
     setGreeting();
 
     // ============================================================
-    // AUTH CHECK - WITH BYPASS SUPPORT
+    // ✅ AUTH CHECK - NO BYPASS
     // ============================================================
     async function checkAuth() {
-        // Check if force bypass is enabled (already handled by IIFE)
-        const urlParams = new URLSearchParams(window.location.search);
-        const forceLoad = urlParams.get('force') === '1' || urlParams.get('bypass') === '1';
-        
-        if (forceLoad) {
-            console.log('🔓 FORCE BYPASS: Dashboard loading without token check');
-            window.history.replaceState({}, document.title, window.location.pathname);
-            
-            const adminData = JSON.parse(localStorage.getItem('adminData') || '{"name":"Admin"}');
-            document.getElementById('adminName').textContent = adminData.name || 'Admin';
-            document.getElementById('welcomeName').textContent = adminData.name || 'Admin';
-            document.getElementById('adminAvatar').textContent = (adminData.name || 'A').charAt(0).toUpperCase();
-            
-            startSessionTimer();
-            return true;
-        }
-        
         const token = localStorage.getItem('adminToken');
         
         if (!token) {
@@ -1645,6 +1595,9 @@
     // LOAD PROFILE
     // ============================================================
     async function loadProfile() {
+      const token = localStorage.getItem('adminToken');
+      if (!token) return;
+      
       try {
         const res = await fetch(`${API_BASE}/profile`, {
           headers: { Authorization: `Bearer ${token}` }
