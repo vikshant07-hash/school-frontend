@@ -693,7 +693,6 @@
             color: var(--gray-600);
         }
 
-        /* Status Badges - Dynamic */
         .status-no-result {
             background: #fee2e2;
             color: #dc2626;
@@ -712,7 +711,7 @@
            ============================================ */
         .student-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
             gap: 10px;
         }
 
@@ -722,14 +721,13 @@
             border-radius: var(--radius);
             transition: var(--transition);
             background: white;
-            cursor: pointer;
+            cursor: default;
             position: relative;
         }
 
         .student-card:hover {
             border-color: var(--primary);
             box-shadow: var(--shadow);
-            transform: translateY(-2px);
         }
 
         .student-card .s-name {
@@ -760,6 +758,111 @@
         .student-card .s-status.published {
             background: #dcfce7;
             color: #16a34a;
+        }
+
+        .student-card .s-actions {
+            margin-top: 6px;
+            display: flex;
+            gap: 4px;
+        }
+
+        /* ============================================
+           MODAL
+           ============================================ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: var(--radius);
+            max-width: 560px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px 28px;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        .modal .modal-header h3 {
+            font-size: 1rem;
+            color: var(--primary);
+        }
+
+        .modal .modal-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--gray-400);
+            transition: var(--transition);
+        }
+        .modal .modal-header .close-btn:hover {
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        .modal .detail-row {
+            display: flex;
+            padding: 5px 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .modal .detail-row .label {
+            width: 110px;
+            font-weight: 600;
+            color: var(--gray-600);
+            font-size: 0.75rem;
+        }
+
+        .modal .detail-row .value {
+            flex: 1;
+            font-weight: 500;
+            color: var(--gray-800);
+            font-size: 0.85rem;
+        }
+
+        .modal .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 2px solid var(--gray-100);
+            flex-wrap: wrap;
         }
 
         /* ============================================
@@ -909,6 +1012,19 @@
                 left: 12px;
                 right: 12px;
                 bottom: 12px;
+            }
+
+            .modal {
+                padding: 18px 16px;
+                margin: 10px;
+            }
+            .modal .detail-row {
+                flex-direction: column;
+                padding: 8px 0;
+            }
+            .modal .detail-row .label {
+                width: 100%;
+                margin-bottom: 2px;
             }
         }
 
@@ -1425,6 +1541,98 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- ============================================
+    MODAL: STUDENT DETAILS / EDIT
+    ============================================ -->
+    <div class="modal-overlay" id="studentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle"><i class="fas fa-user-graduate" style="color:var(--secondary);"></i> Student Details</h3>
+                <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="modalContent">
+                <div style="text-align:center;padding:20px;">
+                    <div class="loading-spinner"></div>
+                    <p style="color:var(--gray-400);margin-top:8px;">Loading...</p>
+                </div>
+            </div>
+            <div class="modal-actions" id="modalActions">
+                <button class="btn btn-primary btn-sm" onclick="editStudent()">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="deleteStudent()">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    MODAL: EDIT STUDENT
+    ============================================ -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit" style="color:var(--secondary);"></i> Edit Student</h3>
+                <button class="close-btn" onclick="closeEditModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="editStudentForm">
+                <input type="hidden" id="editStudentId" />
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Student ID <span class="required">*</span></label>
+                        <input type="text" id="editSId" placeholder="S001" required />
+                    </div>
+                    <div class="form-group">
+                        <label>APAAR ID <span class="required">*</span></label>
+                        <input type="text" id="editApaarId" placeholder="APAAR001" required />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Student Name <span class="required">*</span></label>
+                        <input type="text" id="editSName" placeholder="Full Name" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Father Name <span class="required">*</span></label>
+                        <input type="text" id="editSFather" placeholder="Father's Name" required />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date of Birth <span class="required">*</span></label>
+                        <input type="date" id="editSDob" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Class <span class="required">*</span></label>
+                        <select id="editSClass" required>
+                            <option value="">Select Class</option>
+                            <option value="1">1</option><option value="2">2</option>
+                            <option value="3">3</option><option value="4">4</option>
+                            <option value="5">5</option><option value="6">6</option>
+                            <option value="7">7</option><option value="8">8</option>
+                            <option value="9">9</option><option value="10">10</option>
+                            <option value="11">11</option><option value="12">12</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Session <span class="required">*</span></label>
+                    <select id="editSSession" required>
+                        <option value="">Select Session</option>
+                        <option value="2025-26">2025-26</option>
+                        <option value="2024-25">2024-25</option>
+                        <option value="2023-24">2023-24</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Update Student
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================
     JAVASCRIPT - COMPLETE WORKING
     ============================================ -->
     <script>
@@ -1444,6 +1652,7 @@
         let notUploadedFilter = 'all';
         let publishFilter = 'all';
         let publishedListFilter = 'all';
+        let currentStudentId = null;
 
         // ============================================
         // TOAST
@@ -1668,6 +1877,17 @@
                                 <div class="s-id">ID: ${s.student_id}</div>
                                 <div class="s-id">Class: ${s.class} | ${s.session_year}</div>
                                 <span class="s-status ${statusClass}">${statusText}</span>
+                                <div class="s-actions">
+                                    <button class="btn btn-primary btn-xs" onclick="viewStudent('${s.student_id}')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-warning btn-xs" onclick="editStudentById('${s.student_id}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-xs" onclick="deleteStudentById('${s.student_id}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                         `;
                     }).join('')}
@@ -1681,6 +1901,187 @@
                 btn.classList.toggle('active', btn.dataset.class == cls);
             });
             renderListStudents();
+        }
+
+        // ============================================
+        // VIEW STUDENT
+        // ============================================
+        async function viewStudent(studentId) {
+            currentStudentId = studentId;
+            const modal = document.getElementById('studentModal');
+            const content = document.getElementById('modalContent');
+            modal.classList.add('active');
+            document.getElementById('modalTitle').innerHTML =
+                '<i class="fas fa-user-graduate" style="color:var(--secondary);"></i> Student Details';
+
+            content.innerHTML = `
+                <div style="text-align:center;padding:20px;">
+                    <div class="loading-spinner"></div>
+                    <p style="color:var(--gray-400);margin-top:8px;">Loading student details...</p>
+                </div>
+            `;
+
+            try {
+                const data = await apiCall('/students/' + studentId);
+                if (data.success) {
+                    const s = data.data;
+                    content.innerHTML = `
+                        <div class="detail-row">
+                            <div class="label">Student ID</div>
+                            <div class="value"><strong>${s.student_id}</strong></div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="label">Student Name</div>
+                            <div class="value">${s.student_name}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="label">Father's Name</div>
+                            <div class="value">${s.father_name}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="label">APAAR ID</div>
+                            <div class="value">${s.apaar_id}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="label">Date of Birth</div>
+                            <div class="value">${new Date(s.date_of_birth).toLocaleDateString('en-IN', {day:'2-digit',month:'2-digit',year:'numeric'})}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="label">Class</div>
+                            <div class="value">${s.class}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="label">Session</div>
+                            <div class="value">${s.session_year}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="label">Result Status</div>
+                            <div class="value">
+                                <span class="badge ${s.has_result ? (s.result_status === 'published' ? 'badge-success' : 'badge-info') : 'badge-danger'}">
+                                    ${s.has_result ? (s.result_status === 'published' ? '✅ Published' : '📄 Uploaded') : '📌 No Result'}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('modalActions').style.display = 'flex';
+                } else {
+                    content.innerHTML = `<p style="color:var(--danger);">Student not found</p>`;
+                }
+            } catch (error) {
+                content.innerHTML = `<p style="color:var(--danger);">Error loading details</p>`;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('studentModal').classList.remove('active');
+            currentStudentId = null;
+        }
+
+        // ============================================
+        // EDIT STUDENT
+        // ============================================
+        async function editStudent() {
+            if (!currentStudentId) return;
+            closeModal();
+            setTimeout(() => editStudentById(currentStudentId), 300);
+        }
+
+        async function editStudentById(studentId) {
+            const modal = document.getElementById('editModal');
+            modal.classList.add('active');
+
+            try {
+                const data = await apiCall('/students/' + studentId);
+                if (data.success) {
+                    const s = data.data;
+                    document.getElementById('editStudentId').value = s.student_id;
+                    document.getElementById('editSId').value = s.student_id;
+                    document.getElementById('editApaarId').value = s.apaar_id;
+                    document.getElementById('editSName').value = s.student_name;
+                    document.getElementById('editSFather').value = s.father_name;
+                    document.getElementById('editSDob').value = s.date_of_birth;
+                    document.getElementById('editSClass').value = s.class;
+                    document.getElementById('editSSession').value = s.session_year;
+                }
+            } catch (error) {
+                showToast('Error loading student data', 'error');
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        document.getElementById('editStudentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const studentId = document.getElementById('editStudentId').value;
+            const data = {
+                studentId: document.getElementById('editSId').value.trim(),
+                studentName: document.getElementById('editSName').value.trim(),
+                fatherName: document.getElementById('editSFather').value.trim(),
+                apaarId: document.getElementById('editApaarId').value.trim(),
+                dob: document.getElementById('editSDob').value,
+                class: document.getElementById('editSClass').value,
+                session: document.getElementById('editSSession').value
+            };
+
+            const result = await apiCall('/students/' + studentId, {
+                method: 'PUT',
+                body: JSON.stringify(data)
+            });
+
+            if (result.success) {
+                showToast('✅ Student updated successfully!', 'success');
+                closeEditModal();
+                loadDashboard();
+                loadListStudents();
+                loadUploadStudents();
+                loadNotUploaded();
+            } else {
+                showToast('❌ ' + result.message, 'error');
+            }
+        });
+
+        // ============================================
+        // DELETE STUDENT
+        // ============================================
+        async function deleteStudent() {
+            if (!currentStudentId) return;
+            if (!confirm('Delete this student permanently? This will also delete their result.')) return;
+
+            const result = await apiCall('/students/' + currentStudentId, { method: 'DELETE' });
+
+            if (result.success) {
+                showToast('🗑️ Student deleted!', 'success');
+                closeModal();
+                loadDashboard();
+                loadListStudents();
+                loadUploadStudents();
+                loadUploadedResults();
+                loadNotUploaded();
+                loadPublishResults();
+                loadPublishedList();
+            } else {
+                showToast('❌ ' + result.message, 'error');
+            }
+        }
+
+        async function deleteStudentById(studentId) {
+            if (!confirm('Delete this student permanently?')) return;
+            const result = await apiCall('/students/' + studentId, { method: 'DELETE' });
+            if (result.success) {
+                showToast('🗑️ Student deleted!', 'success');
+                loadDashboard();
+                loadListStudents();
+                loadUploadStudents();
+                loadUploadedResults();
+                loadNotUploaded();
+                loadPublishResults();
+                loadPublishedList();
+            } else {
+                showToast('❌ ' + result.message, 'error');
+            }
         }
 
         // ============================================
@@ -1858,7 +2259,7 @@
         });
 
         // ============================================
-        // UPLOADED RESULTS
+        // UPLOADED RESULTS (Only uploaded, not published)
         // ============================================
         async function loadUploadedResults() {
             try {
@@ -1933,13 +2334,14 @@
         }
 
         // ============================================
-        // NOT UPLOADED
+        // NOT UPLOADED (Students without any result)
         // ============================================
         async function loadNotUploaded() {
             const container = document.getElementById('notUploadedContainer');
             try {
                 const data = await apiCall('/students');
                 if (data.success) {
+                    // Students who have NO result at all
                     const noResult = data.data.filter(s => !s.has_result);
                     updateNotUploadedCounts(noResult);
                     renderNotUploaded(noResult);
@@ -1985,7 +2387,7 @@
             container.innerHTML = `
                 <div class="student-grid">
                     ${filtered.map(s => `
-                        <div class="student-card" onclick="selectForUpload('${s.student_id}','${s.class}','${s.session_year}')" style="border-color:var(--danger);">
+                        <div class="student-card" onclick="selectForUpload('${s.student_id}','${s.class}','${s.session_year}')" style="border-color:var(--danger);cursor:pointer;">
                             <div class="s-name">${s.student_name}</div>
                             <div class="s-id">ID: ${s.student_id}</div>
                             <div class="s-id">Class: ${s.class} | ${s.session_year}</div>
@@ -2107,6 +2509,7 @@
             loadPublishedList();
             loadUploadedResults();
             loadListStudents();
+            loadNotUploaded();
         }
 
         async function unpublishAllFiltered() {
@@ -2134,6 +2537,7 @@
             loadPublishedList();
             loadUploadedResults();
             loadListStudents();
+            loadNotUploaded();
         }
 
         // ============================================
@@ -2291,6 +2695,15 @@
         console.log('📊 Admin Panel v3.0 Loaded');
         console.log('📡 API Base:', API_BASE);
         console.log('🟢 Ready');
+
+        // Close modals on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(el => {
+            el.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
     </script>
 
 </body>
