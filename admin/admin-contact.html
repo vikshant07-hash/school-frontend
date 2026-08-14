@@ -1164,6 +1164,21 @@ const API_BASE = "https://gsssshilla.onrender.com";
 let currentMessages = [];
 
 // ============================================================
+// ✅ GET AUTH HEADERS
+// ============================================================
+function getAuthHeaders() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        showPopup('invalid');
+        return null;
+    }
+    return {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    };
+}
+
+// ============================================================
 // SESSION EXPIRED / INVALID ACCESS - SHOW POPUP
 // ============================================================
 function showPopup(type = 'expired') {
@@ -1288,14 +1303,30 @@ document.querySelectorAll('.nav-links a').forEach(link => {
 });
 
 // ============================================================
-// LOAD MESSAGES
+// ✅ LOAD MESSAGES - WITH TOKEN
 // ============================================================
 async function loadMessages() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        showPopup('invalid');
+        return;
+    }
+    
     const tbody = document.getElementById('messagesTableBody');
     tbody.innerHTML = `<tr><td colspan="6" class="empty-msg"><i class="fas fa-spinner fa-spin"></i> Loading messages...</td></tr>`;
 
     try {
-        const response = await fetch(`${API_BASE}/admin/contact/messages`);
+        const response = await fetch(`${API_BASE}/admin/contact/messages`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (response.status === 401) {
+            showPopup('expired');
+            return;
+        }
+        
         const data = await response.json();
 
         if (data.success) {
@@ -1371,11 +1402,18 @@ function updateStats(messages) {
 }
 
 // ============================================================
-// LOAD CONTACT INFO STATUS
+// ✅ LOAD CONTACT INFO STATUS - WITH TOKEN
 // ============================================================
 async function loadContactInfoStatus() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+    
     try {
-        const response = await fetch(`${API_BASE}/admin/contact/info`);
+        const response = await fetch(`${API_BASE}/admin/contact/info`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         const data = await response.json();
         const el = document.getElementById('contactInfoStatus');
         el.textContent = "✅ Loaded";
@@ -1420,15 +1458,30 @@ function deleteFromModal() {
 }
 
 // ============================================================
-// DELETE MESSAGE
+// ✅ DELETE MESSAGE - WITH TOKEN
 // ============================================================
 async function deleteMessage(id) {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        showPopup('invalid');
+        return;
+    }
+    
     if (!confirm('Are you sure you want to delete this message?')) return;
 
     try {
         const response = await fetch(`${API_BASE}/admin/contact/messages/delete/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         });
+        
+        if (response.status === 401) {
+            showPopup('expired');
+            return;
+        }
+        
         const data = await response.json();
 
         if (data.success) {
@@ -1443,11 +1496,21 @@ async function deleteMessage(id) {
 }
 
 // ============================================================
-// EDIT CONTACT INFO
+// ✅ OPEN EDIT CONTACT INFO - WITH TOKEN
 // ============================================================
 async function openEditInfoModal() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        showPopup('invalid');
+        return;
+    }
+    
     try {
-        const response = await fetch(`${API_BASE}/admin/contact/info`);
+        const response = await fetch(`${API_BASE}/admin/contact/info`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         const data = await response.json();
 
         document.getElementById('editSchoolName').value = data.school_name || '';
@@ -1467,7 +1530,16 @@ function closeEditInfoModal() {
     document.body.style.overflow = '';
 }
 
+// ============================================================
+// ✅ UPDATE CONTACT INFO - WITH TOKEN
+// ============================================================
 async function updateContactInfo() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        showPopup('invalid');
+        return;
+    }
+    
     const data = {
         school_name: document.getElementById('editSchoolName').value.trim(),
         address: document.getElementById('editAddress').value.trim(),
@@ -1489,9 +1561,17 @@ async function updateContactInfo() {
     try {
         const response = await fetch(`${API_BASE}/admin/contact/info/update`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify(data)
         });
+        
+        if (response.status === 401) {
+            showPopup('expired');
+            return;
+        }
 
         const result = await response.json();
 
@@ -1598,6 +1678,5 @@ document.getElementById('editInfoModal').addEventListener('click', (e) => {
     if (e.target === e.currentTarget) closeEditInfoModal();
 });
 </script>
-
 </body>
 </html>
