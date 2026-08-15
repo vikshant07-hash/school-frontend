@@ -49,7 +49,6 @@
             border-radius: 10px;
         }
 
-        /* ===== NAVBAR ===== */
         .navbar {
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             padding: 0 20px;
@@ -139,7 +138,6 @@
             color: var(--gold);
         }
 
-        /* ===== UPLOAD LAYOUT ===== */
         .upload-layout {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -198,7 +196,6 @@
             box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.15);
         }
 
-        /* ===== STUDENT LIST ===== */
         .student-list {
             max-height: 400px;
             overflow-y: auto;
@@ -263,7 +260,6 @@
             color: #059669;
         }
 
-        /* ===== STUDENT DETAIL ===== */
         .student-detail-card {
             background: #f8fafc;
             padding: 16px;
@@ -295,7 +291,6 @@
             border: 2px solid var(--border);
         }
 
-        /* ===== FILE DROP ===== */
         .file-drop {
             border: 2px dashed var(--border);
             border-radius: var(--radius-sm);
@@ -333,7 +328,6 @@
             margin-top: 6px;
         }
 
-        /* ===== BUTTONS ===== */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -377,17 +371,6 @@
         .btn-success:hover {
             background: #059669;
         }
-        .btn-secondary {
-            background: #f1f5f9;
-            color: #475569;
-        }
-        .btn-secondary:hover {
-            background: #e2e8f0;
-        }
-        .btn-block {
-            width: 100%;
-            justify-content: center;
-        }
 
         .success-msg {
             background: #d1fae5;
@@ -430,7 +413,6 @@
             margin-top: 4px;
         }
 
-        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             bottom: 24px;
@@ -458,7 +440,6 @@
             background: #ef4444;
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .navbar {
                 padding: 0 12px;
@@ -706,8 +687,10 @@
             list.innerHTML = '<p class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</p>';
 
             try {
-                let url = `${API_URL}/students/class/${classFilter || '6'}`;
-                if (!classFilter) url = `${API_URL}/students`;
+                let url = `${API_URL}/students`;
+                if (classFilter) {
+                    url += `?class=${classFilter}`;
+                }
 
                 const response = await fetch(url);
                 const result = await response.json();
@@ -742,6 +725,7 @@
             } catch (error) {
                 console.error('Error loading students:', error);
                 list.innerHTML = '<p class="no-data"><i class="fas fa-exclamation-circle" style="color:#ef4444;"></i> Error loading students</p>';
+                showToast('Failed to load students', 'error');
             }
         }
 
@@ -754,12 +738,12 @@
             document.getElementById('studentDetail').style.display = 'block';
             document.getElementById('uploadBtn').disabled = true;
 
-            // Clear previous errors
             document.getElementById('errorMsg').classList.remove('show');
             document.getElementById('successMsg').classList.remove('show');
 
             document.querySelectorAll('.student-item').forEach(el => el.classList.remove('selected'));
-            document.querySelector(`.student-item[onclick="selectStudent(${id})"]`)?.classList.add('selected');
+            const selectedItem = document.querySelector(`.student-item[onclick="selectStudent(${id})"]`);
+            if (selectedItem) selectedItem.classList.add('selected');
 
             try {
                 const response = await fetch(`${API_URL}/students/${id}`);
@@ -769,7 +753,6 @@
                     const s = result.data;
                     selectedStudentData = s;
 
-                    // Show all details
                     document.getElementById('detailName').textContent = s.student_name || '-';
                     document.getElementById('detailStudentId').textContent = s.student_id || '-';
                     document.getElementById('detailClass').textContent = s.class || '-';
@@ -801,7 +784,6 @@
                         document.getElementById('fileDrop').style.borderColor = '#e2e8f0';
                     }
 
-                    // Enable upload button only if file is selected
                     document.getElementById('uploadBtn').disabled = !selectedFile;
                 }
             } catch (error) {
@@ -819,10 +801,12 @@
 
             if (file.type !== 'application/pdf') {
                 showToast('Only PDF files are allowed!', 'error');
+                document.getElementById('fileInput').value = '';
                 return;
             }
             if (file.size > 10 * 1024 * 1024) {
                 showToast('File size must be less than 10MB!', 'error');
+                document.getElementById('fileInput').value = '';
                 return;
             }
 
@@ -830,8 +814,6 @@
             document.getElementById('fileName').textContent = file.name;
             document.getElementById('fileDrop').style.borderColor = '#10b981';
             document.getElementById('uploadBtn').disabled = !selectedStudentId;
-
-            // Clear previous errors
             document.getElementById('errorMsg').classList.remove('show');
         }
 
@@ -867,15 +849,18 @@
         });
 
         // ============================================================
-        // UPLOAD RESULT - FIXED
+        // UPLOAD RESULT
         // ============================================================
         async function uploadResult(e) {
             e.preventDefault();
 
-            // Get student ID from hidden field
+            // 🔥 FIX: Get student ID from hidden field
             const studentId = document.getElementById('selectedStudentId').value;
 
-            if (!studentId) {
+            // Log for debugging
+            console.log('📤 Uploading result for student ID:', studentId);
+
+            if (!studentId || studentId === '') {
                 showToast('Please select a student first.', 'error');
                 document.getElementById('errorMsg').textContent = '❌ Please select a student first.';
                 document.getElementById('errorMsg').classList.add('show');
@@ -908,6 +893,7 @@
                 });
 
                 const result = await response.json();
+                console.log('📤 Upload response:', result);
 
                 if (result.success) {
                     document.getElementById('successMsg').textContent = '✅ ' + result.message;
@@ -915,8 +901,9 @@
                     document.getElementById('deleteBtn').style.display = 'inline-flex';
                     document.getElementById('uploadBtn').textContent = '🔄 Update Result';
                     showToast('✅ Result uploaded successfully!', 'success');
-                    loadStudents();
-                    selectStudent(parseInt(studentId));
+                    // Refresh student list and details
+                    await loadStudents();
+                    await selectStudent(parseInt(studentId));
                 } else {
                     document.getElementById('errorMsg').textContent = '❌ ' + (result.message || 'Upload failed');
                     document.getElementById('errorMsg').classList.add('show');
@@ -960,8 +947,8 @@
                     document.getElementById('uploadBtn').disabled = true;
                     document.getElementById('successMsg').classList.remove('show');
                     document.getElementById('errorMsg').classList.remove('show');
-                    loadStudents();
-                    selectStudent(parseInt(studentId));
+                    await loadStudents();
+                    await selectStudent(parseInt(studentId));
                 } else {
                     showToast('❌ ' + result.message, 'error');
                 }
