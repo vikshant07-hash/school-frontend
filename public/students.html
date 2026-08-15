@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <style>
-        /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
@@ -24,13 +23,9 @@
             --text-light: #64748b;
             --border: #e2e8f0;
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.1);
             --radius: 14px;
             --radius-sm: 8px;
             --transition: all 0.3s ease;
-        }
-        html {
-            scroll-behavior: smooth;
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -124,7 +119,6 @@
             padding: 4px 8px;
         }
 
-        /* ===== CONTAINER ===== */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -303,9 +297,6 @@
         }
         table tbody tr:hover {
             background: #f8fafc;
-        }
-        table tbody tr:last-child td {
-            border-bottom: none;
         }
         .student-photo {
             width: 36px;
@@ -510,7 +501,7 @@
             margin-top: 2px;
         }
 
-        /* ===== PHOTO UPLOAD - Direct Cloudinary ===== */
+        /* ===== PHOTO UPLOAD - Simple (No Cloudinary) ===== */
         .photo-upload {
             border: 2px dashed var(--border);
             border-radius: var(--radius-sm);
@@ -546,18 +537,10 @@
             font-size: 13px;
             font-weight: 500;
             margin-top: 4px;
+            color: var(--text-light);
         }
         .photo-upload .file-name.success {
             color: #10b981;
-        }
-        .photo-upload .file-name.error {
-            color: #ef4444;
-        }
-        .photo-upload .file-name.uploading {
-            color: #3b82f6;
-        }
-        .photo-upload .file-name.default {
-            color: var(--text-light);
         }
         .photo-upload .preview-img {
             max-width: 120px;
@@ -581,34 +564,6 @@
             cursor: pointer;
         }
 
-        /* Upload Progress */
-        .upload-progress {
-            display: none;
-            margin-top: 8px;
-        }
-        .upload-progress.show {
-            display: block;
-        }
-        .upload-progress .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        .upload-progress .progress-bar .progress-fill {
-            height: 100%;
-            background: var(--gold);
-            border-radius: 10px;
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-        .upload-progress .progress-text {
-            font-size: 12px;
-            color: var(--text-light);
-            margin-top: 4px;
-        }
-
         .form-actions {
             grid-column: 1 / -1;
             display: flex;
@@ -619,11 +574,6 @@
         }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 992px) {
-            .form-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
         @media (max-width: 768px) {
             .navbar {
                 padding: 0 12px;
@@ -677,10 +627,6 @@
             .filters .filter-group {
                 flex: 1 1 auto;
                 width: 100%;
-            }
-            .filters .filter-group select,
-            .filters .filter-group input {
-                min-width: unset;
             }
             .form-grid {
                 grid-template-columns: 1fr;
@@ -944,17 +890,11 @@
                             <div class="photo-upload" id="photoUpload">
                                 <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
                                 <div class="upload-text">Click or drag & drop to upload <strong>photo</strong></div>
-                                <div class="file-name default" id="photoFileName">No file selected</div>
+                                <div class="file-name" id="photoFileName">No file selected</div>
                                 <img id="photoPreview" class="preview-img" alt="Preview" />
                                 <input type="file" id="photoInput" accept="image/*" onchange="handlePhotoSelect(event)" />
                             </div>
-                            <div class="upload-progress" id="uploadProgress">
-                                <div class="progress-bar">
-                                    <div class="progress-fill" id="progressFill"></div>
-                                </div>
-                                <div class="progress-text" id="progressText">Uploading to Cloudinary...</div>
-                            </div>
-                            <div class="helper-text">Upload JPG, PNG or WebP (Max 2MB) - Uploads to Cloudinary</div>
+                            <div class="helper-text">Upload JPG, PNG or WebP (Max 2MB) - Stores as base64 in database</div>
                             <input type="hidden" id="studentPhoto" value="" />
                         </div>
                         <div class="form-actions">
@@ -974,16 +914,6 @@
 
     <script>
         const API_URL = 'https://gsssshilla.onrender.com/api/result';
-        let isUploading = false;
-
-        // ============================================================
-        // CLOUDINARY CONFIG - Apka Cloud Name
-        // ============================================================
-        const CLOUDINARY_CLOUD_NAME = 'dwupxj7vf'; // ← Aapka Cloud Name
-        const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
-        const CLOUDINARY_UPLOAD_PRESET = 'students_upload'; // Cloudinary Dashboard mein create karein
-
-        console.log('📸 Cloudinary Upload URL:', CLOUDINARY_UPLOAD_URL);
 
         // ============================================================
         // TOGGLE MENU (Mobile)
@@ -1081,13 +1011,13 @@
         }
 
         // ============================================================
-        // PHOTO UPLOAD - Fixed Cloudinary Upload
+        // PHOTO UPLOAD - Simple base64 (No Cloudinary)
         // ============================================================
-        async function handlePhotoSelect(event) {
+        function handlePhotoSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            // Validate file size
+            // Validate file size (2MB)
             if (file.size > 2 * 1024 * 1024) {
                 showToast('Photo size must be less than 2MB', 'error');
                 document.getElementById('photoInput').value = '';
@@ -1102,101 +1032,26 @@
                 return;
             }
 
-            // Show preview locally
+            // Convert to base64
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('photoPreview').src = e.target.result;
+                const base64 = e.target.result;
+                
+                // Store base64 in hidden field
+                document.getElementById('studentPhoto').value = base64;
+                
+                // Show preview
+                document.getElementById('photoPreview').src = base64;
                 document.getElementById('photoPreview').classList.add('show');
+                document.getElementById('photoFileName').textContent = '✅ ' + file.name;
+                document.getElementById('photoFileName').style.color = '#10b981';
+                
+                showToast('✅ Photo loaded successfully!', 'success');
+            };
+            reader.onerror = function() {
+                showToast('❌ Failed to read file', 'error');
             };
             reader.readAsDataURL(file);
-
-            // Update UI - Uploading
-            const fileNameEl = document.getElementById('photoFileName');
-            fileNameEl.textContent = '⏳ Uploading to Cloudinary...';
-            fileNameEl.className = 'file-name uploading';
-
-            const progressEl = document.getElementById('uploadProgress');
-            progressEl.classList.add('show');
-            const fillEl = document.getElementById('progressFill');
-            const textEl = document.getElementById('progressText');
-
-            // Prepare form data for Cloudinary
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-            formData.append('folder', 'students');
-            
-            // ✅ FIXED: Simple transformation as separate params
-            formData.append('width', 300);
-            formData.append('height', 300);
-            formData.append('crop', 'thumb');
-            formData.append('gravity', 'face');
-            formData.append('quality', 'auto:good');
-
-            try {
-                isUploading = true;
-                textEl.textContent = 'Uploading to Cloudinary... 0%';
-
-                // Upload to Cloudinary using XMLHttpRequest for progress tracking
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', CLOUDINARY_UPLOAD_URL, true);
-
-                xhr.upload.onprogress = function(e) {
-                    if (e.lengthComputable) {
-                        const percent = Math.round((e.loaded / e.total) * 100);
-                        fillEl.style.width = percent + '%';
-                        textEl.textContent = 'Uploading to Cloudinary... ' + percent + '%';
-                    }
-                };
-
-                xhr.onload = function() {
-                    isUploading = false;
-                    if (xhr.status === 200) {
-                        const response = JSON.parse(xhr.responseText);
-                        console.log('✅ Cloudinary Upload Success:', response);
-
-                        // Store Cloudinary URL
-                        const imageUrl = response.secure_url;
-                        document.getElementById('studentPhoto').value = imageUrl;
-                        fileNameEl.textContent = '✅ ' + file.name + ' (Cloudinary)';
-                        fileNameEl.className = 'file-name success';
-                        progressEl.classList.remove('show');
-                        showToast('✅ Photo uploaded to Cloudinary successfully!', 'success');
-                    } else {
-                        const error = JSON.parse(xhr.responseText);
-                        console.error('❌ Cloudinary Upload Error:', error);
-                        fileNameEl.textContent = '❌ Upload failed: ' + (error.error?.message || 'Unknown error');
-                        fileNameEl.className = 'file-name error';
-                        progressEl.classList.remove('show');
-                        showToast('❌ ' + (error.error?.message || 'Upload failed'), 'error');
-                        document.getElementById('photoPreview').classList.remove('show');
-                        document.getElementById('photoInput').value = '';
-                    }
-                };
-
-                xhr.onerror = function() {
-                    isUploading = false;
-                    console.error('❌ Network Error');
-                    fileNameEl.textContent = '❌ Network error - Please try again';
-                    fileNameEl.className = 'file-name error';
-                    progressEl.classList.remove('show');
-                    showToast('❌ Network error. Please check your connection.', 'error');
-                    document.getElementById('photoPreview').classList.remove('show');
-                    document.getElementById('photoInput').value = '';
-                };
-
-                xhr.send(formData);
-
-            } catch (error) {
-                isUploading = false;
-                console.error('❌ Upload error:', error);
-                fileNameEl.textContent = '❌ Upload failed - Please try again';
-                fileNameEl.className = 'file-name error';
-                progressEl.classList.remove('show');
-                showToast('❌ Failed to upload photo. Please try again.', 'error');
-                document.getElementById('photoPreview').classList.remove('show');
-                document.getElementById('photoInput').value = '';
-            }
         }
 
         // Drag and Drop for Photo
@@ -1231,12 +1086,10 @@
 
             document.getElementById('editId').value = '';
             document.getElementById('photoFileName').textContent = 'No file selected';
-            document.getElementById('photoFileName').className = 'file-name default';
+            document.getElementById('photoFileName').style.color = '';
             document.getElementById('photoPreview').classList.remove('show');
             document.getElementById('studentPhoto').value = '';
-            document.getElementById('uploadProgress').classList.remove('show');
             document.getElementById('photoInput').value = '';
-            isUploading = false;
 
             if (mode === 'edit' && data) {
                 document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Student';
@@ -1261,8 +1114,8 @@
                     document.getElementById('studentPhoto').value = data.student_photo;
                     document.getElementById('photoPreview').src = data.student_photo;
                     document.getElementById('photoPreview').classList.add('show');
-                    document.getElementById('photoFileName').textContent = '✅ Existing photo (Cloudinary)';
-                    document.getElementById('photoFileName').className = 'file-name success';
+                    document.getElementById('photoFileName').textContent = '✅ Existing photo';
+                    document.getElementById('photoFileName').style.color = '#10b981';
                 }
             } else {
                 document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Add Student';
@@ -1280,11 +1133,9 @@
             document.getElementById('editId').value = '';
             document.getElementById('photoPreview').classList.remove('show');
             document.getElementById('photoFileName').textContent = 'No file selected';
-            document.getElementById('photoFileName').className = 'file-name default';
+            document.getElementById('photoFileName').style.color = '';
             document.getElementById('studentPhoto').value = '';
-            document.getElementById('uploadProgress').classList.remove('show');
             document.getElementById('photoInput').value = '';
-            isUploading = false;
         }
 
         // Close modal on overlay click
@@ -1302,11 +1153,6 @@
         // ============================================================
         async function saveStudent(e) {
             e.preventDefault();
-
-            if (isUploading) {
-                showToast('Please wait for photo upload to complete', 'error');
-                return;
-            }
 
             const editId = document.getElementById('editId').value;
             const isEdit = !!editId;
@@ -1337,7 +1183,7 @@
 
             // Check if photo is uploaded (for new student)
             if (!isEdit && (!data.studentPhoto || data.studentPhoto === 'https://via.placeholder.com/100')) {
-                showToast('Please upload a student photo (Cloudinary)', 'error');
+                showToast('Please upload a student photo', 'error');
                 return;
             }
 
