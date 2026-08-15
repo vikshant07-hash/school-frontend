@@ -6,7 +6,6 @@
     <title>Results - Govt. Sr. Sec. School Shilla</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <link rel="shortcut icon" href="logo.png" type="image/x-icon" />
     <style>
         /* ============================================================
            ROOT VARIABLES
@@ -1292,7 +1291,7 @@
 
             <li><a href="../index.html"> Home</a></li>
             <li><a href="pub-notif.html"> Notifications</a></li>
-            <li><a href="get-result.html" class="active"> Results</a></li>
+            <li><a href="result.html" class="active"> Results</a></li>
             <li><a href="downloads.html"> Downloads</a></li>
 
             <li>
@@ -1523,7 +1522,10 @@
         // ============================================================
         var menuToggle = document.getElementById("menuToggle");
         var navLinks = document.getElementById("navLinks");
-        var mobileOverlay = document.getElementById("mobileOverlay");
+        var mobileOverlay = document.createElement('div');
+        mobileOverlay.className = 'mobile-overlay';
+        mobileOverlay.id = 'mobileOverlay';
+        document.body.prepend(mobileOverlay);
         var mobileCloseBtn = document.getElementById("mobileCloseBtn");
 
         function openMobileMenu() {
@@ -1651,8 +1653,12 @@
         // ============================================================
         async function loadClasses() {
             try {
+                console.log('📡 Fetching classes from:', API_BASE + '/public/classes');
+
                 const response = await fetch(API_BASE + '/public/classes');
                 const data = await response.json();
+
+                console.log('📊 Response:', data);
 
                 if (data.success && data.data && data.data.length > 0) {
                     classesGrid.innerHTML = '';
@@ -1674,17 +1680,20 @@
                         <div class="no-classes">
                             <div class="icon">📭</div>
                             <h3>No Results Published Yet</h3>
-                            <p>Please check back later. Results will appear here once published.</p>
+                            <p>${data.message || 'Please check back later. Results will appear here once published.'}</p>
                         </div>
                     `;
                 }
             } catch (error) {
-                console.error('Load classes error:', error);
+                console.error('❌ Load classes error:', error);
                 classesGrid.innerHTML = `
                     <div class="no-classes">
                         <div class="icon">⚠️</div>
                         <h3>Failed to Load Results</h3>
-                        <p>Please try again later or contact the school administration.</p>
+                        <p>Error: ${error.message}</p>
+                        <p style="margin-top:8px;font-size:13px;color:var(--danger);">
+                            <i class="fas fa-info-circle"></i> Please check your internet connection and try again.
+                        </p>
                     </div>
                 `;
                 showAlert('Failed to load available results. Please refresh the page.', 'danger');
@@ -1919,8 +1928,30 @@
         }
 
         // ============================================================
+        // CHECK SERVER STATUS
+        // ============================================================
+        async function checkServer() {
+            try {
+                const response = await fetch('https://gsssshilla.onrender.com/test');
+                if (response.ok) {
+                    console.log('✅ Server is online');
+                } else {
+                    console.log('❌ Server responded with error:', response.status);
+                    showAlert('Server is responding with error. Please try again later.', 'warning');
+                }
+            } catch (error) {
+                console.log('❌ Server is offline:', error.message);
+                showAlert('Cannot connect to server. Please check your internet connection.', 'danger');
+            }
+        }
+
+        // ============================================================
         // INIT
         // ============================================================
+        // First check if server is online
+        checkServer();
+
+        // Then load data
         loadClasses();
         populateDropdowns();
         checkUrlParams();
@@ -1928,6 +1959,7 @@
 
         console.log('📊 Public Result Page loaded');
         console.log('📡 API Base:', API_BASE);
+        console.log('🟢 Ready');
     </script>
 
 </body>
