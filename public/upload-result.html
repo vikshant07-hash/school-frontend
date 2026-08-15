@@ -616,7 +616,8 @@
                 </div>
 
                 <form id="uploadForm" onsubmit="uploadResult(event)">
-                    <input type="hidden" id="selectedStudentId" value="" />
+                    <!-- 🔥 Hidden field for student ID -->
+                    <input type="hidden" id="selectedStudentId" name="studentId" value="" />
 
                     <div class="form-group">
                         <label>Select PDF File <span style="color:#ef4444;">*</span></label>
@@ -736,7 +737,12 @@
             console.log('🔍 Selecting student ID:', id);
 
             selectedStudentId = id;
-            document.getElementById('selectedStudentId').value = id;
+            
+            // 🔥 FIX: Set both hidden field and name attribute
+            const hiddenField = document.getElementById('selectedStudentId');
+            hiddenField.value = id;
+            hiddenField.setAttribute('name', 'studentId');
+            
             document.getElementById('studentDetail').style.display = 'block';
             document.getElementById('uploadBtn').disabled = true;
 
@@ -880,11 +886,11 @@
                 return;
             }
 
+            // 🔥 FIX: Create FormData with proper field names
             const formData = new FormData();
             formData.append('studentId', studentId);
             formData.append('marksheet', selectedFile);
 
-            // 🔥 DEBUG: Log FormData contents
             console.log('📤 FormData - studentId:', studentId);
             console.log('📤 FormData - file:', selectedFile.name);
 
