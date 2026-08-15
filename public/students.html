@@ -977,19 +977,14 @@
         let isUploading = false;
 
         // ============================================================
-        // CLOUDINARY CONFIG
-        
-// ============================================================
-// CLOUDINARY CONFIG
-// ============================================================
-// 🔥 Apna Cloud Name
-const CLOUDINARY_CLOUD_NAME = 'dwupxj7vf'; // ← CHANGE THIS
+        // CLOUDINARY CONFIG - Apka Cloud Name
+        // ============================================================
+        const CLOUDINARY_CLOUD_NAME = 'dwupxj7vf'; // ← Aapka Cloud Name
+        const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+        const CLOUDINARY_UPLOAD_PRESET = 'students_upload'; // Cloudinary Dashboard mein create karein
 
-const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
-const CLOUDINARY_UPLOAD_PRESET = 'students_upload'; // Create in Cloudinary Dashboard
+        console.log('📸 Cloudinary Upload URL:', CLOUDINARY_UPLOAD_URL);
 
-console.log('📸 Cloudinary Upload URL:', CLOUDINARY_UPLOAD_URL);
-// Should output: https://api.cloudinary.com/v1_1/dwupxj7vf/image/upload
         // ============================================================
         // TOGGLE MENU (Mobile)
         // ============================================================
@@ -1086,7 +1081,7 @@ console.log('📸 Cloudinary Upload URL:', CLOUDINARY_UPLOAD_URL);
         }
 
         // ============================================================
-        // PHOTO UPLOAD - DIRECT CLOUDINARY (No Backend Required)
+        // PHOTO UPLOAD - Fixed Cloudinary Upload
         // ============================================================
         async function handlePhotoSelect(event) {
             const file = event.target.files[0];
@@ -1131,11 +1126,12 @@ console.log('📸 Cloudinary Upload URL:', CLOUDINARY_UPLOAD_URL);
             formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
             formData.append('folder', 'students');
             
-            // Optional: Add transformation
-            formData.append('transformation', JSON.stringify([
-                { width: 300, height: 300, crop: 'thumb', gravity: 'face' },
-                { quality: 'auto:good' }
-            ]));
+            // ✅ FIXED: Simple transformation as separate params
+            formData.append('width', 300);
+            formData.append('height', 300);
+            formData.append('crop', 'thumb');
+            formData.append('gravity', 'face');
+            formData.append('quality', 'auto:good');
 
             try {
                 isUploading = true;
