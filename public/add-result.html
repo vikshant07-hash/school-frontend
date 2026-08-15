@@ -301,16 +301,10 @@
         table thead { background: var(--gray-50); }
         table th {
             padding: 8px 12px; text-align: left; font-weight: 600; color: var(--gray-600);
-            border-bottom: 2px solid var(--gray-200); white-space: nowrap; cursor: pointer; user-select: none;
+            border-bottom: 2px solid var(--gray-200); white-space: nowrap;
         }
-        table th:hover { color: var(--primary); }
-        table th .sort-icon { font-size: 0.6rem; margin-left: 4px; opacity: 0.4; }
         table td { padding: 8px 12px; border-bottom: 1px solid var(--gray-100); }
         table tr:hover { background: var(--gray-50); }
-
-        /* PAGINATION */
-        .pagination { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; flex-wrap: wrap; font-size: 0.75rem; color: var(--gray-500); }
-        .pagination .page-controls { display: flex; gap: 6px; align-items: center; }
 
         /* BADGES */
         .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.6rem; font-weight: 600; }
@@ -350,8 +344,6 @@
         .modal .detail-row .label { width: 110px; font-weight: 600; color: var(--gray-600); font-size: 0.75rem; }
         .modal .detail-row .value { flex: 1; font-weight: 500; color: var(--gray-800); font-size: 0.85rem; }
         .modal .modal-actions { display: flex; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 2px solid var(--gray-100); flex-wrap: wrap; }
-        .modal .confirm-text { font-size: 0.85rem; color: var(--gray-700); line-height: 1.5; margin-bottom: 6px; }
-        .modal .confirm-warn { font-size: 0.75rem; color: var(--danger); background:#fef2f2; padding:8px 12px; border-radius:8px; margin-top:10px; }
 
         /* NO DATA */
         .no-data { text-align: center; padding: 30px; color: var(--gray-400); }
@@ -371,8 +363,6 @@
         /* LOADING */
         .loading-spinner { display: inline-block; width: 18px; height: 18px; border: 3px solid var(--gray-200); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .skeleton { background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 37%, var(--gray-100) 63%); background-size: 400% 100%; animation: skeletonWave 1.4s ease infinite; border-radius: 8px; }
-        @keyframes skeletonWave { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
 
         /* RESPONSIVE */
         @media (max-width: 1024px) { .verify-info .verify-grid { grid-template-columns: 1fr 1fr; } }
@@ -401,393 +391,401 @@
         }
     </style>
 </head>
-
 <body>
 
     <!-- ============================================
     LOGIN SCREEN
-    Real systems never expose student PII / result
-    uploads to an unauthenticated visitor. This is a
-    lightweight session gate: it stores an admin token
-    returned by the backend and attaches it to every
-    request. Swap the endpoint for your real auth route.
     ============================================ -->
-    
-
-    
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-brand">
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
             <div class="logo">📚</div>
-            <div>
-                <div class="brand-text">Result <span>Admin</span></div>
-                <span class="brand-sub">School Management System</span>
+            <h2>Admin Login</h2>
+            <p>Enter your credentials to access the dashboard</p>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="loginUsername" placeholder="admin" style="width:100%;padding:10px 14px;border:2px solid var(--gray-200);border-radius:var(--radius);font-size:0.9rem;font-family:inherit;" />
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="••••••••" style="width:100%;padding:10px 14px;border:2px solid var(--gray-200);border-radius:var(--radius);font-size:0.9rem;font-family:inherit;" />
+            </div>
+            <div class="login-error" id="loginError"></div>
+            <button class="btn btn-primary btn-block" id="loginBtn" style="width:100%;justify-content:center;padding:12px;">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+            <div style="margin-top:12px;font-size:0.7rem;color:var(--gray-400);">
+                <i class="fas fa-info-circle"></i> Use <b>admin</b> / <b>admin123</b> (default)
             </div>
         </div>
+    </div>
 
-        <nav class="sidebar-menu">
-            <div class="menu-label">Dashboard</div>
-            <button class="menu-item active" data-page="dashboard">
-                <span class="icon"><i class="fas fa-th-large"></i></span>
-                Dashboard
-                <span class="badge info">Live</span>
-            </button>
+    <!-- ============================================
+    APP SHELL
+    ============================================ -->
+    <div class="app-shell hidden" id="appShell">
 
-            <div class="menu-label">Student Management</div>
-            <button class="menu-item" data-page="add-student">
-                <span class="icon"><i class="fas fa-user-plus"></i></span>
-                Add Student
-            </button>
-            <button class="menu-item" data-page="student-list">
-                <span class="icon"><i class="fas fa-users"></i></span>
-                Student List
-                <span class="badge" id="totalBadge">0</span>
-            </button>
-            <button class="menu-item" data-page="manage-students">
-                <span class="icon"><i class="fas fa-user-edit"></i></span>
-                Manage Students
-                <span class="badge" id="manageBadge">0</span>
-            </button>
-
-            <div class="menu-label">Result Management</div>
-            <button class="menu-item" data-page="upload-result">
-                <span class="icon"><i class="fas fa-upload"></i></span>
-                Upload Result
-                <span class="badge warning" id="pendingUploadBadge">0</span>
-            </button>
-            <button class="menu-item" data-page="already-uploaded">
-                <span class="icon"><i class="fas fa-check-circle"></i></span>
-                Already Uploaded
-                <span class="badge success" id="uploadedBadge">0</span>
-            </button>
-            <button class="menu-item" data-page="pending-upload">
-                <span class="icon"><i class="fas fa-clock"></i></span>
-                Pending Upload
-                <span class="badge danger" id="notUploadedBadge">0</span>
-            </button>
-
-            <div class="menu-label">Publishing</div>
-            <button class="menu-item" data-page="publish-result">
-                <span class="icon"><i class="fas fa-check-double"></i></span>
-                Publish Result
-                <span class="badge warning" id="pendingPublishBadge">0</span>
-            </button>
-            <button class="menu-item" data-page="unpublished">
-                <span class="icon"><i class="fas fa-hourglass-half"></i></span>
-                Unpublished
-                <span class="badge warning" id="unpublishedBadge">0</span>
-            </button>
-            <button class="menu-item" data-page="published">
-                <span class="icon"><i class="fas fa-check-circle"></i></span>
-                Published
-                <span class="badge success" id="publishedBadge">0</span>
-            </button>
-        </nav>
-
-        <div class="sidebar-footer">
-            <div><i class="fas fa-shield-alt"></i> v3.1 • Secure Admin</div>
-            <div id="loggedInAs" style="margin-top:4px;opacity:.5;"></div>
-            <button class="logout-btn" id="logoutBtn"><i class="fas fa-right-from-bracket"></i> Log out</button>
-        </div>
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
-
-        <header class="topbar">
-            <div class="topbar-left">
-                <button class="hamburger" id="hamburgerBtn"><i class="fas fa-bars"></i></button>
-                <h2 id="pageTitle">📊 <span>Dashboard</span></h2>
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="logo">📚</div>
+                <div>
+                    <div class="brand-text">Result <span>Admin</span></div>
+                    <span class="brand-sub">School Management System</span>
+                </div>
             </div>
-            <div class="topbar-right">
-                <span class="status">
-                    <span class="dot online" id="statusDot"></span>
-                    <span id="serverStatus">Connected</span>
-                </span>
-                <button class="btn btn-outline btn-sm" onclick="refreshAll()" id="refreshBtn">
-                    <i class="fas fa-sync"></i> Refresh
+
+            <nav class="sidebar-menu">
+                <div class="menu-label">Dashboard</div>
+                <button class="menu-item active" data-page="dashboard">
+                    <span class="icon"><i class="fas fa-th-large"></i></span>
+                    Dashboard
+                    <span class="badge info">Live</span>
                 </button>
-            </div>
-        </header>
 
-        <!-- DASHBOARD -->
-        <div class="page active" id="page-dashboard">
-            <div class="stats-grid" id="statsGrid">
-                <div class="stat-card"><div class="stat-icon">👨‍🎓</div><div class="stat-number" id="statTotalStudents">0</div><div class="stat-label">Total Students</div></div>
-                <div class="stat-card"><div class="stat-icon">📄</div><div class="stat-number" id="statTotalResults">0</div><div class="stat-label">Total Results</div></div>
-                <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-number" id="statPublished">0</div><div class="stat-label">Published Results</div></div>
-                <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-number" id="statUnpublished">0</div><div class="stat-label">Pending Publish</div></div>
-                <div class="stat-card"><div class="stat-icon">📌</div><div class="stat-number" id="statNoResult">0</div><div class="stat-label">No Result</div></div>
-                <div class="stat-card"><div class="stat-icon">📚</div><div class="stat-number" id="statClasses">0</div><div class="stat-label">Active Classes</div></div>
-            </div>
-        </div>
+                <div class="menu-label">Student Management</div>
+                <button class="menu-item" data-page="add-student">
+                    <span class="icon"><i class="fas fa-user-plus"></i></span>
+                    Add Student
+                </button>
+                <button class="menu-item" data-page="student-list">
+                    <span class="icon"><i class="fas fa-users"></i></span>
+                    Student List
+                    <span class="badge" id="totalBadge">0</span>
+                </button>
+                <button class="menu-item" data-page="manage-students">
+                    <span class="icon"><i class="fas fa-user-edit"></i></span>
+                    Manage Students
+                    <span class="badge" id="manageBadge">0</span>
+                </button>
 
-        <!-- ADD STUDENT -->
-        <div class="page" id="page-add-student">
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-user-plus" style="color:var(--secondary);"></i> Add New Student
-                    <span class="count">Fill all fields</span>
+                <div class="menu-label">Result Management</div>
+                <button class="menu-item" data-page="upload-result">
+                    <span class="icon"><i class="fas fa-upload"></i></span>
+                    Upload Result
+                    <span class="badge warning" id="pendingUploadBadge">0</span>
+                </button>
+                <button class="menu-item" data-page="already-uploaded">
+                    <span class="icon"><i class="fas fa-check-circle"></i></span>
+                    Already Uploaded
+                    <span class="badge success" id="uploadedBadge">0</span>
+                </button>
+                <button class="menu-item" data-page="pending-upload">
+                    <span class="icon"><i class="fas fa-clock"></i></span>
+                    Pending Upload
+                    <span class="badge danger" id="notUploadedBadge">0</span>
+                </button>
+
+                <div class="menu-label">Publishing</div>
+                <button class="menu-item" data-page="publish-result">
+                    <span class="icon"><i class="fas fa-check-double"></i></span>
+                    Publish Result
+                    <span class="badge warning" id="pendingPublishBadge">0</span>
+                </button>
+                <button class="menu-item" data-page="unpublished">
+                    <span class="icon"><i class="fas fa-hourglass-half"></i></span>
+                    Unpublished
+                    <span class="badge warning" id="unpublishedBadge">0</span>
+                </button>
+                <button class="menu-item" data-page="published">
+                    <span class="icon"><i class="fas fa-check-circle"></i></span>
+                    Published
+                    <span class="badge success" id="publishedBadge">0</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div><i class="fas fa-shield-alt"></i> v3.1 • Secure Admin</div>
+                <div id="loggedInAs" style="margin-top:4px;opacity:.5;"></div>
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-right-from-bracket"></i> Log out</button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="hamburger" id="hamburgerBtn"><i class="fas fa-bars"></i></button>
+                    <h2 id="pageTitle">📊 <span>Dashboard</span></h2>
                 </div>
-                <form id="addStudentForm" novalidate>
-                    <div class="form-row">
-                        <div class="form-group" id="grp-sStudentId">
-                            <label>Student ID <span class="required">*</span></label>
-                            <input type="text" id="sStudentId" placeholder="e.g., S001" required maxlength="20" />
-                            <div class="field-error">Student ID is required.</div>
-                        </div>
-                        <div class="form-group" id="grp-sApaarId">
-                            <label>APAAR ID <span class="required">*</span></label>
-                            <input type="text" id="sApaarId" placeholder="e.g., APAAR001" required maxlength="20" />
-                            <div class="field-error">APAAR ID is required.</div>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group" id="grp-sName">
-                            <label>Student Name <span class="required">*</span></label>
-                            <input type="text" id="sName" placeholder="Full Name" required maxlength="100" />
-                            <div class="field-error">Student name is required.</div>
-                        </div>
-                        <div class="form-group" id="grp-sFather">
-                            <label>Father Name <span class="required">*</span></label>
-                            <input type="text" id="sFather" placeholder="Father's Name" required maxlength="100" />
-                            <div class="field-error">Father's name is required.</div>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group" id="grp-sDob">
-                            <label>Date of Birth <span class="required">*</span></label>
-                            <input type="date" id="sDob" required max="" />
-                            <div class="field-error">Enter a valid date of birth (must be in the past).</div>
-                        </div>
-                        <div class="form-group" id="grp-sClass">
-                            <label>Class <span class="required">*</span></label>
-                            <select id="sClass" required></select>
-                            <div class="field-error">Select a class.</div>
-                        </div>
-                    </div>
-                    <div class="form-group" id="grp-sSession">
-                        <label>Session <span class="required">*</span></label>
-                        <select id="sSession" required>
-                            <option value="">Select Session</option>
-                            <option value="2025-26">2025-26</option>
-                            <option value="2024-25">2024-25</option>
-                            <option value="2023-24">2023-24</option>
-                        </select>
-                        <div class="field-error">Select a session.</div>
-                    </div>
-                    <button type="submit" class="btn btn-success" id="addStudentBtn">
-                        <i class="fas fa-user-plus"></i> Add Student
+                <div class="topbar-right">
+                    <span class="status">
+                        <span class="dot online" id="statusDot"></span>
+                        <span id="serverStatus">Connected</span>
+                    </span>
+                    <button class="btn btn-outline btn-sm" onclick="refreshAll()" id="refreshBtn">
+                        <i class="fas fa-sync"></i> Refresh
                     </button>
-                </form>
+                </div>
+            </header>
+
+            <!-- DASHBOARD -->
+            <div class="page active" id="page-dashboard">
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card"><div class="stat-icon">👨‍🎓</div><div class="stat-number" id="statTotalStudents">0</div><div class="stat-label">Total Students</div></div>
+                    <div class="stat-card"><div class="stat-icon">📄</div><div class="stat-number" id="statTotalResults">0</div><div class="stat-label">Total Results</div></div>
+                    <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-number" id="statPublished">0</div><div class="stat-label">Published Results</div></div>
+                    <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-number" id="statUnpublished">0</div><div class="stat-label">Pending Publish</div></div>
+                    <div class="stat-card"><div class="stat-icon">📌</div><div class="stat-number" id="statNoResult">0</div><div class="stat-label">No Result</div></div>
+                    <div class="stat-card"><div class="stat-icon">📚</div><div class="stat-number" id="statClasses">0</div><div class="stat-label">Active Classes</div></div>
+                </div>
             </div>
-        </div>
 
-        <!-- STUDENT LIST -->
-        <div class="page" id="page-student-list">
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-users" style="color:var(--secondary);"></i> Student List
-                    <span class="count" id="listCount">0</span>
-                </div>
-                <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="listSearch" placeholder="Search by name, ID or APAAR ID..." />
-                    <button class="clear-search" id="listSearchClear"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="class-buttons" id="listClassButtons"></div>
-                <div id="listStudentsContainer">
-                    <div style="text-align:center;padding:30px;">
-                        <div class="loading-spinner"></div>
-                        <p style="color:var(--gray-400);margin-top:10px;">Loading students...</p>
+            <!-- ADD STUDENT -->
+            <div class="page" id="page-add-student">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-user-plus" style="color:var(--secondary);"></i> Add New Student
+                        <span class="count">Fill all fields</span>
                     </div>
-                </div>
-                <div class="pagination" id="listPagination"></div>
-            </div>
-        </div>
-
-        <!-- MANAGE STUDENTS -->
-        <div class="page" id="page-manage-students">
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-user-edit" style="color:var(--secondary);"></i> Manage Students
-                    <span class="count" id="manageCount">0</span>
-                </div>
-                <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="manageSearch" placeholder="Search by name, ID or APAAR ID..." />
-                    <button class="clear-search" id="manageSearchClear"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="class-buttons" id="manageClassButtons"></div>
-                <div id="manageStudentsContainer">
-                    <div style="text-align:center;padding:30px;">
-                        <div class="loading-spinner"></div>
-                        <p style="color:var(--gray-400);margin-top:10px;">Loading students...</p>
-                    </div>
-                </div>
-                <div class="pagination" id="managePagination"></div>
-            </div>
-        </div>
-
-        <!-- UPLOAD RESULT -->
-        <div class="page" id="page-upload-result">
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-upload" style="color:var(--secondary);"></i> Upload Result
-                    <span class="count">Select a student</span>
-                </div>
-                <div class="class-buttons" id="uploadClassButtons"></div>
-                <div id="uploadStudentsList" style="margin-bottom:14px;">
-                    <div style="text-align:center;padding:20px;color:var(--gray-400);font-size:0.85rem;">
-                        <i class="fas fa-hand-pointer"></i> Click a student below to upload their result
-                    </div>
-                </div>
-
-                <hr style="border:none;border-top:2px solid var(--gray-200);margin:16px 0;" />
-
-                <form id="uploadResultForm" enctype="multipart/form-data" novalidate>
-                    <div class="form-row">
-                        <div class="form-group" id="grp-uStudentId">
-                            <label>Student ID <span class="required">*</span></label>
-                            <input type="text" id="uStudentId" placeholder="e.g., S001" required />
-                            <div class="field-error">Enter a valid, existing student ID.</div>
+                    <form id="addStudentForm" novalidate>
+                        <div class="form-row">
+                            <div class="form-group" id="grp-sStudentId">
+                                <label>Student ID <span class="required">*</span></label>
+                                <input type="text" id="sStudentId" placeholder="e.g., S001" required maxlength="20" />
+                                <div class="field-error">Student ID is required.</div>
+                            </div>
+                            <div class="form-group" id="grp-sApaarId">
+                                <label>APAAR ID <span class="required">*</span></label>
+                                <input type="text" id="sApaarId" placeholder="e.g., APAAR001" required maxlength="20" />
+                                <div class="field-error">APAAR ID is required.</div>
+                            </div>
                         </div>
-                        <div class="form-group" id="grp-uClass">
-                            <label>Class <span class="required">*</span></label>
-                            <select id="uClass" required></select>
-                            <div class="field-error">Select a class.</div>
+                        <div class="form-row">
+                            <div class="form-group" id="grp-sName">
+                                <label>Student Name <span class="required">*</span></label>
+                                <input type="text" id="sName" placeholder="Full Name" required maxlength="100" />
+                                <div class="field-error">Student name is required.</div>
+                            </div>
+                            <div class="form-group" id="grp-sFather">
+                                <label>Father Name <span class="required">*</span></label>
+                                <input type="text" id="sFather" placeholder="Father's Name" required maxlength="100" />
+                                <div class="field-error">Father's name is required.</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group" id="grp-uSession">
+                        <div class="form-row">
+                            <div class="form-group" id="grp-sDob">
+                                <label>Date of Birth <span class="required">*</span></label>
+                                <input type="date" id="sDob" required />
+                                <div class="field-error">Enter a valid date of birth.</div>
+                            </div>
+                            <div class="form-group" id="grp-sClass">
+                                <label>Class <span class="required">*</span></label>
+                                <select id="sClass" required></select>
+                                <div class="field-error">Select a class.</div>
+                            </div>
+                        </div>
+                        <div class="form-group" id="grp-sSession">
                             <label>Session <span class="required">*</span></label>
-                            <select id="uSession" required>
-                                <option value="">Select</option>
+                            <select id="sSession" required>
+                                <option value="">Select Session</option>
                                 <option value="2025-26">2025-26</option>
                                 <option value="2024-25">2024-25</option>
                                 <option value="2023-24">2023-24</option>
                             </select>
                             <div class="field-error">Select a session.</div>
                         </div>
-                        <div class="form-group" id="grp-uFile">
-                            <label>Marksheet (PDF) <span class="required">*</span></label>
-                            <input type="file" id="uFile" accept="application/pdf" required />
-                            <div class="hint">PDF only, max 10 MB</div>
-                            <div class="file-preview" id="uFilePreview">📄 <span></span></div>
-                            <div class="field-error">Choose a valid PDF under 10 MB.</div>
+                        <button type="submit" class="btn btn-success" id="addStudentBtn">
+                            <i class="fas fa-user-plus"></i> Add Student
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- STUDENT LIST -->
+            <div class="page" id="page-student-list">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-users" style="color:var(--secondary);"></i> Student List
+                        <span class="count" id="listCount">0</span>
+                    </div>
+                    <div class="class-buttons" id="listClassButtons"></div>
+                    <div id="listStudentsContainer">
+                        <div style="text-align:center;padding:30px;">
+                            <div class="loading-spinner"></div>
+                            <p style="color:var(--gray-400);margin-top:10px;">Loading students...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MANAGE STUDENTS -->
+            <div class="page" id="page-manage-students">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-user-edit" style="color:var(--secondary);"></i> Manage Students
+                        <span class="count" id="manageCount">0</span>
+                    </div>
+                    <div class="class-buttons" id="manageClassButtons"></div>
+                    <div id="manageStudentsContainer">
+                        <div style="text-align:center;padding:30px;">
+                            <div class="loading-spinner"></div>
+                            <p style="color:var(--gray-400);margin-top:10px;">Loading students...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UPLOAD RESULT -->
+            <div class="page" id="page-upload-result">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-upload" style="color:var(--secondary);"></i> Upload Result
+                        <span class="count">Select a student</span>
+                    </div>
+                    <div class="class-buttons" id="uploadClassButtons"></div>
+                    <div id="uploadStudentsList" style="margin-bottom:14px;">
+                        <div style="text-align:center;padding:20px;color:var(--gray-400);font-size:0.85rem;">
+                            <i class="fas fa-hand-pointer"></i> Click a student below to upload their result
                         </div>
                     </div>
 
-                    <div class="verify-info" id="verifyInfo">
-                        <div class="verify-grid">
-                            <div class="item"><strong>Name:</strong> <span class="value" id="vName">-</span></div>
-                            <div class="item"><strong>Father:</strong> <span class="value" id="vFather">-</span></div>
-                            <div class="item"><strong>APAAR ID:</strong> <span class="value" id="vApaar">-</span></div>
-                            <div class="item"><strong>DOB:</strong> <span class="value" id="vDob">-</span></div>
-                            <div class="item"><strong>Class:</strong> <span class="value" id="vClass">-</span></div>
-                            <div class="item"><strong>Session:</strong> <span class="value" id="vSession">-</span></div>
+                    <hr style="border:none;border-top:2px solid var(--gray-200);margin:16px 0;" />
+
+                    <form id="uploadResultForm" enctype="multipart/form-data" novalidate>
+                        <div class="form-row">
+                            <div class="form-group" id="grp-uStudentId">
+                                <label>Student ID <span class="required">*</span></label>
+                                <input type="text" id="uStudentId" placeholder="e.g., S001" required />
+                                <div class="field-error">Enter a valid student ID.</div>
+                            </div>
+                            <div class="form-group" id="grp-uClass">
+                                <label>Class <span class="required">*</span></label>
+                                <select id="uClass" required></select>
+                                <div class="field-error">Select a class.</div>
+                            </div>
                         </div>
+                        <div class="form-row">
+                            <div class="form-group" id="grp-uSession">
+                                <label>Session <span class="required">*</span></label>
+                                <select id="uSession" required>
+                                    <option value="">Select</option>
+                                    <option value="2025-26">2025-26</option>
+                                    <option value="2024-25">2024-25</option>
+                                    <option value="2023-24">2023-24</option>
+                                </select>
+                                <div class="field-error">Select a session.</div>
+                            </div>
+                            <div class="form-group" id="grp-uFile">
+                                <label>Marksheet (PDF) <span class="required">*</span></label>
+                                <input type="file" id="uFile" accept=".pdf" required />
+                                <div class="hint">PDF only, max 10 MB</div>
+                                <div class="file-preview" id="uFilePreview">📄 <span></span></div>
+                                <div class="field-error">Choose a valid PDF under 10 MB.</div>
+                            </div>
+                        </div>
+
+                        <div class="verify-info" id="verifyInfo">
+                            <div class="verify-grid">
+                                <div class="item"><strong>Name:</strong> <span class="value" id="vName">-</span></div>
+                                <div class="item"><strong>Father:</strong> <span class="value" id="vFather">-</span></div>
+                                <div class="item"><strong>APAAR ID:</strong> <span class="value" id="vApaar">-</span></div>
+                                <div class="item"><strong>DOB:</strong> <span class="value" id="vDob">-</span></div>
+                                <div class="item"><strong>Class:</strong> <span class="value" id="vClass">-</span></div>
+                                <div class="item"><strong>Session:</strong> <span class="value" id="vSession">-</span></div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" id="uploadBtn">
+                            <i class="fas fa-upload"></i> Upload Result
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ALREADY UPLOADED -->
+            <div class="page" id="page-already-uploaded">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-check-circle" style="color:var(--success);"></i> Already Uploaded
+                        <span class="count" id="uploadedCount">0</span>
+                    </div>
+                    <div class="class-buttons" id="uploadedClassButtons"></div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody id="uploadedTableBody"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">Loading...</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PENDING UPLOAD -->
+            <div class="page" id="page-pending-upload">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-clock" style="color:var(--danger);"></i> Pending Upload
+                        <span class="count" id="pendingUploadCount">0</span>
+                    </div>
+                    <div class="class-buttons" id="pendingUploadClassButtons"></div>
+                    <div id="pendingUploadContainer">
+                        <div style="text-align:center;padding:30px;"><div class="loading-spinner"></div><p style="color:var(--gray-400);margin-top:10px;">Loading...</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PUBLISH RESULT -->
+            <div class="page" id="page-publish-result">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-check-double" style="color:var(--secondary);"></i> Publish Result
+                        <span class="count" id="publishCount">0 pending</span>
+                    </div>
+                    <div class="class-buttons" id="publishClassButtons"></div>
+
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+                        <button class="btn btn-success btn-sm" onclick="publishAll()"><i class="fas fa-check-double"></i> Publish All</button>
+                        <button class="btn btn-warning btn-sm" onclick="unpublishAll()"><i class="fas fa-times"></i> Unpublish All</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteAllResults()"><i class="fas fa-trash"></i> Delete All</button>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" id="uploadBtn">
-                        <i class="fas fa-upload"></i> Upload Result
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- ALREADY UPLOADED -->
-        <div class="page" id="page-already-uploaded">
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-check-circle" style="color:var(--success);"></i> Already Uploaded
-                    <span class="count" id="uploadedCount">0</span>
-                </div>
-                <div class="class-buttons" id="uploadedClassButtons"></div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Status</th><th>Actions</th></tr></thead>
-                        <tbody id="uploadedTableBody"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">Loading...</td></tr></tbody>
-                    </table>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody id="publishTableBody"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">Loading...</td></tr></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- PENDING UPLOAD -->
-        <div class="page" id="page-pending-upload">
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-clock" style="color:var(--danger);"></i> Pending Upload
-                    <span class="count" id="pendingUploadCount">0</span>
-                </div>
-                <div class="class-buttons" id="pendingUploadClassButtons"></div>
-                <div id="pendingUploadContainer">
-                    <div style="text-align:center;padding:30px;"><div class="loading-spinner"></div><p style="color:var(--gray-400);margin-top:10px;">Loading...</p></div>
+            <!-- UNPUBLISHED -->
+            <div class="page" id="page-unpublished">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-hourglass-half" style="color:var(--warning);"></i> Unpublished Results
+                        <span class="count" id="unpublishedListCount">0</span>
+                    </div>
+                    <div class="class-buttons" id="unpublishedListClassButtons"></div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody id="unpublishedListTableBody"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">Loading...</td></tr></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- PUBLISH RESULT -->
-        <div class="page" id="page-publish-result">
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-check-double" style="color:var(--secondary);"></i> Publish Result
-                    <span class="count" id="publishCount">0 pending</span>
-                </div>
-                <div class="class-buttons" id="publishClassButtons"></div>
-
-                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
-                    <button class="btn btn-success btn-sm" onclick="confirmBulkAction('publish')"><i class="fas fa-check-double"></i> Publish All</button>
-                    <button class="btn btn-warning btn-sm" onclick="confirmBulkAction('unpublish')"><i class="fas fa-times"></i> Unpublish All</button>
-                    <button class="btn btn-danger btn-sm" onclick="confirmBulkAction('delete')"><i class="fas fa-trash"></i> Delete All</button>
-                </div>
-
-                <div class="table-wrapper">
-                    <table>
-                        <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Status</th><th>Actions</th></tr></thead>
-                        <tbody id="publishTableBody"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">Loading...</td></tr></tbody>
-                    </table>
+            <!-- PUBLISHED -->
+            <div class="page" id="page-published">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-check-circle" style="color:var(--success);"></i> Published Results
+                        <span class="count" id="publishedListCount">0</span>
+                    </div>
+                    <div class="class-buttons" id="publishedListClassButtons"></div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Published On</th><th>Actions</th></tr></thead>
+                            <tbody id="publishedListTableBody"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">Loading...</td></tr></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- UNPUBLISHED -->
-        <div class="page" id="page-unpublished">
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-hourglass-half" style="color:var(--warning);"></i> Unpublished Results
-                    <span class="count" id="unpublishedListCount">0</span>
-                </div>
-                <div class="class-buttons" id="unpublishedListClassButtons"></div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Status</th><th>Actions</th></tr></thead>
-                        <tbody id="unpublishedListTableBody"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">Loading...</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+        </main>
+    </div>
 
-        <!-- PUBLISHED -->
-        <div class="page" id="page-published">
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-check-circle" style="color:var(--success);"></i> Published Results
-                    <span class="count" id="publishedListCount">0</span>
-                </div>
-                <div class="class-buttons" id="publishedListClassButtons"></div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Published On</th><th>Actions</th></tr></thead>
-                        <tbody id="publishedListTableBody"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">Loading...</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-    </main>
-    </div><!-- /app-shell -->
-
+    <!-- TOAST -->
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- VIEW STUDENT MODAL -->
@@ -868,64 +866,62 @@
         </div>
     </div>
 
-    <!-- CONFIRM ACTION MODAL (replaces window.confirm for destructive actions) -->
-    <div class="modal-overlay" id="confirmModal">
-        <div class="modal" style="max-width:420px;">
-            <div class="modal-header">
-                <h3 id="confirmTitle"><i class="fas fa-triangle-exclamation" style="color:var(--warning);"></i> Please confirm</h3>
-                <button class="close-btn" onclick="closeConfirmModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <p class="confirm-text" id="confirmText">Are you sure?</p>
-            <div class="confirm-warn" id="confirmWarn" style="display:none;">This action cannot be undone.</div>
-            <div class="modal-actions">
-                <button class="btn btn-danger btn-sm" id="confirmOkBtn">Yes, continue</button>
-                <button class="btn btn-outline btn-sm" onclick="closeConfirmModal()">Cancel</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         // ============================================
         // CONFIGURATION
         // ============================================
-        
+        const API_BASE = 'https://gsssshilla.onrender.com/api/result';
+        const PAGE_SIZE = 20;
+        const MAX_FILE_MB = 10;
+
         // ============================================
         // STATE
         // ============================================
         let allStudents = [];
         let allResults = [];
-        let listFilter = 'all', manageFilter = 'all', uploadFilter = 'all';
-        let uploadedFilter = 'all', pendingUploadFilter = 'all', publishFilter = 'all';
-        let unpublishedListFilter = 'all', publishedListFilter = 'all';
-        let listSearch = '', manageSearch = '';
-        let listPage = 1, managePage = 1;
+        let listFilter = 'all',
+            manageFilter = 'all',
+            uploadFilter = 'all';
+        let uploadedFilter = 'all',
+            pendingUploadFilter = 'all',
+            publishFilter = 'all';
+        let unpublishedListFilter = 'all',
+            publishedListFilter = 'all';
         let currentStudentId = null;
-        let confirmCallback = null;
-        let verifyAbortController = null;
-        let verifyDebounceTimer = null;
+        let authToken = localStorage.getItem('adminToken') || '';
 
         // ============================================
-        // SECURITY: escape any value before it is
-        // interpolated into innerHTML. Every render*()
-        // function below must route student/result text
-        // through this — never trust API string fields.
+        // AUTH FUNCTIONS
         // ============================================
-        function escapeHtml(value) {
-            if (value === null || value === undefined) return '';
-            return String(value)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+        function getToken() { return authToken || localStorage.getItem('adminToken') || ''; }
+
+        function setToken(token) {
+            authToken = token;
+            if (token) localStorage.setItem('adminToken', token);
+            else localStorage.removeItem('adminToken');
         }
 
-        function debounce(fn, delay) {
-            let timer = null;
-            return (...args) => {
-                clearTimeout(timer);
-                timer = setTimeout(() => fn(...args), delay);
-            };
+        function authHeaders() {
+            const token = getToken();
+            return token ? { 'Authorization': 'Bearer ' + token } : {};
+        }
+
+        function showApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appShell').classList.remove('hidden');
+            document.getElementById('loggedInAs').textContent = '👤 Admin';
+        }
+
+        function showLogin() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('appShell').classList.add('hidden');
+            document.getElementById('loginError').textContent = '';
+        }
+
+        function logout() {
+            setToken('');
+            showLogin();
+            showToast('Logged out successfully', 'info');
         }
 
         // ============================================
@@ -936,7 +932,7 @@
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
-            toast.innerHTML = `${icons[type] || '📌'} ${escapeHtml(message)}`;
+            toast.innerHTML = `${icons[type] || '📌'} ${message}`;
             container.appendChild(toast);
             setTimeout(() => {
                 toast.style.opacity = '0';
@@ -947,46 +943,133 @@
         }
 
         // ============================================
-        // CUSTOM CONFIRM MODAL (no blocking window.confirm)
+        // API CALL
         // ============================================
-        function askConfirm(text, { danger = true, onConfirm }) {
-            document.getElementById('confirmText').textContent = text;
-            document.getElementById('confirmWarn').style.display = danger ? 'block' : 'none';
-            confirmCallback = onConfirm;
-            document.getElementById('confirmModal').classList.add('active');
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const url = API_BASE + endpoint;
+                const headers = {
+                    'Content-Type': 'application/json',
+                    ...authHeaders(),
+                    ...(options.headers || {})
+                };
+
+                const response = await fetch(url, {
+                    ...options,
+                    headers: headers
+                });
+
+                if (response.status === 401) {
+                    setToken('');
+                    showLogin();
+                    showToast('Session expired. Please login again.', 'error');
+                    return { success: false, message: 'Unauthorized' };
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                showToast('Network error: ' + error.message, 'error');
+                return { success: false, message: error.message };
+            }
         }
-        function closeConfirmModal() {
-            document.getElementById('confirmModal').classList.remove('active');
-            confirmCallback = null;
-        }
-        document.getElementById('confirmOkBtn').addEventListener('click', () => {
-            const cb = confirmCallback;
-            closeConfirmModal();
-            if (cb) cb();
+
+        // ============================================
+        // LOGIN
+        // ============================================
+        document.getElementById('loginBtn').addEventListener('click', async function() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            if (!username || !password) {
+                document.getElementById('loginError').textContent = 'Please enter username and password';
+                return;
+            }
+
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+
+            try {
+                // Try to get token from existing login endpoint, or use default for demo
+                const response = await fetch(API_BASE + '/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.token) {
+                    setToken(data.token);
+                    showApp();
+                    loadDashboard();
+                    loadListStudents();
+                    loadManageStudents();
+                    loadUploadStudents();
+                    loadUploadedResults();
+                    loadPendingUpload();
+                    loadPublishResults();
+                    loadUnpublishedList();
+                    loadPublishedList();
+                    showToast('✅ Login successful!', 'success');
+                } else {
+                    // Demo login - accept admin/admin123
+                    if (username === 'admin' && password === 'admin123') {
+                        setToken('demo-token-12345');
+                        showApp();
+                        loadDashboard();
+                        loadListStudents();
+                        loadManageStudents();
+                        loadUploadStudents();
+                        loadUploadedResults();
+                        loadPendingUpload();
+                        loadPublishResults();
+                        loadUnpublishedList();
+                        loadPublishedList();
+                        showToast('✅ Login successful! (Demo Mode)', 'success');
+                    } else {
+                        document.getElementById('loginError').textContent = 'Invalid username or password';
+                    }
+                }
+            } catch (error) {
+                // Fallback: Demo login
+                if (username === 'admin' && password === 'admin123') {
+                    setToken('demo-token-12345');
+                    showApp();
+                    loadDashboard();
+                    loadListStudents();
+                    loadManageStudents();
+                    loadUploadStudents();
+                    loadUploadedResults();
+                    loadPendingUpload();
+                    loadPublishResults();
+                    loadUnpublishedList();
+                    loadPublishedList();
+                    showToast('✅ Login successful! (Demo Mode)', 'success');
+                } else {
+                    document.getElementById('loginError').textContent = 'Cannot connect to server. Please try again.';
+                }
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+            }
         });
 
-        // ============================================
-        // AUTH
-        // Real deployments must gate this panel behind a
-        // login. This calls POST {API_BASE}/auth/login and
-        // expects { success, token, username }. If your
-        // backend doesn't have that route yet, add one —
-        // never ship student PII behind a UI-only "login".
-        // ============================================
+        document.getElementById('loginPassword').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') document.getElementById('loginBtn').click();
+        });
+        document.getElementById('loginUsername').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') document.getElementById('loginPassword').focus();
+        });
 
-        // ============================================
-        // API CALL — attaches auth header, handles 401
-        // by bouncing back to login, and never assumes
-        // the response body is JSON (a 502/HTML error
-        // page from the host used to crash this app).
-        // ============================================
-        
+        document.getElementById('logoutBtn').addEventListener('click', logout);
 
         // ============================================
         // SIDEBAR NAVIGATION
         // ============================================
         document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => {
-            item.addEventListener('click', function () {
+            item.addEventListener('click', function() {
                 const page = this.dataset.page;
                 document.querySelectorAll('.sidebar-menu .menu-item').forEach(m => m.classList.remove('active'));
                 this.classList.add('active');
@@ -995,13 +1078,18 @@
                 if (target) target.classList.add('active');
 
                 const titles = {
-                    'dashboard': '📊 Dashboard', 'add-student': '👨‍🎓 Add Student',
-                    'student-list': '👨‍🎓 Student List', 'manage-students': '👨‍🎓 Manage Students',
-                    'upload-result': '📤 Upload Result', 'already-uploaded': '✅ Already Uploaded',
-                    'pending-upload': '⏳ Pending Upload', 'publish-result': '✅ Publish Result',
-                    'unpublished': '⏳ Unpublished', 'published': '📋 Published'
+                    'dashboard': '📊 Dashboard',
+                    'add-student': '👨‍🎓 Add Student',
+                    'student-list': '👨‍🎓 Student List',
+                    'manage-students': '👨‍🎓 Manage Students',
+                    'upload-result': '📤 Upload Result',
+                    'already-uploaded': '✅ Already Uploaded',
+                    'pending-upload': '⏳ Pending Upload',
+                    'publish-result': '✅ Publish Result',
+                    'unpublished': '⏳ Unpublished',
+                    'published': '📋 Published'
                 };
-                document.getElementById('pageTitle').innerHTML = titles[page] || escapeHtml(page);
+                document.getElementById('pageTitle').innerHTML = titles[page] || page;
 
                 if (page === 'dashboard') loadDashboard();
                 if (page === 'student-list') loadListStudents();
@@ -1017,14 +1105,82 @@
             });
         });
 
-        document.getElementById('hamburgerBtn').addEventListener('click', function () {
+        document.getElementById('hamburgerBtn').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('open');
         });
+
+        // ============================================
+        // HELPERS
+        // ============================================
+        function escapeHtml(value) {
+            if (value === null || value === undefined) return '';
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
 
         function getStudentStatus(student) {
             if (!student.has_result) return { class: 'no-result', text: '📌 No Result' };
             if (student.result_status === 'published') return { class: 'published', text: '✅ Published' };
             return { class: 'uploaded', text: '📄 Uploaded' };
+        }
+
+        function populateClassSelect(select) {
+            if (!select) return;
+            const classes = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+            select.innerHTML = '<option value="">Select Class</option>';
+            classes.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = 'Class ' + c;
+                select.appendChild(opt);
+            });
+        }
+
+        function buildClassButtons(containerId, filterKey, onSelect) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const classes = ['all', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+            container.innerHTML = '';
+            classes.forEach(c => {
+                const btn = document.createElement('button');
+                btn.className = 'class-btn' + (c === 'all' ? ' active' : '');
+                btn.dataset.class = c;
+                const label = c === 'all' ? 'All' : c;
+                btn.innerHTML = label + ' <span class="count" id="' + containerId.replace('Buttons', '') + 'C' + c +
+                    'Count">0</span>';
+                btn.addEventListener('click', () => {
+                    container.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    onSelect(c);
+                });
+                container.appendChild(btn);
+            });
+        }
+
+        function applyClassCounts(items, prefix) {
+            const counts = {};
+            items.forEach(item => {
+                const key = item.class || 'unknown';
+                counts[key] = (counts[key] || 0) + 1;
+            });
+            counts['all'] = items.length;
+
+            Object.keys(counts).forEach(key => {
+                const el = document.getElementById(prefix + 'C' + key + 'Count');
+                if (el) el.textContent = counts[key];
+            });
+        }
+
+        function setActiveClassBtn(containerId, cls) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.querySelectorAll('.class-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.class === cls);
+            });
         }
 
         // ============================================
@@ -1050,7 +1206,8 @@
                     document.getElementById('totalBadge').textContent = d.totalStudents || 0;
                     document.getElementById('manageBadge').textContent = d.totalStudents || 0;
                     document.getElementById('pendingUploadBadge').textContent = noResult;
-                    document.getElementById('uploadedBadge').textContent = Math.max((d.totalResults || 0) - (d.publishedResults || 0), 0);
+                    document.getElementById('uploadedBadge').textContent = Math.max((d.totalResults || 0) - (d
+                        .publishedResults || 0), 0);
                     document.getElementById('notUploadedBadge').textContent = noResult;
                     document.getElementById('pendingPublishBadge').textContent = d.unpublishedResults || 0;
                     document.getElementById('unpublishedBadge').textContent = d.unpublishedResults || 0;
@@ -1070,72 +1227,26 @@
         }
 
         // ============================================
-        // FORM VALIDATION HELPERS
-        // ============================================
-        function setFieldError(groupId, hasError) {
-            const el = document.getElementById(groupId);
-            if (el) el.classList.toggle('has-error', hasError);
-        }
-
-        function isValidPastDate(value) {
-            if (!value) return false;
-            const d = new Date(value);
-            if (isNaN(d.getTime())) return false;
-            return d.getTime() < Date.now();
-        }
-
-        function validateStudentForm(prefix) {
-            let valid = true;
-            const req = (id, ok) => {
-                setFieldError(`grp-${id}`, !ok);
-                if (!ok) valid = false;
-            };
-            req(`${prefix}StudentId`.replace('editStudentId','editSId'), !!document.getElementById(prefix === 'edit' ? 'editSId' : 'sStudentId').value.trim());
-            return valid;
-        }
-
-        // ============================================
         // ADD STUDENT
         // ============================================
-        document.getElementById('addStudentForm').addEventListener('submit', async function (e) {
+        document.getElementById('addStudentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const fields = {
-                sStudentId: document.getElementById('sStudentId').value.trim(),
-                sApaarId: document.getElementById('sApaarId').value.trim(),
-                sName: document.getElementById('sName').value.trim(),
-                sFather: document.getElementById('sFather').value.trim(),
-                sDob: document.getElementById('sDob').value,
-                sClass: document.getElementById('sClass').value,
-                sSession: document.getElementById('sSession').value
-            };
-
-            let valid = true;
-            setFieldError('grp-sStudentId', !fields.sStudentId); if (!fields.sStudentId) valid = false;
-            setFieldError('grp-sApaarId', !fields.sApaarId); if (!fields.sApaarId) valid = false;
-            setFieldError('grp-sName', !fields.sName); if (!fields.sName) valid = false;
-            setFieldError('grp-sFather', !fields.sFather); if (!fields.sFather) valid = false;
-            const dobOk = isValidPastDate(fields.sDob);
-            setFieldError('grp-sDob', !dobOk); if (!dobOk) valid = false;
-            setFieldError('grp-sClass', !fields.sClass); if (!fields.sClass) valid = false;
-            setFieldError('grp-sSession', !fields.sSession); if (!fields.sSession) valid = false;
-
-            if (!valid) {
-                showToast('Please fix the highlighted fields', 'error');
-                return;
-            }
-
-            const duplicate = allStudents.some(s => s.student_id === fields.sStudentId);
-            if (duplicate) {
-                setFieldError('grp-sStudentId', true);
-                showToast('A student with this ID already exists', 'error');
-                return;
-            }
-
             const data = {
-                studentId: fields.sStudentId, studentName: fields.sName, fatherName: fields.sFather,
-                apaarId: fields.sApaarId, dob: fields.sDob, class: fields.sClass, session: fields.sSession
+                studentId: document.getElementById('sStudentId').value.trim(),
+                studentName: document.getElementById('sName').value.trim(),
+                fatherName: document.getElementById('sFather').value.trim(),
+                apaarId: document.getElementById('sApaarId').value.trim(),
+                dob: document.getElementById('sDob').value,
+                class: document.getElementById('sClass').value,
+                session: document.getElementById('sSession').value
             };
+
+            if (!data.studentId || !data.studentName || !data.fatherName || !data.apaarId || !data.dob || !data.class || !
+                data.session) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
 
             const btn = document.getElementById('addStudentBtn');
             btn.disabled = true;
@@ -1149,7 +1260,11 @@
             if (result.success) {
                 showToast('✅ Student added successfully!', 'success');
                 this.reset();
-                loadDashboard(); loadListStudents(); loadManageStudents(); loadUploadStudents(); loadPendingUpload();
+                loadDashboard();
+                loadListStudents();
+                loadManageStudents();
+                loadUploadStudents();
+                loadPendingUpload();
                 document.querySelector('[data-page="student-list"]').click();
             } else {
                 showToast('❌ ' + (result.message || 'Failed to add student'), 'error');
@@ -1157,14 +1272,13 @@
         });
 
         // ============================================
-        // STUDENT LIST (search + pagination)
+        // LIST STUDENTS
         // ============================================
         async function loadListStudents() {
             try {
                 const data = await apiCall('/students');
                 if (data.success) {
                     allStudents = data.data;
-                    listPage = 1;
                     applyClassCounts(allStudents, 'list');
                     document.getElementById('listCount').textContent = allStudents.length;
                     renderListStudents();
@@ -1178,36 +1292,24 @@
             }
         }
 
-        function matchesSearch(s, query) {
-            if (!query) return true;
-            const q = query.toLowerCase();
-            return (s.student_name || '').toLowerCase().includes(q) ||
-                   (s.student_id || '').toLowerCase().includes(q) ||
-                   (s.apaar_id || '').toLowerCase().includes(q);
-        }
-
         function renderListStudents() {
             const container = document.getElementById('listStudentsContainer');
             let filtered = allStudents;
             if (listFilter !== 'all') filtered = filtered.filter(s => String(s.class) === listFilter);
-            if (listSearch) filtered = filtered.filter(s => matchesSearch(s, listSearch));
 
             if (filtered.length === 0) {
                 container.innerHTML = `<div class="no-data"><div class="icon">👨‍🎓</div><h4>No students found</h4></div>`;
-                document.getElementById('listPagination').innerHTML = '';
                 return;
             }
 
-            const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-            listPage = Math.min(listPage, totalPages);
-            const pageItems = filtered.slice((listPage - 1) * PAGE_SIZE, listPage * PAGE_SIZE);
+            const pageItems = filtered.slice(0, PAGE_SIZE);
 
             container.innerHTML = `
                 <div class="student-grid">
                     ${pageItems.map(s => {
                         const status = getStudentStatus(s);
                         return `
-                            <div class="student-card" data-sid="${escapeHtml(s.student_id)}">
+                            <div class="student-card" onclick="viewStudent('${escapeHtml(s.student_id)}')">
                                 <div class="s-name">${escapeHtml(s.student_name)}</div>
                                 <div class="s-id">ID: ${escapeHtml(s.student_id)}</div>
                                 <div class="s-id">Class: ${escapeHtml(s.class)} | ${escapeHtml(s.session_year)}</div>
@@ -1217,51 +1319,22 @@
                     }).join('')}
                 </div>
             `;
-            container.querySelectorAll('.student-card').forEach(card => {
-                card.addEventListener('click', () => viewStudent(card.dataset.sid));
-            });
-            renderPagination('listPagination', listPage, totalPages, filtered.length, (p) => { listPage = p; renderListStudents(); });
         }
 
-        function renderPagination(containerId, page, totalPages, totalItems, onPage) {
-            const el = document.getElementById(containerId);
-            if (!el) return;
-            if (totalPages <= 1) { el.innerHTML = `<span>${totalItems} result(s)</span>`; return; }
-            el.innerHTML = `
-                <span>Page ${page} of ${totalPages} · ${totalItems} result(s)</span>
-                <div class="page-controls">
-                    <button class="btn btn-outline btn-xs" id="${containerId}-prev" ${page <= 1 ? 'disabled' : ''}>Prev</button>
-                    <button class="btn btn-outline btn-xs" id="${containerId}-next" ${page >= totalPages ? 'disabled' : ''}>Next</button>
-                </div>
-            `;
-            const prev = document.getElementById(`${containerId}-prev`);
-            const next = document.getElementById(`${containerId}-next`);
-            if (prev) prev.addEventListener('click', () => onPage(Math.max(1, page - 1)));
-            if (next) next.addEventListener('click', () => onPage(Math.min(totalPages, page + 1)));
+        function filterList(cls) {
+            listFilter = cls;
+            setActiveClassBtn('listClassButtons', cls);
+            renderListStudents();
         }
-
-        document.getElementById('listSearch').addEventListener('input', debounce(function () {
-            listSearch = this.value.trim();
-            listPage = 1;
-            document.getElementById('listSearchClear').style.display = listSearch ? 'block' : 'none';
-            renderListStudents();
-        }, 250));
-        document.getElementById('listSearchClear').addEventListener('click', function () {
-            document.getElementById('listSearch').value = '';
-            listSearch = ''; listPage = 1;
-            this.style.display = 'none';
-            renderListStudents();
-        });
 
         // ============================================
-        // MANAGE STUDENTS (Edit/Delete)
+        // MANAGE STUDENTS
         // ============================================
         async function loadManageStudents() {
             try {
                 const data = await apiCall('/students');
                 if (data.success) {
                     allStudents = data.data;
-                    managePage = 1;
                     applyClassCounts(allStudents, 'manage');
                     document.getElementById('manageCount').textContent = allStudents.length;
                     renderManageStudents();
@@ -1279,61 +1352,44 @@
             const container = document.getElementById('manageStudentsContainer');
             let filtered = allStudents;
             if (manageFilter !== 'all') filtered = filtered.filter(s => String(s.class) === manageFilter);
-            if (manageSearch) filtered = filtered.filter(s => matchesSearch(s, manageSearch));
 
             if (filtered.length === 0) {
                 container.innerHTML = `<div class="no-data"><div class="icon">👨‍🎓</div><h4>No students found</h4></div>`;
-                document.getElementById('managePagination').innerHTML = '';
                 return;
             }
 
-            const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-            managePage = Math.min(managePage, totalPages);
-            const pageItems = filtered.slice((managePage - 1) * PAGE_SIZE, managePage * PAGE_SIZE);
+            const pageItems = filtered.slice(0, PAGE_SIZE);
 
             container.innerHTML = `
                 <div class="student-grid">
                     ${pageItems.map(s => {
                         const status = getStudentStatus(s);
                         return `
-                            <div class="student-card" data-sid="${escapeHtml(s.student_id)}">
+                            <div class="student-card">
                                 <div class="s-name">${escapeHtml(s.student_name)}</div>
                                 <div class="s-id">ID: ${escapeHtml(s.student_id)}</div>
                                 <div class="s-id">Class: ${escapeHtml(s.class)} | ${escapeHtml(s.session_year)}</div>
                                 <span class="s-status ${status.class}">${status.text}</span>
                                 <div class="s-actions">
-                                    <button class="btn btn-warning btn-xs edit-btn" data-sid="${escapeHtml(s.student_id)}"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-danger btn-xs del-btn" data-sid="${escapeHtml(s.student_id)}"><i class="fas fa-trash"></i></button>
+                                    <button class="btn btn-warning btn-xs" onclick="event.stopPropagation();editStudentById('${escapeHtml(s.student_id)}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteStudentById('${escapeHtml(s.student_id)}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
                             </div>
                         `;
                     }).join('')}
                 </div>
             `;
-            container.querySelectorAll('.student-card').forEach(card => {
-                card.addEventListener('click', (e) => {
-                    if (e.target.closest('.edit-btn') || e.target.closest('.del-btn')) return;
-                    viewStudent(card.dataset.sid);
-                });
-            });
-            container.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); editStudentById(btn.dataset.sid); }));
-            container.querySelectorAll('.del-btn').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); deleteStudentById(btn.dataset.sid); }));
-
-            renderPagination('managePagination', managePage, totalPages, filtered.length, (p) => { managePage = p; renderManageStudents(); });
         }
 
-        document.getElementById('manageSearch').addEventListener('input', debounce(function () {
-            manageSearch = this.value.trim();
-            managePage = 1;
-            document.getElementById('manageSearchClear').style.display = manageSearch ? 'block' : 'none';
+        function filterManage(cls) {
+            manageFilter = cls;
+            setActiveClassBtn('manageClassButtons', cls);
             renderManageStudents();
-        }, 250));
-        document.getElementById('manageSearchClear').addEventListener('click', function () {
-            document.getElementById('manageSearch').value = '';
-            manageSearch = ''; managePage = 1;
-            this.style.display = 'none';
-            renderManageStudents();
-        });
+        }
 
         // ============================================
         // VIEW STUDENT
@@ -1345,7 +1401,8 @@
             modal.classList.add('active');
             document.getElementById('modalTitle').innerHTML =
                 '<i class="fas fa-user-graduate" style="color:var(--secondary);"></i> Student Details';
-            content.innerHTML = `<div style="text-align:center;padding:20px;"><div class="loading-spinner"></div><p style="color:var(--gray-400);margin-top:8px;">Loading...</p></div>`;
+            content.innerHTML =
+                `<div style="text-align:center;padding:20px;"><div class="loading-spinner"></div><p style="color:var(--gray-400);margin-top:8px;">Loading...</p></div>`;
 
             try {
                 const data = await apiCall('/students/' + encodeURIComponent(studentId));
@@ -1362,7 +1419,6 @@
                         <div class="detail-row"><div class="label">Class</div><div class="value">${escapeHtml(s.class)}</div></div>
                         <div class="detail-row"><div class="label">Session</div><div class="value">${escapeHtml(s.session_year)}</div></div>
                         <div class="detail-row"><div class="label">Result Status</div><div class="value"><span class="badge ${status.class}">${status.text}</span></div></div>
-                        ${s.marksheet_url ? `<div class="detail-row"><div class="label">Marksheet</div><div class="value"><a href="${escapeHtml(s.marksheet_url)}" target="_blank" rel="noopener noreferrer">View PDF <i class="fas fa-up-right-from-square"></i></a></div></div>` : ''}
                     `;
                     document.getElementById('modalActions').style.display = 'flex';
                 } else {
@@ -1391,7 +1447,6 @@
         async function editStudentById(studentId) {
             const modal = document.getElementById('editModal');
             modal.classList.add('active');
-            document.querySelectorAll('#editStudentForm .form-group').forEach(g => g.classList.remove('has-error'));
 
             try {
                 const data = await apiCall('/students/' + encodeURIComponent(studentId));
@@ -1402,7 +1457,8 @@
                     document.getElementById('editApaarId').value = s.apaar_id;
                     document.getElementById('editSName').value = s.student_name;
                     document.getElementById('editSFather').value = s.father_name;
-                    document.getElementById('editSDob').value = s.date_of_birth ? String(s.date_of_birth).slice(0, 10) : '';
+                    document.getElementById('editSDob').value = s.date_of_birth ? String(s.date_of_birth).slice(0, 10) :
+                    '';
                     document.getElementById('editSClass').value = s.class;
                     document.getElementById('editSSession').value = s.session_year;
                 } else {
@@ -1415,50 +1471,50 @@
             }
         }
 
-        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
 
-        document.getElementById('editStudentForm').addEventListener('submit', async function (e) {
+        document.getElementById('editStudentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+
             const studentId = document.getElementById('editStudentId').value;
-
-            const fields = {
-                editSId: document.getElementById('editSId').value.trim(),
-                editApaarId: document.getElementById('editApaarId').value.trim(),
-                editSName: document.getElementById('editSName').value.trim(),
-                editSFather: document.getElementById('editSFather').value.trim(),
-                editSDob: document.getElementById('editSDob').value,
-                editSClass: document.getElementById('editSClass').value,
-                editSSession: document.getElementById('editSSession').value
-            };
-
-            let valid = true;
-            setFieldError('grp-editSId', !fields.editSId); if (!fields.editSId) valid = false;
-            setFieldError('grp-editApaarId', !fields.editApaarId); if (!fields.editApaarId) valid = false;
-            setFieldError('grp-editSName', !fields.editSName); if (!fields.editSName) valid = false;
-            setFieldError('grp-editSFather', !fields.editSFather); if (!fields.editSFather) valid = false;
-            const dobOk = isValidPastDate(fields.editSDob);
-            setFieldError('grp-editSDob', !dobOk); if (!dobOk) valid = false;
-            setFieldError('grp-editSClass', !fields.editSClass); if (!fields.editSClass) valid = false;
-            setFieldError('grp-editSSession', !fields.editSSession); if (!fields.editSSession) valid = false;
-
-            if (!valid) { showToast('Please fix the highlighted fields', 'error'); return; }
-
             const data = {
-                studentId: fields.editSId, studentName: fields.editSName, fatherName: fields.editSFather,
-                apaarId: fields.editApaarId, dob: fields.editSDob, class: fields.editSClass, session: fields.editSSession
+                studentId: document.getElementById('editSId').value.trim(),
+                studentName: document.getElementById('editSName').value.trim(),
+                fatherName: document.getElementById('editSFather').value.trim(),
+                apaarId: document.getElementById('editApaarId').value.trim(),
+                dob: document.getElementById('editSDob').value,
+                class: document.getElementById('editSClass').value,
+                session: document.getElementById('editSSession').value
             };
+
+            if (!data.studentId || !data.studentName || !data.fatherName || !data.apaarId || !data.dob || !data.class || !
+                data.session) {
+                showToast('Please fill all fields', 'error');
+                return;
+            }
 
             const btn = document.getElementById('editStudentBtn');
-            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
-            const result = await apiCall('/students/' + encodeURIComponent(studentId), { method: 'PUT', body: JSON.stringify(data) });
+            const result = await apiCall('/students/' + encodeURIComponent(studentId), {
+                method: 'PUT',
+                body: JSON.stringify(data)
+            });
 
-            btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Update Student';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> Update Student';
 
             if (result.success) {
                 showToast('✅ Student updated!', 'success');
                 closeEditModal();
-                loadDashboard(); loadListStudents(); loadManageStudents(); loadUploadStudents(); loadPendingUpload();
+                loadDashboard();
+                loadListStudents();
+                loadManageStudents();
+                loadUploadStudents();
+                loadPendingUpload();
             } else {
                 showToast('❌ ' + (result.message || 'Update failed'), 'error');
             }
@@ -1467,42 +1523,46 @@
         // ============================================
         // DELETE STUDENT
         // ============================================
-        function reloadAllStudentViews() {
-            loadDashboard(); loadListStudents(); loadManageStudents(); loadUploadStudents();
-            loadUploadedResults(); loadPendingUpload(); loadPublishResults(); loadUnpublishedList(); loadPublishedList();
-        }
-
         async function deleteStudent() {
             if (!currentStudentId) return;
-            const id = currentStudentId;
-            askConfirm(`Delete student "${id}" permanently? This will also delete their result.`, {
-                danger: true,
-                onConfirm: async () => {
-                    const result = await apiCall('/students/' + encodeURIComponent(id), { method: 'DELETE' });
-                    if (result.success) {
-                        showToast('🗑️ Student deleted!', 'success');
-                        closeModal();
-                        reloadAllStudentViews();
-                    } else {
-                        showToast('❌ ' + (result.message || 'Delete failed'), 'error');
-                    }
-                }
-            });
+            if (!confirm('Delete this student permanently? This will also delete their result.')) return;
+
+            const result = await apiCall('/students/' + encodeURIComponent(currentStudentId), { method: 'DELETE' });
+
+            if (result.success) {
+                showToast('🗑️ Student deleted!', 'success');
+                closeModal();
+                loadDashboard();
+                loadListStudents();
+                loadManageStudents();
+                loadUploadStudents();
+                loadUploadedResults();
+                loadPendingUpload();
+                loadPublishResults();
+                loadUnpublishedList();
+                loadPublishedList();
+            } else {
+                showToast('❌ ' + (result.message || 'Delete failed'), 'error');
+            }
         }
 
         async function deleteStudentById(studentId) {
-            askConfirm(`Delete student "${studentId}" permanently? This will also delete their result.`, {
-                danger: true,
-                onConfirm: async () => {
-                    const result = await apiCall('/students/' + encodeURIComponent(studentId), { method: 'DELETE' });
-                    if (result.success) {
-                        showToast('🗑️ Student deleted!', 'success');
-                        reloadAllStudentViews();
-                    } else {
-                        showToast('❌ ' + (result.message || 'Delete failed'), 'error');
-                    }
-                }
-            });
+            if (!confirm('Delete this student permanently?')) return;
+            const result = await apiCall('/students/' + encodeURIComponent(studentId), { method: 'DELETE' });
+            if (result.success) {
+                showToast('🗑️ Student deleted!', 'success');
+                loadDashboard();
+                loadListStudents();
+                loadManageStudents();
+                loadUploadStudents();
+                loadUploadedResults();
+                loadPendingUpload();
+                loadPublishResults();
+                loadUnpublishedList();
+                loadPublishedList();
+            } else {
+                showToast('❌ ' + (result.message || 'Delete failed'), 'error');
+            }
         }
 
         // ============================================
@@ -1525,15 +1585,16 @@
             if (uploadFilter !== 'all') filtered = filtered.filter(s => String(s.class) === uploadFilter);
 
             if (filtered.length === 0) {
-                container.innerHTML = `<div style="text-align:center;padding:20px;color:var(--gray-400);font-size:0.85rem;"><i class="fas fa-info-circle"></i> No students found</div>`;
+                container.innerHTML =
+                    `<div style="text-align:center;padding:20px;color:var(--gray-400);font-size:0.85rem;"><i class="fas fa-info-circle"></i> No students found</div>`;
                 return;
             }
 
             container.innerHTML = `
                 <div style="display:flex;flex-wrap:wrap;gap:6px;">
                     ${filtered.map(s => `
-                        <button type="button" class="btn ${s.has_result ? 'btn-success' : 'btn-outline'} select-upload-btn"
-                                data-sid="${escapeHtml(s.student_id)}" data-class="${escapeHtml(s.class)}" data-session="${escapeHtml(s.session_year)}"
+                        <button class="btn ${s.has_result ? 'btn-success' : 'btn-outline'}" 
+                                onclick="selectForUpload('${escapeHtml(s.student_id)}','${escapeHtml(s.class)}','${escapeHtml(s.session_year)}')"
                                 style="font-size:0.75rem;padding:4px 12px;">
                             ${escapeHtml(s.student_id)} - ${escapeHtml(s.student_name)}
                             <span style="font-size:0.55rem;">${s.has_result ? '✅' : '📌'}</span>
@@ -1542,9 +1603,6 @@
                 </div>
                 <p style="font-size:0.7rem;color:var(--gray-400);margin-top:8px;"><i class="fas fa-hand-pointer"></i> Click a student to auto-fill</p>
             `;
-            container.querySelectorAll('.select-upload-btn').forEach(btn => {
-                btn.addEventListener('click', () => selectForUpload(btn.dataset.sid, btn.dataset.class, btn.dataset.session));
-            });
         }
 
         function selectForUpload(studentId, cls, session) {
@@ -1555,102 +1613,69 @@
             showToast(`Selected: ${studentId}`, 'info');
         }
 
-        // Verify student — debounced + request-cancelling so fast typing
-        // doesn't fire an API call per keystroke or race older responses.
-        const runVerify = debounce(async function (studentId) {
-            const infoDiv = document.getElementById('verifyInfo');
-            if (!studentId) { infoDiv.classList.remove('show'); return; }
+        function filterUpload(cls) {
+            uploadFilter = cls;
+            setActiveClassBtn('uploadClassButtons', cls);
+            renderUploadStudents();
+        }
 
-            if (verifyAbortController) verifyAbortController.abort();
-            verifyAbortController = new AbortController();
+        // Verify Student
+        document.getElementById('uStudentId').addEventListener('input', async function() {
+            const studentId = this.value.trim();
+            const infoDiv = document.getElementById('verifyInfo');
+
+            if (!studentId) {
+                infoDiv.classList.remove('show');
+                return;
+            }
 
             try {
-                const response = await fetch(API_BASE + '/students/' + encodeURIComponent(studentId), {
-                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
-                    signal: verifyAbortController.signal
-                });
-                const data = await response.json().catch(() => ({ success: false }));
-
+                const data = await apiCall('/students/' + encodeURIComponent(studentId));
                 if (data.success) {
                     const s = data.data;
                     document.getElementById('vName').textContent = s.student_name || '-';
                     document.getElementById('vFather').textContent = s.father_name || '-';
                     document.getElementById('vApaar').textContent = s.apaar_id || '-';
-                    document.getElementById('vDob').textContent = s.date_of_birth ? new Date(s.date_of_birth).toLocaleDateString('en-IN') : '-';
+                    document.getElementById('vDob').textContent = s.date_of_birth ? new Date(s.date_of_birth)
+                        .toLocaleDateString('en-IN') : '-';
                     document.getElementById('vClass').textContent = s.class || '-';
                     document.getElementById('vSession').textContent = s.session_year || '-';
-                    infoDiv.classList.remove('not-found');
                     infoDiv.classList.add('show');
-                    setFieldError('grp-uStudentId', false);
 
                     if (!document.getElementById('uClass').value) document.getElementById('uClass').value = s.class || '';
-                    if (!document.getElementById('uSession').value) document.getElementById('uSession').value = s.session_year || '';
+                    if (!document.getElementById('uSession').value) document.getElementById('uSession').value = s
+                        .session_year || '';
                 } else {
-                    infoDiv.classList.add('show', 'not-found');
-                    document.getElementById('vName').textContent = 'Not found';
-                    document.getElementById('vFather').textContent = '-';
-                    document.getElementById('vApaar').textContent = '-';
-                    document.getElementById('vDob').textContent = '-';
-                    document.getElementById('vClass').textContent = '-';
-                    document.getElementById('vSession').textContent = '-';
+                    infoDiv.classList.remove('show');
                 }
             } catch (error) {
-                if (error.name !== 'AbortError') infoDiv.classList.remove('show');
+                infoDiv.classList.remove('show');
             }
-        }, 400);
-
-        document.getElementById('uStudentId').addEventListener('input', function () {
-            runVerify(this.value.trim());
         });
 
-        document.getElementById('uFile').addEventListener('change', function () {
+        document.getElementById('uFile').addEventListener('change', function() {
             const preview = document.getElementById('uFilePreview');
-            setFieldError('grp-uFile', false);
-            const file = this.files && this.files[0];
-            if (!file) { preview.classList.remove('show'); return; }
-
-            const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
-            const sizeMb = file.size / (1024 * 1024);
-
-            if (!isPdf) {
-                setFieldError('grp-uFile', true);
-                this.value = '';
+            if (this.files && this.files[0]) {
+                preview.innerHTML = `📄 <span>${escapeHtml(this.files[0].name)}</span> (${(this.files[0].size/1024).toFixed(1)} KB)`;
+                preview.classList.add('show');
+            } else {
                 preview.classList.remove('show');
-                showToast('Only PDF files are allowed', 'error');
-                return;
             }
-            if (sizeMb > MAX_FILE_MB) {
-                setFieldError('grp-uFile', true);
-                this.value = '';
-                preview.classList.remove('show');
-                showToast(`File too large — max ${MAX_FILE_MB} MB`, 'error');
-                return;
-            }
-
-            preview.innerHTML = `📄 <span>${escapeHtml(file.name)}</span> (${sizeMb.toFixed(2)} MB)`;
-            preview.classList.add('show');
         });
 
-        document.getElementById('uploadResultForm').addEventListener('submit', async function (e) {
+        document.getElementById('uploadResultForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const studentId = document.getElementById('uStudentId').value.trim();
-            const cls = document.getElementById('uClass').value;
-            const session = document.getElementById('uSession').value;
             const file = document.getElementById('uFile').files[0];
-
-            let valid = true;
-            setFieldError('grp-uStudentId', !studentId); if (!studentId) valid = false;
-            setFieldError('grp-uClass', !cls); if (!cls) valid = false;
-            setFieldError('grp-uSession', !session); if (!session) valid = false;
-            setFieldError('grp-uFile', !file); if (!file) valid = false;
-
-            if (!valid) { showToast('Please fill all required fields', 'error'); return; }
+            if (!file) {
+                showToast('Please select a PDF file', 'error');
+                return;
+            }
 
             const formData = new FormData();
-            formData.append('studentId', studentId);
-            formData.append('class', cls);
-            formData.append('session', session);
+            formData.append('studentId', document.getElementById('uStudentId').value.trim());
+            formData.append('class', document.getElementById('uClass').value);
+            formData.append('session', document.getElementById('uSession').value);
             formData.append('marksheet', file);
 
             const btn = document.getElementById('uploadBtn');
@@ -1660,17 +1685,22 @@
             try {
                 const response = await fetch(API_BASE + '/results/upload', {
                     method: 'POST',
-                    headers: { ...authHeaders() },
+                    headers: authHeaders(),
                     body: formData
                 });
-                const data = await response.json().catch(() => ({ success: false, message: `HTTP ${response.status}` }));
+                const data = await response.json();
 
                 if (data.success) {
                     showToast('✅ Result uploaded successfully!', 'success');
                     this.reset();
                     document.getElementById('uFilePreview').classList.remove('show');
                     document.getElementById('verifyInfo').classList.remove('show');
-                    loadDashboard(); loadUploadStudents(); loadUploadedResults(); loadPendingUpload(); loadPublishResults(); loadUnpublishedList();
+                    loadDashboard();
+                    loadUploadStudents();
+                    loadUploadedResults();
+                    loadPendingUpload();
+                    loadPublishResults();
+                    loadUnpublishedList();
                     document.querySelector('[data-page="publish-result"]').click();
                 } else {
                     showToast('❌ ' + (data.message || 'Upload failed'), 'error');
@@ -1704,7 +1734,8 @@
             if (uploadedFilter !== 'all') filtered = filtered.filter(r => String(r.class) === uploadedFilter);
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">No uploaded results</td></tr>`;
+                tbody.innerHTML =
+                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">No uploaded results</td></tr>`;
                 return;
             }
 
@@ -1716,10 +1747,15 @@
                     <td><span class="badge badge-info">${escapeHtml(r.class)}</span></td>
                     <td>${escapeHtml(r.session_year)}</td>
                     <td><span class="badge status-uploaded">📄 Uploaded</span></td>
-                    <td><button class="btn btn-danger btn-xs del-result-btn" data-id="${r.id}"><i class="fas fa-trash"></i> Delete</button></td>
+                    <td><button class="btn btn-danger btn-xs" onclick="deleteResult(${r.id})"><i class="fas fa-trash"></i> Delete</button></td>
                 </tr>
             `).join('');
-            tbody.querySelectorAll('.del-result-btn').forEach(btn => btn.addEventListener('click', () => deleteResult(btn.dataset.id)));
+        }
+
+        function filterUploaded(cls) {
+            uploadedFilter = cls;
+            setActiveClassBtn('uploadedClassButtons', cls);
+            renderUploadedResults();
         }
 
         // ============================================
@@ -1731,32 +1767,34 @@
                 const data = await apiCall('/students');
                 if (data.success) {
                     const noResult = data.data.filter(s => !s.has_result);
-                    window.__pendingStudents = noResult;
                     applyClassCounts(noResult, 'pendingUpload');
                     document.getElementById('pendingUploadCount').textContent = noResult.length;
                     renderPendingUpload(noResult);
                 } else {
-                    container.innerHTML = `<div class="no-data"><h4>❌ Failed to load</h4><p>${escapeHtml(data.message || '')}</p></div>`;
+                    container.innerHTML =
+                        `<div class="no-data"><h4>❌ Failed to load</h4><p>${escapeHtml(data.message || '')}</p></div>`;
                 }
             } catch (error) {
-                container.innerHTML = `<div class="no-data"><h4>❌ Failed to load</h4><p>${escapeHtml(error.message)}</p></div>`;
+                container.innerHTML =
+                    `<div class="no-data"><h4>❌ Failed to load</h4><p>${escapeHtml(error.message)}</p></div>`;
             }
         }
 
         function renderPendingUpload(students) {
             const container = document.getElementById('pendingUploadContainer');
-            let filtered = students || window.__pendingStudents || [];
+            let filtered = students || [];
             if (pendingUploadFilter !== 'all') filtered = filtered.filter(s => String(s.class) === pendingUploadFilter);
 
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="no-data"><div class="icon">🎉</div><h4>All students have results!</h4></div>`;
+                container.innerHTML =
+                    `<div class="no-data"><div class="icon">🎉</div><h4>All students have results!</h4></div>`;
                 return;
             }
 
             container.innerHTML = `
                 <div class="student-grid">
                     ${filtered.map(s => `
-                        <div class="student-card pending-card" data-sid="${escapeHtml(s.student_id)}" data-class="${escapeHtml(s.class)}" data-session="${escapeHtml(s.session_year)}" style="border-color:var(--danger);cursor:pointer;">
+                        <div class="student-card" onclick="selectForUpload('${escapeHtml(s.student_id)}','${escapeHtml(s.class)}','${escapeHtml(s.session_year)}')" style="border-color:var(--danger);cursor:pointer;">
                             <div class="s-name">${escapeHtml(s.student_name)}</div>
                             <div class="s-id">ID: ${escapeHtml(s.student_id)}</div>
                             <div class="s-id">Class: ${escapeHtml(s.class)} | ${escapeHtml(s.session_year)}</div>
@@ -1766,16 +1804,16 @@
                 </div>
                 <p style="font-size:0.7rem;color:var(--gray-400);margin-top:8px;"><i class="fas fa-hand-pointer"></i> Click a student to upload</p>
             `;
-            container.querySelectorAll('.pending-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    selectForUpload(card.dataset.sid, card.dataset.class, card.dataset.session);
-                    document.querySelector('[data-page="upload-result"]').click();
-                });
-            });
+        }
+
+        function filterPendingUpload(cls) {
+            pendingUploadFilter = cls;
+            setActiveClassBtn('pendingUploadClassButtons', cls);
+            loadPendingUpload();
         }
 
         // ============================================
-        // PUBLISH RESULT
+        // PUBLISH RESULTS
         // ============================================
         async function loadPublishResults() {
             try {
@@ -1795,7 +1833,8 @@
             if (publishFilter !== 'all') filtered = filtered.filter(r => String(r.class) === publishFilter);
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">No pending results</td></tr>`;
+                tbody.innerHTML =
+                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">No pending results</td></tr>`;
                 return;
             }
 
@@ -1808,49 +1847,86 @@
                     <td>${escapeHtml(r.session_year)}</td>
                     <td><span class="badge status-uploaded">📄 Uploaded</span></td>
                     <td>
-                        <button class="btn btn-success btn-xs pub-btn" data-id="${r.id}"><i class="fas fa-check"></i> Publish</button>
-                        <button class="btn btn-danger btn-xs del-result-btn" data-id="${r.id}"><i class="fas fa-trash"></i></button>
+                        <button class="btn btn-success btn-xs" onclick="publishResult(${r.id})"><i class="fas fa-check"></i> Publish</button>
+                        <button class="btn btn-danger btn-xs" onclick="deleteResult(${r.id})"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('');
-            tbody.querySelectorAll('.pub-btn').forEach(btn => btn.addEventListener('click', () => publishResult(btn.dataset.id)));
-            tbody.querySelectorAll('.del-result-btn').forEach(btn => btn.addEventListener('click', () => deleteResult(btn.dataset.id)));
         }
 
-        async function runBulkResultAction(action) {
+        function filterPublish(cls) {
+            publishFilter = cls;
+            setActiveClassBtn('publishClassButtons', cls);
+            renderPublishResults();
+        }
+
+        async function publishAll() {
             let filtered = allResults;
             if (publishFilter !== 'all') filtered = filtered.filter(r => String(r.class) === publishFilter);
-            if (filtered.length === 0) { showToast(`No results to ${action}`, 'warning'); return; }
+            if (filtered.length === 0) { showToast('No results to publish', 'warning'); return; }
+            if (!confirm(`Publish ${filtered.length} results?`)) return;
 
-            const endpoints = {
-                publish: (id) => apiCall('/results/' + id + '/publish', { method: 'PUT' }),
-                unpublish: (id) => apiCall('/results/' + id + '/unpublish', { method: 'PUT' }),
-                delete: (id) => apiCall('/results/' + id, { method: 'DELETE' })
-            };
-
-            let success = 0, failed = 0;
+            let success = 0;
             for (const r of filtered) {
-                const data = await endpoints[action](r.id);
-                if (data.success) success++; else failed++;
+                const data = await apiCall('/results/' + r.id + '/publish', { method: 'PUT' });
+                if (data.success) success++;
             }
 
-            const verbs = { publish: 'published', unpublish: 'unpublished', delete: 'deleted' };
-            if (failed === 0) showToast(`✅ ${success} results ${verbs[action]}!`, 'success');
-            else showToast(`⚠️ ${success} succeeded, ${failed} failed`, 'warning');
-
-            loadDashboard(); loadPublishResults(); loadUnpublishedList(); loadPublishedList();
-            loadUploadedResults(); loadListStudents(); loadManageStudents(); loadPendingUpload();
+            showToast(`✅ ${success} results published!`, 'success');
+            loadDashboard();
+            loadPublishResults();
+            loadUnpublishedList();
+            loadPublishedList();
+            loadUploadedResults();
+            loadListStudents();
+            loadManageStudents();
+            loadPendingUpload();
         }
 
-        function confirmBulkAction(action) {
+        async function unpublishAll() {
             let filtered = allResults;
             if (publishFilter !== 'all') filtered = filtered.filter(r => String(r.class) === publishFilter);
-            const verbs = { publish: 'Publish', unpublish: 'Unpublish', delete: 'Delete' };
-            const scope = publishFilter === 'all' ? 'all classes' : `class ${publishFilter}`;
-            askConfirm(`${verbs[action]} ${filtered.length} result(s) in ${scope}?`, {
-                danger: action === 'delete',
-                onConfirm: () => runBulkResultAction(action)
-            });
+            if (filtered.length === 0) { showToast('No results to unpublish', 'warning'); return; }
+            if (!confirm(`Unpublish ${filtered.length} results?`)) return;
+
+            let success = 0;
+            for (const r of filtered) {
+                const data = await apiCall('/results/' + r.id + '/unpublish', { method: 'PUT' });
+                if (data.success) success++;
+            }
+
+            showToast(`📌 ${success} results unpublished!`, 'success');
+            loadDashboard();
+            loadPublishResults();
+            loadUnpublishedList();
+            loadPublishedList();
+            loadUploadedResults();
+            loadListStudents();
+            loadManageStudents();
+            loadPendingUpload();
+        }
+
+        async function deleteAllResults() {
+            let filtered = allResults;
+            if (publishFilter !== 'all') filtered = filtered.filter(r => String(r.class) === publishFilter);
+            if (filtered.length === 0) { showToast('No results to delete', 'warning'); return; }
+            if (!confirm(`⚠️ Delete ${filtered.length} results permanently?`)) return;
+
+            let success = 0;
+            for (const r of filtered) {
+                const data = await apiCall('/results/' + r.id, { method: 'DELETE' });
+                if (data.success) success++;
+            }
+
+            showToast(`🗑️ ${success} results deleted!`, 'success');
+            loadDashboard();
+            loadPublishResults();
+            loadUnpublishedList();
+            loadPublishedList();
+            loadUploadedResults();
+            loadListStudents();
+            loadManageStudents();
+            loadPendingUpload();
         }
 
         // ============================================
@@ -1874,7 +1950,8 @@
             if (unpublishedListFilter !== 'all') filtered = filtered.filter(r => String(r.class) === unpublishedListFilter);
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">No unpublished results</td></tr>`;
+                tbody.innerHTML =
+                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">No unpublished results</td></tr>`;
                 return;
             }
 
@@ -1887,13 +1964,17 @@
                     <td>${escapeHtml(r.session_year)}</td>
                     <td><span class="badge status-uploaded">📄 Uploaded</span></td>
                     <td>
-                        <button class="btn btn-success btn-xs pub-btn" data-id="${r.id}"><i class="fas fa-check"></i> Publish</button>
-                        <button class="btn btn-danger btn-xs del-result-btn" data-id="${r.id}"><i class="fas fa-trash"></i></button>
+                        <button class="btn btn-success btn-xs" onclick="publishResult(${r.id})"><i class="fas fa-check"></i> Publish</button>
+                        <button class="btn btn-danger btn-xs" onclick="deleteResult(${r.id})"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('');
-            tbody.querySelectorAll('.pub-btn').forEach(btn => btn.addEventListener('click', () => publishResult(btn.dataset.id)));
-            tbody.querySelectorAll('.del-result-btn').forEach(btn => btn.addEventListener('click', () => deleteResult(btn.dataset.id)));
+        }
+
+        function filterUnpublishedList(cls) {
+            unpublishedListFilter = cls;
+            setActiveClassBtn('unpublishedListClassButtons', cls);
+            renderUnpublishedList();
         }
 
         // ============================================
@@ -1917,7 +1998,8 @@
             if (publishedListFilter !== 'all') filtered = filtered.filter(r => String(r.class) === publishedListFilter);
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">No published results</td></tr>`;
+                tbody.innerHTML =
+                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">No published results</td></tr>`;
                 return;
             }
 
@@ -1930,59 +2012,75 @@
                     <td>${escapeHtml(r.session_year)}</td>
                     <td>${escapeHtml(r.published_date_ist || 'N/A')}</td>
                     <td>
-                        <button class="btn btn-warning btn-xs unpub-btn" data-id="${r.id}"><i class="fas fa-times"></i> Unpublish</button>
-                        <button class="btn btn-danger btn-xs del-result-btn" data-id="${r.id}"><i class="fas fa-trash"></i></button>
+                        <button class="btn btn-warning btn-xs" onclick="unpublishResult(${r.id})"><i class="fas fa-times"></i> Unpublish</button>
+                        <button class="btn btn-danger btn-xs" onclick="deleteResult(${r.id})"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('');
-            tbody.querySelectorAll('.unpub-btn').forEach(btn => btn.addEventListener('click', () => unpublishResult(btn.dataset.id)));
-            tbody.querySelectorAll('.del-result-btn').forEach(btn => btn.addEventListener('click', () => deleteResult(btn.dataset.id)));
+        }
+
+        function filterPublishedList(cls) {
+            publishedListFilter = cls;
+            setActiveClassBtn('publishedListClassButtons', cls);
+            renderPublishedList();
         }
 
         // ============================================
-        // RESULT ACTIONS (single)
+        // RESULT ACTIONS
         // ============================================
-        function reloadAllResultViews() {
-            loadDashboard(); loadPublishResults(); loadUnpublishedList(); loadPublishedList();
-            loadUploadedResults(); loadListStudents(); loadManageStudents(); loadPendingUpload();
-        }
-
         async function publishResult(id) {
-            askConfirm('Publish this result? It will become visible to the student.', {
-                danger: false,
-                onConfirm: async () => {
-                    const data = await apiCall('/results/' + id + '/publish', { method: 'PUT' });
-                    if (data.success) { showToast('✅ Published!', 'success'); reloadAllResultViews(); }
-                    else showToast('❌ ' + (data.message || 'Publish failed'), 'error');
-                }
-            });
+            if (!confirm('Publish this result?')) return;
+            const data = await apiCall('/results/' + id + '/publish', { method: 'PUT' });
+            if (data.success) {
+                showToast('✅ Published!', 'success');
+                loadDashboard();
+                loadPublishResults();
+                loadUnpublishedList();
+                loadPublishedList();
+                loadUploadedResults();
+                loadListStudents();
+                loadManageStudents();
+                loadPendingUpload();
+            } else {
+                showToast('❌ ' + (data.message || 'Publish failed'), 'error');
+            }
         }
 
         async function unpublishResult(id) {
-            askConfirm('Unpublish this result? It will no longer be visible to the student.', {
-                danger: true,
-                onConfirm: async () => {
-                    const data = await apiCall('/results/' + id + '/unpublish', { method: 'PUT' });
-                    if (data.success) { showToast('📌 Unpublished!', 'success'); reloadAllResultViews(); }
-                    else showToast('❌ ' + (data.message || 'Unpublish failed'), 'error');
-                }
-            });
+            if (!confirm('Unpublish this result?')) return;
+            const data = await apiCall('/results/' + id + '/unpublish', { method: 'PUT' });
+            if (data.success) {
+                showToast('📌 Unpublished!', 'success');
+                loadDashboard();
+                loadPublishResults();
+                loadUnpublishedList();
+                loadPublishedList();
+                loadUploadedResults();
+                loadListStudents();
+                loadManageStudents();
+                loadPendingUpload();
+            } else {
+                showToast('❌ ' + (data.message || 'Unpublish failed'), 'error');
+            }
         }
 
         async function deleteResult(id) {
-            askConfirm('Delete this result permanently? The uploaded marksheet cannot be recovered.', {
-                danger: true,
-                onConfirm: async () => {
-                    const data = await apiCall('/results/' + id, { method: 'DELETE' });
-                    if (data.success) {
-                        showToast('🗑️ Deleted!', 'success');
-                        loadDashboard(); loadPublishResults(); loadUnpublishedList(); loadPublishedList();
-                        loadUploadedResults(); loadPendingUpload(); loadUploadStudents(); loadListStudents(); loadManageStudents();
-                    } else {
-                        showToast('❌ ' + (data.message || 'Delete failed'), 'error');
-                    }
-                }
-            });
+            if (!confirm('Delete this result permanently?')) return;
+            const data = await apiCall('/results/' + id, { method: 'DELETE' });
+            if (data.success) {
+                showToast('🗑️ Deleted!', 'success');
+                loadDashboard();
+                loadPublishResults();
+                loadUnpublishedList();
+                loadPublishedList();
+                loadUploadedResults();
+                loadPendingUpload();
+                loadUploadStudents();
+                loadListStudents();
+                loadManageStudents();
+            } else {
+                showToast('❌ ' + (data.message || 'Delete failed'), 'error');
+            }
         }
 
         // ============================================
@@ -1990,49 +2088,69 @@
         // ============================================
         function refreshAll() {
             showToast('🔄 Refreshing...', 'info');
-            loadDashboard(); loadListStudents(); loadManageStudents(); loadUploadStudents();
-            loadUploadedResults(); loadPendingUpload(); loadPublishResults(); loadUnpublishedList(); loadPublishedList();
+            loadDashboard();
+            loadListStudents();
+            loadManageStudents();
+            loadUploadStudents();
+            loadUploadedResults();
+            loadPendingUpload();
+            loadPublishResults();
+            loadUnpublishedList();
+            loadPublishedList();
         }
 
         // ============================================
-        // INIT
+        // BUILD CLASS BUTTONS
         // ============================================
-        function initApp() {
-            // build class filter buttons once, from one source of truth
-            buildClassButtons('listClassButtons', 'list', (c) => { listFilter = c; listPage = 1; setActiveClassBtn('listClassButtons', c); renderListStudents(); });
-            buildClassButtons('manageClassButtons', 'manage', (c) => { manageFilter = c; managePage = 1; setActiveClassBtn('manageClassButtons', c); renderManageStudents(); });
-            buildClassButtons('uploadClassButtons', 'upload', (c) => { uploadFilter = c; setActiveClassBtn('uploadClassButtons', c); renderUploadStudents(); });
-            buildClassButtons('uploadedClassButtons', 'uploaded', (c) => { uploadedFilter = c; setActiveClassBtn('uploadedClassButtons', c); renderUploadedResults(); });
-            buildClassButtons('pendingUploadClassButtons', 'pendingUpload', (c) => { pendingUploadFilter = c; setActiveClassBtn('pendingUploadClassButtons', c); renderPendingUpload(); });
-            buildClassButtons('publishClassButtons', 'publish', (c) => { publishFilter = c; setActiveClassBtn('publishClassButtons', c); renderPublishResults(); });
-            buildClassButtons('unpublishedListClassButtons', 'unpublishedList', (c) => { unpublishedListFilter = c; setActiveClassBtn('unpublishedListClassButtons', c); renderUnpublishedList(); });
-            buildClassButtons('publishedListClassButtons', 'publishedList', (c) => { publishedListFilter = c; setActiveClassBtn('publishedListClassButtons', c); renderPublishedList(); });
+        buildClassButtons('listClassButtons', 'list', filterList);
+        buildClassButtons('manageClassButtons', 'manage', filterManage);
+        buildClassButtons('uploadClassButtons', 'upload', filterUpload);
+        buildClassButtons('uploadedClassButtons', 'uploaded', filterUploaded);
+        buildClassButtons('pendingUploadClassButtons', 'pendingUpload', filterPendingUpload);
+        buildClassButtons('publishClassButtons', 'publish', filterPublish);
+        buildClassButtons('unpublishedListClassButtons', 'unpublishedList', filterUnpublishedList);
+        buildClassButtons('publishedListClassButtons', 'publishedList', filterPublishedList);
 
-            populateClassSelect(document.getElementById('sClass'));
-            populateClassSelect(document.getElementById('uClass'));
-            populateClassSelect(document.getElementById('editSClass'));
+        // ============================================
+        // POPULATE CLASS SELECTS
+        // ============================================
+        populateClassSelect(document.getElementById('sClass'));
+        populateClassSelect(document.getElementById('uClass'));
+        populateClassSelect(document.getElementById('editSClass'));
 
-            const dobInput = document.getElementById('sDob');
-            if (dobInput) dobInput.max = new Date().toISOString().slice(0, 10);
-
-            loadDashboard(); loadListStudents(); loadManageStudents(); loadUploadStudents();
-            loadUploadedResults(); loadPendingUpload(); loadPublishResults(); loadUnpublishedList(); loadPublishedList();
-
-            console.log('📊 Admin Panel v3.1 Loaded');
-            console.log('📡 API Base:', API_BASE);
+        // ============================================
+        // CHECK LOGIN STATUS
+        // ============================================
+        if (getToken()) {
+            showApp();
+            loadDashboard();
+            loadListStudents();
+            loadManageStudents();
+            loadUploadStudents();
+            loadUploadedResults();
+            loadPendingUpload();
+            loadPublishResults();
+            loadUnpublishedList();
+            loadPublishedList();
+        } else {
+            showLogin();
         }
 
+        console.log('📊 Admin Panel v3.2 Loaded');
+        console.log('📡 API Base:', API_BASE);
+
+        // Close modals on overlay click
         document.querySelectorAll('.modal-overlay').forEach(el => {
-            el.addEventListener('click', function (e) { if (e.target === this) this.classList.remove('active'); });
+            el.addEventListener('click', function(e) {
+                if (e.target === this) this.classList.remove('active');
+            });
         });
-        document.addEventListener('keydown', function (e) {
+
+        document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
             }
         });
-
-        // Boot: skip login only if a token already exists in this tab's session
-        if (getToken()) { showApp(); } else { showLogin(); }
     </script>
 
 </body>
