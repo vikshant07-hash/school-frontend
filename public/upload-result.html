@@ -23,7 +23,7 @@
             --text-light: #64748b;
             --border: #e2e8f0;
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-            --radius: 12px;
+            --radius: 14px;
             --radius-sm: 8px;
             --transition: all 0.3s ease;
         }
@@ -224,6 +224,8 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            flex: 1;
+            min-width: 0;
         }
         .student-item .info img {
             width: 36px;
@@ -231,6 +233,7 @@
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid var(--border);
+            flex-shrink: 0;
         }
         .student-item .info .name {
             font-weight: 600;
@@ -283,6 +286,13 @@
         .student-detail-card .value {
             font-weight: 600;
             font-size: 14px;
+        }
+        .student-detail-card .photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border);
         }
 
         /* ===== FILE DROP ===== */
@@ -374,9 +384,9 @@
         .btn-secondary:hover {
             background: #e2e8f0;
         }
-        .btn-sm {
-            padding: 4px 10px;
-            font-size: 12px;
+        .btn-block {
+            width: 100%;
+            justify-content: center;
         }
 
         .success-msg {
@@ -617,7 +627,7 @@
                             <div>
                                 <div class="label">Photo</div>
                                 <div class="value">
-                                    <img id="detailPhoto" src="" alt="Photo" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--border);" />
+                                    <img id="detailPhoto" src="" alt="Photo" class="photo" />
                                 </div>
                             </div>
                         </div>
@@ -661,6 +671,7 @@
         const API_URL = 'https://gsssshilla.onrender.com/api/result';
         let selectedStudentId = null;
         let selectedFile = null;
+        let selectedStudentData = null;
 
         // ============================================================
         // TOGGLE MENU
@@ -735,13 +746,17 @@
         }
 
         // ============================================================
-        // SELECT STUDENT - Shows Complete Details
+        // SELECT STUDENT - Complete Details Show
         // ============================================================
         async function selectStudent(id) {
             selectedStudentId = id;
             document.getElementById('selectedStudentId').value = id;
             document.getElementById('studentDetail').style.display = 'block';
             document.getElementById('uploadBtn').disabled = true;
+
+            // Clear previous errors
+            document.getElementById('errorMsg').classList.remove('show');
+            document.getElementById('successMsg').classList.remove('show');
 
             document.querySelectorAll('.student-item').forEach(el => el.classList.remove('selected'));
             document.querySelector(`.student-item[onclick="selectStudent(${id})"]`)?.classList.add('selected');
@@ -752,6 +767,7 @@
 
                 if (result.success) {
                     const s = result.data;
+                    selectedStudentData = s;
 
                     // Show all details
                     document.getElementById('detailName').textContent = s.student_name || '-';
@@ -764,16 +780,16 @@
                     document.getElementById('detailStatus').className = `status-badge ${s.result_status || 'pending'}`;
 
                     const photoEl = document.getElementById('detailPhoto');
-                    photoEl.src = s.student_photo || 'https://via.placeholder.com/40';
+                    photoEl.src = s.student_photo || 'https://via.placeholder.com/50';
                     photoEl.onerror = function() {
-                        this.src = 'https://via.placeholder.com/40';
+                        this.src = 'https://via.placeholder.com/50';
                     };
 
                     // Check if result already exists
                     const statusResponse = await fetch(`${API_URL}/status/${id}`);
                     const statusResult = await statusResponse.json();
 
-                    if (statusResult.success && statusResult.data.marksheet_url) {
+                    if (statusResult.success && statusResult.data && statusResult.data.marksheet_url) {
                         document.getElementById('uploadBtn').textContent = '🔄 Update Result';
                         document.getElementById('deleteBtn').style.display = 'inline-flex';
                         document.getElementById('fileName').textContent = '✅ Existing PDF uploaded';
@@ -785,6 +801,7 @@
                         document.getElementById('fileDrop').style.borderColor = '#e2e8f0';
                     }
 
+                    // Enable upload button only if file is selected
                     document.getElementById('uploadBtn').disabled = !selectedFile;
                 }
             } catch (error) {
@@ -813,6 +830,9 @@
             document.getElementById('fileName').textContent = file.name;
             document.getElementById('fileDrop').style.borderColor = '#10b981';
             document.getElementById('uploadBtn').disabled = !selectedStudentId;
+
+            // Clear previous errors
+            document.getElementById('errorMsg').classList.remove('show');
         }
 
         // Drag and Drop
@@ -842,26 +862,35 @@
                 document.getElementById('fileDrop').style.borderColor = '#10b981';
                 document.getElementById('uploadBtn').disabled = !selectedStudentId;
                 document.getElementById('fileInput').files = e.dataTransfer.files;
+                document.getElementById('errorMsg').classList.remove('show');
             }
         });
 
         // ============================================================
-        // UPLOAD RESULT
+        // UPLOAD RESULT - FIXED
         // ============================================================
         async function uploadResult(e) {
             e.preventDefault();
 
-            if (!selectedStudentId) {
+            // Get student ID from hidden field
+            const studentId = document.getElementById('selectedStudentId').value;
+
+            if (!studentId) {
                 showToast('Please select a student first.', 'error');
+                document.getElementById('errorMsg').textContent = '❌ Please select a student first.';
+                document.getElementById('errorMsg').classList.add('show');
                 return;
             }
+
             if (!selectedFile) {
                 showToast('Please select a PDF file.', 'error');
+                document.getElementById('errorMsg').textContent = '❌ Please select a PDF file.';
+                document.getElementById('errorMsg').classList.add('show');
                 return;
             }
 
             const formData = new FormData();
-            formData.append('studentId', selectedStudentId);
+            formData.append('studentId', studentId);
             formData.append('marksheet', selectedFile);
 
             const btn = document.getElementById('uploadBtn');
@@ -877,6 +906,7 @@
                     method: 'POST',
                     body: formData
                 });
+
                 const result = await response.json();
 
                 if (result.success) {
@@ -886,17 +916,18 @@
                     document.getElementById('uploadBtn').textContent = '🔄 Update Result';
                     showToast('✅ Result uploaded successfully!', 'success');
                     loadStudents();
-                    selectStudent(selectedStudentId);
+                    selectStudent(parseInt(studentId));
                 } else {
-                    document.getElementById('errorMsg').textContent = '❌ ' + result.message;
+                    document.getElementById('errorMsg').textContent = '❌ ' + (result.message || 'Upload failed');
                     document.getElementById('errorMsg').classList.add('show');
-                    showToast('❌ ' + result.message, 'error');
+                    showToast('❌ ' + (result.message || 'Upload failed'), 'error');
                 }
             } catch (error) {
                 console.error('Error uploading result:', error);
-                document.getElementById('errorMsg').textContent = '❌ Failed to upload. Please try again.';
+                const errorMsg = error.message || 'Failed to upload. Please try again.';
+                document.getElementById('errorMsg').textContent = '❌ ' + errorMsg;
                 document.getElementById('errorMsg').classList.add('show');
-                showToast('❌ Failed to upload. Please try again.', 'error');
+                showToast('❌ ' + errorMsg, 'error');
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -907,11 +938,13 @@
         // DELETE RESULT
         // ============================================================
         async function deleteResult() {
-            if (!selectedStudentId) return;
+            const studentId = document.getElementById('selectedStudentId').value;
+            if (!studentId) return;
+
             if (!confirm('Are you sure you want to delete the result for this student?')) return;
 
             try {
-                const response = await fetch(`${API_URL}/${selectedStudentId}`, {
+                const response = await fetch(`${API_URL}/${studentId}`, {
                     method: 'DELETE'
                 });
                 const result = await response.json();
@@ -926,8 +959,9 @@
                     selectedFile = null;
                     document.getElementById('uploadBtn').disabled = true;
                     document.getElementById('successMsg').classList.remove('show');
+                    document.getElementById('errorMsg').classList.remove('show');
                     loadStudents();
-                    selectStudent(selectedStudentId);
+                    selectStudent(parseInt(studentId));
                 } else {
                     showToast('❌ ' + result.message, 'error');
                 }
