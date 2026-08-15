@@ -221,10 +221,6 @@
         .btn-danger:hover {
             background: #dc2626;
         }
-        .btn-block {
-            width: 100%;
-            justify-content: center;
-        }
 
         /* ===== FILTERS ===== */
         .filters {
@@ -388,9 +384,6 @@
         .toast.error {
             background: #ef4444;
         }
-        .toast.info {
-            background: #3b82f6;
-        }
 
         /* ===== MODAL ===== */
         .modal-overlay {
@@ -517,7 +510,7 @@
             margin-top: 2px;
         }
 
-        /* ===== PHOTO UPLOAD - Cloudinary ===== */
+        /* ===== PHOTO UPLOAD - Direct Cloudinary ===== */
         .photo-upload {
             border: 2px dashed var(--border);
             border-radius: var(--radius-sm);
@@ -676,10 +669,6 @@
             }
             .page-header h1 {
                 font-size: 18px;
-            }
-            .page-header .header-actions .btn {
-                width: 100%;
-                justify-content: center;
             }
             .filters {
                 flex-direction: column;
@@ -895,7 +884,7 @@
                         </div>
                         <div class="form-group">
                             <label>Student ID <span class="required">*</span></label>
-                            <input type="text" id="studentId" required placeholder="e.g. STU001" />
+                            <input type="text" id="studentId" required placeholder="e.g. S007" />
                             <div class="helper-text">Unique ID for the student</div>
                         </div>
                         <div class="form-group">
@@ -917,7 +906,7 @@
                         </div>
                         <div class="form-group">
                             <label>Aahar Number <span class="required">*</span></label>
-                            <input type="text" id="aaharNumber" required placeholder="e.g. 321345678" />
+                            <input type="text" id="aaharNumber" required placeholder="e.g. 3213456789" />
                         </div>
                         <div class="form-group">
                             <label>Exam Roll No <span class="required">*</span></label>
@@ -963,7 +952,7 @@
                                 <div class="progress-bar">
                                     <div class="progress-fill" id="progressFill"></div>
                                 </div>
-                                <div class="progress-text" id="progressText">Uploading...</div>
+                                <div class="progress-text" id="progressText">Uploading to Cloudinary...</div>
                             </div>
                             <div class="helper-text">Upload JPG, PNG or WebP (Max 2MB) - Uploads to Cloudinary</div>
                             <input type="hidden" id="studentPhoto" value="" />
@@ -985,8 +974,13 @@
 
     <script>
         const API_URL = 'https://gsssshilla.onrender.com/api/result';
-        let selectedPhotoFile = null;
         let isUploading = false;
+
+        // ============================================================
+        // CLOUDINARY CONFIG
+        // ============================================================
+        const CLOUDINARY_UPLOAD_URL = 'https://api.cloudinary.com/v1_1/gsssshill/image/upload';
+        const CLOUDINARY_UPLOAD_PRESET = 'students_upload'; // Create this in Cloudinary Dashboard
 
         // ============================================================
         // TOGGLE MENU (Mobile)
@@ -1084,7 +1078,7 @@
         }
 
         // ============================================================
-        // PHOTO UPLOAD HANDLING - Cloudinary
+        // PHOTO UPLOAD - DIRECT CLOUDINARY (No Backend Required)
         // ============================================================
         async function handlePhotoSelect(event) {
             const file = event.target.files[0];
@@ -1093,6 +1087,7 @@
             // Validate file size
             if (file.size > 2 * 1024 * 1024) {
                 showToast('Photo size must be less than 2MB', 'error');
+                document.getElementById('photoInput').value = '';
                 return;
             }
 
@@ -1100,6 +1095,7 @@
             const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
             if (!validTypes.includes(file.type)) {
                 showToast('Only JPG, PNG or WebP images are allowed', 'error');
+                document.getElementById('photoInput').value = '';
                 return;
             }
 
@@ -1111,55 +1107,91 @@
             };
             reader.readAsDataURL(file);
 
-            // Update UI
+            // Update UI - Uploading
             const fileNameEl = document.getElementById('photoFileName');
             fileNameEl.textContent = '⏳ Uploading to Cloudinary...';
             fileNameEl.className = 'file-name uploading';
 
-            // Show progress
             const progressEl = document.getElementById('uploadProgress');
             progressEl.classList.add('show');
             const fillEl = document.getElementById('progressFill');
             const textEl = document.getElementById('progressText');
 
-            // Upload to Cloudinary via backend
+            // Prepare form data for Cloudinary
             const formData = new FormData();
-            formData.append('photo', file);
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+            formData.append('folder', 'students');
+            
+            // Optional: Add transformation
+            formData.append('transformation', JSON.stringify([
+                { width: 300, height: 300, crop: 'thumb', gravity: 'face' },
+                { quality: 'auto:good' }
+            ]));
 
             try {
                 isUploading = true;
+                textEl.textContent = 'Uploading to Cloudinary... 0%';
 
-                const response = await fetch(`${API_URL}/upload-photo`, {
-                    method: 'POST',
-                    body: formData
-                });
+                // Upload to Cloudinary using XMLHttpRequest for progress tracking
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', CLOUDINARY_UPLOAD_URL, true);
 
-                const result = await response.json();
+                xhr.upload.onprogress = function(e) {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 100);
+                        fillEl.style.width = percent + '%';
+                        textEl.textContent = 'Uploading to Cloudinary... ' + percent + '%';
+                    }
+                };
 
-                if (result.success) {
-                    // Store Cloudinary URL
-                    document.getElementById('studentPhoto').value = result.data.url;
-                    fileNameEl.textContent = '✅ ' + file.name + ' (Cloudinary)';
-                    fileNameEl.className = 'file-name success';
-                    progressEl.classList.remove('show');
-                    showToast('✅ Photo uploaded to Cloudinary successfully!', 'success');
-                } else {
-                    fileNameEl.textContent = '❌ Upload failed: ' + (result.message || 'Unknown error');
+                xhr.onload = function() {
+                    isUploading = false;
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        console.log('✅ Cloudinary Upload Success:', response);
+
+                        // Store Cloudinary URL
+                        const imageUrl = response.secure_url;
+                        document.getElementById('studentPhoto').value = imageUrl;
+                        fileNameEl.textContent = '✅ ' + file.name + ' (Cloudinary)';
+                        fileNameEl.className = 'file-name success';
+                        progressEl.classList.remove('show');
+                        showToast('✅ Photo uploaded to Cloudinary successfully!', 'success');
+                    } else {
+                        const error = JSON.parse(xhr.responseText);
+                        console.error('❌ Cloudinary Upload Error:', error);
+                        fileNameEl.textContent = '❌ Upload failed: ' + (error.error?.message || 'Unknown error');
+                        fileNameEl.className = 'file-name error';
+                        progressEl.classList.remove('show');
+                        showToast('❌ ' + (error.error?.message || 'Upload failed'), 'error');
+                        document.getElementById('photoPreview').classList.remove('show');
+                        document.getElementById('photoInput').value = '';
+                    }
+                };
+
+                xhr.onerror = function() {
+                    isUploading = false;
+                    console.error('❌ Network Error');
+                    fileNameEl.textContent = '❌ Network error - Please try again';
                     fileNameEl.className = 'file-name error';
                     progressEl.classList.remove('show');
-                    showToast('❌ ' + (result.message || 'Upload failed'), 'error');
-                    // Clear file input
+                    showToast('❌ Network error. Please check your connection.', 'error');
+                    document.getElementById('photoPreview').classList.remove('show');
                     document.getElementById('photoInput').value = '';
-                }
+                };
+
+                xhr.send(formData);
+
             } catch (error) {
-                console.error('Upload error:', error);
+                isUploading = false;
+                console.error('❌ Upload error:', error);
                 fileNameEl.textContent = '❌ Upload failed - Please try again';
                 fileNameEl.className = 'file-name error';
                 progressEl.classList.remove('show');
-                showToast('❌ Failed to upload photo to Cloudinary', 'error');
+                showToast('❌ Failed to upload photo. Please try again.', 'error');
+                document.getElementById('photoPreview').classList.remove('show');
                 document.getElementById('photoInput').value = '';
-            } finally {
-                isUploading = false;
             }
         }
 
@@ -1200,7 +1232,7 @@
             document.getElementById('studentPhoto').value = '';
             document.getElementById('uploadProgress').classList.remove('show');
             document.getElementById('photoInput').value = '';
-            selectedPhotoFile = null;
+            isUploading = false;
 
             if (mode === 'edit' && data) {
                 document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Student';
@@ -1248,7 +1280,7 @@
             document.getElementById('studentPhoto').value = '';
             document.getElementById('uploadProgress').classList.remove('show');
             document.getElementById('photoInput').value = '';
-            selectedPhotoFile = null;
+            isUploading = false;
         }
 
         // Close modal on overlay click
@@ -1302,12 +1334,6 @@
             // Check if photo is uploaded (for new student)
             if (!isEdit && (!data.studentPhoto || data.studentPhoto === 'https://via.placeholder.com/100')) {
                 showToast('Please upload a student photo (Cloudinary)', 'error');
-                return;
-            }
-
-            // Check if photo is still uploading or empty for edit
-            if (isEdit && !data.studentPhoto) {
-                showToast('Please upload a student photo', 'error');
                 return;
             }
 
