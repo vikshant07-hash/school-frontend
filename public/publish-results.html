@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Publish Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F3F4F6;
+            color: #1F2937;
+        }
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 260px;
+            background: #1F2937;
+            color: white;
+            padding: 24px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 24px 32px;
+            font-size: 20px;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar .logo i {
+            color: #818CF8;
+            font-size: 28px;
+        }
+        .sidebar .nav {
+            padding: 20px 12px;
+        }
+        .sidebar .nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #9CA3AF;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+        .sidebar .nav a:hover {
+            background: rgba(255,255,255,0.05);
+            color: white;
+        }
+        .sidebar .nav a.active {
+            background: #4F46E5;
+            color: white;
+        }
+        .sidebar .nav a i {
+            width: 20px;
+            text-align: center;
+        }
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 24px 32px;
+        }
+        .main-content header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .main-content header h1 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .main-content header h1 i {
+            color: #4F46E5;
+            margin-right: 12px;
+        }
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+        }
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card h2 i {
+            color: #4F46E5;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-weight: 500;
+            font-size: 14px;
+            color: #4B5563;
+        }
+        .form-group select {
+            padding: 10px 14px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: white;
+            max-width: 300px;
+        }
+        .form-group select:focus {
+            border-color: #4F46E5;
+            box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-success {
+            background: #10B981;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-success:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-danger {
+            background: #EF4444;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #DC2626;
+        }
+        .btn-secondary {
+            background: #E5E7EB;
+            color: #4B5563;
+        }
+        .btn-secondary:hover {
+            background: #D1D5DB;
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+        .publish-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        table thead {
+            background: #F9FAFB;
+        }
+        table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #4B5563;
+            border-bottom: 1px solid #E5E7EB;
+            white-space: nowrap;
+        }
+        table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #F3F4F6;
+            vertical-align: middle;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.pending {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+        .status-badge.uploaded {
+            background: #DBEAFE;
+            color: #2563EB;
+        }
+        .status-badge.published {
+            background: #D1FAE5;
+            color: #059669;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px !important;
+            color: #9CA3AF;
+        }
+        .no-data {
+            text-align: center;
+            padding: 40px !important;
+            color: #9CA3AF;
+        }
+        .summary-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .summary-item {
+            background: #F9FAFB;
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .summary-item .number {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .summary-item .label {
+            font-size: 13px;
+            color: #6B7280;
+        }
+        .summary-item .number.green {
+            color: #059669;
+        }
+        .summary-item .number.blue {
+            color: #2563EB;
+        }
+        .summary-item .number.orange {
+            color: #D97706;
+        }
+        .success-msg {
+            background: #D1FAE5;
+            color: #065F46;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            display: none;
+        }
+        .success-msg.show {
+            display: block;
+        }
+        .error-msg {
+            background: #FEE2E2;
+            color: #991B1B;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            display: none;
+        }
+        .error-msg.show {
+            display: block;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            .main-content {
+                margin-left: 200px;
+                padding: 16px;
+            }
+            .summary-box {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 60px;
+            }
+            .sidebar .logo span,
+            .sidebar .nav a span {
+                display: none;
+            }
+            .sidebar .nav a {
+                justify-content: center;
+                padding: 12px;
+            }
+            .main-content {
+                margin-left: 60px;
+                padding: 12px;
+            }
+            .publish-actions {
+                flex-direction: column;
+            }
+            .btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Result System</span>
+            </div>
+            <nav class="nav">
+                <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+                <a href="students.html"><i class="fas fa-users"></i> <span>Students</span></a>
+                <a href="upload-result.html"><i class="fas fa-upload"></i> <span>Upload Result</span></a>
+                <a href="publish-results.html" class="active"><i class="fas fa-check-double"></i> <span>Publish Results</span></a>
+            </nav>
+        </aside>
+
+        <!-- Main -->
+        <main class="main-content">
+            <header>
+                <h1><i class="fas fa-check-double"></i> Publish Results</h1>
+            </header>
+
+            <!-- Select Class -->
+            <div class="card">
+                <h2><i class="fas fa-filter"></i> Select Class</h2>
+                <div class="form-group">
+                    <label>Choose Class</label>
+                    <select id="classSelect" onchange="loadClassStudents()">
+                        <option value="">-- Select Class --</option>
+                        <option value="6">Class 6</option>
+                        <option value="7">Class 7</option>
+                        <option value="8">Class 8</option>
+                        <option value="9">Class 9</option>
+                        <option value="10">Class 10</option>
+                        <option value="11">Class 11</option>
+                        <option value="12">Class 12</option>
+                    </select>
+                </div>
+
+                <!-- Summary -->
+                <div class="summary-box" id="summaryBox" style="display:none;margin-top:16px;">
+                    <div class="summary-item">
+                        <div class="number blue" id="totalCount">0</div>
+                        <div class="label">Total Students</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="number orange" id="uploadedCount">0</div>
+                        <div class="label">Uploaded (Ready to Publish)</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="number green" id="publishedCount">0</div>
+                        <div class="label">Published</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="number" id="pendingCount" style="color:#D97706;">0</div>
+                        <div class="label">Pending</div>
+                    </div>
+                </div>
+
+                <!-- Publish Actions -->
+                <div class="publish-actions" id="publishActions" style="display:none;">
+                    <button class="btn btn-success" id="publishBtn" onclick="publishResults()">
+                        <i class="fas fa-check-double"></i> Publish All Results
+                    </button>
+                    <button class="btn btn-danger" id="unpublishBtn" onclick="unpublishResults()">
+                        <i class="fas fa-undo"></i> Unpublish All
+                    </button>
+                    <button class="btn btn-secondary" onclick="loadClassStudents()">
+                        <i class="fas fa-sync"></i> Refresh
+                    </button>
+                </div>
+
+                <div id="publishSuccess" class="success-msg"></div>
+                <div id="publishError" class="error-msg"></div>
+            </div>
+
+            <!-- Students Table -->
+            <div class="card">
+                <h2><i class="fas fa-list"></i> Students List</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Student ID</th>
+                                <th>Roll No</th>
+                                <th>Status</th>
+                                <th>Marksheet</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody">
+                            <tr><td colspan="6" class="loading">Select a class to view students</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api/result';
+        let currentClass = '';
+
+        // Load class students
+        async function loadClassStudents() {
+            const classValue = document.getElementById('classSelect').value;
+            currentClass = classValue;
+
+            if (!classValue) {
+                document.getElementById('studentsTableBody').innerHTML =
+                    '<tr><td colspan="6" class="loading">Select a class to view students</td></tr>';
+                document.getElementById('summaryBox').style.display = 'none';
+                document.getElementById('publishActions').style.display = 'none';
+                return;
+            }
+
+            const tbody = document.getElementById('studentsTableBody');
+            tbody.innerHTML = '<tr><td colspan="6" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+
+            document.getElementById('publishSuccess').classList.remove('show');
+            document.getElementById('publishError').classList.remove('show');
+
+            try {
+                const response = await fetch(`${API_URL}/class/${classValue}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const students = result.data || [];
+
+                    let total = students.length;
+                    let uploaded = 0,
+                        published = 0,
+                        pending = 0;
+
+                    students.forEach(s => {
+                        if (s.result_status === 'published') published++;
+                        else if (s.result_status === 'uploaded') uploaded++;
+                        else pending++;
+                    });
+
+                    // Update summary
+                    document.getElementById('totalCount').textContent = total;
+                    document.getElementById('uploadedCount').textContent = uploaded;
+                    document.getElementById('publishedCount').textContent = published;
+                    document.getElementById('pendingCount').textContent = pending;
+                    document.getElementById('summaryBox').style.display = 'grid';
+
+                    // Show publish actions
+                    document.getElementById('publishActions').style.display = 'flex';
+
+                    // Enable/disable publish button
+                    document.getElementById('publishBtn').disabled = (uploaded === 0);
+                    document.getElementById('unpublishBtn').disabled = (published === 0);
+
+                    // Table
+                    if (students.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="no-data">No students in this class</td></tr>';
+                        return;
+                    }
+
+                    tbody.innerHTML = students.map((s, i) => `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td><strong>${s.student_name}</strong></td>
+                            <td>${s.student_id}</td>
+                            <td>${s.exam_roll_no}</td>
+                            <td><span class="status-badge ${s.result_status || 'pending'}">${s.result_status || 'pending'}</span></td>
+                            <td>
+                                ${s.marksheet_url ? 
+                                    `<a href="${s.marksheet_url}" target="_blank" class="btn btn-sm btn-success">
+                                        <i class="fas fa-eye"></i> View
+                                     </a>` : 
+                                    `<span style="color:#9CA3AF;">Not uploaded</span>`
+                                }
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading class students:', error);
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">Error loading data</td></tr>';
+            }
+        }
+
+        // Publish results
+        async function publishResults() {
+            if (!currentClass) {
+                alert('Please select a class first.');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to publish all uploaded results for Class ${currentClass}?`)) return;
+
+            const btn = document.getElementById('publishBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
+            btn.disabled = true;
+
+            document.getElementById('publishSuccess').classList.remove('show');
+            document.getElementById('publishError').classList.remove('show');
+
+            try {
+                const response = await fetch(`${API_URL}/publish`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ class: currentClass })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('publishSuccess').textContent = '✅ ' + result.message;
+                    document.getElementById('publishSuccess').classList.add('show');
+                    loadClassStudents();
+                } else {
+                    document.getElementById('publishError').textContent = '❌ ' + result.message;
+                    document.getElementById('publishError').classList.add('show');
+                }
+            } catch (error) {
+                console.error('Error publishing results:', error);
+                document.getElementById('publishError').textContent = '❌ Failed to publish. Please try again.';
+                document.getElementById('publishError').classList.add('show');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Unpublish results
+        async function unpublishResults() {
+            if (!currentClass) {
+                alert('Please select a class first.');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to unpublish all results for Class ${currentClass}?`)) return;
+
+            const btn = document.getElementById('unpublishBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Unpublishing...';
+            btn.disabled = true;
+
+            document.getElementById('publishSuccess').classList.remove('show');
+            document.getElementById('publishError').classList.remove('show');
+
+            try {
+                const response = await fetch(`${API_URL}/unpublish`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ class: currentClass })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('publishSuccess').textContent = '✅ ' + result.message;
+                    document.getElementById('publishSuccess').classList.add('show');
+                    loadClassStudents();
+                } else {
+                    document.getElementById('publishError').textContent = '❌ ' + result.message;
+                    document.getElementById('publishError').classList.add('show');
+                }
+            } catch (error) {
+                console.error('Error unpublishing results:', error);
+                document.getElementById('publishError').textContent = '❌ Failed to unpublish. Please try again.';
+                document.getElementById('publishError').classList.add('show');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto-load if class is selected
+            const classSelect = document.getElementById('classSelect');
+            if (classSelect.value) {
+                loadClassStudents();
+            }
+        });
+    </script>
+</body>
+</html>
