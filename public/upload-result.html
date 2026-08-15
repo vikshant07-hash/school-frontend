@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Result</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F3F4F6;
+            color: #1F2937;
+        }
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 260px;
+            background: #1F2937;
+            color: white;
+            padding: 24px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 24px 32px;
+            font-size: 20px;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar .logo i {
+            color: #818CF8;
+            font-size: 28px;
+        }
+        .sidebar .nav {
+            padding: 20px 12px;
+        }
+        .sidebar .nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #9CA3AF;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+        .sidebar .nav a:hover {
+            background: rgba(255,255,255,0.05);
+            color: white;
+        }
+        .sidebar .nav a.active {
+            background: #4F46E5;
+            color: white;
+        }
+        .sidebar .nav a i {
+            width: 20px;
+            text-align: center;
+        }
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 24px 32px;
+        }
+        .main-content header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .main-content header h1 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .main-content header h1 i {
+            color: #4F46E5;
+            margin-right: 12px;
+        }
+        .upload-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        @media (max-width: 900px) {
+            .upload-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card h2 i {
+            color: #4F46E5;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            font-weight: 500;
+            font-size: 14px;
+            color: #4B5563;
+        }
+        .form-group select,
+        .form-group input {
+            padding: 10px 14px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        .form-group select:focus,
+        .form-group input:focus {
+            border-color: #4F46E5;
+            box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: #4F46E5;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #4338CA;
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-success {
+            background: #10B981;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-danger {
+            background: #EF4444;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #DC2626;
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+        .file-drop {
+            border: 2px dashed #E5E7EB;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .file-drop:hover {
+            border-color: #4F46E5;
+            background: #F9FAFB;
+        }
+        .file-drop.dragover {
+            border-color: #4F46E5;
+            background: #EEF2FF;
+        }
+        .file-drop i {
+            font-size: 48px;
+            color: #9CA3AF;
+            margin-bottom: 12px;
+        }
+        .file-drop p {
+            color: #6B7280;
+        }
+        .file-drop .file-name {
+            color: #4F46E5;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .student-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #F3F4F6;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .student-item:hover {
+            background: #F9FAFB;
+        }
+        .student-item.selected {
+            background: #EEF2FF;
+            border-left: 3px solid #4F46E5;
+        }
+        .student-item .info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .student-item .info img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #E5E7EB;
+        }
+        .student-item .info .name {
+            font-weight: 600;
+        }
+        .student-item .info .detail {
+            font-size: 13px;
+            color: #6B7280;
+        }
+        .student-item .status-badge {
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .status-badge.pending {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+        .status-badge.uploaded {
+            background: #DBEAFE;
+            color: #2563EB;
+        }
+        .status-badge.published {
+            background: #D1FAE5;
+            color: #059669;
+        }
+        .student-detail-card {
+            background: #F9FAFB;
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+        .student-detail-card .row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .student-detail-card .row .col {
+            flex: 1;
+            min-width: 120px;
+        }
+        .student-detail-card .label {
+            font-size: 12px;
+            color: #6B7280;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .student-detail-card .value {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #9CA3AF;
+        }
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #9CA3AF;
+        }
+        .success-msg {
+            background: #D1FAE5;
+            color: #065F46;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            display: none;
+        }
+        .success-msg.show {
+            display: block;
+        }
+        .error-msg {
+            background: #FEE2E2;
+            color: #991B1B;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            display: none;
+        }
+        .error-msg.show {
+            display: block;
+        }
+        .upload-info {
+            font-size: 13px;
+            color: #6B7280;
+            margin-top: 8px;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            .main-content {
+                margin-left: 200px;
+                padding: 16px;
+            }
+        }
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 60px;
+            }
+            .sidebar .logo span,
+            .sidebar .nav a span {
+                display: none;
+            }
+            .sidebar .nav a {
+                justify-content: center;
+                padding: 12px;
+            }
+            .main-content {
+                margin-left: 60px;
+                padding: 12px;
+            }
+            .student-item {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Result System</span>
+            </div>
+            <nav class="nav">
+                <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+                <a href="students.html"><i class="fas fa-users"></i> <span>Students</span></a>
+                <a href="upload-result.html" class="active"><i class="fas fa-upload"></i> <span>Upload Result</span></a>
+                <a href="publish-results.html"><i class="fas fa-check-double"></i> <span>Publish Results</span></a>
+            </nav>
+        </aside>
+
+        <!-- Main -->
+        <main class="main-content">
+            <header>
+                <h1><i class="fas fa-upload"></i> Upload Result</h1>
+            </header>
+
+            <div class="upload-container">
+                <!-- Left: Student List -->
+                <div class="card">
+                    <h2><i class="fas fa-users"></i> Select Student</h2>
+                    <div class="form-group">
+                        <label>Filter by Class</label>
+                        <select id="classFilter" onchange="loadStudents()">
+                            <option value="">All Classes</option>
+                            <option value="6">Class 6</option>
+                            <option value="7">Class 7</option>
+                            <option value="8">Class 8</option>
+                            <option value="9">Class 9</option>
+                            <option value="10">Class 10</option>
+                            <option value="11">Class 11</option>
+                            <option value="12">Class 12</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="searchInput" placeholder="Search student by name..." oninput="loadStudents()" />
+                    </div>
+                    <div class="student-list" id="studentList">
+                        <p class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</p>
+                    </div>
+                </div>
+
+                <!-- Right: Upload Form -->
+                <div class="card">
+                    <h2><i class="fas fa-file-pdf"></i> Upload Marksheet</h2>
+
+                    <div id="studentDetail" style="display:none;">
+                        <div class="student-detail-card">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="label">Name</div>
+                                    <div class="value" id="detailName">-</div>
+                                </div>
+                                <div class="col">
+                                    <div class="label">Class</div>
+                                    <div class="value" id="detailClass">-</div>
+                                </div>
+                                <div class="col">
+                                    <div class="label">Roll No</div>
+                                    <div class="value" id="detailRollNo">-</div>
+                                </div>
+                                <div class="col">
+                                    <div class="label">Status</div>
+                                    <div class="value"><span id="detailStatus" class="status-badge pending">-</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="uploadForm" onsubmit="uploadResult(event)">
+                        <input type="hidden" id="selectedStudentId" />
+
+                        <div class="form-group">
+                            <label>Select PDF File (Max 10MB)</label>
+                            <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Click or drag & drop to upload PDF</p>
+                                <div class="file-name" id="fileName">No file selected</div>
+                            </div>
+                            <input type="file" id="fileInput" accept=".pdf" style="display:none;" onchange="handleFileSelect(event)" />
+                            <div class="upload-info">Only PDF files are allowed. Max size: 10MB</div>
+                        </div>
+
+                        <div id="successMsg" class="success-msg"></div>
+                        <div id="errorMsg" class="error-msg"></div>
+
+                        <button type="submit" class="btn btn-primary" id="uploadBtn" disabled>
+                            <i class="fas fa-upload"></i> Upload Result
+                        </button>
+                        <button type="button" class="btn btn-danger" id="deleteBtn" style="display:none;margin-left:10px;" onclick="deleteResult()">
+                            <i class="fas fa-trash"></i> Delete Result
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api/result';
+        let selectedStudentId = null;
+        let selectedFile = null;
+
+        // Load students
+        async function loadStudents() {
+            const classFilter = document.getElementById('classFilter').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            const list = document.getElementById('studentList');
+            list.innerHTML = '<p class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</p>';
+
+            try {
+                let url = `${API_URL}/students/class/${classFilter || '6'}`;
+                if (!classFilter) {
+                    url = `${API_URL}/students`;
+                }
+
+                const response = await fetch(url);
+                const result = await response.json();
+
+                if (result.success) {
+                    let students = result.data || [];
+
+                    if (search) {
+                        students = students.filter(s =>
+                            s.student_name.toLowerCase().includes(search)
+                        );
+                    }
+
+                    if (students.length === 0) {
+                        list.innerHTML = '<p class="no-data">No students found</p>';
+                        return;
+                    }
+
+                    list.innerHTML = students.map(s => `
+                        <div class="student-item ${selectedStudentId === s.id ? 'selected' : ''}" 
+                             onclick="selectStudent(${s.id})">
+                            <div class="info">
+                                <img src="${s.student_photo || 'https://via.placeholder.com/36'}" 
+                                     alt="${s.student_name}"
+                                     onerror="this.src='https://via.placeholder.com/36'" />
+                                <div>
+                                    <div class="name">${s.student_name}</div>
+                                    <div class="detail">${s.student_id} • Class ${s.class}</div>
+                                </div>
+                            </div>
+                            <span class="status-badge ${s.result_status || 'pending'}">${s.result_status || 'pending'}</span>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading students:', error);
+                list.innerHTML = '<p class="no-data">Error loading students</p>';
+            }
+        }
+
+        // Select student
+        async function selectStudent(id) {
+            selectedStudentId = id;
+            document.getElementById('selectedStudentId').value = id;
+            document.getElementById('studentDetail').style.display = 'block';
+            document.getElementById('uploadBtn').disabled = true;
+
+            // Highlight selection
+            document.querySelectorAll('.student-item').forEach(el => el.classList.remove('selected'));
+            document.querySelector(`.student-item[onclick="selectStudent(${id})"]`)?.classList.add('selected');
+
+            try {
+                const response = await fetch(`${API_URL}/students/${id}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const s = result.data;
+                    document.getElementById('detailName').textContent = s.student_name;
+                    document.getElementById('detailClass').textContent = s.class;
+                    document.getElementById('detailRollNo').textContent = s.exam_roll_no;
+                    document.getElementById('detailStatus').textContent = s.result_status || 'pending';
+                    document.getElementById('detailStatus').className = `status-badge ${s.result_status || 'pending'}`;
+
+                    // Check if result exists
+                    const statusResponse = await fetch(`${API_URL}/status/${id}`);
+                    const statusResult = await statusResponse.json();
+
+                    if (statusResult.success && statusResult.data.marksheet_url) {
+                        document.getElementById('uploadBtn').textContent = 'Update Result';
+                        document.getElementById('deleteBtn').style.display = 'inline-flex';
+                        document.getElementById('fileName').textContent = '✅ Existing PDF uploaded';
+                        document.getElementById('fileDrop').style.borderColor = '#10B981';
+                    } else {
+                        document.getElementById('uploadBtn').textContent = 'Upload Result';
+                        document.getElementById('deleteBtn').style.display = 'none';
+                        document.getElementById('fileName').textContent = 'No file selected';
+                        document.getElementById('fileDrop').style.borderColor = '#E5E7EB';
+                    }
+
+                    document.getElementById('uploadBtn').disabled = !selectedFile;
+                }
+            } catch (error) {
+                console.error('Error fetching student details:', error);
+            }
+        }
+
+        // Handle file select
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.type !== 'application/pdf') {
+                    alert('Only PDF files are allowed!');
+                    return;
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('File size must be less than 10MB!');
+                    return;
+                }
+                selectedFile = file;
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('fileDrop').style.borderColor = '#10B981';
+                document.getElementById('uploadBtn').disabled = !selectedStudentId;
+            }
+        }
+
+        // Drag and drop
+        const fileDrop = document.getElementById('fileDrop');
+        fileDrop.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileDrop.classList.add('dragover');
+        });
+        fileDrop.addEventListener('dragleave', () => {
+            fileDrop.classList.remove('dragover');
+        });
+        fileDrop.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileDrop.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                if (file.type !== 'application/pdf') {
+                    alert('Only PDF files are allowed!');
+                    return;
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('File size must be less than 10MB!');
+                    return;
+                }
+                selectedFile = file;
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('fileDrop').style.borderColor = '#10B981';
+                document.getElementById('uploadBtn').disabled = !selectedStudentId;
+                document.getElementById('fileInput').files = e.dataTransfer.files;
+            }
+        });
+
+        // Upload result
+        async function uploadResult(e) {
+            e.preventDefault();
+
+            if (!selectedStudentId) {
+                alert('Please select a student first.');
+                return;
+            }
+
+            if (!selectedFile) {
+                alert('Please select a PDF file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('studentId', selectedStudentId);
+            formData.append('marksheet', selectedFile);
+
+            const btn = document.getElementById('uploadBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            btn.disabled = true;
+
+            document.getElementById('successMsg').classList.remove('show');
+            document.getElementById('errorMsg').classList.remove('show');
+
+            try {
+                const response = await fetch(`${API_URL}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('successMsg').textContent = '✅ ' + result.message;
+                    document.getElementById('successMsg').classList.add('show');
+                    document.getElementById('deleteBtn').style.display = 'inline-flex';
+                    document.getElementById('uploadBtn').textContent = 'Update Result';
+                    loadStudents();
+                    selectStudent(selectedStudentId);
+                } else {
+                    document.getElementById('errorMsg').textContent = '❌ ' + result.message;
+                    document.getElementById('errorMsg').classList.add('show');
+                }
+            } catch (error) {
+                console.error('Error uploading result:', error);
+                document.getElementById('errorMsg').textContent = '❌ Failed to upload. Please try again.';
+                document.getElementById('errorMsg').classList.add('show');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Delete result
+        async function deleteResult() {
+            if (!selectedStudentId) return;
+            if (!confirm('Are you sure you want to delete the result for this student?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/${selectedStudentId}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ Result deleted successfully!');
+                    document.getElementById('deleteBtn').style.display = 'none';
+                    document.getElementById('uploadBtn').textContent = 'Upload Result';
+                    document.getElementById('fileName').textContent = 'No file selected';
+                    document.getElementById('fileDrop').style.borderColor = '#E5E7EB';
+                    document.getElementById('fileInput').value = '';
+                    selectedFile = null;
+                    document.getElementById('uploadBtn').disabled = true;
+                    loadStudents();
+                    selectStudent(selectedStudentId);
+                } else {
+                    alert('❌ Error: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error deleting result:', error);
+                alert('❌ Failed to delete result.');
+            }
+        }
+
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check URL for student ID
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (id) {
+                document.getElementById('classFilter').value = '';
+                loadStudents();
+                setTimeout(() => selectStudent(parseInt(id)), 500);
+            } else {
+                loadStudents();
+            }
+        });
+    </script>
+</body>
+</html>
