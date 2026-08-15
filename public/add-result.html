@@ -412,30 +412,9 @@
     returned by the backend and attaches it to every
     request. Swap the endpoint for your real auth route.
     ============================================ -->
-    <div class="login-screen" id="loginScreen">
-        <div class="login-box">
-            <div class="logo">📚</div>
-            <h2>Result Admin Login</h2>
-            <p>Sign in to manage students & results</p>
-            <form id="loginForm">
-                <div class="form-group">
-                    <label>Username <span class="required">*</span></label>
-                    <input type="text" id="loginUser" autocomplete="username" required />
-                </div>
-                <div class="form-group">
-                    <label>Password <span class="required">*</span></label>
-                    <input type="password" id="loginPass" autocomplete="current-password" required />
-                </div>
-                <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
-                    <i class="fas fa-right-to-bracket"></i> Sign In
-                </button>
-                <div class="login-error" id="loginError"></div>
-            </form>
-        </div>
-    </div>
+    
 
-    <div class="app-shell hidden" id="appShell">
-
+    
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
@@ -909,12 +888,7 @@
         // ============================================
         // CONFIGURATION
         // ============================================
-        const API_BASE = 'https://gsssshilla.onrender.com/api/result';
-        const AUTH_TOKEN_KEY = 'resultAdminToken';
-        const AUTH_USER_KEY = 'resultAdminUser';
-        const MAX_FILE_MB = 10;
-        const PAGE_SIZE = 24;
-
+        
         // ============================================
         // STATE
         // ============================================
@@ -999,74 +973,6 @@
         // backend doesn't have that route yet, add one —
         // never ship student PII behind a UI-only "login".
         // ============================================
-        function getToken() { return sessionStorage.getItem(AUTH_TOKEN_KEY); }
-
-        function authHeaders() {
-            const token = getToken();
-            return token ? { 'Authorization': 'Bearer ' + token } : {};
-        }
-
-        function showApp() {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('appShell').classList.remove('hidden');
-            const user = sessionStorage.getItem(AUTH_USER_KEY);
-            document.getElementById('loggedInAs').textContent = user ? ('Signed in as ' + user) : '';
-            initApp();
-        }
-
-        function showLogin() {
-            document.getElementById('appShell').classList.add('hidden');
-            document.getElementById('loginScreen').classList.remove('hidden');
-        }
-
-        document.getElementById('loginForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
-            const username = document.getElementById('loginUser').value.trim();
-            const password = document.getElementById('loginPass').value;
-            const errorEl = document.getElementById('loginError');
-            const btn = document.getElementById('loginBtn');
-            errorEl.textContent = '';
-
-            if (!username || !password) {
-                errorEl.textContent = 'Enter username and password.';
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
-            try {
-                const res = await fetch(API_BASE + '/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                const data = await res.json().catch(() => ({}));
-                if (res.ok && data.success && data.token) {
-                    sessionStorage.setItem(AUTH_TOKEN_KEY, data.token);
-                    sessionStorage.setItem(AUTH_USER_KEY, username);
-                    document.getElementById('loginPass').value = '';
-                    showApp();
-                } else {
-                    errorEl.textContent = data.message || 'Invalid username or password.';
-                }
-            } catch (err) {
-                errorEl.textContent = 'Could not reach the server. Check your connection.';
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-right-to-bracket"></i> Sign In';
-            }
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', function () {
-            askConfirm('Log out of the admin panel?', {
-                danger: false,
-                onConfirm: () => {
-                    sessionStorage.removeItem(AUTH_TOKEN_KEY);
-                    sessionStorage.removeItem(AUTH_USER_KEY);
-                    showLogin();
-                }
-            });
-        });
 
         // ============================================
         // API CALL — attaches auth header, handles 401
@@ -1074,84 +980,7 @@
         // the response body is JSON (a 502/HTML error
         // page from the host used to crash this app).
         // ============================================
-        async function apiCall(endpoint, options = {}) {
-            try {
-                const response = await fetch(API_BASE + endpoint, {
-                    ...options,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...authHeaders(),
-                        ...(options.headers || {})
-                    }
-                });
-
-                if (response.status === 401) {
-                    showToast('Session expired — please sign in again', 'error');
-                    sessionStorage.removeItem(AUTH_TOKEN_KEY);
-                    sessionStorage.removeItem(AUTH_USER_KEY);
-                    showLogin();
-                    return { success: false, message: 'Unauthorized' };
-                }
-
-                let data;
-                try {
-                    data = await response.json();
-                } catch {
-                    return { success: false, message: `Unexpected server response (HTTP ${response.status})` };
-                }
-                return data;
-            } catch (error) {
-                console.error('API Error:', error);
-                showToast('Network error: ' + error.message, 'error');
-                return { success: false, message: error.message };
-            }
-        }
-
-        // ============================================
-        // CLASS BUTTON GENERATION (was 8x ~14-line
-        // hand-duplicated blocks in the original markup;
-        // one source of truth now, fewer places to break)
-        // ============================================
-        const CLASSES = ['1','2','3','4','5','6','7','8','9','10','11','12'];
-
-        function populateClassSelect(selectEl) {
-            selectEl.innerHTML = '<option value="">Select Class</option>' +
-                CLASSES.map(c => `<option value="${c}">${c}</option>`).join('');
-        }
-
-        function buildClassButtons(containerId, idPrefix, onClick) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            const btns = ['all', ...CLASSES].map(c => `
-                <button class="class-btn ${c === 'all' ? 'active' : ''}" data-class="${c}">
-                    ${c === 'all' ? 'All' : c} <span class="count" id="${idPrefix}${c === 'all' ? 'All' : 'C' + c}Count">0</span>
-                </button>
-            `).join('');
-            container.innerHTML = btns;
-            container.querySelectorAll('.class-btn').forEach(btn => {
-                btn.addEventListener('click', () => onClick(btn.dataset.class));
-            });
-        }
-
-        function setActiveClassBtn(containerId, cls) {
-            document.querySelectorAll(`#${containerId} .class-btn`).forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.class === cls);
-            });
-        }
-
-        function applyClassCounts(items, prefix) {
-            const counts = {};
-            items.forEach(it => {
-                const key = String(it.class || 'unknown');
-                counts[key] = (counts[key] || 0) + 1;
-            });
-            CLASSES.forEach(c => {
-                const el = document.getElementById(`${prefix}C${c}Count`);
-                if (el) el.textContent = counts[c] || 0;
-            });
-            const allEl = document.getElementById(`${prefix}AllCount`);
-            if (allEl) allEl.textContent = items.length;
-        }
+        
 
         // ============================================
         // SIDEBAR NAVIGATION
