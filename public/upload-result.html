@@ -440,23 +440,6 @@
             background: #ef4444;
         }
 
-        /* Debug info */
-        .debug-info {
-            background: #1a2332;
-            color: #a5f3fc;
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            font-family: monospace;
-            font-size: 12px;
-            margin-top: 10px;
-            display: none;
-            overflow-x: auto;
-            max-height: 100px;
-        }
-        .debug-info.show {
-            display: block;
-        }
-
         @media (max-width: 768px) {
             .navbar {
                 padding: 0 12px;
@@ -658,9 +641,6 @@
                         </button>
                     </div>
                 </form>
-
-                <!-- Debug Info -->
-                <div class="debug-info" id="debugInfo"></div>
             </div>
         </div>
     </div>
@@ -695,16 +675,6 @@
             toast.className = 'toast ' + type;
             setTimeout(() => toast.classList.add('show'), 10);
             setTimeout(() => toast.classList.remove('show'), 4000);
-        }
-
-        // ============================================================
-        // DEBUG
-        // ============================================================
-        function showDebug(message) {
-            const el = document.getElementById('debugInfo');
-            el.textContent = '🔍 ' + message;
-            el.classList.add('show');
-            console.log('🔍', message);
         }
 
         // ============================================================
@@ -763,7 +733,7 @@
         // SELECT STUDENT - Complete Details Show
         // ============================================================
         async function selectStudent(id) {
-            showDebug('Selecting student ID: ' + id);
+            console.log('🔍 Selecting student ID:', id);
 
             selectedStudentId = id;
             document.getElementById('selectedStudentId').value = id;
@@ -800,7 +770,7 @@
                         this.src = 'https://via.placeholder.com/50';
                     };
 
-                    showDebug('Student loaded: ' + s.student_name + ' (ID: ' + s.id + ')');
+                    console.log('✅ Student loaded:', s.student_name, 'ID:', s.id);
 
                     // Check if result already exists
                     const statusResponse = await fetch(`${API_URL}/status/${id}`);
@@ -850,7 +820,7 @@
             document.getElementById('uploadBtn').disabled = !selectedStudentId;
             document.getElementById('errorMsg').classList.remove('show');
 
-            showDebug('File selected: ' + file.name + ' (' + (file.size / 1024).toFixed(1) + 'KB)');
+            console.log('📄 File selected:', file.name, file.size);
         }
 
         // Drag and Drop
@@ -881,7 +851,7 @@
                 document.getElementById('uploadBtn').disabled = !selectedStudentId;
                 document.getElementById('fileInput').files = e.dataTransfer.files;
                 document.getElementById('errorMsg').classList.remove('show');
-                showDebug('File dropped: ' + file.name);
+                console.log('📄 File dropped:', file.name);
             }
         });
 
@@ -894,13 +864,12 @@
             // 🔥 FIX: Get student ID from hidden field
             const studentId = document.getElementById('selectedStudentId').value;
 
-            showDebug('Uploading result for student ID: ' + studentId);
+            console.log('📤 Uploading result for student ID:', studentId);
 
             if (!studentId || studentId === '') {
                 showToast('Please select a student first.', 'error');
                 document.getElementById('errorMsg').textContent = '❌ Please select a student first.';
                 document.getElementById('errorMsg').classList.add('show');
-                showDebug('ERROR: No student ID selected');
                 return;
             }
 
@@ -908,17 +877,16 @@
                 showToast('Please select a PDF file.', 'error');
                 document.getElementById('errorMsg').textContent = '❌ Please select a PDF file.';
                 document.getElementById('errorMsg').classList.add('show');
-                showDebug('ERROR: No file selected');
                 return;
             }
 
-            // Create FormData
             const formData = new FormData();
             formData.append('studentId', studentId);
             formData.append('marksheet', selectedFile);
 
-            // Debug: Log FormData contents
-            showDebug('Sending studentId: ' + studentId + ', file: ' + selectedFile.name);
+            // 🔥 DEBUG: Log FormData contents
+            console.log('📤 FormData - studentId:', studentId);
+            console.log('📤 FormData - file:', selectedFile.name);
 
             const btn = document.getElementById('uploadBtn');
             const originalText = btn.innerHTML;
@@ -935,7 +903,7 @@
                 });
 
                 const result = await response.json();
-                showDebug('Response: ' + JSON.stringify(result));
+                console.log('📤 Response:', result);
 
                 if (result.success) {
                     document.getElementById('successMsg').textContent = '✅ ' + result.message;
@@ -949,15 +917,14 @@
                     document.getElementById('errorMsg').textContent = '❌ ' + (result.message || 'Upload failed');
                     document.getElementById('errorMsg').classList.add('show');
                     showToast('❌ ' + (result.message || 'Upload failed'), 'error');
-                    showDebug('ERROR: ' + (result.message || 'Upload failed'));
+                    console.error('❌ Upload error:', result.message);
                 }
             } catch (error) {
-                console.error('Error uploading result:', error);
+                console.error('❌ Error uploading result:', error);
                 const errorMsg = error.message || 'Failed to upload. Please try again.';
                 document.getElementById('errorMsg').textContent = '❌ ' + errorMsg;
                 document.getElementById('errorMsg').classList.add('show');
                 showToast('❌ ' + errorMsg, 'error');
-                showDebug('ERROR: ' + errorMsg);
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -1005,14 +972,14 @@
         // INIT
         // ============================================================
         document.addEventListener('DOMContentLoaded', () => {
-            showDebug('Page loaded. API URL: ' + API_URL);
+            console.log('🚀 Page loaded. API URL:', API_URL);
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
             if (id) {
                 document.getElementById('classFilter').value = '';
                 loadStudents();
                 setTimeout(() => selectStudent(parseInt(id)), 800);
-                showDebug('Auto-selecting student ID: ' + id);
+                console.log('🔍 Auto-selecting student ID:', id);
             } else {
                 loadStudents();
             }
