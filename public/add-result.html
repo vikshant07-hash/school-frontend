@@ -3,200 +3,1132 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Result Admin Panel</title>
+    <title>School Result Management System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <style>
-        /* --- SIMPLE STYLES --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f0f4f8; color: #1a2332; display: flex; min-height: 100vh; }
-        
-        /* Sidebar */
-        .sidebar { width: 260px; background: #0a1628; color: white; height: 100vh; position: fixed; overflow-y: auto; padding: 20px 0; z-index: 1000; }
-        .sidebar-brand { padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; }
-        .sidebar-brand h2 { font-size: 1.2rem; font-weight: 700; }
-        .sidebar-brand h2 span { color: #d4a843; }
-        .sidebar-brand p { font-size: 0.7rem; opacity: 0.4; }
-        .sidebar-menu { padding: 0 12px; }
-        .sidebar-menu .menu-label { font-size: 0.6rem; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 12px 12px 6px; font-weight: 700; letter-spacing: 1px; }
-        .sidebar-menu .menu-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; color: rgba(255,255,255,0.6); cursor: pointer; transition: all 0.3s; font-size: 0.85rem; margin-bottom: 2px; }
-        .sidebar-menu .menu-item:hover { background: rgba(255,255,255,0.06); color: white; }
-        .sidebar-menu .menu-item.active { background: rgba(212,168,67,0.15); color: #d4a843; }
-        .sidebar-menu .menu-item .icon { width: 20px; text-align: center; }
-        .sidebar-menu .menu-item .badge { margin-left: auto; background: rgba(255,255,255,0.08); padding: 1px 10px; border-radius: 20px; font-size: 0.6rem; font-weight: 600; }
-        .sidebar-menu .menu-item .badge.danger { background: #ef4444; color: white; }
-        .sidebar-menu .menu-item .badge.success { background: #22c55e; color: white; }
-        .sidebar-menu .menu-item .badge.warning { background: #f59e0b; color: white; }
-        .sidebar-footer { padding: 12px 20px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.6rem; color: rgba(255,255,255,0.15); text-align: center; }
+        /* ============================================
+           ROOT VARIABLES
+           ============================================ */
+        :root {
+            --primary: #1a3a6b;
+            --primary-dark: #0f2747;
+            --primary-light: #2a5a9b;
+            --secondary: #d4a843;
+            --secondary-light: #e8c96a;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --sidebar-width: 280px;
+            --radius: 12px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-        /* Main */
-        .main-content { margin-left: 260px; flex: 1; padding: 20px 28px 30px; min-height: 100vh; }
-        .topbar { background: white; padding: 12px 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); flex-wrap: wrap; gap: 10px; }
-        .topbar-left { display: flex; align-items: center; gap: 12px; }
-        .topbar-left .hamburger { display: none; background: none; border: none; font-size: 1.2rem; cursor: pointer; }
-        .topbar-left h2 { font-size: 1rem; font-weight: 700; }
-        .topbar-left h2 span { color: #d4a843; }
-        .topbar-right .status { font-size: 0.7rem; color: #94a3b8; display: flex; align-items: center; gap: 6px; }
-        .topbar-right .status .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-        .topbar-right .status .dot.online { background: #22c55e; }
-        .topbar-right .status .dot.offline { background: #ef4444; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        .page { display: none; animation: fadeIn 0.3s ease; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-        .card { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; margin-bottom: 16px; }
-        .card-title { font-size: 0.95rem; font-weight: 700; color: #1a3a6b; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--gray-100);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-400);
+        }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 20px; }
-        .stat-card { background: white; padding: 16px 18px; border-radius: 12px; border: 1px solid #e2e8f0; text-align: center; }
-        .stat-card .stat-number { font-size: 1.6rem; font-weight: 800; color: #1a3a6b; }
-        .stat-card .stat-label { font-size: 0.7rem; color: #94a3b8; }
+        /* ============================================
+           SIDEBAR
+           ============================================ */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--gray-900);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
 
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-weight: 600; color: #475569; margin-bottom: 3px; font-size: 0.8rem; }
-        .form-group label .required { color: #ef4444; }
-        .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.85rem; font-family: inherit; }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: #1a3a6b; }
-        .form-group input[type="file"] { padding: 6px; border: 2px dashed #e2e8f0; background: #f8fafc; cursor: pointer; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .sidebar-brand {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
 
-        .btn { padding: 8px 16px; border: none; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px; font-family: inherit; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .btn-primary { background: #1a3a6b; color: white; }
-        .btn-success { background: #22c55e; color: white; }
-        .btn-danger { background: #ef4444; color: white; }
-        .btn-warning { background: #f59e0b; color: white; }
-        .btn-outline { background: transparent; border: 2px solid #e2e8f0; color: #64748b; }
-        .btn-sm { padding: 4px 10px; font-size: 0.65rem; }
-        .btn-xs { padding: 2px 8px; font-size: 0.55rem; border-radius: 6px; }
+        .sidebar-brand .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--secondary);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--gray-900);
+        }
 
-        .badge { padding: 2px 10px; border-radius: 20px; font-size: 0.6rem; font-weight: 600; }
-        .badge-success { background: #dcfce7; color: #16a34a; }
-        .badge-warning { background: #fef3c7; color: #d97706; }
-        .badge-danger { background: #fee2e2; color: #dc2626; }
-        .badge-info { background: #dbeafe; color: #3b82f6; }
+        .sidebar-brand .brand-text {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        .sidebar-brand .brand-text span {
+            color: var(--secondary);
+        }
+        .sidebar-brand .brand-sub {
+            font-size: 0.6rem;
+            opacity: 0.4;
+            font-weight: 400;
+            display: block;
+        }
 
-        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 6px; }
-        .toast { padding: 10px 18px; border-radius: 8px; color: white; font-weight: 600; font-size: 0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 8px; min-width: 200px; }
-        .toast-success { background: #22c55e; }
-        .toast-error { background: #ef4444; }
-        .toast-warning { background: #f59e0b; }
-        .toast-info { background: #1a3a6b; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+        .sidebar-menu {
+            padding: 12px 12px;
+            flex: 1;
+            overflow-y: auto;
+        }
 
-        .loading-spinner { display: inline-block; width: 18px; height: 18px; border: 3px solid #e2e8f0; border-top: 3px solid #1a3a6b; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .sidebar-menu .menu-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.2);
+            padding: 12px 12px 6px;
+            font-weight: 700;
+        }
 
-        .no-data { text-align: center; padding: 30px; color: #94a3b8; }
-        .no-data .icon { font-size: 2rem; margin-bottom: 6px; }
-        .no-data h4 { color: #64748b; font-size: 0.95rem; }
-        .no-data p { font-size: 0.8rem; }
+        .sidebar-menu .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 2px;
+            position: relative;
+            font-size: 0.85rem;
+        }
 
-        .student-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
-        .student-card { padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; transition: all 0.3s; background: white; }
-        .student-card:hover { border-color: #1a3a6b; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-        .student-card .s-name { font-weight: 600; font-size: 0.85rem; }
-        .student-card .s-id { font-size: 0.7rem; color: #94a3b8; }
-        .student-card .s-status { font-size: 0.6rem; margin-top: 4px; display: inline-block; padding: 1px 8px; border-radius: 20px; font-weight: 600; }
-        .student-card .s-status.no-result { background: #fee2e2; color: #dc2626; }
-        .student-card .s-status.uploaded { background: #dbeafe; color: #3b82f6; }
-        .student-card .s-status.published { background: #dcfce7; color: #16a34a; }
+        .sidebar-menu .menu-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+        }
 
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        table thead { background: #f8fafc; }
-        table th { padding: 8px 12px; text-align: left; font-weight: 600; color: #64748b; border-bottom: 2px solid #e2e8f0; }
-        table td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; }
-        table tr:hover { background: #f8fafc; }
+        .sidebar-menu .menu-item.active {
+            background: rgba(212, 168, 67, 0.15);
+            color: var(--secondary);
+        }
 
-        .class-buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-        .class-btn { padding: 4px 14px; border: 2px solid #e2e8f0; border-radius: 8px; background: white; cursor: pointer; font-weight: 600; font-size: 0.75rem; transition: all 0.3s; color: #64748b; font-family: inherit; }
-        .class-btn:hover { border-color: #1a3a6b; color: #1a3a6b; }
-        .class-btn.active { background: #1a3a6b; color: white; border-color: #1a3a6b; }
-        .class-btn .count { background: rgba(0,0,0,0.08); padding: 0 8px; border-radius: 12px; font-size: 0.6rem; margin-left: 4px; }
-        .class-btn.active .count { background: rgba(255,255,255,0.2); }
+        .sidebar-menu .menu-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 6px;
+            bottom: 6px;
+            width: 3px;
+            background: var(--secondary);
+            border-radius: 0 4px 4px 0;
+        }
 
-        .file-preview { margin-top: 4px; padding: 6px 12px; background: #f8fafc; border-radius: 6px; font-size: 0.75rem; color: #64748b; display: none; }
-        .file-preview.show { display: block; }
+        .sidebar-menu .menu-item .icon {
+            width: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
 
-        .verify-info { background: #f0f7ff; border: 1px solid #b3d4fc; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; display: none; }
-        .verify-info.show { display: block; }
-        .verify-info .verify-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px 20px; }
-        .verify-info .verify-grid .item { padding: 3px 0; font-size: 0.8rem; }
-        .verify-info .verify-grid .item strong { color: #64748b; }
-        .verify-info .verify-grid .item .value { font-weight: 600; color: #1a3a6b; }
+        .sidebar-menu .menu-item .badge {
+            margin-left: auto;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 1px 10px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 600;
+        }
+
+        .sidebar-menu .menu-item .badge.danger {
+            background: var(--danger);
+            color: white;
+        }
+        .sidebar-menu .menu-item .badge.success {
+            background: var(--success);
+            color: white;
+        }
+        .sidebar-menu .menu-item .badge.warning {
+            background: var(--warning);
+            color: white;
+        }
+        .sidebar-menu .menu-item .badge.info {
+            background: var(--info);
+            color: white;
+        }
+
+        .sidebar-footer {
+            padding: 12px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.15);
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        /* ============================================
+           MAIN CONTENT
+           ============================================ */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            min-height: 100vh;
+            padding: 16px 24px 30px;
+        }
+
+        /* Topbar */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topbar-left .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--gray-700);
+            cursor: pointer;
+        }
+
+        .topbar-left h2 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+        .topbar-left h2 span {
+            color: var(--secondary);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .topbar-right .status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            color: var(--gray-500);
+        }
+        .topbar-right .status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .topbar-right .status .dot.online {
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+        .topbar-right .status .dot.offline {
+            background: var(--danger);
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        /* ============================================
+           BUTTONS
+           ============================================ */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover {
+            background: #16a34a;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--gray-200);
+            color: var(--gray-600);
+        }
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--gray-50);
+        }
+
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 0.65rem;
+        }
+        .btn-xs {
+            padding: 2px 8px;
+            font-size: 0.55rem;
+            border-radius: 6px;
+        }
+
+        /* ============================================
+           PAGES
+           ============================================ */
+        .page {
+            display: none;
+            animation: fadeSlide 0.3s ease;
+        }
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================================
+           CARDS
+           ============================================ */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            margin-bottom: 16px;
+        }
+
+        .card .card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card .card-title .count {
+            background: var(--gray-100);
+            padding: 0 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            color: var(--gray-600);
+            font-weight: 600;
+        }
+
+        /* ============================================
+           DASHBOARD STATS
+           ============================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 16px 18px;
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card .stat-number {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+        .stat-card .stat-label {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+        .stat-card .stat-icon {
+            font-size: 1.2rem;
+            margin-bottom: 2px;
+        }
+
+        /* ============================================
+           CLASS BUTTONS
+           ============================================ */
+        .class-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .class-btn {
+            padding: 4px 14px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: var(--transition);
+            color: var(--gray-600);
+            font-family: inherit;
+        }
+
+        .class-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .class-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .class-btn .count {
+            background: rgba(0, 0, 0, 0.08);
+            padding: 0 8px;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            margin-left: 4px;
+        }
+
+        .class-btn.active .count {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ============================================
+           FORMS
+           ============================================ */
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 3px;
+            font-size: 0.8rem;
+        }
+        .form-group label .required {
+            color: var(--danger);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            font-family: inherit;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 58, 107, 0.08);
+        }
+
+        .form-group input[type="file"] {
+            padding: 6px;
+            border: 2px dashed var(--gray-300);
+            background: var(--gray-50);
+            cursor: pointer;
+        }
+        .form-group input[type="file"]:hover {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .file-preview {
+            margin-top: 4px;
+            padding: 6px 12px;
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            display: none;
+        }
+        .file-preview.show {
+            display: block;
+        }
+
+        /* ============================================
+           VERIFY INFO
+           ============================================ */
+        .verify-info {
+            background: #f0f7ff;
+            border: 1px solid #b3d4fc;
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            display: none;
+        }
+        .verify-info.show {
+            display: block;
+        }
+
+        .verify-info .verify-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 4px 20px;
+        }
+
+        .verify-info .verify-grid .item {
+            padding: 3px 0;
+            font-size: 0.8rem;
+        }
+        .verify-info .verify-grid .item strong {
+            color: var(--gray-600);
+        }
+        .verify-info .verify-grid .item .value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* ============================================
+           TABLE
+           ============================================ */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        table thead {
+            background: var(--gray-50);
+        }
+
+        table th {
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-600);
+            border-bottom: 2px solid var(--gray-200);
+            white-space: nowrap;
+        }
+
+        table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        table tr:hover {
+            background: var(--gray-50);
+        }
+
+        /* ============================================
+           BADGES
+           ============================================ */
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .badge-warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .badge-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .badge-info {
+            background: #dbeafe;
+            color: #3b82f6;
+        }
+
+        .status-no-result {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .status-uploaded {
+            background: #dbeafe;
+            color: #3b82f6;
+        }
+        .status-published {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        /* ============================================
+           STUDENT GRID
+           ============================================ */
+        .student-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 10px;
+        }
+
+        .student-card {
+            padding: 10px 14px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            transition: var(--transition);
+            background: white;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .student-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .student-card .s-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--gray-800);
+        }
+        .student-card .s-id {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+        }
+        .student-card .s-status {
+            font-size: 0.6rem;
+            margin-top: 4px;
+            display: inline-block;
+            padding: 1px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .student-card .s-status.no-result {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .student-card .s-status.uploaded {
+            background: #dbeafe;
+            color: #3b82f6;
+        }
+        .student-card .s-status.published {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .student-card .s-actions {
+            margin-top: 6px;
+            display: flex;
+            gap: 4px;
+        }
+
+        /* ============================================
+           MODAL
+           ============================================ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: var(--radius);
+            max-width: 560px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px 28px;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        .modal .modal-header h3 {
+            font-size: 1rem;
+            color: var(--primary);
+        }
+
+        .modal .modal-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--gray-400);
+            transition: var(--transition);
+        }
+        .modal .modal-header .close-btn:hover {
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        .modal .detail-row {
+            display: flex;
+            padding: 5px 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .modal .detail-row .label {
+            width: 110px;
+            font-weight: 600;
+            color: var(--gray-600);
+            font-size: 0.75rem;
+        }
+
+        .modal .detail-row .value {
+            flex: 1;
+            font-weight: 500;
+            color: var(--gray-800);
+            font-size: 0.85rem;
+        }
+
+        .modal .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 2px solid var(--gray-100);
+            flex-wrap: wrap;
+        }
+
+        /* ============================================
+           NO DATA
+           ============================================ */
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: var(--gray-400);
+        }
+        .no-data .icon {
+            font-size: 2rem;
+            margin-bottom: 6px;
+        }
+        .no-data h4 {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+        }
+        .no-data p {
+            font-size: 0.8rem;
+        }
+
+        /* ============================================
+           TOAST
+           ============================================ */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .toast {
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 200px;
+        }
+
+        .toast-success {
+            background: var(--success);
+        }
+        .toast-error {
+            background: var(--danger);
+        }
+        .toast-warning {
+            background: var(--warning);
+        }
+        .toast-info {
+            background: var(--primary);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ============================================
+           LOADING
+           ============================================ */
+        .loading-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid var(--gray-200);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 1024px) {
+            .verify-info .verify-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
 
         @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.open { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 12px 14px; }
-            .topbar-left .hamburger { display: block; }
-            .form-row { grid-template-columns: 1fr; }
-            .stats-grid { grid-template-columns: 1fr 1fr; }
-            .verify-info .verify-grid { grid-template-columns: 1fr; }
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 10px 12px;
+            }
+
+            .topbar-left .hamburger {
+                display: block;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .student-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .verify-info .verify-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .toast {
+                min-width: auto;
+                width: 100%;
+            }
+            .toast-container {
+                left: 12px;
+                right: 12px;
+                bottom: 12px;
+            }
+
+            .modal {
+                padding: 18px 16px;
+                margin: 10px;
+            }
+            .modal .detail-row {
+                flex-direction: column;
+                padding: 8px 0;
+            }
+            .modal .detail-row .label {
+                width: 100%;
+                margin-bottom: 2px;
+            }
         }
+
         @media (max-width: 480px) {
-            .stats-grid { grid-template-columns: 1fr; }
-            .student-grid { grid-template-columns: 1fr; }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .student-grid {
+                grid-template-columns: 1fr;
+            }
+            .topbar {
+                padding: 8px 12px;
+            }
+            .topbar-left h2 {
+                font-size: 0.85rem;
+            }
+            .class-buttons {
+                gap: 4px;
+            }
+            .class-btn {
+                padding: 3px 10px;
+                font-size: 0.65rem;
+            }
         }
     </style>
 </head>
+
 <body>
 
-    <!-- ======= SIDEBAR ======= -->
+    <!-- ============================================
+    SIDEBAR
+    ============================================ -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <h2>📚 Result <span>Admin</span></h2>
-            <p>School Management System</p>
+            <div class="logo">📚</div>
+            <div>
+                <div class="brand-text">Result <span>Admin</span></div>
+                <span class="brand-sub">School Management System</span>
+            </div>
         </div>
+
         <nav class="sidebar-menu">
             <div class="menu-label">Dashboard</div>
             <a class="menu-item active" data-page="dashboard">
-                <span class="icon"><i class="fas fa-th-large"></i></span> Dashboard
+                <span class="icon"><i class="fas fa-th-large"></i></span>
+                Dashboard
+                <span class="badge info">Live</span>
             </a>
-            <div class="menu-label">Students</div>
+
+            <div class="menu-label">Student Management</div>
             <a class="menu-item" data-page="add-student">
-                <span class="icon"><i class="fas fa-user-plus"></i></span> Add Student
+                <span class="icon"><i class="fas fa-user-plus"></i></span>
+                Add Student
             </a>
-            <a class="menu-item" data-page="list-students">
-                <span class="icon"><i class="fas fa-users"></i></span> List Students
+            <a class="menu-item" data-page="student-list">
+                <span class="icon"><i class="fas fa-users"></i></span>
+                Student List
                 <span class="badge" id="totalBadge">0</span>
             </a>
-            <div class="menu-label">Results</div>
+            <a class="menu-item" data-page="manage-students">
+                <span class="icon"><i class="fas fa-user-edit"></i></span>
+                Manage Students
+                <span class="badge" id="manageBadge">0</span>
+            </a>
+
+            <div class="menu-label">Result Management</div>
             <a class="menu-item" data-page="upload-result">
-                <span class="icon"><i class="fas fa-upload"></i></span> Upload Result
+                <span class="icon"><i class="fas fa-upload"></i></span>
+                Upload Result
                 <span class="badge warning" id="pendingUploadBadge">0</span>
             </a>
-            <a class="menu-item" data-page="result-uploaded">
-                <span class="icon"><i class="fas fa-check-circle"></i></span> Uploaded
+            <a class="menu-item" data-page="already-uploaded">
+                <span class="icon"><i class="fas fa-check-circle"></i></span>
+                Already Uploaded
                 <span class="badge success" id="uploadedBadge">0</span>
             </a>
-            <a class="menu-item" data-page="result-not-uploaded">
-                <span class="icon"><i class="fas fa-clock"></i></span> Not Uploaded
+            <a class="menu-item" data-page="pending-upload">
+                <span class="icon"><i class="fas fa-clock"></i></span>
+                Pending Upload
                 <span class="badge danger" id="notUploadedBadge">0</span>
             </a>
+
             <div class="menu-label">Publishing</div>
-            <a class="menu-item" data-page="publish-results">
-                <span class="icon"><i class="fas fa-check-double"></i></span> Publish
+            <a class="menu-item" data-page="publish-result">
+                <span class="icon"><i class="fas fa-check-double"></i></span>
+                Publish Result
                 <span class="badge warning" id="pendingPublishBadge">0</span>
             </a>
-            <a class="menu-item" data-page="published-results">
-                <span class="icon"><i class="fas fa-check-circle"></i></span> Published
+            <a class="menu-item" data-page="unpublished">
+                <span class="icon"><i class="fas fa-hourglass-half"></i></span>
+                Unpublished
+                <span class="badge warning" id="unpublishedBadge">0</span>
+            </a>
+            <a class="menu-item" data-page="published">
+                <span class="icon"><i class="fas fa-check-circle"></i></span>
+                Published
                 <span class="badge success" id="publishedBadge">0</span>
             </a>
         </nav>
+
         <div class="sidebar-footer">
             <i class="fas fa-shield-alt"></i> v3.0 • Secure Admin
         </div>
     </aside>
 
-    <!-- ======= MAIN ======= -->
+    <!-- ============================================
+    MAIN CONTENT
+    ============================================ -->
     <main class="main-content">
 
+        <!-- Topbar -->
         <header class="topbar">
             <div class="topbar-left">
-                <button class="hamburger" id="hamburgerBtn"><i class="fas fa-bars"></i></button>
+                <button class="hamburger" id="hamburgerBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <h2 id="pageTitle">📊 <span>Dashboard</span></h2>
             </div>
             <div class="topbar-right">
@@ -210,110 +1142,83 @@
             </div>
         </header>
 
-        <!-- ======= DASHBOARD ======= -->
+        <!-- ============================================
+        PAGE: DASHBOARD
+        ============================================ -->
         <div class="page active" id="page-dashboard">
-            <div class="stats-grid">
+            <div class="stats-grid" id="statsGrid">
                 <div class="stat-card">
-                    <div class="stat-number" id="sTotal">0</div>
+                    <div class="stat-icon">👨‍🎓</div>
+                    <div class="stat-number" id="statTotalStudents">0</div>
                     <div class="stat-label">Total Students</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="sTotalResults">0</div>
+                    <div class="stat-icon">📄</div>
+                    <div class="stat-number" id="statTotalResults">0</div>
                     <div class="stat-label">Total Results</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="sPublished">0</div>
-                    <div class="stat-label">Published</div>
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-number" id="statPublished">0</div>
+                    <div class="stat-label">Published Results</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="sUnpublished">0</div>
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-number" id="statUnpublished">0</div>
                     <div class="stat-label">Pending Publish</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="sNoResult">0</div>
+                    <div class="stat-icon">📌</div>
+                    <div class="stat-number" id="statNoResult">0</div>
                     <div class="stat-label">No Result</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="sClasses">0</div>
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-number" id="statClasses">0</div>
                     <div class="stat-label">Active Classes</div>
                 </div>
             </div>
-
-            <div class="card">
-                <div class="card-title"><i class="fas fa-user-plus" style="color:#d4a843;"></i> Quick Add Student</div>
-                <form id="quickAddForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Student ID *</label>
-                            <input type="text" id="qId" placeholder="S001" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Name *</label>
-                            <input type="text" id="qName" placeholder="Full Name" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Class *</label>
-                            <select id="qClass" required>
-                                <option value="">Select</option>
-                                <option value="1">1</option><option value="2">2</option>
-                                <option value="3">3</option><option value="4">4</option>
-                                <option value="5">5</option><option value="6">6</option>
-                                <option value="7">7</option><option value="8">8</option>
-                                <option value="9">9</option><option value="10">10</option>
-                                <option value="11">11</option><option value="12">12</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Session *</label>
-                            <select id="qSession" required>
-                                <option value="">Select</option>
-                                <option value="2025-26">2025-26</option>
-                                <option value="2024-25">2024-25</option>
-                                <option value="2023-24">2023-24</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-success">➕ Add</button>
-                </form>
-            </div>
         </div>
 
-        <!-- ======= ADD STUDENT ======= -->
+        <!-- ============================================
+        PAGE: ADD STUDENT
+        ============================================ -->
         <div class="page" id="page-add-student">
             <div class="card">
-                <div class="card-title"><i class="fas fa-user-plus" style="color:#d4a843;"></i> Add New Student</div>
+                <div class="card-title">
+                    <i class="fas fa-user-plus" style="color:var(--secondary);"></i> Add New Student
+                    <span class="count">Fill all fields</span>
+                </div>
                 <form id="addStudentForm">
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Student ID *</label>
-                            <input type="text" id="sId" placeholder="S001" required>
+                            <label>Student ID <span class="required">*</span></label>
+                            <input type="text" id="sStudentId" placeholder="e.g., S001" required />
                         </div>
                         <div class="form-group">
-                            <label>APAAR ID *</label>
-                            <input type="text" id="sApaar" placeholder="APAAR001" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Name *</label>
-                            <input type="text" id="sName" placeholder="Full Name" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Father Name *</label>
-                            <input type="text" id="sFather" placeholder="Father's Name" required>
+                            <label>APAAR ID <span class="required">*</span></label>
+                            <input type="text" id="sApaarId" placeholder="e.g., APAAR001" required />
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>DOB *</label>
-                            <input type="date" id="sDob" required>
+                            <label>Student Name <span class="required">*</span></label>
+                            <input type="text" id="sName" placeholder="Full Name" required />
                         </div>
                         <div class="form-group">
-                            <label>Class *</label>
+                            <label>Father Name <span class="required">*</span></label>
+                            <input type="text" id="sFather" placeholder="Father's Name" required />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date of Birth <span class="required">*</span></label>
+                            <input type="date" id="sDob" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Class <span class="required">*</span></label>
                             <select id="sClass" required>
-                                <option value="">Select</option>
+                                <option value="">Select Class</option>
                                 <option value="1">1</option><option value="2">2</option>
                                 <option value="3">3</option><option value="4">4</option>
                                 <option value="5">5</option><option value="6">6</option>
@@ -324,71 +1229,135 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Session *</label>
+                        <label>Session <span class="required">*</span></label>
                         <select id="sSession" required>
-                            <option value="">Select</option>
+                            <option value="">Select Session</option>
                             <option value="2025-26">2025-26</option>
                             <option value="2024-25">2024-25</option>
                             <option value="2023-24">2023-24</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-success">➕ Add Student</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-user-plus"></i> Add Student
+                    </button>
                 </form>
             </div>
         </div>
 
-        <!-- ======= LIST STUDENTS ======= -->
-        <div class="page" id="page-list-students">
+        <!-- ============================================
+        PAGE: STUDENT LIST
+        ============================================ -->
+        <div class="page" id="page-student-list">
             <div class="card">
-                <div class="card-title"><i class="fas fa-users" style="color:#d4a843;"></i> Students List <span class="badge badge-info" id="listCount">0</span></div>
-                <div class="class-buttons" id="listClassButtons">
-                    <button class="class-btn active" data-class="all" onclick="filterList('all')">All <span class="count" id="listAllCount">0</span></button>
-                    <button class="class-btn" data-class="1" onclick="filterList('1')">1 <span class="count" id="listC1Count">0</span></button>
-                    <button class="class-btn" data-class="2" onclick="filterList('2')">2 <span class="count" id="listC2Count">0</span></button>
-                    <button class="class-btn" data-class="3" onclick="filterList('3')">3 <span class="count" id="listC3Count">0</span></button>
-                    <button class="class-btn" data-class="4" onclick="filterList('4')">4 <span class="count" id="listC4Count">0</span></button>
-                    <button class="class-btn" data-class="5" onclick="filterList('5')">5 <span class="count" id="listC5Count">0</span></button>
-                    <button class="class-btn" data-class="6" onclick="filterList('6')">6 <span class="count" id="listC6Count">0</span></button>
-                    <button class="class-btn" data-class="7" onclick="filterList('7')">7 <span class="count" id="listC7Count">0</span></button>
-                    <button class="class-btn" data-class="8" onclick="filterList('8')">8 <span class="count" id="listC8Count">0</span></button>
-                    <button class="class-btn" data-class="9" onclick="filterList('9')">9 <span class="count" id="listC9Count">0</span></button>
-                    <button class="class-btn" data-class="10" onclick="filterList('10')">10 <span class="count" id="listC10Count">0</span></button>
-                    <button class="class-btn" data-class="11" onclick="filterList('11')">11 <span class="count" id="listC11Count">0</span></button>
-                    <button class="class-btn" data-class="12" onclick="filterList('12')">12 <span class="count" id="listC12Count">0</span></button>
+                <div class="card-title">
+                    <i class="fas fa-users" style="color:var(--secondary);"></i> Student List
+                    <span class="count" id="listCount">0</span>
                 </div>
-                <div id="listContainer"><div class="no-data"><div class="loading-spinner"></div><p>Loading...</p></div></div>
+                <div class="class-buttons" id="listClassButtons">
+                    <button class="class-btn active" data-class="all" onclick="filterListStudents('all')">
+                        All <span class="count" id="listAllCount">0</span>
+                    </button>
+                    <button class="class-btn" data-class="1" onclick="filterListStudents('1')">1 <span class="count" id="listC1Count">0</span></button>
+                    <button class="class-btn" data-class="2" onclick="filterListStudents('2')">2 <span class="count" id="listC2Count">0</span></button>
+                    <button class="class-btn" data-class="3" onclick="filterListStudents('3')">3 <span class="count" id="listC3Count">0</span></button>
+                    <button class="class-btn" data-class="4" onclick="filterListStudents('4')">4 <span class="count" id="listC4Count">0</span></button>
+                    <button class="class-btn" data-class="5" onclick="filterListStudents('5')">5 <span class="count" id="listC5Count">0</span></button>
+                    <button class="class-btn" data-class="6" onclick="filterListStudents('6')">6 <span class="count" id="listC6Count">0</span></button>
+                    <button class="class-btn" data-class="7" onclick="filterListStudents('7')">7 <span class="count" id="listC7Count">0</span></button>
+                    <button class="class-btn" data-class="8" onclick="filterListStudents('8')">8 <span class="count" id="listC8Count">0</span></button>
+                    <button class="class-btn" data-class="9" onclick="filterListStudents('9')">9 <span class="count" id="listC9Count">0</span></button>
+                    <button class="class-btn" data-class="10" onclick="filterListStudents('10')">10 <span class="count" id="listC10Count">0</span></button>
+                    <button class="class-btn" data-class="11" onclick="filterListStudents('11')">11 <span class="count" id="listC11Count">0</span></button>
+                    <button class="class-btn" data-class="12" onclick="filterListStudents('12')">12 <span class="count" id="listC12Count">0</span></button>
+                </div>
+                <div id="listStudentsContainer">
+                    <div style="text-align:center;padding:30px;">
+                        <div class="loading-spinner"></div>
+                        <p style="color:var(--gray-400);margin-top:10px;">Loading students...</p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- ======= UPLOAD RESULT ======= -->
+        <!-- ============================================
+        PAGE: MANAGE STUDENTS
+        ============================================ -->
+        <div class="page" id="page-manage-students">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-user-edit" style="color:var(--secondary);"></i> Manage Students
+                    <span class="count" id="manageCount">0</span>
+                </div>
+                <div class="class-buttons" id="manageClassButtons">
+                    <button class="class-btn active" data-class="all" onclick="filterManageStudents('all')">
+                        All <span class="count" id="manageAllCount">0</span>
+                    </button>
+                    <button class="class-btn" data-class="1" onclick="filterManageStudents('1')">1 <span class="count" id="manageC1Count">0</span></button>
+                    <button class="class-btn" data-class="2" onclick="filterManageStudents('2')">2 <span class="count" id="manageC2Count">0</span></button>
+                    <button class="class-btn" data-class="3" onclick="filterManageStudents('3')">3 <span class="count" id="manageC3Count">0</span></button>
+                    <button class="class-btn" data-class="4" onclick="filterManageStudents('4')">4 <span class="count" id="manageC4Count">0</span></button>
+                    <button class="class-btn" data-class="5" onclick="filterManageStudents('5')">5 <span class="count" id="manageC5Count">0</span></button>
+                    <button class="class-btn" data-class="6" onclick="filterManageStudents('6')">6 <span class="count" id="manageC6Count">0</span></button>
+                    <button class="class-btn" data-class="7" onclick="filterManageStudents('7')">7 <span class="count" id="manageC7Count">0</span></button>
+                    <button class="class-btn" data-class="8" onclick="filterManageStudents('8')">8 <span class="count" id="manageC8Count">0</span></button>
+                    <button class="class-btn" data-class="9" onclick="filterManageStudents('9')">9 <span class="count" id="manageC9Count">0</span></button>
+                    <button class="class-btn" data-class="10" onclick="filterManageStudents('10')">10 <span class="count" id="manageC10Count">0</span></button>
+                    <button class="class-btn" data-class="11" onclick="filterManageStudents('11')">11 <span class="count" id="manageC11Count">0</span></button>
+                    <button class="class-btn" data-class="12" onclick="filterManageStudents('12')">12 <span class="count" id="manageC12Count">0</span></button>
+                </div>
+                <div id="manageStudentsContainer">
+                    <div style="text-align:center;padding:30px;">
+                        <div class="loading-spinner"></div>
+                        <p style="color:var(--gray-400);margin-top:10px;">Loading students...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================
+        PAGE: UPLOAD RESULT
+        ============================================ -->
         <div class="page" id="page-upload-result">
             <div class="card">
-                <div class="card-title"><i class="fas fa-upload" style="color:#d4a843;"></i> Upload Result</div>
-                <div class="class-buttons" id="uploadClassButtons">
-                    <button class="class-btn active" data-class="all" onclick="filterUpload('all')">All <span class="count" id="uploadAllCount">0</span></button>
-                    <button class="class-btn" data-class="1" onclick="filterUpload('1')">1 <span class="count" id="uploadC1Count">0</span></button>
-                    <button class="class-btn" data-class="2" onclick="filterUpload('2')">2 <span class="count" id="uploadC2Count">0</span></button>
-                    <button class="class-btn" data-class="3" onclick="filterUpload('3')">3 <span class="count" id="uploadC3Count">0</span></button>
-                    <button class="class-btn" data-class="4" onclick="filterUpload('4')">4 <span class="count" id="uploadC4Count">0</span></button>
-                    <button class="class-btn" data-class="5" onclick="filterUpload('5')">5 <span class="count" id="uploadC5Count">0</span></button>
-                    <button class="class-btn" data-class="6" onclick="filterUpload('6')">6 <span class="count" id="uploadC6Count">0</span></button>
-                    <button class="class-btn" data-class="7" onclick="filterUpload('7')">7 <span class="count" id="uploadC7Count">0</span></button>
-                    <button class="class-btn" data-class="8" onclick="filterUpload('8')">8 <span class="count" id="uploadC8Count">0</span></button>
-                    <button class="class-btn" data-class="9" onclick="filterUpload('9')">9 <span class="count" id="uploadC9Count">0</span></button>
-                    <button class="class-btn" data-class="10" onclick="filterUpload('10')">10 <span class="count" id="uploadC10Count">0</span></button>
-                    <button class="class-btn" data-class="11" onclick="filterUpload('11')">11 <span class="count" id="uploadC11Count">0</span></button>
-                    <button class="class-btn" data-class="12" onclick="filterUpload('12')">12 <span class="count" id="uploadC12Count">0</span></button>
+                <div class="card-title">
+                    <i class="fas fa-upload" style="color:var(--secondary);"></i> Upload Result
+                    <span class="count">Select a student</span>
                 </div>
-                <div id="uploadList"><div class="no-data"><i class="fas fa-hand-pointer"></i> Click a student below</div></div>
-                <hr style="border:none;border-top:2px solid #e2e8f0;margin:14px 0;">
-                <form id="uploadForm" enctype="multipart/form-data">
+
+                <div class="class-buttons" id="uploadClassButtons">
+                    <button class="class-btn active" data-class="all" onclick="filterUploadStudents('all')">
+                        All <span class="count" id="uploadAllCount">0</span>
+                    </button>
+                    <button class="class-btn" data-class="1" onclick="filterUploadStudents('1')">1 <span class="count" id="uploadC1Count">0</span></button>
+                    <button class="class-btn" data-class="2" onclick="filterUploadStudents('2')">2 <span class="count" id="uploadC2Count">0</span></button>
+                    <button class="class-btn" data-class="3" onclick="filterUploadStudents('3')">3 <span class="count" id="uploadC3Count">0</span></button>
+                    <button class="class-btn" data-class="4" onclick="filterUploadStudents('4')">4 <span class="count" id="uploadC4Count">0</span></button>
+                    <button class="class-btn" data-class="5" onclick="filterUploadStudents('5')">5 <span class="count" id="uploadC5Count">0</span></button>
+                    <button class="class-btn" data-class="6" onclick="filterUploadStudents('6')">6 <span class="count" id="uploadC6Count">0</span></button>
+                    <button class="class-btn" data-class="7" onclick="filterUploadStudents('7')">7 <span class="count" id="uploadC7Count">0</span></button>
+                    <button class="class-btn" data-class="8" onclick="filterUploadStudents('8')">8 <span class="count" id="uploadC8Count">0</span></button>
+                    <button class="class-btn" data-class="9" onclick="filterUploadStudents('9')">9 <span class="count" id="uploadC9Count">0</span></button>
+                    <button class="class-btn" data-class="10" onclick="filterUploadStudents('10')">10 <span class="count" id="uploadC10Count">0</span></button>
+                    <button class="class-btn" data-class="11" onclick="filterUploadStudents('11')">11 <span class="count" id="uploadC11Count">0</span></button>
+                    <button class="class-btn" data-class="12" onclick="filterUploadStudents('12')">12 <span class="count" id="uploadC12Count">0</span></button>
+                </div>
+
+                <div id="uploadStudentsList" style="margin-bottom:14px;">
+                    <div style="text-align:center;padding:20px;color:var(--gray-400);font-size:0.85rem;">
+                        <i class="fas fa-hand-pointer"></i> Click a student below to upload their result
+                    </div>
+                </div>
+
+                <hr style="border:none;border-top:2px solid var(--gray-200);margin:16px 0;" />
+
+                <form id="uploadResultForm" enctype="multipart/form-data">
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Student ID *</label>
-                            <input type="text" id="uStudentId" placeholder="S001" required>
+                            <label>Student ID <span class="required">*</span></label>
+                            <input type="text" id="uStudentId" placeholder="e.g., S001" required />
                         </div>
                         <div class="form-group">
-                            <label>Class *</label>
+                            <label>Class <span class="required">*</span></label>
                             <select id="uClass" required>
                                 <option value="">Select</option>
                                 <option value="1">1</option><option value="2">2</option>
@@ -402,7 +1371,7 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Session *</label>
+                            <label>Session <span class="required">*</span></label>
                             <select id="uSession" required>
                                 <option value="">Select</option>
                                 <option value="2025-26">2025-26</option>
@@ -411,32 +1380,43 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>PDF *</label>
-                            <input type="file" id="uFile" accept=".pdf" required>
+                            <label>Marksheet (PDF) <span class="required">*</span></label>
+                            <input type="file" id="uFile" accept=".pdf" required />
                             <div class="file-preview" id="uFilePreview">📄 <span></span></div>
                         </div>
                     </div>
+
                     <div class="verify-info" id="verifyInfo">
                         <div class="verify-grid">
                             <div class="item"><strong>Name:</strong> <span class="value" id="vName">-</span></div>
                             <div class="item"><strong>Father:</strong> <span class="value" id="vFather">-</span></div>
-                            <div class="item"><strong>APAAR:</strong> <span class="value" id="vApaar">-</span></div>
+                            <div class="item"><strong>APAAR ID:</strong> <span class="value" id="vApaar">-</span></div>
                             <div class="item"><strong>DOB:</strong> <span class="value" id="vDob">-</span></div>
                             <div class="item"><strong>Class:</strong> <span class="value" id="vClass">-</span></div>
                             <div class="item"><strong>Session:</strong> <span class="value" id="vSession">-</span></div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary" id="uploadBtn">📤 Upload</button>
+
+                    <button type="submit" class="btn btn-primary" id="uploadBtn">
+                        <i class="fas fa-upload"></i> Upload Result
+                    </button>
                 </form>
             </div>
         </div>
 
-        <!-- ======= UPLOADED RESULTS ======= -->
-        <div class="page" id="page-result-uploaded">
+        <!-- ============================================
+        PAGE: ALREADY UPLOADED
+        ============================================ -->
+        <div class="page" id="page-already-uploaded">
             <div class="card">
-                <div class="card-title"><i class="fas fa-check-circle" style="color:#22c55e;"></i> Uploaded Results <span class="badge badge-success" id="uploadedCount">0</span></div>
+                <div class="card-title">
+                    <i class="fas fa-check-circle" style="color:var(--success);"></i> Already Uploaded
+                    <span class="count" id="uploadedCount">0</span>
+                </div>
                 <div class="class-buttons" id="uploadedClassButtons">
-                    <button class="class-btn active" data-class="all" onclick="filterUploaded('all')">All <span class="count" id="uploadedAllCount">0</span></button>
+                    <button class="class-btn active" data-class="all" onclick="filterUploaded('all')">
+                        All <span class="count" id="uploadedAllCount">0</span>
+                    </button>
                     <button class="class-btn" data-class="1" onclick="filterUploaded('1')">1 <span class="count" id="uploadedC1Count">0</span></button>
                     <button class="class-btn" data-class="2" onclick="filterUploaded('2')">2 <span class="count" id="uploadedC2Count">0</span></button>
                     <button class="class-btn" data-class="3" onclick="filterUploaded('3')">3 <span class="count" id="uploadedC3Count">0</span></button>
@@ -452,42 +1432,65 @@
                 </div>
                 <div class="table-wrapper">
                     <table>
-                        <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Status</th><th>Actions</th></tr></thead>
-                        <tbody id="uploadedTableBody"><tr><td colspan="7" style="text-align:center;padding:30px;color:#94a3b8;">Loading...</td></tr></tbody>
+                        <thead>
+                            <tr><th>#</th><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Status</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody id="uploadedTableBody">
+                            <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">Loading...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- ======= NOT UPLOADED ======= -->
-        <div class="page" id="page-result-not-uploaded">
+        <!-- ============================================
+        PAGE: PENDING UPLOAD
+        ============================================ -->
+        <div class="page" id="page-pending-upload">
             <div class="card">
-                <div class="card-title"><i class="fas fa-clock" style="color:#ef4444;"></i> Not Uploaded <span class="badge badge-danger" id="notUploadedCount">0</span></div>
-                <div class="class-buttons" id="notUploadedClassButtons">
-                    <button class="class-btn active" data-class="all" onclick="filterNotUploaded('all')">All <span class="count" id="notUploadedAllCount">0</span></button>
-                    <button class="class-btn" data-class="1" onclick="filterNotUploaded('1')">1 <span class="count" id="notUploadedC1Count">0</span></button>
-                    <button class="class-btn" data-class="2" onclick="filterNotUploaded('2')">2 <span class="count" id="notUploadedC2Count">0</span></button>
-                    <button class="class-btn" data-class="3" onclick="filterNotUploaded('3')">3 <span class="count" id="notUploadedC3Count">0</span></button>
-                    <button class="class-btn" data-class="4" onclick="filterNotUploaded('4')">4 <span class="count" id="notUploadedC4Count">0</span></button>
-                    <button class="class-btn" data-class="5" onclick="filterNotUploaded('5')">5 <span class="count" id="notUploadedC5Count">0</span></button>
-                    <button class="class-btn" data-class="6" onclick="filterNotUploaded('6')">6 <span class="count" id="notUploadedC6Count">0</span></button>
-                    <button class="class-btn" data-class="7" onclick="filterNotUploaded('7')">7 <span class="count" id="notUploadedC7Count">0</span></button>
-                    <button class="class-btn" data-class="8" onclick="filterNotUploaded('8')">8 <span class="count" id="notUploadedC8Count">0</span></button>
-                    <button class="class-btn" data-class="9" onclick="filterNotUploaded('9')">9 <span class="count" id="notUploadedC9Count">0</span></button>
-                    <button class="class-btn" data-class="10" onclick="filterNotUploaded('10')">10 <span class="count" id="notUploadedC10Count">0</span></button>
-                    <button class="class-btn" data-class="11" onclick="filterNotUploaded('11')">11 <span class="count" id="notUploadedC11Count">0</span></button>
-                    <button class="class-btn" data-class="12" onclick="filterNotUploaded('12')">12 <span class="count" id="notUploadedC12Count">0</span></button>
+                <div class="card-title">
+                    <i class="fas fa-clock" style="color:var(--danger);"></i> Pending Upload
+                    <span class="count" id="pendingUploadCount">0</span>
                 </div>
-                <div id="notUploadedContainer"><div class="no-data"><div class="loading-spinner"></div><p>Loading...</p></div></div>
+                <div class="class-buttons" id="pendingUploadClassButtons">
+                    <button class="class-btn active" data-class="all" onclick="filterPendingUpload('all')">
+                        All <span class="count" id="pendingUploadAllCount">0</span>
+                    </button>
+                    <button class="class-btn" data-class="1" onclick="filterPendingUpload('1')">1 <span class="count" id="pendingUploadC1Count">0</span></button>
+                    <button class="class-btn" data-class="2" onclick="filterPendingUpload('2')">2 <span class="count" id="pendingUploadC2Count">0</span></button>
+                    <button class="class-btn" data-class="3" onclick="filterPendingUpload('3')">3 <span class="count" id="pendingUploadC3Count">0</span></button>
+                    <button class="class-btn" data-class="4" onclick="filterPendingUpload('4')">4 <span class="count" id="pendingUploadC4Count">0</span></button>
+                    <button class="class-btn" data-class="5" onclick="filterPendingUpload('5')">5 <span class="count" id="pendingUploadC5Count">0</span></button>
+                    <button class="class-btn" data-class="6" onclick="filterPendingUpload('6')">6 <span class="count" id="pendingUploadC6Count">0</span></button>
+                    <button class="class-btn" data-class="7" onclick="filterPendingUpload('7')">7 <span class="count" id="pendingUploadC7Count">0</span></button>
+                    <button class="class-btn" data-class="8" onclick="filterPendingUpload('8')">8 <span class="count" id="pendingUploadC8Count">0</span></button>
+                    <button class="class-btn" data-class="9" onclick="filterPendingUpload('9')">9 <span class="count" id="pendingUploadC9Count">0</span></button>
+                    <button class="class-btn" data-class="10" onclick="filterPendingUpload('10')">10 <span class="count" id="pendingUploadC10Count">0</span></button>
+                    <button class="class-btn" data-class="11" onclick="filterPendingUpload('11')">11 <span class="count" id="pendingUploadC11Count">0</span></button>
+                    <button class="class-btn" data-class="12" onclick="filterPendingUpload('12')">12 <span class="count" id="pendingUploadC12Count">0</span></button>
+                </div>
+                <div id="pendingUploadContainer">
+                    <div style="text-align:center;padding:30px;">
+                        <div class="loading-spinner"></div>
+                        <p style="color:var(--gray-400);margin-top:10px;">Loading...</p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- ======= PUBLISH RESULTS ======= -->
-        <div class="page" id="page-publish-results">
+        <!-- ============================================
+        PAGE: PUBLISH RESULT
+        ============================================ -->
+        <div class="page" id="page-publish-result">
             <div class="card">
-                <div class="card-title"><i class="fas fa-check-double" style="color:#d4a843;"></i> Publish Results <span class="badge badge-warning" id="publishCount">0 pending</span></div>
+                <div class="card-title">
+                    <i class="fas fa-check-double" style="color:var(--secondary);"></i> Publish Result
+                    <span class="count" id="publishCount">0 pending</span>
+                </div>
                 <div class="class-buttons" id="publishClassButtons">
-                    <button class="class-btn active" data-class="all" onclick="filterPublish('all')">All <span class="count" id="publishAllCount">0</span></button>
+                    <button class="class-btn active" data-class="all" onclick="filterPublish('all')">
+                        All <span class="count" id="publishAllCount">0</span>
+                    </button>
                     <button class="class-btn" data-class="1" onclick="filterPublish('1')">1 <span class="count" id="publishC1Count">0</span></button>
                     <button class="class-btn" data-class="2" onclick="filterPublish('2')">2 <span class="count" id="publishC2Count">0</span></button>
                     <button class="class-btn" data-class="3" onclick="filterPublish('3')">3 <span class="count" id="publishC3Count">0</span></button>
@@ -501,25 +1504,84 @@
                     <button class="class-btn" data-class="11" onclick="filterPublish('11')">11 <span class="count" id="publishC11Count">0</span></button>
                     <button class="class-btn" data-class="12" onclick="filterPublish('12')">12 <span class="count" id="publishC12Count">0</span></button>
                 </div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
-                    <button class="btn btn-success btn-sm" onclick="publishAll()">✅ Publish All</button>
-                    <button class="btn btn-warning btn-sm" onclick="unpublishAll()">📌 Unpublish All</button>
+
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+                    <button class="btn btn-success btn-sm" onclick="publishAllFiltered()">
+                        <i class="fas fa-check-double"></i> Publish All
+                    </button>
+                    <button class="btn btn-warning btn-sm" onclick="unpublishAllFiltered()">
+                        <i class="fas fa-times"></i> Unpublish All
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteAllFiltered()">
+                        <i class="fas fa-trash"></i> Delete All
+                    </button>
                 </div>
+
                 <div class="table-wrapper">
                     <table>
-                        <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Status</th><th>Actions</th></tr></thead>
-                        <tbody id="publishTableBody"><tr><td colspan="7" style="text-align:center;padding:30px;color:#94a3b8;">Loading...</td></tr></tbody>
+                        <thead>
+                            <tr><th>#</th><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Status</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody id="publishTableBody">
+                            <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">Loading...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- ======= PUBLISHED RESULTS LIST ======= -->
-        <div class="page" id="page-published-results">
+        <!-- ============================================
+        PAGE: UNPUBLISHED
+        ============================================ -->
+        <div class="page" id="page-unpublished">
             <div class="card">
-                <div class="card-title"><i class="fas fa-check-circle" style="color:#22c55e;"></i> Published Results <span class="badge badge-success" id="publishedListCount">0</span></div>
+                <div class="card-title">
+                    <i class="fas fa-hourglass-half" style="color:var(--warning);"></i> Unpublished Results
+                    <span class="count" id="unpublishedListCount">0</span>
+                </div>
+                <div class="class-buttons" id="unpublishedListClassButtons">
+                    <button class="class-btn active" data-class="all" onclick="filterUnpublishedList('all')">
+                        All <span class="count" id="unpublishedListAllCount">0</span>
+                    </button>
+                    <button class="class-btn" data-class="1" onclick="filterUnpublishedList('1')">1 <span class="count" id="unpublishedListC1Count">0</span></button>
+                    <button class="class-btn" data-class="2" onclick="filterUnpublishedList('2')">2 <span class="count" id="unpublishedListC2Count">0</span></button>
+                    <button class="class-btn" data-class="3" onclick="filterUnpublishedList('3')">3 <span class="count" id="unpublishedListC3Count">0</span></button>
+                    <button class="class-btn" data-class="4" onclick="filterUnpublishedList('4')">4 <span class="count" id="unpublishedListC4Count">0</span></button>
+                    <button class="class-btn" data-class="5" onclick="filterUnpublishedList('5')">5 <span class="count" id="unpublishedListC5Count">0</span></button>
+                    <button class="class-btn" data-class="6" onclick="filterUnpublishedList('6')">6 <span class="count" id="unpublishedListC6Count">0</span></button>
+                    <button class="class-btn" data-class="7" onclick="filterUnpublishedList('7')">7 <span class="count" id="unpublishedListC7Count">0</span></button>
+                    <button class="class-btn" data-class="8" onclick="filterUnpublishedList('8')">8 <span class="count" id="unpublishedListC8Count">0</span></button>
+                    <button class="class-btn" data-class="9" onclick="filterUnpublishedList('9')">9 <span class="count" id="unpublishedListC9Count">0</span></button>
+                    <button class="class-btn" data-class="10" onclick="filterUnpublishedList('10')">10 <span class="count" id="unpublishedListC10Count">0</span></button>
+                    <button class="class-btn" data-class="11" onclick="filterUnpublishedList('11')">11 <span class="count" id="unpublishedListC11Count">0</span></button>
+                    <button class="class-btn" data-class="12" onclick="filterUnpublishedList('12')">12 <span class="count" id="unpublishedListC12Count">0</span></button>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>#</th><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Status</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody id="unpublishedListTableBody">
+                            <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================
+        PAGE: PUBLISHED
+        ============================================ -->
+        <div class="page" id="page-published">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-check-circle" style="color:var(--success);"></i> Published Results
+                    <span class="count" id="publishedListCount">0</span>
+                </div>
                 <div class="class-buttons" id="publishedListClassButtons">
-                    <button class="class-btn active" data-class="all" onclick="filterPublishedList('all')">All <span class="count" id="publishedListAllCount">0</span></button>
+                    <button class="class-btn active" data-class="all" onclick="filterPublishedList('all')">
+                        All <span class="count" id="publishedListAllCount">0</span>
+                    </button>
                     <button class="class-btn" data-class="1" onclick="filterPublishedList('1')">1 <span class="count" id="publishedListC1Count">0</span></button>
                     <button class="class-btn" data-class="2" onclick="filterPublishedList('2')">2 <span class="count" id="publishedListC2Count">0</span></button>
                     <button class="class-btn" data-class="3" onclick="filterPublishedList('3')">3 <span class="count" id="publishedListC3Count">0</span></button>
@@ -535,8 +1597,12 @@
                 </div>
                 <div class="table-wrapper">
                     <table>
-                        <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Published On</th><th>Actions</th></tr></thead>
-                        <tbody id="publishedListTableBody"><tr><td colspan="7" style="text-align:center;padding:30px;color:#94a3b8;">Loading...</td></tr></tbody>
+                        <thead>
+                            <tr><th>#</th><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Published On</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody id="publishedListTableBody">
+                            <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">Loading...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -544,17 +1610,111 @@
 
     </main>
 
-    <!-- ======= TOAST ======= -->
+    <!-- ============================================
+    TOAST CONTAINER
+    ============================================ -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ======= JAVASCRIPT ======= -->
+    <!-- ============================================
+    MODAL: VIEW/EDIT STUDENT
+    ============================================ -->
+    <div class="modal-overlay" id="studentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle"><i class="fas fa-user-graduate" style="color:var(--secondary);"></i> Student Details</h3>
+                <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="modalContent">
+                <div style="text-align:center;padding:20px;">
+                    <div class="loading-spinner"></div>
+                    <p style="color:var(--gray-400);margin-top:8px;">Loading...</p>
+                </div>
+            </div>
+            <div class="modal-actions" id="modalActions">
+                <button class="btn btn-primary btn-sm" onclick="editStudent()">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="deleteStudent()">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    MODAL: EDIT STUDENT
+    ============================================ -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit" style="color:var(--secondary);"></i> Edit Student</h3>
+                <button class="close-btn" onclick="closeEditModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="editStudentForm">
+                <input type="hidden" id="editStudentId" />
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Student ID <span class="required">*</span></label>
+                        <input type="text" id="editSId" placeholder="S001" required />
+                    </div>
+                    <div class="form-group">
+                        <label>APAAR ID <span class="required">*</span></label>
+                        <input type="text" id="editApaarId" placeholder="APAAR001" required />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Student Name <span class="required">*</span></label>
+                        <input type="text" id="editSName" placeholder="Full Name" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Father Name <span class="required">*</span></label>
+                        <input type="text" id="editSFather" placeholder="Father's Name" required />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date of Birth <span class="required">*</span></label>
+                        <input type="date" id="editSDob" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Class <span class="required">*</span></label>
+                        <select id="editSClass" required>
+                            <option value="">Select Class</option>
+                            <option value="1">1</option><option value="2">2</option>
+                            <option value="3">3</option><option value="4">4</option>
+                            <option value="5">5</option><option value="6">6</option>
+                            <option value="7">7</option><option value="8">8</option>
+                            <option value="9">9</option><option value="10">10</option>
+                            <option value="11">11</option><option value="12">12</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Session <span class="required">*</span></label>
+                    <select id="editSSession" required>
+                        <option value="">Select Session</option>
+                        <option value="2025-26">2025-26</option>
+                        <option value="2024-25">2024-25</option>
+                        <option value="2023-24">2023-24</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Update Student
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================
+    JAVASCRIPT - COMPLETE WORKING
+    ============================================ -->
     <script>
         // ============================================
-        // 🔥 API BASE - DIRECT (NO PROXY)
+        // CONFIGURATION
         // ============================================
         const API_BASE = 'https://gsssshilla.onrender.com/api/result';
-
-        console.log('📡 API Base:', API_BASE);
 
         // ============================================
         // STATE
@@ -562,11 +1722,14 @@
         let allStudents = [];
         let allResults = [];
         let listFilter = 'all';
+        let manageFilter = 'all';
         let uploadFilter = 'all';
         let uploadedFilter = 'all';
-        let notUploadedFilter = 'all';
+        let pendingUploadFilter = 'all';
         let publishFilter = 'all';
+        let unpublishedListFilter = 'all';
         let publishedListFilter = 'all';
+        let currentStudentId = null;
 
         // ============================================
         // TOAST
@@ -591,27 +1754,17 @@
         // ============================================
         async function apiCall(endpoint, options = {}) {
             try {
-                const url = API_BASE + endpoint;
-                console.log('📡 Calling:', url);
-
-                const response = await fetch(url, {
+                const response = await fetch(API_BASE + endpoint, {
                     ...options,
                     headers: {
                         'Content-Type': 'application/json',
                         ...(options.headers || {})
                     }
                 });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                console.log('✅ Response:', data);
-                return data;
+                return await response.json();
             } catch (error) {
-                console.error('❌ API Error:', error);
-                showToast('❌ ' + error.message, 'error');
+                console.error('API Error:', error);
+                showToast('Network error: ' + error.message, 'error');
                 return { success: false, message: error.message };
             }
         }
@@ -633,22 +1786,26 @@
                 const titles = {
                     'dashboard': '📊 Dashboard',
                     'add-student': '👨‍🎓 Add Student',
-                    'list-students': '👨‍🎓 List Students',
+                    'student-list': '👨‍🎓 Student List',
+                    'manage-students': '👨‍🎓 Manage Students',
                     'upload-result': '📤 Upload Result',
-                    'result-uploaded': '✅ Uploaded Results',
-                    'result-not-uploaded': '⏳ Not Uploaded',
-                    'publish-results': '✅ Publish Results',
-                    'published-results': '📋 Published Results'
+                    'already-uploaded': '✅ Already Uploaded',
+                    'pending-upload': '⏳ Pending Upload',
+                    'publish-result': '✅ Publish Result',
+                    'unpublished': '⏳ Unpublished',
+                    'published': '📋 Published'
                 };
                 document.getElementById('pageTitle').innerHTML = titles[page] || page;
 
                 if (page === 'dashboard') loadDashboard();
-                if (page === 'list-students') loadListStudents();
+                if (page === 'student-list') loadListStudents();
+                if (page === 'manage-students') loadManageStudents();
                 if (page === 'upload-result') loadUploadStudents();
-                if (page === 'result-uploaded') loadUploadedResults();
-                if (page === 'result-not-uploaded') loadNotUploaded();
-                if (page === 'publish-results') loadPublishResults();
-                if (page === 'published-results') loadPublishedList();
+                if (page === 'already-uploaded') loadUploadedResults();
+                if (page === 'pending-upload') loadPendingUpload();
+                if (page === 'publish-result') loadPublishResults();
+                if (page === 'unpublished') loadUnpublishedList();
+                if (page === 'published') loadPublishedList();
 
                 document.getElementById('sidebar').classList.remove('open');
             });
@@ -657,6 +1814,15 @@
         document.getElementById('hamburgerBtn').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('open');
         });
+
+        // ============================================
+        // GET STATUS HELPER
+        // ============================================
+        function getStudentStatus(student) {
+            if (!student.has_result) return { class: 'no-result', text: '📌 No Result' };
+            if (student.result_status === 'published') return { class: 'published', text: '✅ Published' };
+            return { class: 'uploaded', text: '📄 Uploaded' };
+        }
 
         // ============================================
         // DASHBOARD
@@ -668,26 +1834,28 @@
 
                 if (stats.success) {
                     const d = stats.data;
-                    document.getElementById('sTotal').textContent = d.totalStudents || 0;
-                    document.getElementById('sTotalResults').textContent = d.totalResults || 0;
-                    document.getElementById('sPublished').textContent = d.publishedResults || 0;
-                    document.getElementById('sUnpublished').textContent = d.unpublishedResults || 0;
+                    document.getElementById('statTotalStudents').textContent = d.totalStudents || 0;
+                    document.getElementById('statTotalResults').textContent = d.totalResults || 0;
+                    document.getElementById('statPublished').textContent = d.publishedResults || 0;
+                    document.getElementById('statUnpublished').textContent = d.unpublishedResults || 0;
 
                     let noResult = 0;
                     if (students.success) {
                         noResult = students.data.filter(s => !s.has_result).length;
                     }
-                    document.getElementById('sNoResult').textContent = noResult;
+                    document.getElementById('statNoResult').textContent = noResult;
 
                     const classes = d.classes || [];
-                    document.getElementById('sClasses').textContent = classes.length || 0;
+                    document.getElementById('statClasses').textContent = classes.length || 0;
 
                     // Badges
                     document.getElementById('totalBadge').textContent = d.totalStudents || 0;
+                    document.getElementById('manageBadge').textContent = d.totalStudents || 0;
                     document.getElementById('pendingUploadBadge').textContent = noResult;
                     document.getElementById('uploadedBadge').textContent = d.totalResults - d.publishedResults || 0;
                     document.getElementById('notUploadedBadge').textContent = noResult;
                     document.getElementById('pendingPublishBadge').textContent = d.unpublishedResults || 0;
+                    document.getElementById('unpublishedBadge').textContent = d.unpublishedResults || 0;
                     document.getElementById('publishedBadge').textContent = d.publishedResults || 0;
 
                     document.getElementById('statusDot').className = 'dot online';
@@ -707,10 +1875,10 @@
             e.preventDefault();
 
             const data = {
-                studentId: document.getElementById('sId').value.trim(),
+                studentId: document.getElementById('sStudentId').value.trim(),
                 studentName: document.getElementById('sName').value.trim(),
                 fatherName: document.getElementById('sFather').value.trim(),
-                apaarId: document.getElementById('sApaar').value.trim(),
+                apaarId: document.getElementById('sApaarId').value.trim(),
                 dob: document.getElementById('sDob').value,
                 class: document.getElementById('sClass').value,
                 session: document.getElementById('sSession').value
@@ -722,46 +1890,21 @@
             });
 
             if (result.success) {
-                showToast('✅ Student added!', 'success');
+                showToast('✅ Student added successfully!', 'success');
                 this.reset();
                 loadDashboard();
                 loadListStudents();
-            } else {
-                showToast('❌ ' + result.message, 'error');
-            }
-        });
-
-        // Quick Add
-        document.getElementById('quickAddForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const data = {
-                studentId: document.getElementById('qId').value.trim(),
-                studentName: document.getElementById('qName').value.trim(),
-                fatherName: 'N/A',
-                apaarId: 'APAAR' + document.getElementById('qId').value.trim(),
-                dob: '2000-01-01',
-                class: document.getElementById('qClass').value,
-                session: document.getElementById('qSession').value
-            };
-
-            const result = await apiCall('/students', {
-                method: 'POST',
-                body: JSON.stringify(data)
-            });
-
-            if (result.success) {
-                showToast('✅ Student added!', 'success');
-                this.reset();
-                loadDashboard();
-                loadListStudents();
+                loadManageStudents();
+                loadUploadStudents();
+                loadPendingUpload();
+                document.querySelector('[data-page="student-list"]').click();
             } else {
                 showToast('❌ ' + result.message, 'error');
             }
         });
 
         // ============================================
-        // LIST STUDENTS
+        // STUDENT LIST (View Only)
         // ============================================
         async function loadListStudents() {
             try {
@@ -773,7 +1916,7 @@
                 }
             } catch (error) {
                 console.error('List students error:', error);
-                document.getElementById('listContainer').innerHTML =
+                document.getElementById('listStudentsContainer').innerHTML =
                     `<div class="no-data"><h4>❌ Failed to load</h4><p>${error.message}</p></div>`;
             }
         }
@@ -797,7 +1940,7 @@
         }
 
         function renderListStudents() {
-            const container = document.getElementById('listContainer');
+            const container = document.getElementById('listStudentsContainer');
             let filtered = allStudents;
             if (listFilter !== 'all') {
                 filtered = allStudents.filter(s => s.class == listFilter);
@@ -812,23 +1955,13 @@
             container.innerHTML = `
                 <div class="student-grid">
                     ${filtered.map(s => {
-                        let statusClass = 'no-result';
-                        let statusText = '📌 No Result';
-                        if (s.has_result) {
-                            if (s.result_status === 'published') {
-                                statusClass = 'published';
-                                statusText = '✅ Published';
-                            } else {
-                                statusClass = 'uploaded';
-                                statusText = '📄 Uploaded';
-                            }
-                        }
+                        const status = getStudentStatus(s);
                         return `
-                            <div class="student-card">
+                            <div class="student-card" onclick="viewStudent('${s.student_id}')">
                                 <div class="s-name">${s.student_name}</div>
                                 <div class="s-id">ID: ${s.student_id}</div>
                                 <div class="s-id">Class: ${s.class} | ${s.session_year}</div>
-                                <span class="s-status ${statusClass}">${statusText}</span>
+                                <span class="s-status ${status.class}">${status.text}</span>
                             </div>
                         `;
                     }).join('')}
@@ -836,12 +1969,253 @@
             `;
         }
 
-        function filterList(cls) {
+        function filterListStudents(cls) {
             listFilter = cls;
             document.querySelectorAll('#listClassButtons .class-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.class == cls);
             });
             renderListStudents();
+        }
+
+        // ============================================
+        // MANAGE STUDENTS (Edit/Delete)
+        // ============================================
+        async function loadManageStudents() {
+            try {
+                const data = await apiCall('/students');
+                if (data.success) {
+                    allStudents = data.data;
+                    updateManageCounts();
+                    renderManageStudents();
+                }
+            } catch (error) {
+                console.error('Manage students error:', error);
+                document.getElementById('manageStudentsContainer').innerHTML =
+                    `<div class="no-data"><h4>❌ Failed to load</h4><p>${error.message}</p></div>`;
+            }
+        }
+
+        function updateManageCounts() {
+            const counts = {};
+            allStudents.forEach(s => {
+                const key = s.class || 'unknown';
+                counts[key] = (counts[key] || 0) + 1;
+            });
+            counts['all'] = allStudents.length;
+
+            Object.keys(counts).forEach(key => {
+                const el = document.getElementById(`manageC${key}Count`);
+                if (el) el.textContent = counts[key];
+                const allEl = document.getElementById('manageAllCount');
+                if (allEl) allEl.textContent = counts['all'];
+            });
+
+            document.getElementById('manageCount').textContent = allStudents.length;
+        }
+
+        function renderManageStudents() {
+            const container = document.getElementById('manageStudentsContainer');
+            let filtered = allStudents;
+            if (manageFilter !== 'all') {
+                filtered = allStudents.filter(s => s.class == manageFilter);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML =
+                    `<div class="no-data"><div class="icon">👨‍🎓</div><h4>No students found</h4></div>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="student-grid">
+                    ${filtered.map(s => {
+                        const status = getStudentStatus(s);
+                        return `
+                            <div class="student-card" onclick="viewStudent('${s.student_id}')">
+                                <div class="s-name">${s.student_name}</div>
+                                <div class="s-id">ID: ${s.student_id}</div>
+                                <div class="s-id">Class: ${s.class} | ${s.session_year}</div>
+                                <span class="s-status ${status.class}">${status.text}</span>
+                                <div class="s-actions">
+                                    <button class="btn btn-warning btn-xs" onclick="event.stopPropagation();editStudentById('${s.student_id}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteStudentById('${s.student_id}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function filterManageStudents(cls) {
+            manageFilter = cls;
+            document.querySelectorAll('#manageClassButtons .class-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.class == cls);
+            });
+            renderManageStudents();
+        }
+
+        // ============================================
+        // VIEW STUDENT
+        // ============================================
+        async function viewStudent(studentId) {
+            currentStudentId = studentId;
+            const modal = document.getElementById('studentModal');
+            const content = document.getElementById('modalContent');
+            modal.classList.add('active');
+            document.getElementById('modalTitle').innerHTML =
+                '<i class="fas fa-user-graduate" style="color:var(--secondary);"></i> Student Details';
+
+            content.innerHTML = `
+                <div style="text-align:center;padding:20px;">
+                    <div class="loading-spinner"></div>
+                    <p style="color:var(--gray-400);margin-top:8px;">Loading...</p>
+                </div>
+            `;
+
+            try {
+                const data = await apiCall('/students/' + studentId);
+                if (data.success) {
+                    const s = data.data;
+                    const status = getStudentStatus(s);
+                    content.innerHTML = `
+                        <div class="detail-row"><div class="label">Student ID</div><div class="value"><strong>${s.student_id}</strong></div></div>
+                        <div class="detail-row"><div class="label">Student Name</div><div class="value">${s.student_name}</div></div>
+                        <div class="detail-row"><div class="label">Father's Name</div><div class="value">${s.father_name}</div></div>
+                        <div class="detail-row"><div class="label">APAAR ID</div><div class="value">${s.apaar_id}</div></div>
+                        <div class="detail-row"><div class="label">Date of Birth</div><div class="value">${new Date(s.date_of_birth).toLocaleDateString('en-IN', {day:'2-digit',month:'2-digit',year:'numeric'})}</div></div>
+                        <div class="detail-row"><div class="label">Class</div><div class="value">${s.class}</div></div>
+                        <div class="detail-row"><div class="label">Session</div><div class="value">${s.session_year}</div></div>
+                        <div class="detail-row"><div class="label">Result Status</div><div class="value"><span class="badge ${status.class}">${status.text}</span></div></div>
+                    `;
+                    document.getElementById('modalActions').style.display = 'flex';
+                } else {
+                    content.innerHTML = `<p style="color:var(--danger);">Student not found</p>`;
+                }
+            } catch (error) {
+                content.innerHTML = `<p style="color:var(--danger);">Error loading details</p>`;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('studentModal').classList.remove('active');
+            currentStudentId = null;
+        }
+
+        // ============================================
+        // EDIT STUDENT
+        // ============================================
+        async function editStudent() {
+            if (!currentStudentId) return;
+            closeModal();
+            setTimeout(() => editStudentById(currentStudentId), 300);
+        }
+
+        async function editStudentById(studentId) {
+            const modal = document.getElementById('editModal');
+            modal.classList.add('active');
+
+            try {
+                const data = await apiCall('/students/' + studentId);
+                if (data.success) {
+                    const s = data.data;
+                    document.getElementById('editStudentId').value = s.student_id;
+                    document.getElementById('editSId').value = s.student_id;
+                    document.getElementById('editApaarId').value = s.apaar_id;
+                    document.getElementById('editSName').value = s.student_name;
+                    document.getElementById('editSFather').value = s.father_name;
+                    document.getElementById('editSDob').value = s.date_of_birth;
+                    document.getElementById('editSClass').value = s.class;
+                    document.getElementById('editSSession').value = s.session_year;
+                }
+            } catch (error) {
+                showToast('Error loading student data', 'error');
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        document.getElementById('editStudentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const studentId = document.getElementById('editStudentId').value;
+            const data = {
+                studentId: document.getElementById('editSId').value.trim(),
+                studentName: document.getElementById('editSName').value.trim(),
+                fatherName: document.getElementById('editSFather').value.trim(),
+                apaarId: document.getElementById('editApaarId').value.trim(),
+                dob: document.getElementById('editSDob').value,
+                class: document.getElementById('editSClass').value,
+                session: document.getElementById('editSSession').value
+            };
+
+            const result = await apiCall('/students/' + studentId, {
+                method: 'PUT',
+                body: JSON.stringify(data)
+            });
+
+            if (result.success) {
+                showToast('✅ Student updated!', 'success');
+                closeEditModal();
+                loadDashboard();
+                loadListStudents();
+                loadManageStudents();
+                loadUploadStudents();
+                loadPendingUpload();
+            } else {
+                showToast('❌ ' + result.message, 'error');
+            }
+        });
+
+        // ============================================
+        // DELETE STUDENT
+        // ============================================
+        async function deleteStudent() {
+            if (!currentStudentId) return;
+            if (!confirm('Delete this student permanently? This will also delete their result.')) return;
+
+            const result = await apiCall('/students/' + currentStudentId, { method: 'DELETE' });
+
+            if (result.success) {
+                showToast('🗑️ Student deleted!', 'success');
+                closeModal();
+                loadDashboard();
+                loadListStudents();
+                loadManageStudents();
+                loadUploadStudents();
+                loadUploadedResults();
+                loadPendingUpload();
+                loadPublishResults();
+                loadUnpublishedList();
+                loadPublishedList();
+            } else {
+                showToast('❌ ' + result.message, 'error');
+            }
+        }
+
+        async function deleteStudentById(studentId) {
+            if (!confirm('Delete this student permanently?')) return;
+            const result = await apiCall('/students/' + studentId, { method: 'DELETE' });
+            if (result.success) {
+                showToast('🗑️ Student deleted!', 'success');
+                loadDashboard();
+                loadListStudents();
+                loadManageStudents();
+                loadUploadStudents();
+                loadUploadedResults();
+                loadPendingUpload();
+                loadPublishResults();
+                loadUnpublishedList();
+                loadPublishedList();
+            } else {
+                showToast('❌ ' + result.message, 'error');
+            }
         }
 
         // ============================================
@@ -877,7 +2251,7 @@
         }
 
         function renderUploadStudents() {
-            const container = document.getElementById('uploadList');
+            const container = document.getElementById('uploadStudentsList');
             let filtered = allStudents;
             if (uploadFilter !== 'all') {
                 filtered = allStudents.filter(s => s.class == uploadFilter);
@@ -885,7 +2259,9 @@
 
             if (filtered.length === 0) {
                 container.innerHTML =
-                    `<div class="no-data"><i class="fas fa-info-circle"></i> No students found</div>`;
+                    `<div style="text-align:center;padding:20px;color:var(--gray-400);font-size:0.85rem;">
+                        <i class="fas fa-info-circle"></i> No students found
+                    </div>`;
                 return;
             }
 
@@ -900,13 +2276,13 @@
                         </button>
                     `).join('')}
                 </div>
-                <p style="font-size:0.7rem;color:#94a3b8;margin-top:6px;">
+                <p style="font-size:0.7rem;color:var(--gray-400);margin-top:8px;">
                     <i class="fas fa-hand-pointer"></i> Click a student to auto-fill
                 </p>
             `;
         }
 
-        function filterUpload(cls) {
+        function filterUploadStudents(cls) {
             uploadFilter = cls;
             document.querySelectorAll('#uploadClassButtons .class-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.class == cls);
@@ -969,7 +2345,7 @@
             }
         });
 
-        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+        document.getElementById('uploadResultForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const file = document.getElementById('uFile').files[0];
@@ -985,7 +2361,7 @@
             formData.append('marksheet', file);
 
             const btn = document.getElementById('uploadBtn');
-            btn.innerHTML = '⏳ Uploading...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
             btn.disabled = true;
 
             try {
@@ -996,27 +2372,30 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showToast('✅ Result uploaded!', 'success');
+                    showToast('✅ Result uploaded successfully!', 'success');
                     this.reset();
                     document.getElementById('uFilePreview').classList.remove('show');
                     document.getElementById('verifyInfo').classList.remove('show');
                     loadDashboard();
                     loadUploadStudents();
                     loadUploadedResults();
-                    loadNotUploaded();
+                    loadPendingUpload();
+                    loadPublishResults();
+                    loadUnpublishedList();
+                    document.querySelector('[data-page="publish-result"]').click();
                 } else {
                     showToast('❌ ' + data.message, 'error');
                 }
             } catch (error) {
                 showToast('❌ Error: ' + error.message, 'error');
             } finally {
-                btn.innerHTML = '📤 Upload';
+                btn.innerHTML = '<i class="fas fa-upload"></i> Upload Result';
                 btn.disabled = false;
             }
         });
 
         // ============================================
-        // UPLOADED RESULTS
+        // ALREADY UPLOADED (Edit before publish)
         // ============================================
         async function loadUploadedResults() {
             try {
@@ -1058,21 +2437,22 @@
 
             if (filtered.length === 0) {
                 tbody.innerHTML =
-                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:#94a3b8;">No uploaded results</td></tr>`;
+                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">No uploaded results</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = filtered.map((r, i) => `
                 <tr>
-                    <td>${i+1}</td>
+                    <td>${i + 1}</td>
                     <td><strong>${r.student_id}</strong></td>
                     <td>${r.student_name}</td>
                     <td><span class="badge badge-info">${r.class}</span></td>
                     <td>${r.session_year}</td>
-                    <td><span class="badge badge-info">📄 Uploaded</span></td>
+                    <td><span class="badge status-uploaded">📄 Uploaded</span></td>
                     <td>
-                        <button class="btn btn-success btn-xs" onclick="publishResult(${r.id})">✅</button>
-                        <button class="btn btn-danger btn-xs" onclick="deleteResult(${r.id})">🗑️</button>
+                        <button class="btn btn-danger btn-xs" onclick="deleteResult(${r.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
                     </td>
                 </tr>
             `).join('');
@@ -1087,25 +2467,25 @@
         }
 
         // ============================================
-        // NOT UPLOADED
+        // PENDING UPLOAD (No Result)
         // ============================================
-        async function loadNotUploaded() {
-            const container = document.getElementById('notUploadedContainer');
+        async function loadPendingUpload() {
+            const container = document.getElementById('pendingUploadContainer');
             try {
                 const data = await apiCall('/students');
                 if (data.success) {
                     const noResult = data.data.filter(s => !s.has_result);
-                    updateNotUploadedCounts(noResult);
-                    renderNotUploaded(noResult);
+                    updatePendingUploadCounts(noResult);
+                    renderPendingUpload(noResult);
                 }
             } catch (error) {
-                console.error('Not uploaded error:', error);
+                console.error('Pending upload error:', error);
                 container.innerHTML =
                     `<div class="no-data"><h4>❌ Failed to load</h4><p>${error.message}</p></div>`;
             }
         }
 
-        function updateNotUploadedCounts(students) {
+        function updatePendingUploadCounts(students) {
             const counts = {};
             students.forEach(s => {
                 const key = s.class || 'unknown';
@@ -1114,20 +2494,20 @@
             counts['all'] = students.length;
 
             Object.keys(counts).forEach(key => {
-                const el = document.getElementById(`notUploadedC${key}Count`);
+                const el = document.getElementById(`pendingUploadC${key}Count`);
                 if (el) el.textContent = counts[key];
-                const allEl = document.getElementById('notUploadedAllCount');
+                const allEl = document.getElementById('pendingUploadAllCount');
                 if (allEl) allEl.textContent = counts['all'];
             });
 
-            document.getElementById('notUploadedCount').textContent = students.length;
+            document.getElementById('pendingUploadCount').textContent = students.length;
         }
 
-        function renderNotUploaded(students) {
-            const container = document.getElementById('notUploadedContainer');
+        function renderPendingUpload(students) {
+            const container = document.getElementById('pendingUploadContainer');
             let filtered = students;
-            if (notUploadedFilter !== 'all') {
-                filtered = students.filter(s => s.class == notUploadedFilter);
+            if (pendingUploadFilter !== 'all') {
+                filtered = students.filter(s => s.class == pendingUploadFilter);
             }
 
             if (filtered.length === 0) {
@@ -1139,7 +2519,7 @@
             container.innerHTML = `
                 <div class="student-grid">
                     ${filtered.map(s => `
-                        <div class="student-card" onclick="selectForUpload('${s.student_id}','${s.class}','${s.session_year}')" style="border-color:#ef4444;cursor:pointer;">
+                        <div class="student-card" onclick="selectForUpload('${s.student_id}','${s.class}','${s.session_year}')" style="border-color:var(--danger);cursor:pointer;">
                             <div class="s-name">${s.student_name}</div>
                             <div class="s-id">ID: ${s.student_id}</div>
                             <div class="s-id">Class: ${s.class} | ${s.session_year}</div>
@@ -1147,22 +2527,22 @@
                         </div>
                     `).join('')}
                 </div>
-                <p style="font-size:0.7rem;color:#94a3b8;margin-top:6px;">
+                <p style="font-size:0.7rem;color:var(--gray-400);margin-top:8px;">
                     <i class="fas fa-hand-pointer"></i> Click a student to upload
                 </p>
             `;
         }
 
-        function filterNotUploaded(cls) {
-            notUploadedFilter = cls;
-            document.querySelectorAll('#notUploadedClassButtons .class-btn').forEach(btn => {
+        function filterPendingUpload(cls) {
+            pendingUploadFilter = cls;
+            document.querySelectorAll('#pendingUploadClassButtons .class-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.class == cls);
             });
-            loadNotUploaded();
+            loadPendingUpload();
         }
 
         // ============================================
-        // PUBLISH RESULTS
+        // PUBLISH RESULT
         // ============================================
         async function loadPublishResults() {
             try {
@@ -1204,21 +2584,25 @@
 
             if (filtered.length === 0) {
                 tbody.innerHTML =
-                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:#94a3b8;">No pending results</td></tr>`;
+                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">No pending results</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = filtered.map((r, i) => `
                 <tr>
-                    <td>${i+1}</td>
+                    <td>${i + 1}</td>
                     <td><strong>${r.student_id}</strong></td>
                     <td>${r.student_name}</td>
                     <td><span class="badge badge-info">${r.class}</span></td>
                     <td>${r.session_year}</td>
-                    <td><span class="badge badge-warning">⏳ Pending</span></td>
+                    <td><span class="badge status-uploaded">📄 Uploaded</span></td>
                     <td>
-                        <button class="btn btn-success btn-xs" onclick="publishResult(${r.id})">✅</button>
-                        <button class="btn btn-danger btn-xs" onclick="deleteResult(${r.id})">🗑️</button>
+                        <button class="btn btn-success btn-xs" onclick="publishResult(${r.id})">
+                            <i class="fas fa-check"></i> Publish
+                        </button>
+                        <button class="btn btn-danger btn-xs" onclick="deleteResult(${r.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </td>
                 </tr>
             `).join('');
@@ -1232,7 +2616,7 @@
             renderPublishResults();
         }
 
-        async function publishAll() {
+        async function publishAllFiltered() {
             let filtered = allResults;
             if (publishFilter !== 'all') {
                 filtered = allResults.filter(r => r.class == publishFilter);
@@ -1254,13 +2638,15 @@
             showToast(`✅ ${success} results published!`, 'success');
             loadDashboard();
             loadPublishResults();
+            loadUnpublishedList();
             loadPublishedList();
             loadUploadedResults();
             loadListStudents();
-            loadNotUploaded();
+            loadManageStudents();
+            loadPendingUpload();
         }
 
-        async function unpublishAll() {
+        async function unpublishAllFiltered() {
             let filtered = allResults;
             if (publishFilter !== 'all') {
                 filtered = allResults.filter(r => r.class == publishFilter);
@@ -1282,10 +2668,117 @@
             showToast(`📌 ${success} results unpublished!`, 'success');
             loadDashboard();
             loadPublishResults();
+            loadUnpublishedList();
             loadPublishedList();
             loadUploadedResults();
             loadListStudents();
-            loadNotUploaded();
+            loadManageStudents();
+            loadPendingUpload();
+        }
+
+        async function deleteAllFiltered() {
+            let filtered = allResults;
+            if (publishFilter !== 'all') {
+                filtered = allResults.filter(r => r.class == publishFilter);
+            }
+
+            if (filtered.length === 0) {
+                showToast('No results to delete', 'warning');
+                return;
+            }
+
+            if (!confirm(`⚠️ Delete ${filtered.length} results permanently?`)) return;
+
+            let success = 0;
+            for (const r of filtered) {
+                const data = await apiCall('/results/' + r.id, { method: 'DELETE' });
+                if (data.success) success++;
+            }
+
+            showToast(`🗑️ ${success} results deleted!`, 'success');
+            loadDashboard();
+            loadPublishResults();
+            loadUnpublishedList();
+            loadPublishedList();
+            loadUploadedResults();
+            loadListStudents();
+            loadManageStudents();
+            loadPendingUpload();
+        }
+
+        // ============================================
+        // UNPUBLISHED LIST
+        // ============================================
+        async function loadUnpublishedList() {
+            try {
+                const data = await apiCall('/results?status=unpublished');
+                if (data.success) {
+                    allResults = data.data;
+                    updateUnpublishedListCounts();
+                    renderUnpublishedList();
+                }
+            } catch (error) {
+                console.error('Unpublished list error:', error);
+            }
+        }
+
+        function updateUnpublishedListCounts() {
+            const counts = {};
+            allResults.forEach(r => {
+                const key = r.class || 'unknown';
+                counts[key] = (counts[key] || 0) + 1;
+            });
+            counts['all'] = allResults.length;
+
+            Object.keys(counts).forEach(key => {
+                const el = document.getElementById(`unpublishedListC${key}Count`);
+                if (el) el.textContent = counts[key];
+                const allEl = document.getElementById('unpublishedListAllCount');
+                if (allEl) allEl.textContent = counts['all'];
+            });
+
+            document.getElementById('unpublishedListCount').textContent = allResults.length;
+        }
+
+        function renderUnpublishedList() {
+            const tbody = document.getElementById('unpublishedListTableBody');
+            let filtered = allResults;
+            if (unpublishedListFilter !== 'all') {
+                filtered = allResults.filter(r => r.class == unpublishedListFilter);
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML =
+                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">No unpublished results</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((r, i) => `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td><strong>${r.student_id}</strong></td>
+                    <td>${r.student_name}</td>
+                    <td><span class="badge badge-info">${r.class}</span></td>
+                    <td>${r.session_year}</td>
+                    <td><span class="badge status-uploaded">📄 Uploaded</span></td>
+                    <td>
+                        <button class="btn btn-success btn-xs" onclick="publishResult(${r.id})">
+                            <i class="fas fa-check"></i> Publish
+                        </button>
+                        <button class="btn btn-danger btn-xs" onclick="deleteResult(${r.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterUnpublishedList(cls) {
+            unpublishedListFilter = cls;
+            document.querySelectorAll('#unpublishedListClassButtons .class-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.class == cls);
+            });
+            renderUnpublishedList();
         }
 
         // ============================================
@@ -1331,21 +2824,25 @@
 
             if (filtered.length === 0) {
                 tbody.innerHTML =
-                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:#94a3b8;">No published results</td></tr>`;
+                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">No published results</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = filtered.map((r, i) => `
                 <tr>
-                    <td>${i+1}</td>
+                    <td>${i + 1}</td>
                     <td><strong>${r.student_id}</strong></td>
                     <td>${r.student_name}</td>
                     <td><span class="badge badge-info">${r.class}</span></td>
                     <td>${r.session_year}</td>
                     <td>${r.published_date_ist || 'N/A'}</td>
                     <td>
-                        <button class="btn btn-warning btn-xs" onclick="unpublishResult(${r.id})">📌</button>
-                        <button class="btn btn-danger btn-xs" onclick="deleteResult(${r.id})">🗑️</button>
+                        <button class="btn btn-warning btn-xs" onclick="unpublishResult(${r.id})">
+                            <i class="fas fa-times"></i> Unpublish
+                        </button>
+                        <button class="btn btn-danger btn-xs" onclick="deleteResult(${r.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </td>
                 </tr>
             `).join('');
@@ -1369,10 +2866,12 @@
                 showToast('✅ Published!', 'success');
                 loadDashboard();
                 loadPublishResults();
+                loadUnpublishedList();
                 loadPublishedList();
                 loadUploadedResults();
                 loadListStudents();
-                loadNotUploaded();
+                loadManageStudents();
+                loadPendingUpload();
             } else {
                 showToast('❌ ' + data.message, 'error');
             }
@@ -1385,10 +2884,12 @@
                 showToast('📌 Unpublished!', 'success');
                 loadDashboard();
                 loadPublishResults();
+                loadUnpublishedList();
                 loadPublishedList();
                 loadUploadedResults();
                 loadListStudents();
-                loadNotUploaded();
+                loadManageStudents();
+                loadPendingUpload();
             } else {
                 showToast('❌ ' + data.message, 'error');
             }
@@ -1401,11 +2902,13 @@
                 showToast('🗑️ Deleted!', 'success');
                 loadDashboard();
                 loadPublishResults();
+                loadUnpublishedList();
                 loadPublishedList();
                 loadUploadedResults();
-                loadNotUploaded();
+                loadPendingUpload();
                 loadUploadStudents();
                 loadListStudents();
+                loadManageStudents();
             } else {
                 showToast('❌ ' + data.message, 'error');
             }
@@ -1418,10 +2921,12 @@
             showToast('🔄 Refreshing...', 'info');
             loadDashboard();
             loadListStudents();
+            loadManageStudents();
             loadUploadStudents();
             loadUploadedResults();
-            loadNotUploaded();
+            loadPendingUpload();
             loadPublishResults();
+            loadUnpublishedList();
             loadPublishedList();
         }
 
@@ -1430,15 +2935,26 @@
         // ============================================
         loadDashboard();
         loadListStudents();
+        loadManageStudents();
         loadUploadStudents();
         loadUploadedResults();
-        loadNotUploaded();
+        loadPendingUpload();
         loadPublishResults();
+        loadUnpublishedList();
         loadPublishedList();
 
-        console.log('📊 Admin Panel Loaded');
+        console.log('📊 Admin Panel v3.0 Loaded');
         console.log('📡 API Base:', API_BASE);
         console.log('🟢 Ready');
+
+        // Close modals on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(el => {
+            el.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
     </script>
 
 </body>
