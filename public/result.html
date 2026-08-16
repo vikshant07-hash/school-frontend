@@ -485,7 +485,7 @@ body { padding-top: 70px; }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flexible-wrap: wrap;
+  flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 18px;
 }
@@ -658,7 +658,7 @@ body { padding-top: 70px; }
   color: var(--text-light);
 }
 
-/* HIDE FILTER BOX - selected-info hidden */
+/* HIDE FILTER BOX */
 .selected-info {
   display: none !important;
 }
@@ -759,7 +759,7 @@ body { padding-top: 70px; }
 }
 
 /* ============================================================
-   RESULT DISPLAY - PROFESSIONAL (No Section)
+   RESULT DISPLAY - PROFESSIONAL
 ============================================================ */
 .result-found-banner {
   display: flex;
@@ -1252,14 +1252,23 @@ body { padding-top: 70px; }
       </div>
     </div>
 
-    <!-- Professional Search Form (No Filter Box) -->
+    <!-- Professional Search Form -->
     <div class="search-section" id="searchSection">
       <div class="form-header">
         <h3><i class="fas fa-search"></i> Check Your Result</h3>
         <span class="form-status" id="formStatus">Fill the details below</span>
       </div>
 
-      <!-- selected-info is HIDDEN via CSS (display:none) -->
+      <!-- selected-info is HIDDEN -->
+      <div class="selected-info" id="selectedInfo">
+        <span class="label"><i class="fas fa-filter"></i> Selected:</span>
+        <span class="value" id="selectedSessionDisplay">-</span>
+        <span class="value" id="selectedClassDisplay">-</span>
+        <span class="value" id="selectedExamDisplay">-</span>
+        <button class="clear-btn" onclick="clearSelection()">
+          <i class="fas fa-times"></i> Change
+        </button>
+      </div>
 
       <form id="resultSearchForm" onsubmit="searchResult(event)">
         <div class="form-grid">
@@ -1542,30 +1551,57 @@ async function apiCall(url, options = {}) {
 }
 
 // ============================================================
-//  LOAD AVAILABLE CLASSES - WITH DETAILED CARDS (No Student Count)
+//  LOAD AVAILABLE CLASSES - SHOW DATE FROM PUBLISHED MARKSHEET
 // ============================================================
 async function loadAvailableClasses() {
   try {
-    const data = await apiCall(`${API_BASE}/public/classes`);
-    console.log('📊 Classes data:', data);
+    // Step 1: Get available classes
+    const classesData = await apiCall(`${API_BASE}/public/classes`);
+    console.log('📊 Classes data:', classesData);
     
-    if (data.success && data.data.length > 0) {
-      // For each class, get detailed marksheet info
-      const classDetails = await Promise.all(data.data.map(async (c) => {
+    if (classesData.success && classesData.data.length > 0) {
+      
+      // Step 2: For each class, get marksheets to find publish date
+      const classDetails = await Promise.all(classesData.data.map(async (c) => {
         try {
           const session = DEFAULT_SESSION;
           const detailRes = await apiCall(`${API_BASE}/public/${session}/${c.class}`);
+          
           if (detailRes.success && detailRes.data.length > 0) {
+            // Get first marksheet's date (when it was published)
             const first = detailRes.data[0];
+            let declaredDate = null;
+            
+            // Try to get date from updated_at (when published) or uploaded_at
+            if (first.updated_at) {
+              declaredDate = first.updated_at;
+            } else if (first.uploaded_at) {
+              declaredDate = first.uploaded_at;
+            }
+            
             return {
-              ...c,
+              class: c.class,
+              total_published: c.total_published,
               exam_type: first.exam_type || 'Various',
-              updated_at: first.updated_at || first.uploaded_at || null
+              declared_date: declaredDate,
+              marksheets: detailRes.data
             };
           }
-          return { ...c, exam_type: 'Various', updated_at: null };
+          return { 
+            class: c.class, 
+            total_published: c.total_published, 
+            exam_type: 'Various', 
+            declared_date: null,
+            marksheets: []
+          };
         } catch (e) {
-          return { ...c, exam_type: 'Various', updated_at: null };
+          return { 
+            class: c.class, 
+            total_published: c.total_published, 
+            exam_type: 'Various', 
+            declared_date: null,
+            marksheets: []
+          };
         }
       }));
 
@@ -1573,10 +1609,10 @@ async function loadAvailableClasses() {
       classCountBadge.textContent = `${classDetails.length} Class${classDetails.length > 1 ? 'es' : ''}`;
 
       classGrid.innerHTML = classDetails.map(c => {
-        // Format date - Declared = Published Date
+        // Format date - from the first published marksheet of this class
         let dateStr = 'Not available';
-        if (c.updated_at) {
-          const date = new Date(c.updated_at);
+        if (c.declared_date) {
+          const date = new Date(c.declared_date);
           dateStr = date.toLocaleDateString('en-IN', {
             day: '2-digit',
             month: 'short',
@@ -1614,7 +1650,7 @@ async function loadAvailableClasses() {
         `;
       }).join('');
       
-      console.log('✅ Classes rendered with details');
+      console.log('✅ Classes rendered with declared dates from first marksheet');
     } else {
       classCountBadge.textContent = '0 Classes';
       classGrid.innerHTML = `
@@ -1641,7 +1677,7 @@ async function loadAvailableClasses() {
 }
 
 // ============================================================
-//  SELECT CLASS - OPEN FORM WITH AUTO-FILL (No Filter Box)
+//  SELECT CLASS - OPEN FORM WITH AUTO-FILL
 // ============================================================
 function selectClass(classNum, examType = 'Various', declaredDate = null) {
   console.log('✅ Class selected:', classNum, 'Exam:', examType, 'Declared:', declaredDate);
@@ -1650,7 +1686,7 @@ function selectClass(classNum, examType = 'Various', declaredDate = null) {
   selectedSession = DEFAULT_SESSION;
   selectedExamType = examType;
 
-  // ===== SHOW SEARCH SECTION =====
+  // Show search section
   searchSection.classList.add('active');
   searchSection.style.display = 'block';
 
@@ -1659,7 +1695,7 @@ function selectClass(classNum, examType = 'Various', declaredDate = null) {
   formClass.value = `Class ${selectedClass}`;
   formExamType.value = selectedExamType;
 
-  // Update form status with declared date
+  // Update form status
   let statusMsg = `✓ Class ${selectedClass} selected. Enter your ID and DOB.`;
   if (declaredDate && declaredDate !== 'Not available') {
     statusMsg += ` (Declared: ${declaredDate})`;
@@ -1707,7 +1743,6 @@ function clearSelection() {
     card.style.background = 'white';
   });
   
-  // Clear form fields
   formSession.value = '';
   formClass.value = '';
   formExamType.value = '';
@@ -1759,7 +1794,6 @@ async function searchResult(event) {
     return;
   }
 
-  // Show loading
   searchBtn.disabled = true;
   searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
   formStatus.textContent = '⏳ Searching for your result...';
@@ -1819,7 +1853,7 @@ async function searchResult(event) {
 }
 
 // ============================================================
-//  RENDER RESULT - WITH GREEN "RESULT FOUND" BANNER (No Section)
+//  RENDER RESULT
 // ============================================================
 function renderResult(data) {
   const s = data.student;
@@ -1834,7 +1868,6 @@ function renderResult(data) {
     `;
   } else {
     marksheetHtml = marksheets.map(m => {
-      // Format published date
       let publishDate = 'Not available';
       if (m.updated_at) {
         const date = new Date(m.updated_at);
@@ -1878,7 +1911,6 @@ function renderResult(data) {
   }
 
   resultDisplay.innerHTML = `
-    <!-- Green Result Found Banner -->
     <div class="result-found-banner">
       <i class="fas fa-check-circle"></i>
       <div>
@@ -1937,7 +1969,6 @@ function renderResult(data) {
     </div>
   `;
 
-  // Scroll to result
   resultDisplay.scrollIntoView({ behavior: 'smooth', block: 'start' });
   showToast('✅ Result found!', 'success');
 }
