@@ -21,6 +21,8 @@
   --gray: #94a3b8;
   --text: #1a2332;
   --text-light: #5a6a7e;
+  --success: #16a34a;
+  --success-light: #dcfce7;
   --shadow-sm: 0 4px 20px rgba(0,0,0,0.06);
   --shadow-md: 0 8px 40px rgba(0,0,0,0.10);
   --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
@@ -63,7 +65,6 @@ ul { list-style: none; }
   border-bottom: 1px solid var(--gray-light);
   transition: var(--transition);
 }
-
 .navbar.scrolled { box-shadow: var(--shadow-sm); }
 body { padding-top: 70px; }
 
@@ -73,7 +74,6 @@ body { padding-top: 70px; }
   gap: 12px;
   flex-shrink: 0;
 }
-
 .logo img {
   width: 44px;
   height: 44px;
@@ -83,7 +83,6 @@ body { padding-top: 70px; }
   padding: 2px;
   background: var(--white);
 }
-
 .logo-text .school-name {
   display: block;
   font-family: 'Playfair Display', serif;
@@ -471,7 +470,9 @@ body { padding-top: 70px; }
 .result-content.visible { display: block; }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ===== AVAILABLE CLASSES ===== */
+/* ============================================================
+   AVAILABLE RESULTS - PROFESSIONAL CARDS
+============================================================ */
 .class-section {
   background: var(--white);
   border-radius: var(--radius);
@@ -480,44 +481,69 @@ body { padding-top: 70px; }
   border: 1px solid var(--gray-light);
   margin-bottom: 28px;
 }
-.class-section h2 {
+.class-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.class-section .section-header h2 {
   font-family: 'Playfair Display', serif;
   font-size: 22px;
   color: var(--primary);
-  margin-bottom: 6px;
 }
-.class-section .sub-text {
-  color: var(--text-light);
-  font-size: 14px;
-  margin-bottom: 18px;
+.class-section .section-header h2 i { color: var(--accent-dark); }
+.class-section .section-header .badge-count {
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  padding: 4px 16px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .class-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
 }
 
+/* Professional Class Card */
 .class-card {
   background: var(--white);
   border: 2px solid var(--gray-light);
   border-radius: var(--radius-sm);
-  padding: 20px 24px;
+  padding: 22px 24px;
   cursor: pointer;
   transition: var(--transition);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  position: relative;
+  overflow: hidden;
 }
+.class-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--accent);
+  opacity: 0;
+  transition: var(--transition);
+}
+.class-card:hover::before { opacity: 1; }
 .class-card:hover {
   border-color: var(--accent);
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
 }
-.class-card .card-header {
+
+.class-card .card-top {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  margin-bottom: 10px;
 }
 .class-card .class-title {
   font-size: 20px;
@@ -528,34 +554,34 @@ body { padding-top: 70px; }
   color: var(--accent-dark);
   margin-right: 8px;
 }
-.class-card .click-badge {
-  background: var(--accent);
-  color: var(--white);
-  padding: 4px 16px;
+.class-card .status-badge {
+  background: var(--success-light);
+  color: var(--success);
+  padding: 4px 14px;
   border-radius: 50px;
   font-size: 12px;
   font-weight: 600;
-  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
-.class-card:hover .click-badge {
-  background: var(--accent-dark);
-  transform: scale(1.05);
-}
+
 .class-card .card-details {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 4px;
+  gap: 10px;
+  margin: 10px 0 8px;
 }
 .class-card .detail-tag {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   font-size: 13px;
   color: var(--text-light);
   background: var(--off-white);
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: 50px;
+  transition: var(--transition);
 }
 .class-card .detail-tag i {
   font-size: 12px;
@@ -565,17 +591,41 @@ body { padding-top: 70px; }
   color: var(--text);
   font-weight: 600;
 }
-.class-card .publish-count {
+
+.class-card .card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--gray-light);
+}
+.class-card .publish-info {
   font-size: 13px;
   color: var(--gray);
-  margin-top: 4px;
+}
+.class-card .publish-info i { color: var(--success); }
+.class-card .click-hint {
+  background: var(--accent);
+  color: var(--white);
+  padding: 5px 18px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: var(--transition);
+}
+.class-card:hover .click-hint {
+  background: var(--accent-dark);
+  transform: scale(1.05);
 }
 
-/* ===== SEARCH FORM ===== */
+/* ============================================================
+   SEARCH FORM - PROFESSIONAL
+============================================================ */
 .search-section {
   background: var(--white);
   border-radius: var(--radius);
-  padding: 30px;
+  padding: 32px 34px;
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--gray-light);
   display: none;
@@ -585,16 +635,25 @@ body { padding-top: 70px; }
   display: block !important;
 }
 
-.search-section h3 {
+.search-section .form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--gray-light);
+}
+.search-section .form-header h3 {
   font-family: 'Playfair Display', serif;
   font-size: 20px;
   color: var(--primary);
-  margin-bottom: 4px;
 }
-.search-section .sub-text {
+.search-section .form-header h3 i { color: var(--accent-dark); }
+.search-section .form-header .form-status {
+  font-size: 13px;
   color: var(--text-light);
-  font-size: 14px;
-  margin-bottom: 18px;
 }
 
 .selected-info {
@@ -603,13 +662,23 @@ body { padding-top: 70px; }
   gap: 12px;
   flex-wrap: wrap;
   background: #fef8ed;
-  padding: 10px 18px;
+  padding: 12px 20px;
   border-radius: var(--radius-sm);
-  margin-bottom: 18px;
+  margin-bottom: 22px;
   border: 1px solid #f5d78a;
 }
-.selected-info .label { color: var(--text-light); font-size: 13px; }
-.selected-info .value { font-weight: 700; color: var(--accent-dark); }
+.selected-info .label {
+  color: var(--text-light);
+  font-size: 13px;
+  font-weight: 500;
+}
+.selected-info .value {
+  font-weight: 700;
+  color: var(--accent-dark);
+  background: var(--white);
+  padding: 2px 14px;
+  border-radius: 50px;
+}
 .selected-info .clear-btn {
   background: none;
   border: none;
@@ -620,32 +689,74 @@ body { padding-top: 70px; }
   border-radius: 4px;
   transition: var(--transition);
   font-weight: 500;
+  margin-left: auto;
 }
-.selected-info .clear-btn:hover { background: rgba(0,0,0,0.05); color: #dc2626; }
+.selected-info .clear-btn:hover {
+  background: rgba(0,0,0,0.05);
+  color: #dc2626;
+}
 
-.search-box {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 24px;
 }
-.search-box input {
-  flex: 1;
-  min-width: 180px;
+.form-grid .full-width { grid-column: 1 / -1; }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.form-group label .required {
+  color: #dc2626;
+  margin-left: 2px;
+}
+.form-group label i {
+  color: var(--accent-dark);
+  margin-right: 6px;
+  width: 16px;
+}
+.form-group input,
+.form-group select {
   padding: 12px 16px;
   border: 1px solid var(--gray-light);
   border-radius: var(--radius-sm);
   font-size: 14px;
   transition: var(--transition);
   background: var(--white);
+  font-family: 'Inter', sans-serif;
 }
-.search-box input:focus {
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(232, 184, 75, 0.15);
 }
+.form-group input:disabled,
+.form-group select:disabled {
+  background: #f1f5f9;
+  cursor: not-allowed;
+}
+.form-group .input-hint {
+  font-size: 12px;
+  color: var(--gray);
+  margin-top: 2px;
+}
 
-.search-box .btn-primary {
-  padding: 12px 32px;
+.form-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.btn-primary {
+  padding: 14px 36px;
   background: var(--accent);
   color: var(--white);
   border: none;
@@ -659,29 +770,64 @@ body { padding-top: 70px; }
   gap: 8px;
   font-family: 'Inter', sans-serif;
 }
-.search-box .btn-primary:hover {
+.btn-primary:hover {
   background: var(--accent-dark);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
 }
-.search-box .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-.search-hint {
-  font-size: 13px;
-  color: var(--gray);
-  margin-top: 10px;
+.btn-secondary {
+  padding: 14px 28px;
+  background: var(--off-white);
+  color: var(--text-light);
+  border: 1px solid var(--gray-light);
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: 'Inter', sans-serif;
 }
-.search-hint i { color: var(--accent-dark); }
+.btn-secondary:hover {
+  background: var(--gray-light);
+  color: var(--text);
+}
 
-/* ===== RESULT DISPLAY ===== */
+/* ============================================================
+   RESULT DISPLAY - PROFESSIONAL
+============================================================ */
+.result-found-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--success-light);
+  color: var(--success);
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  border-left: 4px solid var(--success);
+}
+.result-found-banner i { font-size: 20px; }
+.result-found-banner strong { font-weight: 700; }
+
 .result-card {
   background: var(--white);
   border-radius: var(--radius);
   padding: 28px;
-  margin-top: 24px;
+  margin-top: 16px;
   border: 1px solid var(--gray-light);
   box-shadow: var(--shadow-sm);
   animation: fadeInUp 0.5s ease;
+}
+.result-card .student-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 2px solid var(--gray-light);
+  padding-bottom: 14px;
 }
 .result-card .student-name {
   font-size: 24px;
@@ -695,10 +841,15 @@ body { padding-top: 70px; }
   margin-left: 10px;
   font-weight: 400;
 }
+.result-card .student-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
 
 .result-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 10px 20px;
   margin: 16px 0;
 }
@@ -710,19 +861,26 @@ body { padding-top: 70px; }
   letter-spacing: 0.04em;
   font-weight: 600;
 }
-.result-grid .item span { font-weight: 600; color: var(--text); }
-.result-grid .item.highlight span { color: var(--accent-dark); font-size: 18px; }
+.result-grid .item span {
+  font-weight: 600;
+  color: var(--text);
+}
+.result-grid .item.highlight span {
+  color: var(--accent-dark);
+  font-size: 18px;
+}
 
 .badge {
   display: inline-block;
-  padding: 2px 12px;
+  padding: 2px 14px;
   border-radius: 50px;
   font-size: 11px;
   font-weight: 600;
 }
-.badge-success { background: #dcfce7; color: #166534; }
+.badge-success { background: var(--success-light); color: var(--success); }
 .badge-info { background: #dbeafe; color: #1e40af; }
 .badge-warning { background: #fef3c7; color: #92400e; }
+.badge-accent { background: #fef8ed; color: var(--accent-dark); }
 
 /* ===== MARKSHEET LIST ===== */
 .marksheet-list {
@@ -787,7 +945,7 @@ body { padding-top: 70px; }
 }
 
 .btn-sm {
-  padding: 6px 14px;
+  padding: 6px 16px;
   font-size: 12px;
   border: none;
   border-radius: 6px;
@@ -805,19 +963,23 @@ body { padding-top: 70px; }
 .btn-download { background: #e0e7ff; color: #3730a3; }
 .btn-download:hover { background: #c7d2fe; }
 
-/* ===== ALERTS ===== */
+/* ============================================================
+   ALERTS
+============================================================ */
 .alert {
   padding: 14px 18px;
   border-radius: var(--radius-sm);
   margin-top: 12px;
 }
 .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-.alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+.alert-success { background: var(--success-light); color: var(--success); border: 1px solid #bbf7d0; }
 .alert-warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
 .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
 .alert i { margin-right: 8px; }
 
-/* ===== TOAST ===== */
+/* ============================================================
+   TOAST
+============================================================ */
 .toast-container {
   position: fixed;
   top: 90px;
@@ -835,7 +997,7 @@ body { padding-top: 70px; }
   min-width: 240px;
   backdrop-filter: blur(4px);
 }
-.toast-success { background: #16a34a; }
+.toast-success { background: var(--success); }
 .toast-error { background: #dc2626; }
 .toast-warning { background: #f59e0b; }
 .toast-info { background: #1a56db; }
@@ -971,36 +1133,40 @@ body { padding-top: 70px; }
    RESPONSIVE
 ============================================================ */
 @media (max-width: 992px) {
-  .class-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  .class-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
 }
 @media (max-width: 768px) {
   .page-header { padding: 40px 20px 30px; }
   .page-header h1 { font-size: 26px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid .full-width { grid-column: 1; }
   .result-card { padding: 20px; }
   .result-card .student-name { font-size: 20px; }
   .result-grid { grid-template-columns: 1fr 1fr; }
   .class-section { padding: 20px; }
   .search-section { padding: 20px; }
-  .search-box { flex-direction: column; }
-  .search-box input { min-width: auto; }
   .loader-4square { grid-template-columns: 50px 50px; grid-template-rows: 50px 50px; }
   .class-grid { grid-template-columns: 1fr; }
   .class-card .card-details { gap: 8px; }
+  .selected-info { flex-direction: column; text-align: center; }
+  .selected-info .clear-btn { margin-left: 0; }
 }
 @media (max-width: 480px) {
   .page-header h1 { font-size: 22px; }
   .page-header p { font-size: 13px; }
   .result-grid { grid-template-columns: 1fr; }
   .class-card { padding: 16px; }
-  .class-card .card-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .class-card .card-top { flex-direction: column; align-items: flex-start; gap: 8px; }
   .marksheet-item { flex-direction: column; align-items: stretch; text-align: center; }
   .marksheet-item .exam-actions { justify-content: center; }
   .marksheet-item .exam-info { justify-content: center; }
-  .selected-info { flex-direction: column; text-align: center; }
   .loader-4square { grid-template-columns: 40px 40px; grid-template-rows: 40px 40px; gap: 6px; }
   .loader-text { font-size: 13px; }
   .toast-container { top: 80px; right: 10px; left: 10px; }
   .toast { min-width: auto; }
+  .search-section .form-header { flex-direction: column; align-items: flex-start; }
+  .form-actions { flex-direction: column; }
+  .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
 }
 </style>
 </head>
@@ -1112,38 +1278,79 @@ body { padding-top: 70px; }
 
     <!-- Available Classes -->
     <div class="class-section">
-      <h2><i class="fas fa-school" style="color:var(--accent-dark);"></i> Available Results</h2>
-      <p class="sub-text">Click on any class card to check results</p>
+      <div class="section-header">
+        <h2><i class="fas fa-school"></i> Available Results</h2>
+        <span class="badge-count" id="classCountBadge">0 Classes</span>
+      </div>
+      <p style="color:var(--text-light); font-size:14px; margin-bottom:18px;">
+        Click on any class card to check your result
+      </p>
       <div class="class-grid" id="classGrid">
         <!-- Dynamically loaded -->
       </div>
     </div>
 
-    <!-- Search Form -->
+    <!-- Professional Search Form -->
     <div class="search-section" id="searchSection">
-      <h3><i class="fas fa-search" style="color:var(--accent-dark);"></i> Check Your Result</h3>
-      <p class="sub-text">Enter your Student ID or APAAR ID with Date of Birth</p>
+      <div class="form-header">
+        <h3><i class="fas fa-search"></i> Check Your Result</h3>
+        <span class="form-status" id="formStatus">Fill the details below</span>
+      </div>
 
       <div class="selected-info" id="selectedInfo">
         <span class="label"><i class="fas fa-filter"></i> Selected:</span>
         <span class="value" id="selectedSessionDisplay">-</span>
         <span class="value" id="selectedClassDisplay">-</span>
+        <span class="value" id="selectedExamDisplay">-</span>
         <button class="clear-btn" onclick="clearSelection()">
-          <i class="fas fa-times"></i> Change Class
+          <i class="fas fa-times"></i> Change
         </button>
       </div>
 
-      <div class="search-box">
-        <input type="text" id="studentIdInput" placeholder="Student ID or APAAR ID" />
-        <input type="date" id="dobInput" />
-        <button class="btn-primary" id="searchBtn" onclick="searchResult()">
-          <i class="fas fa-search"></i> View Result
-        </button>
-      </div>
+      <form id="resultSearchForm" onsubmit="searchResult(event)">
+        <div class="form-grid">
+          <!-- Session - Auto-filled -->
+          <div class="form-group">
+            <label><i class="fas fa-calendar-alt"></i> Session <span class="required">*</span></label>
+            <input type="text" id="formSession" disabled placeholder="Auto-filled" />
+          </div>
 
-      <div class="search-hint">
-        <i class="fas fa-info-circle"></i> Use either <strong>Student ID</strong> or <strong>APAAR ID</strong> with your Date of Birth
-      </div>
+          <!-- Class - Auto-filled (not changeable) -->
+          <div class="form-group">
+            <label><i class="fas fa-school"></i> Class <span class="required">*</span></label>
+            <input type="text" id="formClass" disabled placeholder="Auto-filled" />
+          </div>
+
+          <!-- Exam Type - Auto-filled -->
+          <div class="form-group">
+            <label><i class="fas fa-file-alt"></i> Exam Type <span class="required">*</span></label>
+            <input type="text" id="formExamType" disabled placeholder="Auto-filled" />
+          </div>
+
+          <!-- Student ID / APAAR ID -->
+          <div class="form-group">
+            <label><i class="fas fa-id-card"></i> Student ID or APAAR ID <span class="required">*</span></label>
+            <input type="text" id="studentIdInput" placeholder="Enter Student ID or APAAR ID" required />
+            <span class="input-hint">Enter either Student ID or APAAR ID</span>
+          </div>
+
+          <!-- Date of Birth -->
+          <div class="form-group full-width">
+            <label><i class="fas fa-calendar-day"></i> Date of Birth <span class="required">*</span></label>
+            <input type="date" id="dobInput" required />
+            <span class="input-hint">Format: DD/MM/YYYY (Select from calendar)</span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" id="searchBtn">
+            <i class="fas fa-search"></i> View Result
+          </button>
+          <button type="reset" class="btn-secondary" onclick="clearForm()">
+            <i class="fas fa-undo"></i> Clear
+          </button>
+        </div>
+      </form>
 
       <div id="resultDisplay"></div>
     </div>
@@ -1320,6 +1527,7 @@ const DEFAULT_SESSION = '2025-26';
 
 let selectedClass = null;
 let selectedSession = null;
+let selectedExamType = null;
 let retryCount = 0;
 const MAX_RETRIES = 2;
 
@@ -1327,11 +1535,16 @@ const MAX_RETRIES = 2;
 const loaderWrapper = document.getElementById('loaderWrapper');
 const resultContent = document.getElementById('resultContent');
 const classGrid = document.getElementById('classGrid');
+const classCountBadge = document.getElementById('classCountBadge');
 const searchSection = document.getElementById('searchSection');
 const resultDisplay = document.getElementById('resultDisplay');
 const searchBtn = document.getElementById('searchBtn');
 const studentIdInput = document.getElementById('studentIdInput');
 const dobInput = document.getElementById('dobInput');
+const formSession = document.getElementById('formSession');
+const formClass = document.getElementById('formClass');
+const formExamType = document.getElementById('formExamType');
+const formStatus = document.getElementById('formStatus');
 
 // ============================================================
 //  TOAST
@@ -1389,22 +1602,25 @@ async function loadAvailableClasses() {
           const session = DEFAULT_SESSION;
           const detailRes = await apiCall(`${API_BASE}/public/${session}/${c.class}`);
           if (detailRes.success && detailRes.data.length > 0) {
-            // Get first marksheet for details
             const first = detailRes.data[0];
             return {
               ...c,
               exam_type: first.exam_type || 'Various',
-              updated_at: first.updated_at || first.uploaded_at || null
+              updated_at: first.updated_at || first.uploaded_at || null,
+              student_count: detailRes.data.length
             };
           }
-          return { ...c, exam_type: 'Various', updated_at: null };
+          return { ...c, exam_type: 'Various', updated_at: null, student_count: 0 };
         } catch (e) {
-          return { ...c, exam_type: 'Various', updated_at: null };
+          return { ...c, exam_type: 'Various', updated_at: null, student_count: 0 };
         }
       }));
 
+      // Update badge
+      classCountBadge.textContent = `${classDetails.length} Class${classDetails.length > 1 ? 'es' : ''}`;
+
       classGrid.innerHTML = classDetails.map(c => {
-        // Format date
+        // Format date - Declared = Published Date
         let dateStr = 'Not available';
         if (c.updated_at) {
           const date = new Date(c.updated_at);
@@ -1416,13 +1632,13 @@ async function loadAvailableClasses() {
         }
 
         return `
-          <div class="class-card" onclick="selectClass(${c.class})">
-            <div class="card-header">
+          <div class="class-card" onclick="selectClass(${c.class}, '${c.exam_type}')">
+            <div class="card-top">
               <span class="class-title">
                 <i class="fas fa-school"></i> Class ${c.class}
               </span>
-              <span class="click-badge">
-                Click <i class="fas fa-arrow-right"></i>
+              <span class="status-badge">
+                <i class="fas fa-check-circle"></i> ${c.total_published} Published
               </span>
             </div>
             <div class="card-details">
@@ -1436,9 +1652,13 @@ async function loadAvailableClasses() {
                 <i class="fas fa-clock"></i> Declared: <strong>${dateStr}</strong>
               </span>
             </div>
-            <div class="publish-count">
-              <i class="fas fa-check-circle" style="color:var(--success);"></i>
-              ${c.total_published} result${c.total_published > 1 ? 's' : ''} published
+            <div class="card-footer">
+              <span class="publish-info">
+                <i class="fas fa-users"></i> ${c.student_count || 0} students
+              </span>
+              <span class="click-hint">
+                Click <i class="fas fa-arrow-right"></i>
+              </span>
             </div>
           </div>
         `;
@@ -1446,18 +1666,20 @@ async function loadAvailableClasses() {
       
       console.log('✅ Classes rendered with details');
     } else {
+      classCountBadge.textContent = '0 Classes';
       classGrid.innerHTML = `
-        <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--gray);">
-          <i class="fas fa-info-circle" style="font-size:40px; display:block; margin-bottom:12px; color:var(--gray-light);"></i>
-          <h3 style="font-size:18px; color:var(--text);">No Published Results</h3>
-          <p style="margin-top:4px;">Results will appear here once they are published by the administration.</p>
+        <div style="grid-column:1/-1; text-align:center; padding:50px 20px; color:var(--gray);">
+          <i class="fas fa-info-circle" style="font-size:48px; display:block; margin-bottom:14px; color:var(--gray-light);"></i>
+          <h3 style="font-size:20px; color:var(--text);">No Published Results</h3>
+          <p style="margin-top:6px; color:var(--text-light);">Results will appear here once they are published by the administration.</p>
         </div>
       `;
     }
   } catch (error) {
     console.error('Error loading classes:', error);
+    classCountBadge.textContent = 'Error';
     classGrid.innerHTML = `
-      <div style="grid-column:1/-1; padding:20px; text-align:center; color:#dc2626; background:#fee2e2; border-radius:10px;">
+      <div style="grid-column:1/-1; padding:24px; text-align:center; color:#dc2626; background:#fee2e2; border-radius:10px;">
         <i class="fas fa-exclamation-circle"></i> Failed to load classes. 
         <button onclick="loadAvailableClasses()" style="background:none; border:none; color:#1a56db; font-weight:600; cursor:pointer; text-decoration:underline;">
           Retry
@@ -1471,19 +1693,30 @@ async function loadAvailableClasses() {
 // ============================================================
 //  SELECT CLASS - OPEN FORM WITH AUTO-FILL
 // ============================================================
-function selectClass(classNum) {
-  console.log('✅ Class selected:', classNum);
+function selectClass(classNum, examType = 'Various') {
+  console.log('✅ Class selected:', classNum, 'Exam:', examType);
   
   selectedClass = classNum;
   selectedSession = DEFAULT_SESSION;
+  selectedExamType = examType;
 
   // ===== SHOW SEARCH SECTION =====
   searchSection.classList.add('active');
   searchSection.style.display = 'block';
 
+  // Auto-fill form fields
+  formSession.value = selectedSession;
+  formClass.value = `Class ${selectedClass}`;
+  formExamType.value = selectedExamType;
+
   // Update selected info
   document.getElementById('selectedSessionDisplay').textContent = selectedSession;
   document.getElementById('selectedClassDisplay').textContent = `Class ${selectedClass}`;
+  document.getElementById('selectedExamDisplay').textContent = selectedExamType;
+
+  // Update form status
+  formStatus.textContent = '✓ Class selected. Enter your ID and DOB.';
+  formStatus.style.color = 'var(--success)';
 
   // Highlight selected class card
   document.querySelectorAll('.class-card').forEach(card => {
@@ -1505,7 +1738,7 @@ function selectClass(classNum) {
     studentIdInput.focus();
   }, 500);
 
-  showToast(`Session ${selectedSession} | Class ${selectedClass} selected`, 'success');
+  showToast(`Session ${selectedSession} | Class ${selectedClass} | Exam: ${selectedExamType}`, 'success');
 }
 
 // ============================================================
@@ -1514,6 +1747,7 @@ function selectClass(classNum) {
 function clearSelection() {
   selectedClass = null;
   selectedSession = null;
+  selectedExamType = null;
   
   searchSection.classList.remove('active');
   searchSection.style.display = 'none';
@@ -1524,35 +1758,68 @@ function clearSelection() {
     card.style.background = 'white';
   });
   
+  // Clear form fields
+  formSession.value = '';
+  formClass.value = '';
+  formExamType.value = '';
   studentIdInput.value = '';
   dobInput.value = '';
+  formStatus.textContent = 'Fill the details below';
+  formStatus.style.color = 'var(--text-light)';
   
   showToast('Selection cleared', 'info');
 }
 
 // ============================================================
+//  CLEAR FORM
+// ============================================================
+function clearForm() {
+  studentIdInput.value = '';
+  dobInput.value = '';
+  resultDisplay.innerHTML = '';
+  if (selectedClass) {
+    formStatus.textContent = '✓ Class selected. Enter your ID and DOB.';
+    formStatus.style.color = 'var(--success)';
+  } else {
+    formStatus.textContent = 'Fill the details below';
+    formStatus.style.color = 'var(--text-light)';
+  }
+  showToast('Form cleared', 'info');
+}
+
+// ============================================================
 //  SEARCH RESULT
 // ============================================================
-async function searchResult() {
+async function searchResult(event) {
+  if (event) event.preventDefault();
+  
   const studentId = studentIdInput.value.trim();
   const dob = dobInput.value;
 
   if (!studentId || !dob) {
     showToast('Please enter both ID and Date of Birth', 'warning');
+    formStatus.textContent = '⚠️ Please fill all required fields';
+    formStatus.style.color = '#dc2626';
     return;
   }
 
   if (!selectedClass || !selectedSession) {
     showToast('Please select a class first from Available Results', 'warning');
+    formStatus.textContent = '⚠️ Please select a class first';
+    formStatus.style.color = '#dc2626';
     return;
   }
 
+  // Show loading
   searchBtn.disabled = true;
   searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+  formStatus.textContent = '⏳ Searching for your result...';
+  formStatus.style.color = '#1a56db';
+  
   resultDisplay.innerHTML = `
     <div style="text-align:center; padding:30px; color:var(--gray);">
-      <i class="fas fa-spinner fa-spin" style="font-size:28px;"></i>
-      <p style="margin-top:8px;">Searching for your result...</p>
+      <i class="fas fa-spinner fa-spin" style="font-size:32px;"></i>
+      <p style="margin-top:12px;">Searching for your result...</p>
     </div>
   `;
 
@@ -1571,8 +1838,12 @@ async function searchResult() {
     searchBtn.innerHTML = '<i class="fas fa-search"></i> View Result';
 
     if (data.success) {
+      formStatus.textContent = '✅ Result Found!';
+      formStatus.style.color = 'var(--success)';
       renderResult(data.data);
     } else {
+      formStatus.textContent = '❌ ' + data.message;
+      formStatus.style.color = '#dc2626';
       resultDisplay.innerHTML = `
         <div class="alert alert-error">
           <i class="fas fa-exclamation-circle"></i> ${data.message}
@@ -1584,10 +1855,12 @@ async function searchResult() {
     console.error('Search error:', error);
     searchBtn.disabled = false;
     searchBtn.innerHTML = '<i class="fas fa-search"></i> View Result';
+    formStatus.textContent = '❌ Search failed. Please try again.';
+    formStatus.style.color = '#dc2626';
     resultDisplay.innerHTML = `
       <div class="alert alert-error">
         <i class="fas fa-exclamation-circle"></i> Search failed. Please try again.
-        <button onclick="searchResult()" style="background:none; border:none; color:#1a56db; font-weight:600; cursor:pointer; text-decoration:underline; margin-left:8px;">
+        <button onclick="document.getElementById('searchBtn').click()" style="background:none; border:none; color:#1a56db; font-weight:600; cursor:pointer; text-decoration:underline; margin-left:8px;">
           Retry
         </button>
       </div>
@@ -1597,7 +1870,7 @@ async function searchResult() {
 }
 
 // ============================================================
-//  RENDER RESULT - WITH MARKSHEET VIEW/DOWNLOAD
+//  RENDER RESULT - WITH GREEN "RESULT FOUND" BANNER
 // ============================================================
 function renderResult(data) {
   const s = data.student;
@@ -1656,15 +1929,24 @@ function renderResult(data) {
   }
 
   resultDisplay.innerHTML = `
+    <!-- Green Result Found Banner -->
+    <div class="result-found-banner">
+      <i class="fas fa-check-circle"></i>
+      <div>
+        <strong>Result Found!</strong> 
+        <span style="font-weight:400;">Student details and marksheets are displayed below.</span>
+      </div>
+    </div>
+
     <div class="result-card">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; border-bottom:2px solid var(--gray-light); padding-bottom:14px;">
+      <div class="student-header">
         <div>
           <span class="student-name">${s.name}</span>
           <span class="student-id">ID: ${s.student_id}</span>
         </div>
-        <div>
+        <div class="student-badges">
           <span class="badge badge-info">Class ${s.class || '-'}</span>
-          ${s.apaar_id ? `<span class="badge badge-info" style="margin-left:6px;">APAAR: ${s.apaar_id}</span>` : ''}
+          ${s.apaar_id ? `<span class="badge badge-accent">APAAR: ${s.apaar_id}</span>` : ''}
         </div>
       </div>
 
@@ -1710,6 +1992,7 @@ function renderResult(data) {
     </div>
   `;
 
+  // Scroll to result
   resultDisplay.scrollIntoView({ behavior: 'smooth', block: 'start' });
   showToast('✅ Result found!', 'success');
 }
@@ -1737,10 +2020,16 @@ async function downloadMarksheet(id) {
 //  ENTER KEY SUPPORT
 // ============================================================
 studentIdInput.addEventListener('keypress', function(e) {
-  if (e.key === 'Enter') searchResult();
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    document.getElementById('searchBtn').click();
+  }
 });
 dobInput.addEventListener('keypress', function(e) {
-  if (e.key === 'Enter') searchResult();
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    document.getElementById('searchBtn').click();
+  }
 });
 
 // ============================================================
