@@ -762,7 +762,7 @@ body { padding-top: 70px; }
 
 .selected-info .clear-btn:hover {
   background: rgba(0,0,0,0.05);
-  color: var(--danger);
+  color: #dc2626;
 }
 
 .search-box {
@@ -900,7 +900,7 @@ body { padding-top: 70px; }
   color: #92400e;
 }
 
-/* ===== MARKSHEET LIST ===== */
+/* ===== MARKSHEET LIST - UPDATED ===== */
 .marksheet-list {
   margin-top: 16px;
   border-top: 2px solid var(--gray-light);
@@ -921,7 +921,7 @@ body { padding-top: 70px; }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  padding: 14px 0;
   border-bottom: 1px solid var(--gray-light);
   flex-wrap: wrap;
   gap: 10px;
@@ -934,18 +934,38 @@ body { padding-top: 70px; }
 .marksheet-item .exam-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: wrap;
 }
 
 .marksheet-item .exam-name {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 15px;
+  color: var(--primary);
 }
 
 .marksheet-item .exam-session {
   color: var(--text-light);
   font-size: 13px;
+  background: var(--off-white);
+  padding: 2px 12px;
+  border-radius: 50px;
+}
+
+.marksheet-item .exam-class {
+  color: var(--text-light);
+  font-size: 13px;
+  background: #dbeafe;
+  padding: 2px 12px;
+  border-radius: 50px;
+}
+
+.marksheet-item .exam-date {
+  color: var(--gray);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .marksheet-item .exam-actions {
@@ -1210,6 +1230,7 @@ body { padding-top: 70px; }
   .search-box { flex-direction: column; }
   .search-box input { min-width: auto; }
   .loader-4square { grid-template-columns: 50px 50px; grid-template-rows: 50px 50px; }
+  .marksheet-item .exam-info { gap: 8px; }
 }
 
 @media (max-width: 480px) {
@@ -1220,6 +1241,7 @@ body { padding-top: 70px; }
   .class-btn { padding: 14px 16px; }
   .marksheet-item { flex-direction: column; align-items: stretch; text-align: center; }
   .marksheet-item .exam-actions { justify-content: center; }
+  .marksheet-item .exam-info { justify-content: center; }
   .selected-info { flex-direction: column; text-align: center; }
   .loader-4square { grid-template-columns: 40px 40px; grid-template-rows: 40px 40px; gap: 6px; }
   .loader-text { font-size: 13px; }
@@ -1644,14 +1666,10 @@ function selectClass(classNum) {
   selectedClass = classNum;
   selectedSession = DEFAULT_SESSION;
 
-  // Show search section
   searchSection.classList.add('active');
-
-  // Update selected info
   document.getElementById('selectedSessionDisplay').textContent = selectedSession;
   document.getElementById('selectedClassDisplay').textContent = `Class ${selectedClass}`;
 
-  // Highlight selected class
   document.querySelectorAll('.class-btn').forEach(btn => {
     btn.style.borderColor = '#e2e8f0';
     btn.style.background = 'white';
@@ -1661,10 +1679,8 @@ function selectClass(classNum) {
     }
   });
 
-  // Scroll to search
   searchSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   studentIdInput.focus();
-
   showToast(`Session ${selectedSession} | Class ${selectedClass} selected`, 'success');
 }
 
@@ -1702,7 +1718,6 @@ async function searchResult() {
     return;
   }
 
-  // Show loading
   searchBtn.disabled = true;
   searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
   resultDisplay.innerHTML = `
@@ -1753,7 +1768,7 @@ async function searchResult() {
 }
 
 // ============================================================
-//  RENDER RESULT
+//  RENDER RESULT - UPDATED with Class, Session, Exam Type, Published Date
 // ============================================================
 function renderResult(data) {
   const s = data.student;
@@ -1767,23 +1782,48 @@ function renderResult(data) {
       </div>
     `;
   } else {
-    marksheetHtml = marksheets.map(m => `
-      <div class="marksheet-item">
-        <div class="exam-info">
-          <span class="exam-name">${m.exam_type}</span>
-          <span class="exam-session">${m.session}</span>
-          <span class="badge badge-success">Published</span>
+    marksheetHtml = marksheets.map(m => {
+      // Format published date
+      let publishDate = 'Not available';
+      if (m.updated_at) {
+        const date = new Date(m.updated_at);
+        publishDate = date.toLocaleDateString('en-IN', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        });
+      } else if (m.uploaded_at) {
+        const date = new Date(m.uploaded_at);
+        publishDate = date.toLocaleDateString('en-IN', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        });
+      }
+
+      return `
+        <div class="marksheet-item">
+          <div class="exam-info">
+            <span class="exam-name">${m.exam_type}</span>
+            <span class="exam-session">${m.session}</span>
+            <span class="exam-class">Class ${m.class || s.class || '-'}</span>
+            <span class="exam-date">
+              <i class="fas fa-calendar-alt" style="font-size:11px; color:var(--gray);"></i>
+              ${publishDate}
+            </span>
+            <span class="badge badge-success">Published</span>
+          </div>
+          <div class="exam-actions">
+            <button class="btn-sm btn-view" onclick="window.open('${m.cloudinary_url}', '_blank')">
+              <i class="fas fa-eye"></i> View
+            </button>
+            <button class="btn-sm btn-download" onclick="downloadMarksheet(${m.id})">
+              <i class="fas fa-download"></i> Download
+            </button>
+          </div>
         </div>
-        <div class="exam-actions">
-          <button class="btn-sm btn-view" onclick="window.open('${m.cloudinary_url}', '_blank')">
-            <i class="fas fa-eye"></i> View
-          </button>
-          <button class="btn-sm btn-download" onclick="downloadMarksheet(${m.id})">
-            <i class="fas fa-download"></i> Download
-          </button>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   resultDisplay.innerHTML = `
@@ -1841,7 +1881,6 @@ function renderResult(data) {
     </div>
   `;
 
-  // Scroll to result
   resultDisplay.scrollIntoView({ behavior: 'smooth', block: 'start' });
   showToast('Result found!', 'success');
 }
@@ -1890,14 +1929,11 @@ dobInput.addEventListener('keypress', function(e) {
 //  INITIALIZATION
 // ============================================================
 async function init() {
-  // Show loader
   loaderWrapper.style.display = 'flex';
   resultContent.style.display = 'none';
 
-  // Load classes
   await loadAvailableClasses();
 
-  // Hide loader, show content
   loaderWrapper.style.display = 'none';
   resultContent.style.display = 'block';
 
@@ -1905,7 +1941,6 @@ async function init() {
   console.log('📡 API:', API_BASE);
 }
 
-// Start
 init();
 </script>
 
