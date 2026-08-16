@@ -192,7 +192,7 @@
         <ul class="nav-links" id="navLinks">
             <li><a href="../index.html"><i class="fas fa-home"></i> Home</a></li>
             <li><a href="#" class="active"><i class="fas fa-graduation-cap"></i> Results</a></li>
-            <li><a href="../admin/dashboard.html" class="admin-link"><i class="fas fa-lock"></i> Admin</a></li>
+            <li><a href="../admin/dashboard.html"><i class="fas fa-lock"></i> Admin</a></li>
         </ul>
     </nav>
 
@@ -327,13 +327,16 @@
             setTimeout(() => toast.classList.remove('show'), 4000);
         }
 
-        // Load Published Results
         async function loadPublishedResults() {
             const grid = document.getElementById('resultGrid');
             grid.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading results...</div>';
 
             try {
                 const response = await fetch(`${API_URL}/students`);
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}`);
+                }
+
                 const result = await response.json();
 
                 if (result.success) {
@@ -377,6 +380,8 @@
                             </a>
                         `;
                     }).join('');
+                } else {
+                    throw new Error(result.message || 'Failed to fetch data');
                 }
             } catch (error) {
                 console.error('Error loading results:', error);
@@ -384,13 +389,13 @@
                     <div class="no-results">
                         <i class="fas fa-exclamation-circle" style="color:#ef4444;"></i>
                         <h3>Failed to load results</h3>
-                        <p>Please refresh the page</p>
+                        <p>${error.message}</p>
                     </div>
                 `;
+                showToast('Failed to load results: ' + error.message, 'error');
             }
         }
 
-        // Select Result
         function selectResult(key) {
             const [classVal, sessionVal, examTypeVal] = key.split('_');
 
@@ -417,7 +422,6 @@
             verifyCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // Go Back
         function goBack() {
             document.getElementById('resultsListCard').style.display = 'block';
             document.getElementById('verifyCard').style.display = 'none';
@@ -427,7 +431,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Verify Student
         async function verifyStudent(e) {
             e.preventDefault();
 
@@ -452,6 +455,10 @@
 
             try {
                 const response = await fetch(`${API_URL}/students`);
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}`);
+                }
+
                 const result = await response.json();
 
                 if (!result.success) {
@@ -482,6 +489,10 @@
                 currentStudentData = student;
 
                 const statusResponse = await fetch(`${API_URL}/status/${student.id}`);
+                if (!statusResponse.ok) {
+                    throw new Error(`Server returned ${statusResponse.status}`);
+                }
+
                 const statusResult = await statusResponse.json();
 
                 if (statusResult.success && statusResult.data.marksheet_url) {
@@ -493,14 +504,13 @@
 
             } catch (error) {
                 console.error('Error verifying student:', error);
-                showError('An error occurred. Please try again.');
+                showError('An error occurred: ' + error.message);
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
         }
 
-        // Display Result
         function displayResult(student, resultData) {
             document.getElementById('resultDisplay').style.display = 'block';
 
@@ -532,7 +542,6 @@
             document.getElementById('resultDisplay').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // Download Result
         function downloadResult() {
             if (!currentMarksheetUrl) {
                 alert('No marksheet available for download');
