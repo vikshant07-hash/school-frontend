@@ -58,15 +58,6 @@
             padding: 6px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border);
         }
 
-        .btn {
-            display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px;
-            border-radius: var(--radius-sm); font-weight: 600; font-size: 13px;
-            border: none; cursor: pointer; transition: var(--transition);
-            text-decoration: none; white-space: nowrap;
-        }
-        .btn-primary { background: var(--gold); color: var(--primary); }
-        .btn-primary:hover { background: #c49a38; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(212,168,67,0.3); }
-
         .stats-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 16px; margin-bottom: 24px;
@@ -166,6 +157,19 @@
         .error-box.show { display: block; }
         .error-box .error-title { font-weight: 700; font-size: 16px; }
         .error-box .error-detail { font-size: 14px; margin-top: 4px; }
+        .error-box .retry-btn {
+            margin-top: 10px; background: #dc2626; color: white;
+            border: none; padding: 6px 16px; border-radius: var(--radius-sm);
+            cursor: pointer; font-weight: 600;
+        }
+        .error-box .retry-btn:hover { background: #b91c1c; }
+
+        .loading-spinner {
+            display: inline-block; width: 20px; height: 20px;
+            border: 3px solid #f3f3f3; border-top: 3px solid var(--gold);
+            border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         @media (max-width: 768px) {
             .navbar { padding: 0 12px; height: 54px; }
@@ -238,6 +242,7 @@
         <div class="error-box" id="errorBox">
             <div class="error-title"><i class="fas fa-exclamation-circle"></i> Failed to Load Data</div>
             <div class="error-detail" id="errorDetail">Please check your connection and try again.</div>
+            <button class="retry-btn" onclick="fetchStats()"><i class="fas fa-sync"></i> Retry</button>
         </div>
 
         <!-- Stats -->
@@ -245,28 +250,28 @@
             <div class="stat-card">
                 <div class="icon blue"><i class="fas fa-users"></i></div>
                 <div class="info">
-                    <h3 id="totalStudents">0</h3>
+                    <h3 id="totalStudents"><span class="loading-spinner"></span></h3>
                     <p>Total Students</p>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="icon green"><i class="fas fa-check-circle"></i></div>
                 <div class="info">
-                    <h3 id="publishedResults">0</h3>
+                    <h3 id="publishedResults"><span class="loading-spinner"></span></h3>
                     <p>Published Results</p>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="icon orange"><i class="fas fa-clock"></i></div>
                 <div class="info">
-                    <h3 id="uploadedResults">0</h3>
+                    <h3 id="uploadedResults"><span class="loading-spinner"></span></h3>
                     <p>Uploaded (Pending)</p>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="icon purple"><i class="fas fa-hourglass-half"></i></div>
                 <div class="info">
-                    <h3 id="pendingStudents">0</h3>
+                    <h3 id="pendingStudents"><span class="loading-spinner"></span></h3>
                     <p>Pending Results</p>
                 </div>
             </div>
@@ -299,7 +304,7 @@
                 <i class="fas fa-history"></i> Recent Students
             </div>
             <div id="activityList">
-                <p class="no-activity"><i class="fas fa-spinner fa-spin"></i> Loading...</p>
+                <p class="no-activity"><span class="loading-spinner"></span> Loading...</p>
             </div>
         </div>
     </div>
@@ -309,7 +314,7 @@
 
     <script>
         // ============================================================
-        // ✅ CONFIGURATION - CHANGE THIS IF NEEDED
+        // ✅ API URL - YAHAN APNA SAHI URL DAALEIN
         // ============================================================
         const API_URL = 'https://gsssshilla.onrender.com/api/result';
         console.log('📡 API_URL:', API_URL);
@@ -338,7 +343,7 @@
         }
 
         // ============================================================
-        // SHOW ERROR
+        // SHOW/HIDE ERROR
         // ============================================================
         function showError(message) {
             const box = document.getElementById('errorBox');
@@ -365,11 +370,18 @@
                 hideError();
                 console.log('📡 Fetching stats from:', `${API_URL}/students`);
 
+                // Show loading
+                document.querySelectorAll('.stat-card .info h3').forEach(el => {
+                    el.innerHTML = '<span class="loading-spinner"></span>';
+                });
+                document.getElementById('activityList').innerHTML = 
+                    '<p class="no-activity"><span class="loading-spinner"></span> Loading...</p>';
+
                 const response = await fetch(`${API_URL}/students`);
                 console.log('📡 Response status:', response.status);
 
                 if (!response.ok) {
-                    throw new Error(`Server returned ${response.status} - ${response.statusText}`);
+                    throw new Error(`Server returned ${response.status}`);
                 }
 
                 const result = await response.json();
@@ -438,14 +450,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 Dashboard page loaded');
             console.log('🔗 API URL:', API_URL);
-
-            // Test API connection
-            fetch(`${API_URL}`)
-                .then(res => res.json())
-                .then(data => console.log('✅ API Root response:', data))
-                .catch(err => console.error('❌ API Root error:', err));
-
             fetchStats();
+            // Auto-refresh every 60 seconds
             setInterval(fetchStats, 60000);
         });
     </script>
