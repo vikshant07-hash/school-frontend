@@ -591,28 +591,30 @@ body { padding-top: 70px; }
   color: var(--text);
   font-weight: 600;
 }
+.class-card .detail-tag .date-highlight {
+  color: var(--accent-dark);
+  font-weight: 700;
+}
 
 .class-card .card-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin-top: 10px;
   padding-top: 10px;
   border-top: 1px solid var(--gray-light);
 }
-.class-card .publish-info {
-  font-size: 13px;
-  color: var(--gray);
-}
-.class-card .publish-info i { color: var(--success); }
 .class-card .click-hint {
   background: var(--accent);
   color: var(--white);
-  padding: 5px 18px;
+  padding: 5px 20px;
   border-radius: 50px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 .class-card:hover .click-hint {
   background: var(--accent-dark);
@@ -620,7 +622,7 @@ body { padding-top: 70px; }
 }
 
 /* ============================================================
-   SEARCH FORM - PROFESSIONAL
+   SEARCH FORM - PROFESSIONAL (No Filter Box)
 ============================================================ */
 .search-section {
   background: var(--white);
@@ -656,15 +658,16 @@ body { padding-top: 70px; }
   color: var(--text-light);
 }
 
+/* No filter box - only selected info in compact form */
 .selected-info {
   display: flex;
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
   background: #fef8ed;
-  padding: 12px 20px;
+  padding: 10px 18px;
   border-radius: var(--radius-sm);
-  margin-bottom: 22px;
+  margin-bottom: 20px;
   border: 1px solid #f5d78a;
 }
 .selected-info .label {
@@ -678,6 +681,7 @@ body { padding-top: 70px; }
   background: var(--white);
   padding: 2px 14px;
   border-radius: 50px;
+  font-size: 13px;
 }
 .selected-info .clear-btn {
   background: none;
@@ -722,8 +726,7 @@ body { padding-top: 70px; }
   margin-right: 6px;
   width: 16px;
 }
-.form-group input,
-.form-group select {
+.form-group input {
   padding: 12px 16px;
   border: 1px solid var(--gray-light);
   border-radius: var(--radius-sm);
@@ -732,14 +735,12 @@ body { padding-top: 70px; }
   background: var(--white);
   font-family: 'Inter', sans-serif;
 }
-.form-group input:focus,
-.form-group select:focus {
+.form-group input:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(232, 184, 75, 0.15);
 }
-.form-group input:disabled,
-.form-group select:disabled {
+.form-group input:disabled {
   background: #f1f5f9;
   cursor: not-allowed;
 }
@@ -795,7 +796,7 @@ body { padding-top: 70px; }
 }
 
 /* ============================================================
-   RESULT DISPLAY - PROFESSIONAL
+   RESULT DISPLAY - PROFESSIONAL (No Student Section)
 ============================================================ */
 .result-found-banner {
   display: flex;
@@ -1588,7 +1589,7 @@ async function apiCall(url, options = {}) {
 }
 
 // ============================================================
-//  LOAD AVAILABLE CLASSES - WITH DETAILED CARDS
+//  LOAD AVAILABLE CLASSES - WITH DETAILED CARDS (No Student Count)
 // ============================================================
 async function loadAvailableClasses() {
   try {
@@ -1606,13 +1607,12 @@ async function loadAvailableClasses() {
             return {
               ...c,
               exam_type: first.exam_type || 'Various',
-              updated_at: first.updated_at || first.uploaded_at || null,
-              student_count: detailRes.data.length
+              updated_at: first.updated_at || first.uploaded_at || null
             };
           }
-          return { ...c, exam_type: 'Various', updated_at: null, student_count: 0 };
+          return { ...c, exam_type: 'Various', updated_at: null };
         } catch (e) {
-          return { ...c, exam_type: 'Various', updated_at: null, student_count: 0 };
+          return { ...c, exam_type: 'Various', updated_at: null };
         }
       }));
 
@@ -1638,7 +1638,7 @@ async function loadAvailableClasses() {
                 <i class="fas fa-school"></i> Class ${c.class}
               </span>
               <span class="status-badge">
-                <i class="fas fa-check-circle"></i> ${c.total_published} Published
+                <i class="fas fa-check-circle"></i> Published
               </span>
             </div>
             <div class="card-details">
@@ -1649,13 +1649,10 @@ async function loadAvailableClasses() {
                 <i class="fas fa-file-alt"></i> Exam: <strong>${c.exam_type}</strong>
               </span>
               <span class="detail-tag">
-                <i class="fas fa-clock"></i> Declared: <strong>${dateStr}</strong>
+                <i class="fas fa-clock"></i> Declared: <strong class="date-highlight">${dateStr}</strong>
               </span>
             </div>
             <div class="card-footer">
-              <span class="publish-info">
-                <i class="fas fa-users"></i> ${c.student_count || 0} students
-              </span>
               <span class="click-hint">
                 Click <i class="fas fa-arrow-right"></i>
               </span>
@@ -1691,7 +1688,7 @@ async function loadAvailableClasses() {
 }
 
 // ============================================================
-//  SELECT CLASS - OPEN FORM WITH AUTO-FILL
+//  SELECT CLASS - OPEN FORM WITH AUTO-FILL (No Filter Box)
 // ============================================================
 function selectClass(classNum, examType = 'Various') {
   console.log('✅ Class selected:', classNum, 'Exam:', examType);
@@ -1870,7 +1867,7 @@ async function searchResult(event) {
 }
 
 // ============================================================
-//  RENDER RESULT - WITH GREEN "RESULT FOUND" BANNER
+//  RENDER RESULT - WITH GREEN "RESULT FOUND" BANNER (No Section)
 // ============================================================
 function renderResult(data) {
   const s = data.student;
@@ -1978,10 +1975,6 @@ function renderResult(data) {
         <div class="item">
           <label>Date of Birth</label>
           <span>${s.dob ? new Date(s.dob).toLocaleDateString() : '-'}</span>
-        </div>
-        <div class="item">
-          <label>Section</label>
-          <span>${s.section || '-'}</span>
         </div>
       </div>
 
