@@ -485,7 +485,7 @@ body { padding-top: 70px; }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
+  flexible-wrap: wrap;
   gap: 12px;
   margin-bottom: 18px;
 }
@@ -658,46 +658,9 @@ body { padding-top: 70px; }
   color: var(--text-light);
 }
 
-/* No filter box - only selected info in compact form */
+/* HIDE FILTER BOX - selected-info hidden */
 .selected-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  background: #fef8ed;
-  padding: 10px 18px;
-  border-radius: var(--radius-sm);
-  margin-bottom: 20px;
-  border: 1px solid #f5d78a;
-}
-.selected-info .label {
-  color: var(--text-light);
-  font-size: 13px;
-  font-weight: 500;
-}
-.selected-info .value {
-  font-weight: 700;
-  color: var(--accent-dark);
-  background: var(--white);
-  padding: 2px 14px;
-  border-radius: 50px;
-  font-size: 13px;
-}
-.selected-info .clear-btn {
-  background: none;
-  border: none;
-  color: var(--gray);
-  cursor: pointer;
-  font-size: 13px;
-  padding: 4px 12px;
-  border-radius: 4px;
-  transition: var(--transition);
-  font-weight: 500;
-  margin-left: auto;
-}
-.selected-info .clear-btn:hover {
-  background: rgba(0,0,0,0.05);
-  color: #dc2626;
+  display: none !important;
 }
 
 .form-grid {
@@ -796,7 +759,7 @@ body { padding-top: 70px; }
 }
 
 /* ============================================================
-   RESULT DISPLAY - PROFESSIONAL (No Student Section)
+   RESULT DISPLAY - PROFESSIONAL (No Section)
 ============================================================ */
 .result-found-banner {
   display: flex;
@@ -1149,8 +1112,6 @@ body { padding-top: 70px; }
   .loader-4square { grid-template-columns: 50px 50px; grid-template-rows: 50px 50px; }
   .class-grid { grid-template-columns: 1fr; }
   .class-card .card-details { gap: 8px; }
-  .selected-info { flex-direction: column; text-align: center; }
-  .selected-info .clear-btn { margin-left: 0; }
 }
 @media (max-width: 480px) {
   .page-header h1 { font-size: 22px; }
@@ -1291,22 +1252,14 @@ body { padding-top: 70px; }
       </div>
     </div>
 
-    <!-- Professional Search Form -->
+    <!-- Professional Search Form (No Filter Box) -->
     <div class="search-section" id="searchSection">
       <div class="form-header">
         <h3><i class="fas fa-search"></i> Check Your Result</h3>
         <span class="form-status" id="formStatus">Fill the details below</span>
       </div>
 
-      <div class="selected-info" id="selectedInfo">
-        <span class="label"><i class="fas fa-filter"></i> Selected:</span>
-        <span class="value" id="selectedSessionDisplay">-</span>
-        <span class="value" id="selectedClassDisplay">-</span>
-        <span class="value" id="selectedExamDisplay">-</span>
-        <button class="clear-btn" onclick="clearSelection()">
-          <i class="fas fa-times"></i> Change
-        </button>
-      </div>
+      <!-- selected-info is HIDDEN via CSS (display:none) -->
 
       <form id="resultSearchForm" onsubmit="searchResult(event)">
         <div class="form-grid">
@@ -1632,7 +1585,7 @@ async function loadAvailableClasses() {
         }
 
         return `
-          <div class="class-card" onclick="selectClass(${c.class}, '${c.exam_type}')">
+          <div class="class-card" onclick="selectClass(${c.class}, '${c.exam_type}', '${dateStr}')">
             <div class="card-top">
               <span class="class-title">
                 <i class="fas fa-school"></i> Class ${c.class}
@@ -1690,8 +1643,8 @@ async function loadAvailableClasses() {
 // ============================================================
 //  SELECT CLASS - OPEN FORM WITH AUTO-FILL (No Filter Box)
 // ============================================================
-function selectClass(classNum, examType = 'Various') {
-  console.log('✅ Class selected:', classNum, 'Exam:', examType);
+function selectClass(classNum, examType = 'Various', declaredDate = null) {
+  console.log('✅ Class selected:', classNum, 'Exam:', examType, 'Declared:', declaredDate);
   
   selectedClass = classNum;
   selectedSession = DEFAULT_SESSION;
@@ -1706,13 +1659,12 @@ function selectClass(classNum, examType = 'Various') {
   formClass.value = `Class ${selectedClass}`;
   formExamType.value = selectedExamType;
 
-  // Update selected info
-  document.getElementById('selectedSessionDisplay').textContent = selectedSession;
-  document.getElementById('selectedClassDisplay').textContent = `Class ${selectedClass}`;
-  document.getElementById('selectedExamDisplay').textContent = selectedExamType;
-
-  // Update form status
-  formStatus.textContent = '✓ Class selected. Enter your ID and DOB.';
+  // Update form status with declared date
+  let statusMsg = `✓ Class ${selectedClass} selected. Enter your ID and DOB.`;
+  if (declaredDate && declaredDate !== 'Not available') {
+    statusMsg += ` (Declared: ${declaredDate})`;
+  }
+  formStatus.textContent = statusMsg;
   formStatus.style.color = 'var(--success)';
 
   // Highlight selected class card
