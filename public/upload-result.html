@@ -704,4 +704,72 @@
                     document.getElementById('successMsg').textContent = '✅ ' + result.message;
                     document.getElementById('successMsg').classList.add('show');
                     document.getElementById('deleteBtn').style.display = 'inline-flex';
-                    document
+                    document.getElementById('uploadBtn').textContent = '🔄 Update Result';
+                    showToast('✅ Result uploaded successfully!', 'success');
+                    await loadStudents();
+                    await selectStudent(parseInt(studentId));
+                } else {
+                    document.getElementById('errorMsg').textContent = '❌ ' + (result.message || 'Upload failed');
+                    document.getElementById('errorMsg').classList.add('show');
+                    showToast('❌ ' + (result.message || 'Upload failed'), 'error');
+                }
+            } catch (error) {
+                console.error('Error uploading result:', error);
+                const errorMsg = error.message || 'Failed to upload. Please try again.';
+                document.getElementById('errorMsg').textContent = '❌ ' + errorMsg;
+                document.getElementById('errorMsg').classList.add('show');
+                showToast('❌ ' + errorMsg, 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        async function deleteResult() {
+            const studentId = document.getElementById('selectedStudentId').value;
+            if (!studentId) return;
+
+            if (!confirm('Are you sure you want to delete the result for this student?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/${studentId}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('✅ Result deleted successfully!', 'success');
+                    document.getElementById('deleteBtn').style.display = 'none';
+                    document.getElementById('uploadBtn').textContent = '📤 Upload Result';
+                    document.getElementById('fileName').textContent = 'No file selected';
+                    document.getElementById('fileDrop').style.borderColor = '#e2e8f0';
+                    document.getElementById('fileInput').value = '';
+                    selectedFile = null;
+                    document.getElementById('uploadBtn').disabled = true;
+                    document.getElementById('successMsg').classList.remove('show');
+                    document.getElementById('errorMsg').classList.remove('show');
+                    await loadStudents();
+                    await selectStudent(parseInt(studentId));
+                } else {
+                    showToast('❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting result:', error);
+                showToast('❌ Failed to delete result.', 'error');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (id) {
+                document.getElementById('classFilter').value = '';
+                loadStudents();
+                setTimeout(() => selectStudent(parseInt(id)), 800);
+            } else {
+                loadStudents();
+            }
+        });
+    </script>
+</body>
+</html>
