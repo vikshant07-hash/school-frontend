@@ -3,558 +3,178 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Result Portal - GSSS Shilla</title>
+    <title>View Results - GSSS Shilla</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f4f8; color: #1a2332; min-height: 100vh; }
+        :root {
+            --primary: #0a1628; --primary-light: #1a3a6b; --gold: #d4a843;
+            --bg: #f0f4f8; --white: #ffffff; --text: #1a2332; --text-light: #64748b;
+            --border: #e2e8f0; --shadow: 0 4px 20px rgba(0,0,0,0.06);
+            --radius: 14px; --radius-sm: 8px; --transition: all 0.3s ease;
         }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f0f4f8;
-            color: #1a2332;
-            min-height: 100vh;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
 
-        /* ===== NAVBAR ===== */
         .navbar {
-            background: linear-gradient(135deg, #0a1628, #1a3a6b);
-            padding: 0 32px;
-            height: 68px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            padding: 0 20px; height: 60px; display: flex; align-items: center;
+            justify-content: space-between; position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.15);
         }
         .navbar .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: white;
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none; color: white; flex-shrink: 0;
         }
-        .navbar .brand img {
-            height: 44px;
-            width: auto;
-            border-radius: 8px;
-            background: white;
-            padding: 4px;
-        }
-        .navbar .brand .name {
-            font-size: 18px;
-            font-weight: 800;
-            color: white;
-        }
-        .navbar .brand .name span {
-            color: #d4a843;
-        }
-        .navbar .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            list-style: none;
-        }
+        .navbar .brand img { height: 36px; width: auto; border-radius: 6px; background: white; padding: 3px; }
+        .navbar .brand .name { font-size: 16px; font-weight: 800; color: white; }
+        .navbar .brand .name span { color: var(--gold); }
+        .navbar .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; }
         .navbar .nav-links a {
-            text-decoration: none;
-            color: rgba(255, 255, 255, 0.7);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: 0.3s;
+            text-decoration: none; color: rgba(255,255,255,0.7); padding: 6px 12px;
+            border-radius: var(--radius-sm); font-size: 13px; font-weight: 500;
+            transition: var(--transition); white-space: nowrap;
         }
-        .navbar .nav-links a:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-        .navbar .nav-links a.active {
-            background: #d4a843;
-            color: #0a1628;
-        }
-        .navbar .nav-links a.admin-link {
-            border: 1px solid rgba(212, 168, 67, 0.3);
-            color: #d4a843;
-        }
-        .navbar .nav-links a.admin-link:hover {
-            background: #d4a843;
-            color: #0a1628;
+        .navbar .nav-links a:hover { background: rgba(255,255,255,0.1); color: white; }
+        .navbar .nav-links a.active { background: var(--gold); color: var(--primary); }
+        .navbar .nav-links a i { margin-right: 4px; }
+        .navbar .menu-toggle {
+            display: none; background: none; border: none; color: white;
+            font-size: 22px; cursor: pointer; padding: 4px 8px;
         }
 
-        /* ===== HERO ===== */
-        .hero {
-            background: linear-gradient(135deg, #0a1628, #1a3a6b);
-            padding: 50px 32px 70px;
-            text-align: center;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        .hero h1 {
-            font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-        .hero h1 span {
-            color: #d4a843;
-        }
-        .hero p {
-            font-size: 16px;
-            opacity: 0.8;
-            max-width: 500px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 16px 20px; }
+        .page-header { margin-bottom: 20px; }
+        .page-header h1 { font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .page-header h1 i { color: var(--gold); }
+        .page-header p { color: var(--text-light); font-size: 14px; margin-top: 4px; }
 
-        /* ===== CONTAINER ===== */
-        .container {
-            max-width: 1100px;
-            margin: -30px auto 40px;
-            padding: 0 20px;
-            position: relative;
-            z-index: 10;
+        .card {
+            background: var(--white); border-radius: var(--radius); padding: 20px 24px;
+            border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 20px;
         }
-
-        /* ===== PUBLISHED RESULTS LIST ===== */
-        .results-list-card {
-            background: white;
-            border-radius: 16px;
-            padding: 28px 32px;
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e2e8f0;
-            margin-bottom: 24px;
-        }
-        .results-list-card h2 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .results-list-card h2 i {
-            color: #d4a843;
-        }
-        .results-list-card .sub-title {
-            font-size: 14px;
-            color: #64748b;
-            margin-bottom: 16px;
-        }
+        .card h2 { font-size: 17px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .card h2 i { color: var(--gold); }
 
         .result-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px;
         }
         .result-item {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 18px 20px;
-            border: 1px solid #e2e8f0;
-            transition: 0.3s;
-            cursor: pointer;
-            text-decoration: none;
-            color: #1a2332;
-            display: block;
+            background: #f8fafc; padding: 16px 18px; border-radius: var(--radius-sm);
+            border: 1px solid var(--border); cursor: pointer; transition: var(--transition);
+            text-decoration: none; color: var(--text); display: block;
         }
-        .result-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-            border-color: #d4a843;
-        }
-        .result-item .class-name {
-            font-size: 20px;
-            font-weight: 700;
-            color: #0a1628;
-        }
-        .result-item .class-name i {
-            color: #d4a843;
-            margin-right: 8px;
-        }
-        .result-item .meta {
-            display: flex;
-            gap: 16px;
-            margin-top: 6px;
-            font-size: 13px;
-            color: #64748b;
-        }
-        .result-item .meta span {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+        .result-item:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--gold); }
+        .result-item .class-name { font-size: 18px; font-weight: 700; color: var(--primary); }
+        .result-item .class-name i { color: var(--gold); margin-right: 8px; }
+        .result-item .meta { display: flex; gap: 12px; margin-top: 4px; font-size: 13px; color: var(--text-light); }
         .result-item .badge {
-            display: inline-block;
-            background: #d1fae5;
-            color: #059669;
-            padding: 2px 12px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 8px;
+            display: inline-block; background: #d1fae5; color: #059669;
+            padding: 2px 12px; border-radius: 50px; font-size: 12px; font-weight: 600; margin-top: 6px;
         }
-        .result-item .badge i {
-            margin-right: 4px;
-        }
-        .no-results {
-            text-align: center;
-            padding: 40px;
-            color: #94a3b8;
-            grid-column: 1 / -1;
-        }
-        .no-results i {
-            font-size: 40px;
-            margin-bottom: 12px;
-            display: block;
-        }
+        .no-results { text-align: center; padding: 40px; color: var(--text-light); grid-column: 1 / -1; }
+        .no-results i { font-size: 40px; margin-bottom: 12px; display: block; color: #d1d5db; }
 
-        /* ===== VERIFICATION CARD ===== */
-        .verify-card {
-            background: white;
-            border-radius: 16px;
-            padding: 28px 32px;
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e2e8f0;
-            display: none;
-        }
-        .verify-card.active {
-            display: block;
-            animation: fadeIn 0.4s ease;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .verify-card .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #64748b;
-            text-decoration: none;
-            font-size: 14px;
-            margin-bottom: 16px;
-            transition: 0.3s;
-        }
-        .verify-card .back-link:hover {
-            color: #d4a843;
-        }
-        .verify-card h2 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .verify-card h2 i {
-            color: #d4a843;
-        }
-        .verify-card .info-text {
-            font-size: 14px;
-            color: #64748b;
-            margin-bottom: 20px;
-        }
-
-        .verify-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 16px;
-            align-items: end;
-        }
-        .verify-grid .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .verify-grid .form-group label {
-            font-weight: 500;
-            font-size: 13px;
-            color: #475569;
-        }
+        .verify-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: end; }
+        .verify-grid .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .verify-grid .form-group label { font-weight: 500; font-size: 13px; color: var(--text-light); }
         .verify-grid .form-group input {
-            padding: 10px 14px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            transition: 0.3s;
-            background: white;
-            width: 100%;
+            padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+            font-size: 14px; outline: none; transition: var(--transition); background: var(--white); width: 100%;
         }
-        .verify-grid .form-group input:focus {
-            border-color: #d4a843;
-            box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.1);
-        }
+        .verify-grid .form-group input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,168,67,0.15); }
         .verify-grid .form-group .auto-value {
-            padding: 10px 14px;
-            background: #f1f5f9;
-            border-radius: 8px;
-            font-size: 14px;
-            color: #475569;
-            border: 1px solid #e2e8f0;
+            padding: 8px 12px; background: #f1f5f9; border-radius: var(--radius-sm);
+            font-size: 14px; color: var(--text-light); border: 1px solid var(--border);
         }
 
         .btn {
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            border: none;
-            cursor: pointer;
-            transition: 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            height: 44px;
+            display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px;
+            border-radius: var(--radius-sm); font-weight: 600; font-size: 13px;
+            border: none; cursor: pointer; transition: var(--transition);
+            text-decoration: none; white-space: nowrap;
         }
-        .btn-primary {
-            background: #d4a843;
-            color: #0a1628;
-        }
-        .btn-primary:hover {
-            background: #c49a38;
-            transform: translateY(-1px);
-        }
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .btn-success {
-            background: #10b981;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #059669;
-            transform: translateY(-1px);
-        }
-        .btn-outline {
-            background: transparent;
-            color: #475569;
-            border: 1px solid #e2e8f0;
-        }
-        .btn-outline:hover {
-            background: #f1f5f9;
-        }
-        .btn-block {
-            width: 100%;
-            justify-content: center;
-        }
-
-        /* ===== RESULT DISPLAY ===== */
-        .result-display {
-            display: none;
-            margin-top: 24px;
-        }
-        .result-display.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .result-card {
-            background: white;
-            border-radius: 16px;
-            padding: 28px 32px;
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e2e8f0;
-        }
-        .result-card .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            padding-bottom: 16px;
-            border-bottom: 2px solid #f1f5f9;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .result-card .header .school-name {
-            font-size: 22px;
-            font-weight: 800;
-            color: #0a1628;
-        }
-        .result-card .header .school-name span {
-            color: #d4a843;
-        }
-        .result-card .header .result-title {
-            text-align: right;
-        }
-        .result-card .header .result-title .exam {
-            font-size: 18px;
-            font-weight: 700;
-            color: #0a1628;
-        }
-        .result-card .header .result-title .session {
-            font-size: 14px;
-            color: #64748b;
-        }
+        .btn-primary { background: var(--gold); color: var(--primary); }
+        .btn-primary:hover { background: #c49a38; transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-outline { background: transparent; color: var(--text-light); border: 1px solid var(--border); }
+        .btn-outline:hover { background: #f1f5f9; }
+        .btn-block { width: 100%; justify-content: center; }
 
         .student-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            padding: 20px 0;
-            border-bottom: 1px solid #f1f5f9;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px;
+            padding: 16px 0; border-bottom: 1px solid var(--border);
         }
-        .student-info .info-item .label {
-            font-size: 12px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-        .student-info .info-item .value {
-            font-size: 16px;
-            font-weight: 600;
-            color: #0a1628;
-        }
-
-        .result-actions {
-            display: flex;
-            gap: 12px;
-            padding-top: 20px;
-            flex-wrap: wrap;
-        }
+        .student-info .info-item .label { font-size: 12px; color: var(--text-light); text-transform: uppercase; font-weight: 500; }
+        .student-info .info-item .value { font-size: 15px; font-weight: 600; color: var(--primary); }
 
         .marksheet-preview {
-            margin-top: 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #f8fafc;
+            margin-top: 16px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+            overflow: hidden; background: #f8fafc;
         }
-        .marksheet-preview iframe {
-            width: 100%;
-            height: 500px;
-            border: none;
-        }
-        .marksheet-preview .pdf-placeholder {
-            text-align: center;
-            padding: 60px 20px;
-            color: #94a3b8;
-        }
-        .marksheet-preview .pdf-placeholder i {
-            font-size: 64px;
-            color: #d4a843;
-            margin-bottom: 12px;
-            display: block;
-        }
+        .marksheet-preview iframe { width: 100%; height: 500px; border: none; }
+        .marksheet-preview .pdf-placeholder { text-align: center; padding: 60px 20px; color: var(--text-light); }
+        .marksheet-preview .pdf-placeholder i { font-size: 64px; color: var(--gold); margin-bottom: 12px; display: block; }
 
-        .error-msg {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-top: 12px;
-            display: none;
-        }
-        .error-msg.show {
-            display: block;
-        }
+        .result-actions { display: flex; gap: 12px; padding-top: 16px; flex-wrap: wrap; }
 
-        .success-msg {
-            background: #d1fae5;
-            color: #065f46;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-top: 12px;
-            display: none;
-        }
-        .success-msg.show {
-            display: block;
-        }
+        .error-msg { background: #fee2e2; color: #991b1b; padding: 10px 14px; border-radius: var(--radius-sm); margin-top: 12px; display: none; }
+        .error-msg.show { display: block; }
+        .success-msg { background: #d1fae5; color: #065f46; padding: 10px 14px; border-radius: var(--radius-sm); margin-top: 12px; display: none; }
+        .success-msg.show { display: block; }
 
-        /* ===== FOOTER ===== */
-        .footer {
-            background: #0a1628;
-            color: rgba(255, 255, 255, 0.6);
-            padding: 24px 32px;
-            text-align: center;
-            font-size: 13px;
-            margin-top: 40px;
-        }
-        .footer a {
-            color: #d4a843;
-            text-decoration: none;
-        }
+        .loading { text-align: center; padding: 30px; color: var(--text-light); }
+        .loading i { font-size: 28px; margin-bottom: 8px; display: block; }
 
-        /* ===== LOADING ===== */
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #94a3b8;
+        .back-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            color: var(--text-light); text-decoration: none; font-size: 14px;
+            margin-bottom: 16px; transition: var(--transition);
         }
-        .loading i {
-            font-size: 32px;
-            margin-bottom: 10px;
-            display: block;
-        }
+        .back-link:hover { color: var(--gold); }
 
-        /* ===== RESPONSIVE ===== */
+        .toast {
+            position: fixed; bottom: 24px; right: 24px; padding: 12px 20px;
+            border-radius: var(--radius); color: white; font-weight: 500; font-size: 14px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15); z-index: 9999;
+            transform: translateY(100px); opacity: 0; transition: all 0.4s ease; max-width: 90%;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+
         @media (max-width: 768px) {
-            .navbar {
-                padding: 0 16px;
-            }
+            .navbar { padding: 0 12px; height: 54px; }
+            .navbar .brand .name { font-size: 14px; }
+            .navbar .brand img { height: 30px; }
             .navbar .nav-links {
-                display: none;
+                display: none; position: absolute; top: 54px; left: 0; right: 0;
+                background: var(--primary); flex-direction: column; padding: 12px 16px;
+                gap: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                border-radius: 0 0 var(--radius) var(--radius);
             }
-            .hero {
-                padding: 30px 16px 60px;
-            }
-            .hero h1 {
-                font-size: 26px;
-            }
-            .container {
-                padding: 0 12px;
-            }
-            .results-list-card {
-                padding: 20px 16px;
-            }
-            .verify-card {
-                padding: 20px 16px;
-            }
-            .result-card {
-                padding: 20px 16px;
-            }
-            .verify-grid {
-                grid-template-columns: 1fr;
-            }
-            .result-grid {
-                grid-template-columns: 1fr;
-            }
-            .student-info {
-                grid-template-columns: 1fr 1fr;
-            }
-            .result-card .header {
-                flex-direction: column;
-                text-align: center;
-            }
-            .result-card .header .result-title {
-                text-align: center;
-            }
-            .marksheet-preview iframe {
-                height: 300px;
-            }
+            .navbar .nav-links.open { display: flex; }
+            .navbar .nav-links a { padding: 10px 14px; width: 100%; }
+            .navbar .menu-toggle { display: block; }
+            .container { padding: 12px 12px; }
+            .page-header h1 { font-size: 20px; }
+            .card { padding: 16px; }
+            .result-grid { grid-template-columns: 1fr; }
+            .verify-grid { grid-template-columns: 1fr; }
+            .student-info { grid-template-columns: 1fr 1fr; }
+            .marksheet-preview iframe { height: 300px; }
+            .result-actions { flex-direction: column; }
+            .result-actions .btn { width: 100%; justify-content: center; }
+            .toast { bottom: 12px; right: 12px; left: 12px; max-width: 100%; }
         }
         @media (max-width: 480px) {
-            .student-info {
-                grid-template-columns: 1fr;
-            }
-            .result-actions {
-                flex-direction: column;
-            }
-            .btn {
-                justify-content: center;
-            }
+            .student-info { grid-template-columns: 1fr; }
+            .verify-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -566,39 +186,38 @@
             <img src="../logo(1).png" alt="Logo" />
             <div class="name">GSSS<span> SHILLA</span></div>
         </a>
-        <ul class="nav-links">
+        <button class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <ul class="nav-links" id="navLinks">
             <li><a href="../index.html"><i class="fas fa-home"></i> Home</a></li>
             <li><a href="#" class="active"><i class="fas fa-graduation-cap"></i> Results</a></li>
             <li><a href="../admin/dashboard.html" class="admin-link"><i class="fas fa-lock"></i> Admin</a></li>
         </ul>
     </nav>
 
-    <!-- ===== HERO ===== -->
-    <section class="hero">
-        <h1>📊 Result <span>Portal</span></h1>
-        <p>View and download your published results</p>
-    </section>
-
-    <!-- ===== MAIN CONTAINER ===== -->
+    <!-- ===== MAIN ===== -->
     <div class="container">
 
-        <!-- ===== PUBLISHED RESULTS LIST ===== -->
-        <div class="results-list-card" id="resultsListCard">
+        <!-- Published Results List -->
+        <div class="card" id="resultsListCard">
             <h2><i class="fas fa-list"></i> Published Results</h2>
-            <p class="sub-title">Select a class to view results</p>
+            <p style="color:var(--text-light);font-size:14px;margin-bottom:16px;">Select a class to view results</p>
             <div class="result-grid" id="resultGrid">
                 <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading results...</div>
             </div>
         </div>
 
-        <!-- ===== VERIFICATION CARD ===== -->
-        <div class="verify-card" id="verifyCard">
+        <!-- Verification Card -->
+        <div class="card" id="verifyCard" style="display:none;">
             <a href="#" class="back-link" onclick="goBack()">
                 <i class="fas fa-arrow-left"></i> Back to results list
             </a>
 
             <h2><i class="fas fa-shield-alt"></i> Verify Student</h2>
-            <p class="info-text">Enter Student ID or APAAR ID and Date of Birth to view result</p>
+            <p style="color:var(--text-light);font-size:14px;margin-bottom:16px;">
+                Enter Student ID or APAAR ID and Date of Birth to view result
+            </p>
 
             <div id="verifyError" class="error-msg"></div>
             <div id="verifySuccess" class="success-msg"></div>
@@ -637,58 +256,31 @@
                 </div>
             </form>
 
-            <!-- ===== RESULT DISPLAY ===== -->
-            <div class="result-display" id="resultDisplay">
-                <div class="result-card">
-                    <!-- Header -->
-                    <div class="header">
+            <!-- Result Display -->
+            <div id="resultDisplay" style="display:none;margin-top:20px;">
+                <div class="card" style="padding:20px;margin-bottom:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:start;padding-bottom:12px;border-bottom:2px solid #f1f5f9;flex-wrap:wrap;gap:10px;">
                         <div>
-                            <div class="school-name">GSSS <span>SHILLA</span></div>
-                            <div style="font-size:13px;color:#64748b;">Govt. Sr. Sec. School, Shilla</div>
+                            <div style="font-size:20px;font-weight:800;color:var(--primary);">GSSS <span style="color:var(--gold);">SHILLA</span></div>
+                            <div style="font-size:13px;color:var(--text-light);">Govt. Sr. Sec. School, Shilla</div>
                         </div>
-                        <div class="result-title">
-                            <div class="exam" id="displayExamType">-</div>
-                            <div class="session" id="displaySession">-</div>
+                        <div style="text-align:right;">
+                            <div style="font-size:17px;font-weight:700;color:var(--primary);" id="displayExamType">-</div>
+                            <div style="font-size:13px;color:var(--text-light);" id="displaySession">-</div>
                         </div>
                     </div>
 
-                    <!-- Student Info -->
                     <div class="student-info" id="studentInfo">
-                        <div class="info-item">
-                            <div class="label">Student Name</div>
-                            <div class="value" id="displayName">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="label">Student ID</div>
-                            <div class="value" id="displayStudentId">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="label">APAAR ID</div>
-                            <div class="value" id="displayApaarId">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="label">Class</div>
-                            <div class="value" id="displayClass">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="label">Roll No</div>
-                            <div class="value" id="displayRollNo">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="label">Father's Name</div>
-                            <div class="value" id="displayFather">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="label">Mother's Name</div>
-                            <div class="value" id="displayMother">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="label">Date of Birth</div>
-                            <div class="value" id="displayDob">-</div>
-                        </div>
+                        <div class="info-item"><div class="label">Student Name</div><div class="value" id="displayName">-</div></div>
+                        <div class="info-item"><div class="label">Student ID</div><div class="value" id="displayStudentId">-</div></div>
+                        <div class="info-item"><div class="label">APAAR ID</div><div class="value" id="displayApaarId">-</div></div>
+                        <div class="info-item"><div class="label">Class</div><div class="value" id="displayClass">-</div></div>
+                        <div class="info-item"><div class="label">Roll No</div><div class="value" id="displayRollNo">-</div></div>
+                        <div class="info-item"><div class="label">Father's Name</div><div class="value" id="displayFather">-</div></div>
+                        <div class="info-item"><div class="label">Mother's Name</div><div class="value" id="displayMother">-</div></div>
+                        <div class="info-item"><div class="label">Date of Birth</div><div class="value" id="displayDob">-</div></div>
                     </div>
 
-                    <!-- Marksheet Preview -->
                     <div class="marksheet-preview" id="marksheetPreview">
                         <div class="pdf-placeholder">
                             <i class="fas fa-file-pdf"></i>
@@ -696,7 +288,6 @@
                         </div>
                     </div>
 
-                    <!-- Actions -->
                     <div class="result-actions">
                         <button class="btn btn-success" id="downloadBtn" onclick="downloadResult()">
                             <i class="fas fa-download"></i> Download Marksheet (PDF)
@@ -708,13 +299,10 @@
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- ===== FOOTER ===== -->
-    <footer class="footer">
-        <span>&copy; 2026 <a href="#">Govt. Sr. Sec. School Shilla</a>. All rights reserved.</span>
-    </footer>
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
 
     <script>
         const API_URL = 'https://gsssshilla.onrender.com/api/result';
@@ -722,39 +310,43 @@
         let currentStudentData = null;
         let currentMarksheetUrl = null;
 
-        // ============================================================
-        // LOAD PUBLISHED RESULTS
-        // ============================================================
+        function toggleMenu() {
+            document.getElementById('navLinks').classList.toggle('open');
+        }
+        document.querySelectorAll('#navLinks a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.remove('open');
+            });
+        });
+
+        function showToast(message, type = 'error') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        // Load Published Results
         async function loadPublishedResults() {
             const grid = document.getElementById('resultGrid');
             grid.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading results...</div>';
 
             try {
-                // Get all students with published results
                 const response = await fetch(`${API_URL}/students`);
                 const result = await response.json();
 
                 if (result.success) {
                     const students = result.data || [];
-
-                    // Filter only published results
                     const published = students.filter(s => s.result_status === 'published');
 
-                    // Group by class, session, exam_type
                     const groups = {};
                     published.forEach(s => {
                         const key = `${s.class}_${s.session}_${s.exam_type}`;
                         if (!groups[key]) {
-                            groups[key] = {
-                                class: s.class,
-                                session: s.session,
-                                examType: s.exam_type,
-                                count: 0,
-                                students: []
-                            };
+                            groups[key] = { class: s.class, session: s.session, examType: s.exam_type, count: 0 };
                         }
                         groups[key].count++;
-                        groups[key].students.push(s);
                     });
 
                     const groupKeys = Object.keys(groups);
@@ -770,25 +362,18 @@
                         return;
                     }
 
+                    const examLabels = { 'midterm': 'Mid Term', 'final': 'Final', 'other': 'Other' };
+
                     grid.innerHTML = groupKeys.map(key => {
                         const g = groups[key];
-                        const examLabels = {
-                            'midterm': 'Mid Term',
-                            'final': 'Final',
-                            'other': 'Other'
-                        };
                         return `
                             <a href="#" class="result-item" onclick="selectResult('${key}')">
-                                <div class="class-name">
-                                    <i class="fas fa-users"></i> Class ${g.class}
-                                </div>
+                                <div class="class-name"><i class="fas fa-users"></i> Class ${g.class}</div>
                                 <div class="meta">
                                     <span><i class="far fa-calendar-alt"></i> ${g.session}</span>
                                     <span><i class="fas fa-file-alt"></i> ${examLabels[g.examType] || g.examType}</span>
                                 </div>
-                                <div class="badge">
-                                    <i class="fas fa-check-circle"></i> ${g.count} Student${g.count > 1 ? 's' : ''}
-                                </div>
+                                <div class="badge"><i class="fas fa-check-circle"></i> ${g.count} Student${g.count > 1 ? 's' : ''}</div>
                             </a>
                         `;
                     }).join('');
@@ -805,31 +390,18 @@
             }
         }
 
-        // ============================================================
-        // SELECT RESULT
-        // ============================================================
+        // Select Result
         function selectResult(key) {
             const [classVal, sessionVal, examTypeVal] = key.split('_');
 
-            selectedResult = {
-                class: classVal,
-                session: sessionVal,
-                examType: examTypeVal
-            };
+            selectedResult = { class: classVal, session: sessionVal, examType: examTypeVal };
 
-            // Hide results list
             document.getElementById('resultsListCard').style.display = 'none';
 
-            // Show verification card
             const verifyCard = document.getElementById('verifyCard');
-            verifyCard.classList.add('active');
+            verifyCard.style.display = 'block';
 
-            // Auto-fill values
-            const examLabels = {
-                'midterm': 'Mid Term',
-                'final': 'Final',
-                'other': 'Other'
-            };
+            const examLabels = { 'midterm': 'Mid Term', 'final': 'Final', 'other': 'Other' };
             document.getElementById('verifyClass').textContent = `Class ${classVal}`;
             document.getElementById('verifyClassInput').value = classVal;
             document.getElementById('verifySession').textContent = sessionVal;
@@ -837,31 +409,25 @@
             document.getElementById('verifyExamType').textContent = examLabels[examTypeVal] || examTypeVal;
             document.getElementById('verifyExamTypeInput').value = examTypeVal;
 
-            // Reset form
             document.getElementById('verifyForm').reset();
-            document.getElementById('resultDisplay').classList.remove('active');
+            document.getElementById('resultDisplay').style.display = 'none';
             document.getElementById('verifyError').classList.remove('show');
             document.getElementById('verifySuccess').classList.remove('show');
 
-            // Scroll to verification card
             verifyCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // ============================================================
-        // GO BACK
-        // ============================================================
+        // Go Back
         function goBack() {
             document.getElementById('resultsListCard').style.display = 'block';
-            document.getElementById('verifyCard').classList.remove('active');
-            document.getElementById('resultDisplay').classList.remove('active');
+            document.getElementById('verifyCard').style.display = 'none';
+            document.getElementById('resultDisplay').style.display = 'none';
             selectedResult = null;
             currentStudentData = null;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // ============================================================
-        // VERIFY STUDENT
-        // ============================================================
+        // Verify Student
         async function verifyStudent(e) {
             e.preventDefault();
 
@@ -885,7 +451,6 @@
             document.getElementById('verifySuccess').classList.remove('show');
 
             try {
-                // Get all students
                 const response = await fetch(`${API_URL}/students`);
                 const result = await response.json();
 
@@ -895,8 +460,6 @@
                 }
 
                 const students = result.data || [];
-
-                // Find student by identifier (student_id or apaar_id) and class, session, exam_type
                 const student = students.find(s =>
                     (s.student_id === identifier || s.apaar_id === identifier) &&
                     s.class === classVal &&
@@ -910,17 +473,14 @@
                     return;
                 }
 
-                // Verify DOB
                 const studentDob = new Date(student.date_of_birth).toISOString().split('T')[0];
                 if (studentDob !== dob) {
                     showError('Date of Birth does not match our records. Please try again.');
                     return;
                 }
 
-                // Student found!
                 currentStudentData = student;
 
-                // Get result details
                 const statusResponse = await fetch(`${API_URL}/status/${student.id}`);
                 const statusResult = await statusResponse.json();
 
@@ -940,14 +500,10 @@
             }
         }
 
-        // ============================================================
-        // DISPLAY RESULT
-        // ============================================================
+        // Display Result
         function displayResult(student, resultData) {
-            const display = document.getElementById('resultDisplay');
-            display.classList.add('active');
+            document.getElementById('resultDisplay').style.display = 'block';
 
-            // Set student info
             document.getElementById('displayName').textContent = student.student_name;
             document.getElementById('displayStudentId').textContent = student.student_id;
             document.getElementById('displayApaarId').textContent = student.apaar_id;
@@ -955,69 +511,36 @@
             document.getElementById('displayRollNo').textContent = student.exam_roll_no;
             document.getElementById('displayFather').textContent = student.father_name;
             document.getElementById('displayMother').textContent = student.mother_name;
-
-            const dob = new Date(student.date_of_birth);
-            document.getElementById('displayDob').textContent = dob.toLocaleDateString('en-IN', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
+            document.getElementById('displayDob').textContent = new Date(student.date_of_birth).toLocaleDateString('en-IN', {
+                day: 'numeric', month: 'long', year: 'numeric'
             });
 
-            // Set exam info
-            const examLabels = {
-                'midterm': 'Mid Term Examination',
-                'final': 'Final Examination',
-                'other': 'Other Examination'
-            };
+            const examLabels = { 'midterm': 'Mid Term Examination', 'final': 'Final Examination', 'other': 'Other Examination' };
             document.getElementById('displayExamType').textContent = examLabels[student.exam_type] || student.exam_type;
             document.getElementById('displaySession').textContent = `Session: ${student.session}`;
 
-            // Show marksheet
             const preview = document.getElementById('marksheetPreview');
-            if (resultData.marksheet_url) {
-                // Check if URL is a direct PDF or Cloudinary URL
-                let pdfUrl = resultData.marksheet_url;
-                // If it's a Cloudinary URL, add raw flag for direct download
-                if (pdfUrl.includes('cloudinary.com')) {
-                    pdfUrl = pdfUrl.replace('/upload/', '/upload/fl_attachment/');
-                }
-                preview.innerHTML = `
-                    <iframe src="${pdfUrl}#toolbar=1" allow="fullscreen"></iframe>
-                `;
-            } else {
-                preview.innerHTML = `
-                    <div class="pdf-placeholder">
-                        <i class="fas fa-file-pdf"></i>
-                        <p>No marksheet available</p>
-                    </div>
-                `;
+            let pdfUrl = resultData.marksheet_url;
+            if (pdfUrl.includes('cloudinary.com')) {
+                pdfUrl = pdfUrl.replace('/upload/', '/upload/fl_attachment/');
             }
+            preview.innerHTML = `<iframe src="${pdfUrl}#toolbar=1" allow="fullscreen"></iframe>`;
 
-            // Show success message
-            const successMsg = document.getElementById('verifySuccess');
-            successMsg.textContent = '✅ Student verified successfully!';
-            successMsg.classList.add('show');
+            document.getElementById('verifySuccess').textContent = '✅ Student verified successfully!';
+            document.getElementById('verifySuccess').classList.add('show');
 
-            // Scroll to result
-            display.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            document.getElementById('resultDisplay').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // ============================================================
-        // DOWNLOAD RESULT
-        // ============================================================
+        // Download Result
         function downloadResult() {
             if (!currentMarksheetUrl) {
                 alert('No marksheet available for download');
                 return;
             }
-
-            // Open in new tab for download
             window.open(currentMarksheetUrl, '_blank');
         }
 
-        // ============================================================
-        // SHOW ERROR
-        // ============================================================
         function showError(message) {
             const errorMsg = document.getElementById('verifyError');
             errorMsg.textContent = '❌ ' + message;
@@ -1025,11 +548,7 @@
             document.getElementById('verifySuccess').classList.remove('show');
         }
 
-        // ============================================================
-        // INIT
-        // ============================================================
         document.addEventListener('DOMContentLoaded', () => {
-            // Check if URL has query params (direct link)
             const params = new URLSearchParams(window.location.search);
             const classVal = params.get('class');
             const sessionVal = params.get('session');
@@ -1037,7 +556,6 @@
 
             if (classVal && sessionVal && examVal) {
                 const key = `${classVal}_${sessionVal}_${examVal}`;
-                // Wait for results to load then select
                 setTimeout(() => {
                     const items = document.querySelectorAll('.result-item');
                     items.forEach(item => {
@@ -1049,17 +567,6 @@
             }
 
             loadPublishedResults();
-        });
-
-        // Auto-submit if all fields filled
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const form = document.getElementById('verifyForm');
-                if (form && form.classList.contains('active')) {
-                    e.preventDefault();
-                    verifyStudent(e);
-                }
-            }
         });
     </script>
 </body>
