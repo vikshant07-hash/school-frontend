@@ -172,9 +172,9 @@
         <div class="header-actions">
             <select id="sessionFilter" class="btn btn-outline session-filter" style="padding:8px 14px;">
                 <option value="">All Sessions</option>
+                <option value="2026-27" selected>2026-27</option>
                 <option value="2025-26" selected>2025-26</option>
-                <option value="2024-25">2024-25</option>
-                <option value="2023-24">2023-24</option>
+                
             </select>
             <button class="btn btn-outline" onclick="refreshAll()"><i class="fas fa-sync"></i> Refresh</button>
             <button class="btn btn-success" onclick="openAddStudent()"><i class="fas fa-user-plus"></i> Add Student</button>
@@ -183,8 +183,8 @@
 
     <div class="tabs">
         <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</button>
-        <button class="tab-btn" data-tab="students" onclick="switchTab('students')"><i class="fas fa-users"></i> Students</button>
-        <button class="tab-btn" data-tab="upload" onclick="switchTab('upload')"><i class="fas fa-upload"></i> Upload</button>
+        <button class="tab-btn" data-tab="students" onclick="switchTab('students')"><i class="fas fa-users"></i> Manage Students</button>
+        <button class="tab-btn" data-tab="upload" onclick="switchTab('upload')"><i class="fas fa-upload"></i> Upload Results</button>
         <button class="tab-btn" data-tab="publish" onclick="switchTab('publish')"><i class="fas fa-check-circle"></i> Publish</button>
     </div>
 
@@ -202,11 +202,12 @@
         <div class="class-nav">
             <h3><i class="fas fa-school"></i> Select Class</h3>
             <div class="class-buttons" id="classButtons">
+                <button class="class-btn active" data-class="All" onclick="selectClass(All)">All Classes</button>
                 <button class="class-btn" data-class="6" onclick="selectClass(6)">Class 6</button>
                 <button class="class-btn" data-class="7" onclick="selectClass(7)">Class 7</button>
                 <button class="class-btn" data-class="8" onclick="selectClass(8)">Class 8</button>
                 <button class="class-btn" data-class="9" onclick="selectClass(9)">Class 9</button>
-                <button class="class-btn active" data-class="10" onclick="selectClass(10)">Class 10</button>
+                <button class="class-btn" data-class="10" onclick="selectClass(10)">Class 10</button>
                 <button class="class-btn" data-class="11" onclick="selectClass(11)">Class 11</button>
                 <button class="class-btn" data-class="12" onclick="selectClass(12)">Class 12</button>
             </div>
@@ -231,7 +232,7 @@
                         <input type="text" id="uploadStudentId" placeholder="Enter Student ID" required />
                         <button type="button" class="btn btn-primary btn-sm" onclick="fetchStudentForUpload()" style="margin-top:4px;"><i class="fas fa-search"></i> Fetch Student</button>
                     </div>
-                    <div class="form-group"><label>Student Name</label><input type="text" id="uploadStudentName" disabled placeholder="Will auto-fill" /></div>
+                    <div class="form-group"><label>Student Name</label><input type="text" id="uploadStudentName" disabled placeholder="Enter Student id first" /></div>
                     <div class="form-group"><label>Session</label><input type="text" id="uploadSession" disabled placeholder="Will auto-fill" /></div>
                     <div class="form-group"><label>Class</label><input type="text" id="uploadClass" disabled placeholder="Will auto-fill" /></div>
                     <div class="form-group">
@@ -239,9 +240,8 @@
                         <select id="uploadExamType" required>
                             <option value="Annual Examination">Annual Examination</option>
                             <option value="Half Yearly Examination">Half Yearly</option>
-                            <option value="Pre Board">Pre Board</option>
-                            <option value="Board Examination">Board Examination</option>
-                            <option value="Final Examination">Final Examination</option>
+                            
+                            
                             <option value="Monthly Test">Monthly Test</option>
                             <option value="Unit Test">Unit Test</option>
                         </select>
@@ -273,11 +273,12 @@
             <div class="class-nav" style="box-shadow:none; padding:0 0 16px 0;">
                 <h3><i class="fas fa-school"></i> Select Class</h3>
                 <div class="class-buttons" id="publishClassButtons">
+                    <button class="class-btn active" data-class="All" onclick="selectPublishClass(All)">All classes</button>
                     <button class="class-btn" data-class="6" onclick="selectPublishClass(6)">Class 6</button>
                     <button class="class-btn" data-class="7" onclick="selectPublishClass(7)">Class 7</button>
                     <button class="class-btn" data-class="8" onclick="selectPublishClass(8)">Class 8</button>
                     <button class="class-btn" data-class="9" onclick="selectPublishClass(9)">Class 9</button>
-                    <button class="class-btn active" data-class="10" onclick="selectPublishClass(10)">Class 10</button>
+                    <button class="class-btn" data-class="10" onclick="selectPublishClass(10)">Class 10</button>
                     <button class="class-btn" data-class="11" onclick="selectPublishClass(11)">Class 11</button>
                     <button class="class-btn" data-class="12" onclick="selectPublishClass(12)">Class 12</button>
                 </div>
@@ -290,8 +291,7 @@
                     <option value="Annual Examination">Annual Examination</option>
                     <option value="Half Yearly Examination">Half Yearly</option>
                     <option value="Pre Board">Pre Board</option>
-                    <option value="Board Examination">Board Examination</option>
-                    <option value="Final Examination">Final Examination</option>
+                    
                     <option value="Monthly Test">Monthly Test</option>
                     <option value="Unit Test">Unit Test</option>
                 </select>
@@ -351,8 +351,8 @@
         <form id="studentForm" onsubmit="saveStudent(event)">
             <input type="hidden" id="editStudentId" />
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
-                <div class="form-group"><label>Student ID *</label><input type="text" id="sStudentId" required placeholder="STU10025" /></div>
-                <div class="form-group"><label>APAAR ID</label><input type="text" id="sApaarId" placeholder="Optional" /></div>
+                <div class="form-group"><label>Student ID *</label><input type="text" id="sStudentId" required placeholder="Enter Student Id" /></div>
+                <div class="form-group"><label>APAAR ID</label><input type="text" id="sApaarId" required placeholder="Valid APAAR Id" /></div>
             </div>
             <div class="form-group"><label>Full Name *</label><input type="text" id="sName" required placeholder="Student Name" /></div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
@@ -362,17 +362,18 @@
             <div class="form-group"><label>Date of Birth</label><input type="date" id="sDob" /></div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
                 <div class="form-group"><label>Session *</label><select id="sSession" required>
-                    <option value="2025-26">2025-26</option><option value="2024-25">2024-25</option><option value="2023-24">2023-24</option>
+                    <option value="2026-27">2026-27</option><option value="2025-26">2025-26</option>
                 </select></div>
                 <div class="form-group"><label>Class *</label><select id="sClass" required>
+                    <option value="All" selected>All classes</option>
                     <option value="6">Class 6</option><option value="7">Class 7</option><option value="8">Class 8</option>
-                    <option value="9">Class 9</option><option value="10" selected>Class 10</option>
+                    <option value="9">Class 9</option><option value="10">Class 10</option>
                     <option value="11">Class 11</option><option value="12">Class 12</option>
                 </select></div>
             </div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
                 <div class="form-group"><label>Section</label><input type="text" id="sSection" placeholder="A, B, etc." /></div>
-                <div class="form-group"><label>Exam Roll No</label><input type="text" id="sRollNo" placeholder="Roll Number" /></div>
+                <div class="form-group"><label>Exam Roll No</label><input type="text" id="sRollNo" placeholder="Roll Number" required/></div>
             </div>
             <div class="form-group"><label>Photo URL</label><input type="text" id="sPhoto" placeholder="Optional photo URL" /></div>
             <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px; padding-top:16px; border-top:1px solid #e2e8f0;">
@@ -737,9 +738,7 @@ function renderStudentDetail(data) {
                         <select id="modalExamType" required>
                             <option value="Annual Examination">Annual Examination</option>
                             <option value="Half Yearly Examination">Half Yearly</option>
-                            <option value="Pre Board">Pre Board</option>
-                            <option value="Board Examination">Board Examination</option>
-                            <option value="Final Examination">Final Examination</option>
+                            
                             <option value="Monthly Test">Monthly Test</option>
                             <option value="Unit Test">Unit Test</option>
                         </select>
