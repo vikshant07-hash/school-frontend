@@ -1,3 +1,4 @@
+<!-- public/admin/result-dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -174,12 +175,8 @@
                 <option value="2024-25">2024-25</option>
                 <option value="2023-24">2023-24</option>
             </select>
-            <button class="btn btn-outline" onclick="refreshAll()">
-                <i class="fas fa-sync"></i> Refresh
-            </button>
-            <button class="btn btn-success" onclick="openAddStudent()">
-                <i class="fas fa-user-plus"></i> Add Student
-            </button>
+            <button class="btn btn-outline" onclick="refreshAll()"><i class="fas fa-sync"></i> Refresh</button>
+            <button class="btn btn-success" onclick="openAddStudent()"><i class="fas fa-user-plus"></i> Add Student</button>
         </div>
     </header>
 
@@ -403,7 +400,7 @@ function esc(value) {
 function formatDate(value) {
     if (!value) return '-';
     const d = new Date(value);
-    if (Number.isNaN(d.getTime())) return '-';
+    if (isNaN(d.getTime())) return '-';
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
@@ -511,7 +508,6 @@ async function loadStudents(classNum, page = 1) {
     const session = document.getElementById('sessionFilter').value;
     const params = new URLSearchParams({ page, limit: PAGE_SIZE });
     if (session) params.set('session', session);
-    // ✅ FIX: Ensure class is passed as number
     const url = `${API_BASE}/class/${classNum}/students?${params.toString()}`;
 
     const container = document.getElementById('studentGridContainer');
@@ -915,7 +911,6 @@ async function loadPublishableStudents(classNum) {
         const session = document.getElementById('sessionFilter').value;
         const examFilter = document.getElementById('publishExamFilter').value;
         const params = new URLSearchParams({ limit: 100 });
-        // ✅ FIX: class as number
         if (classNum) params.set('class', classNum);
         if (session) params.set('session', session);
         if (examFilter) params.set('exam_type', examFilter);
