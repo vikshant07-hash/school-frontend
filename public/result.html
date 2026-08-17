@@ -1551,74 +1551,19 @@ async function apiCall(url, options = {}) {
 }
 
 // ============================================================
-//  LOAD AVAILABLE CLASSES - SHOW DATE FROM PUBLISHED MARKSHEET
+//  LOAD AVAILABLE CLASSES - USE DECLARATION DATE FROM BACKEND
 // ============================================================
 async function loadAvailableClasses() {
   try {
-    // Step 1: Get available classes
-    const classesData = await apiCall(`${API_BASE}/public/classes`);
-    console.log('📊 Classes data:', classesData);
+    const data = await apiCall(`${API_BASE}/public/classes`);
+    console.log('📊 Classes data:', data);
     
-    if (classesData.success && classesData.data.length > 0) {
-      
-      // Step 2: For each class, get marksheets to find publish date
-      const classDetails = await Promise.all(classesData.data.map(async (c) => {
-        try {
-          const session = DEFAULT_SESSION;
-          const detailRes = await apiCall(`${API_BASE}/public/${session}/${c.class}`);
-          
-          if (detailRes.success && detailRes.data.length > 0) {
-            // Get first marksheet's date (when it was published)
-            const first = detailRes.data[0];
-            let declaredDate = null;
-            
-            // Try to get date from updated_at (when published) or uploaded_at
-            if (first.updated_at) {
-              declaredDate = first.updated_at;
-            } else if (first.uploaded_at) {
-              declaredDate = first.uploaded_at;
-            }
-            
-            return {
-              class: c.class,
-              total_published: c.total_published,
-              exam_type: first.exam_type || 'Various',
-              declared_date: declaredDate,
-              marksheets: detailRes.data
-            };
-          }
-          return { 
-            class: c.class, 
-            total_published: c.total_published, 
-            exam_type: 'Various', 
-            declared_date: null,
-            marksheets: []
-          };
-        } catch (e) {
-          return { 
-            class: c.class, 
-            total_published: c.total_published, 
-            exam_type: 'Various', 
-            declared_date: null,
-            marksheets: []
-          };
-        }
-      }));
+    if (data.success && data.data.length > 0) {
+      classCountBadge.textContent = `${data.data.length} Class${data.data.length > 1 ? 'es' : ''}`;
 
-      // Update badge
-      classCountBadge.textContent = `${classDetails.length} Class${classDetails.length > 1 ? 'es' : ''}`;
-
-      classGrid.innerHTML = classDetails.map(c => {
-        // Format date - from the first published marksheet of this class
-        let dateStr = 'Not available';
-        if (c.declared_date) {
-          const date = new Date(c.declared_date);
-          dateStr = date.toLocaleDateString('en-IN', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
-          });
-        }
+      classGrid.innerHTML = data.data.map(c => {
+        // Use declared_date directly from backend
+        const dateStr = c.declared_date || 'Not available';
 
         return `
           <div class="class-card" onclick="selectClass(${c.class}, '${c.exam_type}', '${dateStr}')">
@@ -1650,7 +1595,7 @@ async function loadAvailableClasses() {
         `;
       }).join('');
       
-      console.log('✅ Classes rendered with declared dates from first marksheet');
+      console.log('✅ Classes rendered with declaration dates');
     } else {
       classCountBadge.textContent = '0 Classes';
       classGrid.innerHTML = `
