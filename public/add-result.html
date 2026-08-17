@@ -1,4 +1,4 @@
-<!-- public/admin/result-dashboard.html -->
+<!-- public/admin/result-dashboard.html - COMPLETE FIXED -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -263,10 +263,12 @@
         </div>
     </div>
 
+    <!-- ===== PUBLISH TAB - FIXED ===== -->
     <div id="tab-publish" class="tab-content">
         <div class="publish-section">
             <h3><i class="fas fa-check-circle"></i> Publish Results</h3>
             <p style="color:#64748b; margin-bottom:16px;">Select a class and exam type to filter marksheets, then publish individually or bulk.</p>
+
             <div class="class-nav" style="box-shadow:none; padding:0 0 16px 0;">
                 <h3><i class="fas fa-school"></i> Select Class</h3>
                 <div class="class-buttons" id="publishClassButtons">
@@ -279,6 +281,7 @@
                     <button class="class-btn" data-class="12" onclick="selectPublishClass(12)">Class 12</button>
                 </div>
             </div>
+
             <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:16px; padding:12px 16px; background:#f8fafc; border-radius:8px;">
                 <label style="font-weight:600; font-size:13px; color:#334155;"><i class="fas fa-filter"></i> Filter by Exam Type:</label>
                 <select id="publishExamFilter" class="exam-filter" onchange="loadPublishableStudents(publishClass)">
@@ -293,6 +296,7 @@
                 </select>
                 <span style="font-size:12px; color:#94a3b8; margin-left:auto;"><i class="fas fa-info-circle"></i> Select exam type to view specific results</span>
             </div>
+
             <div class="publish-grid" style="margin-bottom:16px;">
                 <div class="form-group">
                     <label>Declaration Date <span class="required">*</span></label>
@@ -303,6 +307,7 @@
                     <button class="btn btn-success btn-lg" onclick="bulkPublish()" style="width:100%;"><i class="fas fa-check-double"></i> Bulk Publish Selected</button>
                 </div>
             </div>
+
             <div class="table-container" style="box-shadow:none; padding:0;">
                 <h3>
                     <span><i class="fas fa-file-pdf"></i> Marksheets <span id="publishCount">(0)</span></span>
@@ -312,16 +317,23 @@
                     <thead>
                         <tr>
                             <th style="width:40px;"><input type="checkbox" id="selectAllPublish" onchange="toggleAllPublish()" /></th>
-                            <th>Student ID</th><th>Name</th><th>Exam Type</th><th>Class</th><th>Status</th><th>Actions</th>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Exam Type</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="publishTableBody"><tr><td colspan="7" style="text-align:center; color:#64748b; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr></tbody>
+                    <tbody id="publishTableBody">
+                        <tr><td colspan="6" style="text-align:center; color:#64748b; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Modals -->
 <div class="modal-overlay" id="studentModal">
     <div class="modal-content">
         <div class="modal-header">
@@ -895,7 +907,7 @@ async function loadRecentUploads() {
 }
 
 // ================================================================
-//  PUBLISH SECTION
+//  PUBLISH SECTION - FIXED
 // ================================================================
 function selectPublishClass(classNum) {
     publishClass = classNum;
@@ -906,46 +918,60 @@ function selectPublishClass(classNum) {
 
 async function loadPublishableStudents(classNum) {
     const tbody = document.getElementById('publishTableBody');
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>`;
+    
     try {
         const session = document.getElementById('sessionFilter').value;
         const examFilter = document.getElementById('publishExamFilter').value;
-        const params = new URLSearchParams({ limit: 100 });
-        if (classNum) params.set('class', classNum);
-        if (session) params.set('session', session);
-        if (examFilter) params.set('exam_type', examFilter);
-
-        const data = await apiCall(`${API_BASE}/marksheets?${params.toString()}`);
-        document.getElementById('publishCount').textContent = `(${data.pagination?.total ?? data.data.length})`;
-
-        if (data.data && data.data.length > 0) {
+        
+        // ✅ Build URL with proper params - 6 columns only
+        let url = `${API_BASE}/marksheets?limit=100`;
+        if (classNum) url += `&class=${parseInt(classNum)}`;
+        if (session) url += `&session=${encodeURIComponent(session)}`;
+        if (examFilter) url += `&exam_type=${encodeURIComponent(examFilter)}`;
+        
+        console.log('🔍 Fetching marksheets from:', url);
+        const data = await apiCall(url);
+        console.log('📊 Marksheets data:', data);
+        
+        const countEl = document.getElementById('publishCount');
+        const total = data.pagination?.total ?? data.data?.length ?? 0;
+        countEl.textContent = `(${total})`;
+        
+        if (data.success && data.data && data.data.length > 0) {
             tbody.innerHTML = data.data.map((m) => `
                 <tr>
                     <td><input type="checkbox" class="publish-checkbox" data-id="${m.id}" data-student="${esc(m.student_id)}" /></td>
                     <td><strong>${esc(m.student_id)}</strong></td>
                     <td>${esc(m.name)}</td>
                     <td><span class="badge badge-info">${esc(m.exam_type)}</span></td>
-                    <td>${esc(m.class)}</td>
-                    <td><span class="badge ${m.is_published ? 'badge-success' : 'badge-warning'}">${m.is_published ? '✅ Published' : '⏳ Unpublished'}</span></td>
+                    <td>
+                        <span class="badge ${m.is_published ? 'badge-success' : 'badge-warning'}">
+                            ${m.is_published ? '✅ Published' : '⏳ Unpublished'}
+                        </span>
+                    </td>
                     <td>
                         <div class="action-group">
                             ${m.is_published
                                 ? `<button class="action-btn unpublish" onclick="unpublishSingle(${m.id})"><i class="fas fa-eye-slash"></i> Unpublish</button>`
-                                : `<button class="action-btn publish" onclick="publishSingle(${m.id})"><i class="fas fa-check-circle"></i> Publish</button>`}
+                                : `<button class="action-btn publish" onclick="publishSingle(${m.id})"><i class="fas fa-check-circle"></i> Publish</button>`
+                            }
                             <button class="action-btn view" onclick="viewMarksheet(${m.id})"><i class="fas fa-eye"></i> View</button>
                             <button class="action-btn download" onclick="downloadMarksheet(${m.id})"><i class="fas fa-download"></i> Download</button>
                         </div>
                     </td>
-                </tr>`).join('');
+                </tr>
+            `).join('');
         } else {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b; padding:30px;">
-                <i class="fas fa-file-pdf"></i> No marksheets found for this class${session ? ` / session "${esc(session)}"` : ''}
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b; padding:30px;">
+                <i class="fas fa-file-pdf"></i> No marksheets found for this class
                 <br/><small style="color:#94a3b8;">${examFilter ? `Filter: "${esc(examFilter)}"` : 'Upload marksheets first from the Upload tab'}</small>
             </td></tr>`;
         }
     } catch (error) {
+        console.error('Error loading publishable students:', error);
         tbody.innerHTML = `
-            <tr><td colspan="7" style="text-align:center; color:#dc2626; padding:20px;">
+            <tr><td colspan="6" style="text-align:center; color:#dc2626; padding:20px;">
                 <i class="fas fa-exclamation-circle"></i> ${esc(error.message || 'Failed to load data.')}
                 <button class="retry-btn" onclick="loadPublishableStudents(${classNum})"><i class="fas fa-sync"></i> Retry</button>
             </td></tr>`;
