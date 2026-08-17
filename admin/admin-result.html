@@ -1443,28 +1443,219 @@
         <form id="studentForm" onsubmit="saveStudent(event)">
             <input type="hidden" id="editStudentId">
             <div class="form-row">
-                <div class="form-group">
-                    <label>Student ID <span class="required">*</span></label>
-                    <input type="text" id="sStudentId" class="form-control" required placeholder="STU10025">
-                </div>
-                <div class="form-group">
-                    <label>APAAR ID</label>
-                    <input type="text" id="sApaarId" class="form-control" placeholder="Optional">
-                </div>
+
+
+                <div class="form-group"><label>Student ID <span class="required">*</span></label><input type="text" id="sStudentId" class="form-control" placeholder="e.g. ST10A025" maxlength="8" required><small style="color:var(--text-muted);font-size:11px;margin-top:4px;display:block;"><i class="fas fa-info-circle"></i> Format: <strong>AA99A999</strong> (2 Letters + 2 Numbers + 1 Letter + 3 Numbers)</small><div id="studentIdError" style="color:var(--red);font-size:12px;margin-top:4px;display:none;"><i class="fas fa-exclamation-circle"></i> Invalid format! Use: 2 Letters + 2 Numbers + 1 Letter + 3 Numbers (e.g. ST10A025)</div></div><script>document.addEventListener('DOMContentLoaded',function(){var s=document.getElementById('sStudentId'),e=document.getElementById('studentIdError');if(s){s.addEventListener('input',function(){this.value=this.value.toUpperCase();var v=this.value,c='';for(var i=0;i<v.length&&i<8;i++){var ch=v[i];if(i<2){if(/[A-Z]/.test(ch))c+=ch;}else if(i>=2&&i<4){if(/[0-9]/.test(ch))c+=ch;}else if(i===4){if(/[A-Z]/.test(ch))c+=ch;}else if(i>=5&&i<8){if(/[0-9]/.test(ch))c+=ch;}}this.value=c;var p=/^[A-Z]{2}[0-9]{2}[A-Z][0-9]{3}$/;if(this.value.length===8){if(p.test(this.value)){e.style.display='none';this.style.borderColor='var(--green)';this.style.boxShadow='0 0 0 3px rgba(16,185,129,0.1)';}else{e.style.display='block';this.style.borderColor='var(--red)';this.style.boxShadow='0 0 0 3px rgba(239,68,68,0.1)';}}else if(this.value.length>0){e.style.display='block';this.style.borderColor='var(--red)';this.style.boxShadow='0 0 0 3px rgba(239,68,68,0.1)';}else{e.style.display='none';this.style.borderColor='';this.style.boxShadow='';}});s.addEventListener('blur',function(){var p=/^[A-Z]{2}[0-9]{2}[A-Z][0-9]{3}$/;if(this.value.length>0&&!p.test(this.value)){e.style.display='block';this.style.borderColor='var(--red)';this.style.boxShadow='0 0 0 3px rgba(239,68,68,0.1)';showToast('❌ Invalid Student ID format! Use: AA99A999 (e.g. ST10A025)','error');}});}});function validateStudentId(){var s=document.getElementById('sStudentId'),e=document.getElementById('studentIdError'),p=/^[A-Z]{2}[0-9]{2}[A-Z][0-9]{3}$/;if(!s)return true;var v=s.value.trim().toUpperCase();if(v===''||!p.test(v)){e.style.display='block';s.style.borderColor='var(--red)';s.style.boxShadow='0 0 0 3px rgba(239,68,68,0.1)';s.focus();showToast('❌ Invalid Student ID! Use format: AA99A999 (e.g. ST10A025)','error');return false;}return true;}</script>
+                
+
+<div class="form-group">
+    <label>APAAR ID <span class="required">*</span></label>
+    <input type="text" id="sApaarId" class="form-control" placeholder="Enter 11-digit APAAR ID" maxlength="11" required>
+    <small style="color:var(--text-muted); font-size:11px; margin-top:4px; display:block;">
+        <i class="fas fa-info-circle"></i> APAAR ID must be exactly 11 digits (numbers only)
+    </small>
+    <div id="apaarError" style="color:var(--red); font-size:12px; margin-top:4px; display:none;">
+        <i class="fas fa-exclamation-circle"></i> Please enter exactly 11 digits (numbers only)
+    </div>
+</div>
+
+<script>
+// ================================================================
+//  APAAR ID - REAL-TIME VALIDATION
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const apaar = document.getElementById('sApaarId');
+    const error = document.getElementById('apaarError');
+    
+    if (apaar) {
+        apaar.addEventListener('input', function() {
+            // Only numbers
+            this.value = this.value.replace(/\D/g, '');
+            
+            // Check length
+            if (this.value.length > 0 && this.value.length !== 11) {
+                error.style.display = 'block';
+                this.style.borderColor = 'var(--red)';
+                this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+            } else if (this.value.length === 11) {
+                error.style.display = 'none';
+                this.style.borderColor = 'var(--green)';
+                this.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
+            } else {
+                error.style.display = 'none';
+                this.style.borderColor = '';
+                this.style.boxShadow = '';
+            }
+        });
+    }
+});
+</script>
+                
+                
             </div>
-            <div class="form-group">
-                <label>Full Name <span class="required">*</span></label>
-                <input type="text" id="sName" class="form-control" required placeholder="Student Name">
-            </div>
+            <div class="form-group"><label>Full Name <span class="required">*</span></label><input type="text" id="sName" class="form-control" required placeholder="Student Name"><small style="color:var(--text-muted);font-size:11px;margin-top:4px;display:block;"><i class="fas fa-info-circle"></i> Only alphabets (A-Z) and spaces allowed</small><div id="nameError" style="color:var(--red);font-size:12px;margin-top:4px;display:none;"><i class="fas fa-exclamation-circle"></i> Only alphabets and spaces allowed (no digits or special characters)</div></div><script>document.addEventListener('DOMContentLoaded',function(){var n=document.getElementById('sName'),e=document.getElementById('nameError');if(n){n.addEventListener('input',function(){var c=this.value.replace(/[^A-Za-z\s]/g,'');c=c.toUpperCase();c=c.replace(/\s+/g,' ');c=c.trimStart();this.value=c;var p=/^[A-Z\s]+$/;if(this.value.length>0){if(p.test(this.value)&&this.value.trim().length>0){e.style.display='none';this.style.borderColor='var(--green)';this.style.boxShadow='0 0 0 3px rgba(16,185,129,0.1)';}else{e.style.display='block';this.style.borderColor='var(--red)';this.style.boxShadow='0 0 0 3px rgba(239,68,68,0.1)';}}else{e.style.display='none';this.style.borderColor='';this.style.boxShadow='';}});n.addEventListener('blur',function(){var p=/^[A-Z\s]+$/;var v=this.value.trim();if(v.length>0&&!p.test(v)){e.style.display='block';this.style.borderColor='var(--red)';this.style.boxShadow='0 0 0 3px rgba(239,68,68,0.1)';showToast('❌ Only alphabets and spaces allowed in name','error');}});}});function validateFullName(){var n=document.getElementById('sName'),e=document.getElementById('nameError'),p=/^[A-Z\s]+$/;if(!n)return true;var v=n.value.trim();if(v===''||!p.test(v)){e.style.display='block';n.style.borderColor='var(--red)';n.style.boxShadow='0 0 0 3px rgba(239,68,68,0.1)';n.focus();showToast('❌ Only alphabets and spaces allowed in name','error');return false;}return true;}</script>
             <div class="form-row">
-                <div class="form-group">
-                    <label>Father's Name</label>
-                    <input type="text" id="sFatherName" class="form-control" placeholder="Father's Name">
-                </div>
-                <div class="form-group">
-                    <label>Mother's Name</label>
-                    <input type="text" id="sMotherName" class="form-control" placeholder="Mother's Name">
-                </div>
+                <!-- ============================================================
+   FATHER'S NAME - Only Alphabets, Auto Capital
+============================================================ -->
+<div class="form-group">
+    <label>Father's Name</label>
+    <input type="text" id="sFatherName" class="form-control" placeholder="Father's Name">
+    <small style="color:var(--text-muted); font-size:11px; margin-top:4px; display:block;">
+        <i class="fas fa-info-circle"></i> Only alphabets (A-Z) and spaces allowed
+    </small>
+    <div id="fatherNameError" style="color:var(--red); font-size:12px; margin-top:4px; display:none;">
+        <i class="fas fa-exclamation-circle"></i> Only alphabets and spaces allowed
+    </div>
+</div>
+
+<!-- ============================================================
+   MOTHER'S NAME - Only Alphabets, Auto Capital
+============================================================ -->
+<div class="form-group">
+    <label>Mother's Name</label>
+    <input type="text" id="sMotherName" class="form-control" placeholder="Mother's Name">
+    <small style="color:var(--text-muted); font-size:11px; margin-top:4px; display:block;">
+        <i class="fas fa-info-circle"></i> Only alphabets (A-Z) and spaces allowed
+    </small>
+    <div id="motherNameError" style="color:var(--red); font-size:12px; margin-top:4px; display:none;">
+        <i class="fas fa-exclamation-circle"></i> Only alphabets and spaces allowed
+    </div>
+</div>
+
+<script>
+// ================================================================
+//  FATHER'S NAME VALIDATION
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const fatherInput = document.getElementById('sFatherName');
+    const fatherError = document.getElementById('fatherNameError');
+    
+    if (fatherInput) {
+        fatherInput.addEventListener('input', function() {
+            // Remove digits and special characters
+            let cleaned = this.value.replace(/[^A-Za-z\s]/g, '');
+            cleaned = cleaned.toUpperCase();
+            cleaned = cleaned.replace(/\s+/g, ' ');
+            cleaned = cleaned.trimStart();
+            this.value = cleaned;
+            
+            const pattern = /^[A-Z\s]+$/;
+            if (this.value.length > 0) {
+                if (pattern.test(this.value) && this.value.trim().length > 0) {
+                    fatherError.style.display = 'none';
+                    this.style.borderColor = 'var(--green)';
+                    this.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
+                } else {
+                    fatherError.style.display = 'block';
+                    this.style.borderColor = 'var(--red)';
+                    this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+                }
+            } else {
+                fatherError.style.display = 'none';
+                this.style.borderColor = '';
+                this.style.boxShadow = '';
+            }
+        });
+        
+        fatherInput.addEventListener('blur', function() {
+            const pattern = /^[A-Z\s]+$/;
+            const val = this.value.trim();
+            if (val.length > 0 && !pattern.test(val)) {
+                fatherError.style.display = 'block';
+                this.style.borderColor = 'var(--red)';
+                this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+            }
+        });
+    }
+});
+
+// ================================================================
+//  MOTHER'S NAME VALIDATION
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const motherInput = document.getElementById('sMotherName');
+    const motherError = document.getElementById('motherNameError');
+    
+    if (motherInput) {
+        motherInput.addEventListener('input', function() {
+            let cleaned = this.value.replace(/[^A-Za-z\s]/g, '');
+            cleaned = cleaned.toUpperCase();
+            cleaned = cleaned.replace(/\s+/g, ' ');
+            cleaned = cleaned.trimStart();
+            this.value = cleaned;
+            
+            const pattern = /^[A-Z\s]+$/;
+            if (this.value.length > 0) {
+                if (pattern.test(this.value) && this.value.trim().length > 0) {
+                    motherError.style.display = 'none';
+                    this.style.borderColor = 'var(--green)';
+                    this.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
+                } else {
+                    motherError.style.display = 'block';
+                    this.style.borderColor = 'var(--red)';
+                    this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+                }
+            } else {
+                motherError.style.display = 'none';
+                this.style.borderColor = '';
+                this.style.boxShadow = '';
+            }
+        });
+        
+        motherInput.addEventListener('blur', function() {
+            const pattern = /^[A-Z\s]+$/;
+            const val = this.value.trim();
+            if (val.length > 0 && !pattern.test(val)) {
+                motherError.style.display = 'block';
+                this.style.borderColor = 'var(--red)';
+                this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+            }
+        });
+    }
+});
+
+// ================================================================
+//  VALIDATION FUNCTIONS (Form Submit ke time use karein)
+// ================================================================
+function validateFatherName() {
+    const input = document.getElementById('sFatherName');
+    const error = document.getElementById('fatherNameError');
+    const pattern = /^[A-Z\s]+$/;
+    
+    if (!input) return true;
+    const value = input.value.trim();
+    
+    if (value.length > 0 && !pattern.test(value)) {
+        error.style.display = 'block';
+        input.style.borderColor = 'var(--red)';
+        input.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+        input.focus();
+        showToast('❌ Only alphabets and spaces allowed in Father\'s Name', 'error');
+        return false;
+    }
+    return true;
+}
+
+function validateMotherName() {
+    const input = document.getElementById('sMotherName');
+    const error = document.getElementById('motherNameError');
+    const pattern = /^[A-Z\s]+$/;
+    
+    if (!input) return true;
+    const value = input.value.trim();
+    
+    if (value.length > 0 && !pattern.test(value)) {
+        error.style.display = 'block';
+        input.style.borderColor = 'var(--red)';
+        input.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+        input.focus();
+        showToast('❌ Only alphabets and spaces allowed in Mother\'s Name', 'error');
+        return false;
+    }
+    return true;
+}
+</script>
             </div>
             <div class="form-group">
                 <label>Date of Birth</label>
@@ -1502,10 +1693,7 @@
                     <input type="text" id="sRollNo" class="form-control" placeholder="Roll Number">
                 </div>
             </div>
-            <div class="form-group">
-                <label>Photo URL</label>
-                <input type="text" id="sPhoto" class="form-control" placeholder="Optional photo URL">
-            </div>
+            <div class="form-group"><label>Photo</label><div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;"><div style="flex:1; min-width:200px;"><input type="file" id="sPhoto" class="form-control" accept="image/*" style="padding:8px;"><small style="color:var(--text-muted); font-size:11px; margin-top:4px; display:block;"><i class="fas fa-info-circle"></i> Upload JPG, PNG, WebP (Max 5MB)</small><div id="photoError" style="color:var(--red); font-size:12px; margin-top:4px; display:none;"><i class="fas fa-exclamation-circle"></i> <span id="photoErrorText">Invalid file</span></div></div><div id="photoPreview" style="width:80px; height:80px; border-radius:50%; border:2px dashed var(--border); overflow:hidden; display:flex; align-items:center; justify-content:center; background:var(--bg); flex-shrink:0;"><i class="fas fa-user" style="font-size:32px; color:var(--text-muted);"></i></div></div><input type="hidden" id="sPhotoUrl" value=""></div><script>document.addEventListener('DOMContentLoaded',function(){var p=document.getElementById('sPhoto'),pr=document.getElementById('photoPreview'),hu=document.getElementById('sPhotoUrl'),er=document.getElementById('photoError'),et=document.getElementById('photoErrorText');if(p){p.addEventListener('change',function(e){var f=this.files[0];er.style.display='none';if(!f){pr.innerHTML='<i class="fas fa-user" style="font-size:32px; color:var(--text-muted);"></i>';hu.value='';return;}if(f.size>5*1024*1024){et.textContent='File size must be less than 5MB';er.style.display='block';this.value='';pr.innerHTML='<i class="fas fa-user" style="font-size:32px; color:var(--text-muted);"></i>';hu.value='';showToast('❌ File size must be less than 5MB','error');return;}var vt=['image/jpeg','image/png','image/webp','image/jpg','image/gif'];if(!vt.includes(f.type)){et.textContent='Only JPG, PNG, WebP, GIF images are allowed';er.style.display='block';this.value='';pr.innerHTML='<i class="fas fa-user" style="font-size:32px; color:var(--text-muted);"></i>';hu.value='';showToast('❌ Only JPG, PNG, WebP, GIF images are allowed','error');return;}var rd=new FileReader();rd.onload=function(e){pr.innerHTML='<img src="'+e.target.result+'" style="width:100%; height:100%; object-fit:cover;">';hu.value=e.target.result;};rd.readAsDataURL(f);});}});function getPhotoData(){var h=document.getElementById('sPhotoUrl');return h?h.value:'';}function clearPhoto(){var p=document.getElementById('sPhoto'),pr=document.getElementById('photoPreview'),hu=document.getElementById('sPhotoUrl');if(p)p.value='';if(pr)pr.innerHTML='<i class="fas fa-user" style="font-size:32px; color:var(--text-muted);"></i>';if(hu)hu.value='';}function setPhotoFromUrl(url){var pr=document.getElementById('photoPreview'),hu=document.getElementById('sPhotoUrl');if(url&&url.trim()!==''){pr.innerHTML='<img src="'+url+'" style="width:100%; height:100%; object-fit:cover;">';if(hu)hu.value=url;}}</script>
             <div class="form-actions" style="justify-content:flex-end; border-top:1px solid var(--border); padding-top:16px;">
                 <button type="button" class="btn btn-outline" onclick="closeModal('studentAddModal')">Cancel</button>
                 <button type="submit" class="btn btn-success" id="studentSaveBtn">
