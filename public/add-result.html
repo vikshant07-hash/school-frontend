@@ -168,11 +168,6 @@
     <header class="dashboard-header">
         <h1><i class="fas fa-graduation-cap"></i> Result Management</h1>
         <div class="header-actions">
-            <!-- FIX: added "All Sessions" option with empty value. Previously the
-                 dropdown always defaulted to a hardcoded "2025-26", which silently
-                 filtered out every record whose session didn't match that exact
-                 string (leading/trailing spaces, older sessions, typos, etc.),
-                 producing {success:true, data:[]} even though records existed. -->
             <select id="sessionFilter" class="btn btn-outline session-filter" style="padding:8px 14px;">
                 <option value="">All Sessions</option>
                 <option value="2025-26" selected>2025-26</option>
@@ -393,14 +388,8 @@ let publishClass = 10;
 const PAGE_SIZE = 20;
 
 // ================================================================
-//  SMALL UTILITIES
+//  UTILITIES
 // ================================================================
-
-// Escape any value before it is inserted into innerHTML — every
-// field that could contain user-entered text (names, ids, exam
-// types) is now passed through this instead of being interpolated
-// raw, which previously allowed a student name like `<img onerror=..>`
-// to execute script in the admin panel.
 function esc(value) {
     if (value === null || value === undefined) return '';
     return String(value)
@@ -422,7 +411,7 @@ function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    toast.textContent = message; // textContent, not innerHTML — always safe
+    toast.textContent = message;
     container.appendChild(toast);
     setTimeout(() => {
         toast.style.opacity = '0';
@@ -431,9 +420,6 @@ function showToast(message, type = 'info') {
     }, 4000);
 }
 
-// Central fetch wrapper: surfaces the backend's own error message
-// (result.message) instead of a generic "HTTP 400", and never throws
-// on a well-formed error JSON body.
 async function apiCall(url, options = {}) {
     let response;
     try {
@@ -522,9 +508,10 @@ function selectClass(classNum) {
 // ================================================================
 async function loadStudents(classNum, page = 1) {
     currentPage = page;
-    const session = document.getElementById('sessionFilter').value; // may be "" (All Sessions) — that's fine now
+    const session = document.getElementById('sessionFilter').value;
     const params = new URLSearchParams({ page, limit: PAGE_SIZE });
     if (session) params.set('session', session);
+    // ✅ FIX: Ensure class is passed as number
     const url = `${API_BASE}/class/${classNum}/students?${params.toString()}`;
 
     const container = document.getElementById('studentGridContainer');
@@ -585,10 +572,6 @@ function renderStudentCards(students) {
     }).join('');
 }
 
-// Generic pagination renderer using the {page, totalPages} the
-// backend now actually returns (previously totalPages was never
-// sent, so this function's `pagination.totalPages <= 1` check
-// always no-op'd and the pager silently never rendered).
 function renderPagination(pagination, onPage) {
     const container = document.getElementById('pagination');
     if (!pagination || !pagination.totalPages || pagination.totalPages <= 1) {
@@ -929,9 +912,11 @@ async function loadPublishableStudents(classNum) {
     const tbody = document.getElementById('publishTableBody');
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>`;
     try {
-        const session = document.getElementById('sessionFilter').value; // "" = all sessions, now supported by backend
+        const session = document.getElementById('sessionFilter').value;
         const examFilter = document.getElementById('publishExamFilter').value;
-        const params = new URLSearchParams({ class: classNum, limit: 100 });
+        const params = new URLSearchParams({ limit: 100 });
+        // ✅ FIX: class as number
+        if (classNum) params.set('class', classNum);
         if (session) params.set('session', session);
         if (examFilter) params.set('exam_type', examFilter);
 
@@ -1103,9 +1088,7 @@ async function deleteExam(id) {
 }
 
 // ================================================================
-//  BULK PUBLISH — now uses the single atomic /marksheets/bulk-publish
-//  endpoint instead of firing N parallel single-publish requests
-//  (the old approach had no atomicity and made N separate round trips).
+//  BULK PUBLISH
 // ================================================================
 async function bulkPublish() {
     const publishDate = document.getElementById('publishDate').value;
@@ -1150,7 +1133,7 @@ function refreshAll() {
 }
 
 // ================================================================
-//  FILTERS THAT AFFECT MULTIPLE TABS
+//  FILTERS
 // ================================================================
 document.getElementById('sessionFilter').addEventListener('change', () => {
     currentPage = 1;
