@@ -7,6 +7,7 @@
     <title>Result Management - GSSS Shilla</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
+        /* ===== CSS - SAME AS BEFORE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f4f8; color: #0f172a; }
         .result-dashboard { max-width: 1400px; margin: 0 auto; padding: 20px; }
@@ -924,7 +925,6 @@ async function loadPublishableStudents(classNum) {
         const session = document.getElementById('sessionFilter').value;
         const examFilter = document.getElementById('publishExamFilter').value;
         
-        // ✅ Build URL with proper params - 6 columns only
         let url = `${API_BASE}/marksheets?limit=100`;
         if (classNum) url += `&class=${parseInt(classNum)}`;
         if (session) url += `&session=${encodeURIComponent(session)}`;
@@ -985,26 +985,51 @@ function toggleAllPublish() {
 }
 
 // ================================================================
-//  MARKSHEET OPERATIONS - ✅ FIXED
+//  MARKSHEET OPERATIONS - ✅ FIXED WITH DIRECT CLOUDINARY URL
 // ================================================================
 
-// ✅ VIEW marksheet - Direct open with redirect handling
+// ✅ VIEW marksheet - Direct Cloudinary URL from API
 function viewMarksheet(id) {
-    // Open in new tab - browser will handle redirect from backend
-    window.open(`${PUBLIC_API}/public/marksheet/${id}`, '_blank');
+    showToast('Loading marksheet...', 'info');
+    
+    // Fetch marksheet details first
+    fetch(`${API_BASE}/marksheets/${id}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.data.cloudinary_url) {
+                // ✅ Open Cloudinary URL directly in new tab
+                window.open(data.data.cloudinary_url, '_blank');
+                showToast('Marksheet opened!', 'success');
+            } else {
+                showToast('Failed to get marksheet URL', 'error');
+            }
+        })
+        .catch(err => {
+            console.error('Error fetching marksheet:', err);
+            showToast('Failed to load marksheet', 'error');
+        });
 }
 
-// ✅ DOWNLOAD marksheet - Direct download with redirect
-async function downloadMarksheet(id) {
+// ✅ DOWNLOAD marksheet - Direct Cloudinary URL with download flag
+function downloadMarksheet(id) {
     showToast('Preparing download...', 'info');
-    try {
-        // Open in new tab - browser will handle download redirect
-        window.open(`${PUBLIC_API}/public/marksheet/${id}/download`, '_blank');
-        showToast('Download started!', 'success');
-    } catch (error) {
-        console.error('Download error:', error);
-        showToast('Download failed', 'error');
-    }
+    
+    fetch(`${API_BASE}/marksheets/${id}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.data.cloudinary_url) {
+                // ✅ Add download flag to Cloudinary URL
+                const downloadUrl = data.data.cloudinary_url.replace('/upload/', '/upload/fl_attachment/');
+                window.open(downloadUrl, '_blank');
+                showToast('Download started!', 'success');
+            } else {
+                showToast('Failed to get download link', 'error');
+            }
+        })
+        .catch(err => {
+            console.error('Download error:', err);
+            showToast('Download failed', 'error');
+        });
 }
 
 // ================================================================
