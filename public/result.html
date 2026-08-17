@@ -1362,21 +1362,7 @@ body { padding-top: 70px; }
   <div class="result-content" id="resultContent">
 
     <!-- ===== RECENT RESULTS - TOP SECTION ===== -->
-    <div class="recent-section" id="recentSection">
-      <div class="section-header">
-        <h2><i class="fas fa-clock"></i> Recent Results</h2>
-        <span class="recent-badge"><i class="fas fa-bolt"></i> Latest Updates</span>
-      </div>
-      <p style="color:var(--text-light); font-size:14px; margin-bottom:18px;">
-        Most recently published results
-      </p>
-      <div class="recent-grid" id="recentGrid">
-        <div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--gray);">
-          <i class="fas fa-spinner fa-spin" style="font-size:28px;"></i>
-          <p style="margin-top:8px;">Loading recent results...</p>
-        </div>
-      </div>
-    </div>
+
 
     <!-- ===== AVAILABLE RESULTS ===== -->
     <div class="class-section" id="classSection">
@@ -1671,108 +1657,8 @@ async function apiCall(url, options = {}) {
   }
 }
 
-// ============================================================
-//  LOAD RECENT RESULTS - Sorted by declaration_date (Newest first)
-// ============================================================
-async function loadRecentResults() {
-  try {
-    // First get all classes
-    const classesData = await apiCall(`${API_BASE}/public/classes`);
-    console.log('📊 Classes data:', classesData);
-    
-    if (classesData.success && classesData.data.length > 0) {
-      // Get detailed marksheets for each class
-      const allMarksheets = [];
-      
-      for (const c of classesData.data) {
-        try {
-          const detailRes = await apiCall(`${API_BASE}/public/${DEFAULT_SESSION}/${c.class}`);
-          if (detailRes.success && detailRes.data.length > 0) {
-            // Add class info to each marksheet
-            detailRes.data.forEach(m => {
-              allMarksheets.push({
-                ...m,
-                class: c.class,
-                declared_date: c.declared_date,
-                exam_type: c.exam_type
-              });
-            });
-          }
-        } catch (e) {
-          console.error('Error fetching class details:', e);
-        }
-      }
-      
-      // Sort by declared_date (newest first)
-      allMarksheets.sort((a, b) => {
-        const dateA = a.declared_date ? new Date(a.declared_date) : 0;
-        const dateB = b.declared_date ? new Date(b.declared_date) : 0;
-        return dateB - dateA;
-      });
-      
-      // Get top 6 recent results
-      const recent = allMarksheets.slice(0, 6);
-      
-      if (recent.length > 0) {
-        recentGrid.innerHTML = recent.map(m => {
-          const dateStr = m.declared_date || 'Not available';
-          return `
-            <div class="recent-card" onclick="selectClass(${m.class}, '${m.exam_type}', '${dateStr}')">
-              <div class="card-top">
-                <span class="class-title">
-                  <i class="fas fa-school"></i> Class ${m.class}
-                </span>
-                <span class="new-badge"><i class="fas fa-clock"></i> New</span>
-              </div>
-              <div class="card-details">
-                <span class="detail-tag">
-                  <i class="fas fa-user"></i> <strong>${m.name}</strong>
-                </span>
-                <span class="detail-tag">
-                  <i class="fas fa-file-alt"></i> ${m.exam_type}
-                </span>
-                <span class="detail-tag">
-                  <i class="fas fa-calendar-alt"></i> <strong class="date-highlight">${dateStr}</strong>
-                </span>
-              </div>
-              <div class="card-footer">
-                <span class="click-hint">
-                  Check Result <i class="fas fa-arrow-right"></i>
-                </span>
-              </div>
-            </div>
-          `;
-        }).join('');
-      } else {
-        recentGrid.innerHTML = `
-          <div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--gray);">
-            <i class="fas fa-info-circle" style="font-size:28px; display:block; margin-bottom:8px;"></i>
-            No recent results available
-          </div>
-        `;
-      }
-    } else {
-      recentGrid.innerHTML = `
-        <div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--gray);">
-          <i class="fas fa-info-circle" style="font-size:28px; display:block; margin-bottom:8px;"></i>
-          No results available yet
-        </div>
-      `;
-    }
-  } catch (error) {
-    console.error('Error loading recent results:', error);
-    recentGrid.innerHTML = `
-      <div style="grid-column:1/-1; text-align:center; padding:30px; color:#dc2626;">
-        <i class="fas fa-exclamation-circle" style="font-size:28px; display:block; margin-bottom:8px;"></i>
-        Failed to load recent results
-        <br/><button class="retry-btn" onclick="loadRecentResults()" style="background:none; border:none; color:#1a56db; font-weight:600; cursor:pointer; text-decoration:underline; margin-top:8px;">
-          Retry
-        </button>
-      </div>
-    `;
-  }
-}
 
+      
 // ============================================================
 //  LOAD AVAILABLE CLASSES
 // ============================================================
