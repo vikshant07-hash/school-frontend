@@ -1192,7 +1192,7 @@ function toggleAllPublish() {
     document.querySelectorAll('.publish-checkbox').forEach(cb => cb.checked = checked);
 }
 
-// ===== PUBLISH SINGLE =====
+// ===== PUBLISH SINGLE WITH DATE =====
 function publishSingle(id) {
     const publishDate = document.getElementById('publishDate').value;
     if (!publishDate) {
@@ -1202,24 +1202,73 @@ function publishSingle(id) {
     
     if (!confirm('Publish this marksheet? It will become publicly visible.')) return;
     
-    fetch(`${API_BASE}/marksheets/${id}/publish`, { method: 'POST' })
-        .then(res => res.json())
-        .then(result => {
-            if (result.success) {
-                showToast('✅ Marksheet published successfully!', 'success');
-                loadPublishableStudents(publishClass);
-                loadDashboardStats();
-                loadRecentUploads();
-            } else {
-                showToast('Error: ' + result.message, 'error');
-            }
-        })
-        .catch(err => {
-            console.error('Error publishing:', err);
-            showToast('Failed to publish', 'error');
-        });
+    fetch(`${API_BASE}/marksheets/${id}/publish`, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ declaration_date: publishDate })
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (result.success) {
+            showToast('✅ Marksheet published successfully!', 'success');
+            loadPublishableStudents(publishClass);
+            loadDashboardStats();
+            loadRecentUploads();
+        } else {
+            showToast('Error: ' + result.message, 'error');
+        }
+    })
+    .catch(err => {
+        console.error('Error publishing:', err);
+        showToast('Failed to publish', 'error');
+    });
 }
 
+// ===== BULK PUBLISH WITH DATE =====
+function bulkPublish() {
+    const publishDate = document.getElementById('publishDate').value;
+    if (!publishDate) {
+        showToast('Please select a Declaration Date first', 'warning');
+        return;
+    }
+    
+    const selected = document.querySelectorAll('.publish-checkbox:checked');
+    if (selected.length === 0) {
+        showToast('Please select at least one student to publish', 'warning');
+        return;
+    }
+    
+    if (!confirm(`Publish ${selected.length} marksheet(s)? They will become publicly visible with declaration date: ${new Date(publishDate).toLocaleDateString()}`)) {
+        return;
+    }
+    
+    const ids = Array.from(selected).map(cb => cb.dataset.id);
+    let published = 0;
+    let failed = 0;
+    
+    const promises = ids.map(id => 
+        fetch(`${API_BASE}/marksheets/${id}/publish`, { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ declaration_date: publishDate })
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (result.success) published++;
+            else failed++;
+        })
+        .catch(() => failed++)
+    );
+    
+    Promise.all(promises).then(() => {
+        showToast(`✅ ${published} published, ${failed} failed`, published > 0 ? 'success' : 'error');
+        loadPublishableStudents(publishClass);
+        loadDashboardStats();
+        loadRecentUploads();
+        document.getElementById('selectAllPublish').checked = false;
+    });
+}
+    
 // ===== UNPUBLISH SINGLE =====
 function unpublishSingle(id) {
     if (!confirm('Unpublish this marksheet? It will be hidden from public view.')) return;
@@ -1243,46 +1292,6 @@ function unpublishSingle(id) {
 }
 
 // ===== BULK PUBLISH =====
-function bulkPublish() {
-    const publishDate = document.getElementById('publishDate').value;
-    if (!publishDate) {
-        showToast('Please select a Declaration Date first', 'warning');
-        return;
-    }
-    
-    const selected = document.querySelectorAll('.publish-checkbox:checked');
-    if (selected.length === 0) {
-        showToast('Please select at least one student to publish', 'warning');
-        return;
-    }
-    
-    if (!confirm(`Publish ${selected.length} marksheet(s)? They will become publicly visible with declaration date: ${new Date(publishDate).toLocaleDateString()}`)) {
-        return;
-    }
-    
-    const ids = Array.from(selected).map(cb => cb.dataset.id);
-    let published = 0;
-    let failed = 0;
-    
-    // Publish one by one
-    const promises = ids.map(id => 
-        fetch(`${API_BASE}/marksheets/${id}/publish`, { method: 'POST' })
-            .then(res => res.json())
-            .then(result => {
-                if (result.success) published++;
-                else failed++;
-            })
-            .catch(() => failed++)
-    );
-    
-    Promise.all(promises).then(() => {
-        showToast(`✅ ${published} published, ${failed} failed`, published > 0 ? 'success' : 'error');
-        loadPublishableStudents(publishClass);
-        loadDashboardStats();
-        loadRecentUploads();
-        document.getElementById('selectAllPublish').checked = false;
-    });
-}
 
 // ================================================================
 //  REFRESH ALL
