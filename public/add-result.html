@@ -985,22 +985,25 @@ function toggleAllPublish() {
 }
 
 // ================================================================
-//  MARKSHEET OPERATIONS
+//  MARKSHEET OPERATIONS - ✅ FIXED
 // ================================================================
+
+// ✅ VIEW marksheet - Direct open with redirect handling
 function viewMarksheet(id) {
-    window.open(`${PUBLIC_API}/public/marksheet/${id}`, '_blank', 'noopener');
+    // Open in new tab - browser will handle redirect from backend
+    window.open(`${PUBLIC_API}/public/marksheet/${id}`, '_blank');
 }
 
+// ✅ DOWNLOAD marksheet - Direct download with redirect
 async function downloadMarksheet(id) {
+    showToast('Preparing download...', 'info');
     try {
-        const data = await apiCall(`${PUBLIC_API}/public/marksheet/${id}/download`);
-        if (data.data?.download_url) {
-            window.open(data.data.download_url, '_blank', 'noopener');
-        } else {
-            showToast('Failed to get download link', 'error');
-        }
+        // Open in new tab - browser will handle download redirect
+        window.open(`${PUBLIC_API}/public/marksheet/${id}/download`, '_blank');
+        showToast('Download started!', 'success');
     } catch (error) {
-        showToast(error.message || 'Download failed', 'error');
+        console.error('Download error:', error);
+        showToast('Download failed', 'error');
     }
 }
 
