@@ -7,7 +7,7 @@
     <title>Result Management - GSSS Shilla</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
-        /* ===== CSS (Same as before) ===== */
+        /* ===== CSS ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f4f8; color: #0f172a; }
         .result-dashboard { max-width: 1400px; margin: 0 auto; padding: 20px; }
@@ -350,7 +350,7 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <!-- ================================================================
-     COMPLETE JAVASCRIPT
+     COMPLETE JAVASCRIPT - FIXED
      ================================================================ -->
 <script>
 // ================================================================
@@ -362,8 +362,6 @@ const PUBLIC_API = 'https://gsssshilla.onrender.com/api/results';
 let currentClass = 10;
 let currentPage = 1;
 const PAGE_SIZE = 20;
-let retryCount = 0;
-const MAX_RETRIES = 3;
 
 // ================================================================
 //  TOAST
@@ -382,7 +380,7 @@ function showToast(message, type = 'info') {
 }
 
 // ================================================================
-//  API CALL WITH RETRY
+//  API CALL
 // ================================================================
 async function apiCall(url, options = {}) {
     try {
@@ -399,18 +397,9 @@ async function apiCall(url, options = {}) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
-        const data = await response.json();
-        retryCount = 0;
-        return data;
+        return await response.json();
     } catch (error) {
         console.error('API Call Failed:', error);
-        if (retryCount < MAX_RETRIES) {
-            retryCount++;
-            showToast(`Retrying... (${retryCount}/${MAX_RETRIES})`, 'warning');
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            return apiCall(url, options);
-        }
-        retryCount = 0;
         throw error;
     }
 }
@@ -418,14 +407,24 @@ async function apiCall(url, options = {}) {
 // ================================================================
 //  MODAL HELPERS
 // ================================================================
-function openModal(id) { document.getElementById(id).classList.add('active'); }
-function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function openModal(id) { 
+    document.getElementById(id).classList.add('active'); 
+}
+
+function closeModal(id) { 
+    document.getElementById(id).classList.remove('active'); 
+}
 
 document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('active');
+    if (e.target.classList.contains('modal-overlay')) {
+        e.target.classList.remove('active');
+    }
 });
+
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+    }
 });
 
 // ================================================================
@@ -463,8 +462,7 @@ async function loadDashboardStats() {
         }
     } catch (error) {
         console.error('Error loading stats:', error);
-        showToast('Failed to load dashboard stats. Please refresh.', 'error');
-        // Show error in stats
+        showToast('Failed to load dashboard stats', 'error');
         ['totalStudents', 'totalMarksheets', 'publishedResults', 'unpublishedResults'].forEach(id => {
             document.getElementById(id).textContent = '❌';
         });
@@ -484,7 +482,7 @@ function selectClass(classNum) {
 }
 
 // ================================================================
-//  LOAD STUDENTS
+//  LOAD STUDENTS - FIXED
 // ================================================================
 async function loadStudents(classNum, page = 1) {
     currentPage = page;
@@ -510,7 +508,7 @@ async function loadStudents(classNum, page = 1) {
                 </div>
             </td></tr>
         `;
-        showToast('Failed to load students. Please try again.', 'error');
+        showToast('Failed to load students', 'error');
     }
 }
 
@@ -524,17 +522,33 @@ function renderStudents(students) {
     }
     tbody.innerHTML = students.map(s => `
         <tr>
-            <td><strong>${s.student_id || '-'}</strong><br><small style="color:#64748b;">${s.apaar_id || ''}</small></td>
+            <td>
+                <strong>${s.student_id || '-'}</strong>
+                <br/><small style="color:#64748b;">${s.apaar_id || ''}</small>
+            </td>
             <td>${s.name || '-'}</td>
             <td>${s.exam_roll_no || '-'}</td>
             <td>${s.session || '-'}</td>
             <td>${s.marksheet_count || 0}</td>
-            <td><span class="badge ${(s.published_count || 0) > 0 ? 'badge-success' : 'badge-warning'}">${s.published_count || 0}</span></td>
+            <td>
+                <span class="badge ${(s.published_count || 0) > 0 ? 'badge-success' : 'badge-warning'}">
+                    ${s.published_count || 0}
+                </span>
+            </td>
             <td>
                 <div class="action-group">
-                    <button class="action-btn view" onclick="viewStudentDetails('${s.student_id}')" title="View Details"><i class="fas fa-eye"></i></button>
-                    <button class="action-btn edit" onclick="editStudent('${s.student_id}')" title="Edit"><i class="fas fa-edit"></i></button>
-                    <button class="action-btn upload" onclick="openMarksheetModal('${s.student_id}')" title="Upload"><i class="fas fa-upload"></i></button>
+                    <button class="action-btn view" onclick="viewStudentDetails('${s.student_id}')" title="View">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn edit" onclick="editStudent('${s.student_id}')" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn upload" onclick="openMarksheetModal('${s.student_id}')" title="Upload">
+                        <i class="fas fa-upload"></i>
+                    </button>
+                    <button class="action-btn delete" onclick="deleteStudent('${s.student_id}')" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             </td>
         </tr>
@@ -548,11 +562,15 @@ function renderPagination(pagination) {
         return;
     }
     let html = '';
-    html += `<button onclick="loadStudents(${currentClass}, ${pagination.page - 1})" ${pagination.page <= 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`;
+    html += `<button onclick="loadStudents(${currentClass}, ${pagination.page - 1})" ${pagination.page <= 1 ? 'disabled' : ''}>
+        <i class="fas fa-chevron-left"></i>
+    </button>`;
     for (let i = 1; i <= pagination.totalPages; i++) {
         html += `<button onclick="loadStudents(${currentClass}, ${i})" class="${i === pagination.page ? 'active' : ''}">${i}</button>`;
     }
-    html += `<button onclick="loadStudents(${currentClass}, ${pagination.page + 1})" ${pagination.page >= pagination.totalPages ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>`;
+    html += `<button onclick="loadStudents(${currentClass}, ${pagination.page + 1})" ${pagination.page >= pagination.totalPages ? 'disabled' : ''}>
+        <i class="fas fa-chevron-right"></i>
+    </button>`;
     container.innerHTML = html;
 }
 
@@ -569,22 +587,56 @@ async function viewStudentDetails(studentId) {
             let html = `
                 <div class="profile-card" style="padding:0; box-shadow:none;">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:2px solid #e2e8f0; padding-bottom:15px;">
-                        <div><span class="student-name-highlight">${s.name}</span><span style="color:#64748b; margin-left:10px;">ID: ${s.student_id}</span></div>
                         <div>
-                            <button class="btn btn-sm btn-primary" onclick="closeModal('studentDetailModal');openMarksheetModal('${s.student_id}')"><i class="fas fa-upload"></i> Upload</button>
-                            <button class="btn btn-sm btn-outline" onclick="closeModal('studentDetailModal');editStudent('${s.student_id}')"><i class="fas fa-edit"></i> Edit</button>
+                            <span class="student-name-highlight">${s.name}</span>
+                            <span style="color:#64748b; margin-left:10px;">ID: ${s.student_id}</span>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-primary" onclick="closeModal('studentDetailModal');openMarksheetModal('${s.student_id}')">
+                                <i class="fas fa-upload"></i> Upload
+                            </button>
+                            <button class="btn btn-sm btn-outline" onclick="closeModal('studentDetailModal');editStudent('${s.student_id}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
                         </div>
                     </div>
                     <div class="profile-grid" style="margin-top:12px;">
-                        <div class="profile-item highlight"><label>Session</label><span>${s.session || '-'}</span></div>
-                        <div class="profile-item"><label>Roll No</label><span>${s.exam_roll_no || '-'}</span></div>
-                        <div class="profile-item"><label>Student ID</label><span>${s.student_id}</span></div>
-                        <div class="profile-item"><label>APAAR ID</label><span>${s.apaar_id || '-'}</span></div>
-                        <div class="profile-item"><label>Class</label><span>${s.class || '-'}</span></div>
-                        <div class="profile-item"><label>Father's Name</label><span>${s.father_name || '-'}</span></div>
-                        <div class="profile-item"><label>Mother's Name</label><span>${s.mother_name || '-'}</span></div>
-                        <div class="profile-item"><label>Date of Birth</label><span>${s.dob ? new Date(s.dob).toLocaleDateString() : '-'}</span></div>
-                        <div class="profile-item"><label>Section</label><span>${s.section || '-'}</span></div>
+                        <div class="profile-item highlight">
+                            <label>Session</label>
+                            <span>${s.session || '-'}</span>
+                        </div>
+                        <div class="profile-item">
+                            <label>Roll No</label>
+                            <span>${s.exam_roll_no || '-'}</span>
+                        </div>
+                        <div class="profile-item">
+                            <label>Student ID</label>
+                            <span>${s.student_id}</span>
+                        </div>
+                        <div class="profile-item">
+                            <label>APAAR ID</label>
+                            <span>${s.apaar_id || '-'}</span>
+                        </div>
+                        <div class="profile-item">
+                            <label>Class</label>
+                            <span>${s.class || '-'}</span>
+                        </div>
+                        <div class="profile-item">
+                            <label>Father's Name</label>
+                            <span>${s.father_name || '-'}</span>
+                        </div>
+                        <div class="profile-item">
+                            <label>Mother's Name</label>
+                            <span>${s.mother_name || '-'}</span>
+                        </div>
+                        <div class="profile-item">
+                            <label>Date of Birth</label>
+                            <span>${s.dob ? new Date(s.dob).toLocaleDateString() : '-'}</span>
+                        </div>
+                        <div class="profile-item">
+                            <label>Section</label>
+                            <span>${s.section || '-'}</span>
+                        </div>
                     </div>
                     <hr style="margin:15px 0; border-color:#e2e8f0;">
                     <div class="marksheet-list">
@@ -595,16 +647,28 @@ async function viewStudentDetails(studentId) {
                                     <div class="exam-info">
                                         <span class="exam-name">${m.exam_type}</span>
                                         <span style="color:#64748b; font-size:13px;">${m.session}</span>
-                                        <span class="badge ${m.is_published ? 'badge-success' : 'badge-warning'}">${m.is_published ? '✅ Published' : '⏳ Unpublished'}</span>
+                                        <span class="badge ${m.is_published ? 'badge-success' : 'badge-warning'}">
+                                            ${m.is_published ? '✅ Published' : '⏳ Unpublished'}
+                                        </span>
                                     </div>
                                     <div class="action-group">
-                                        <button class="action-btn view" onclick="viewMarksheet(${m.id})" title="View PDF"><i class="fas fa-eye"></i></button>
-                                        <button class="action-btn download" onclick="downloadMarksheet(${m.id})" title="Download PDF"><i class="fas fa-download"></i></button>
+                                        <button class="action-btn view" onclick="viewMarksheet(${m.id})" title="View PDF">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn download" onclick="downloadMarksheet(${m.id})" title="Download PDF">
+                                            <i class="fas fa-download"></i>
+                                        </button>
                                         ${m.is_published ?
-                                            `<button class="action-btn unpublish" onclick="unpublishMarksheet(${m.id})" title="Unpublish"><i class="fas fa-eye-slash"></i></button>` :
-                                            `<button class="action-btn publish" onclick="publishMarksheet(${m.id})" title="Publish"><i class="fas fa-check-circle"></i></button>`
+                                            `<button class="action-btn unpublish" onclick="unpublishMarksheet(${m.id})" title="Unpublish">
+                                                <i class="fas fa-eye-slash"></i>
+                                            </button>` :
+                                            `<button class="action-btn publish" onclick="publishMarksheet(${m.id})" title="Publish">
+                                                <i class="fas fa-check-circle"></i>
+                                            </button>`
                                         }
-                                        <button class="action-btn delete" onclick="deleteMarksheet(${m.id})" title="Delete"><i class="fas fa-trash"></i></button>
+                                        <button class="action-btn delete" onclick="deleteMarksheet(${m.id})" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </div>
                                 </div>
                             `).join('')
@@ -622,7 +686,7 @@ async function viewStudentDetails(studentId) {
 }
 
 // ================================================================
-//  STUDENT CRUD
+//  STUDENT CRUD - FIXED DELETE
 // ================================================================
 function openAddStudent() {
     document.getElementById('studentModalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Add Student';
@@ -691,21 +755,58 @@ function saveStudent(event) {
     const url = isEdit ? `${API_BASE}/students/${studentId}` : `${API_BASE}/students`;
     const method = isEdit ? 'PUT' : 'POST';
 
-    fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-        .then(res => res.json())
-        .then(result => {
-            if (result.success) {
-                showToast(result.message, 'success');
-                closeModal('studentModal');
-                refreshAll();
-            } else {
-                showToast('Error: ' + result.message, 'error');
-            }
-        })
-        .catch(err => {
-            console.error('Error saving student:', err);
-            showToast('Failed to save student', 'error');
-        });
+    fetch(url, { 
+        method: method, 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify(data) 
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (result.success) {
+            showToast(result.message, 'success');
+            closeModal('studentModal');
+            refreshAll();
+        } else {
+            showToast('Error: ' + result.message, 'error');
+        }
+    })
+    .catch(err => {
+        console.error('Error saving student:', err);
+        showToast('Failed to save student', 'error');
+    });
+}
+
+// ===== DELETE STUDENT - FIXED =====
+function deleteStudent(studentId) {
+    if (!confirm(`⚠️ Are you sure you want to delete student ${studentId}?\nThis will also delete all associated marksheets.`)) {
+        return;
+    }
+    
+    showToast('Deleting student...', 'info');
+    
+    fetch(`${API_BASE}/students/${studentId}`, { 
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (result.success) {
+            showToast('✅ Student deleted successfully!', 'success');
+            // Refresh all views
+            refreshAll();
+            // Close any open modals
+            closeModal('studentDetailModal');
+            // Clear search results
+            document.getElementById('searchResults').innerHTML = '';
+            document.getElementById('studentSearchInput').value = '';
+        } else {
+            showToast('❌ Error: ' + result.message, 'error');
+        }
+    })
+    .catch(err => {
+        console.error('Error deleting student:', err);
+        showToast('❌ Failed to delete student. Please try again.', 'error');
+    });
 }
 
 // ================================================================
@@ -713,7 +814,10 @@ function saveStudent(event) {
 // ================================================================
 function searchStudent() {
     const searchTerm = document.getElementById('studentSearchInput').value.trim();
-    if (!searchTerm) { showToast('Please enter a Student ID or APAAR ID', 'warning'); return; }
+    if (!searchTerm) { 
+        showToast('Please enter a Student ID or APAAR ID', 'warning'); 
+        return; 
+    }
     fetch(`${API_BASE}/students/search/${searchTerm}`)
         .then(res => res.json())
         .then(data => {
@@ -762,33 +866,45 @@ function uploadMarksheet(event) {
     }
     formData.append('pdf', fileInput.files[0]);
 
-    fetch(`${API_BASE}/marksheets/upload`, { method: 'POST', body: formData })
-        .then(res => res.json())
-        .then(result => {
-            if (result.success) {
-                showToast('✅ ' + result.message, 'success');
-                closeModal('marksheetModal');
-                refreshAll();
-                document.getElementById('marksheetForm').reset();
-            } else {
-                showToast('Error: ' + result.message, 'error');
-            }
-        })
-        .catch(err => {
-            console.error('Error uploading marksheet:', err);
-            showToast('Failed to upload marksheet', 'error');
-        });
+    fetch(`${API_BASE}/marksheets/upload`, { 
+        method: 'POST', 
+        body: formData 
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (result.success) {
+            showToast('✅ ' + result.message, 'success');
+            closeModal('marksheetModal');
+            refreshAll();
+            document.getElementById('marksheetForm').reset();
+        } else {
+            showToast('Error: ' + result.message, 'error');
+        }
+    })
+    .catch(err => {
+        console.error('Error uploading marksheet:', err);
+        showToast('Failed to upload marksheet', 'error');
+    });
 }
 
-function viewMarksheet(id) { window.open(`${PUBLIC_API}/public/marksheet/${id}`, '_blank'); }
+function viewMarksheet(id) { 
+    window.open(`${PUBLIC_API}/public/marksheet/${id}`, '_blank'); 
+}
+
 function downloadMarksheet(id) {
     fetch(`${PUBLIC_API}/public/marksheet/${id}/download`)
         .then(res => res.json())
         .then(data => {
-            if (data.success && data.data.download_url) window.open(data.data.download_url, '_blank');
-            else showToast('Failed to get download URL', 'error');
+            if (data.success && data.data.download_url) {
+                window.open(data.data.download_url, '_blank');
+            } else {
+                showToast('Failed to get download URL', 'error');
+            }
         })
-        .catch(err => { console.error('Error downloading:', err); showToast('Download failed', 'error'); });
+        .catch(err => { 
+            console.error('Error downloading:', err); 
+            showToast('Download failed', 'error'); 
+        });
 }
 
 function publishMarksheet(id) {
@@ -803,7 +919,10 @@ function publishMarksheet(id) {
                     showToast('Error: ' + result.message, 'error');
                 }
             })
-            .catch(err => { console.error('Error publishing:', err); showToast('Failed to publish marksheet', 'error'); });
+            .catch(err => { 
+                console.error('Error publishing:', err); 
+                showToast('Failed to publish marksheet', 'error'); 
+            });
     }
 }
 
@@ -819,7 +938,10 @@ function unpublishMarksheet(id) {
                     showToast('Error: ' + result.message, 'error');
                 }
             })
-            .catch(err => { console.error('Error unpublishing:', err); showToast('Failed to unpublish marksheet', 'error'); });
+            .catch(err => { 
+                console.error('Error unpublishing:', err); 
+                showToast('Failed to unpublish marksheet', 'error'); 
+            });
     }
 }
 
@@ -835,7 +957,10 @@ function deleteMarksheet(id) {
                     showToast('Error: ' + result.message, 'error');
                 }
             })
-            .catch(err => { console.error('Error deleting marksheet:', err); showToast('Failed to delete marksheet', 'error'); });
+            .catch(err => { 
+                console.error('Error deleting marksheet:', err); 
+                showToast('Failed to delete marksheet', 'error'); 
+            });
     }
 }
 
@@ -850,20 +975,33 @@ async function loadAllStudents() {
             container.innerHTML = `
                 <div class="table-container">
                     <table>
-                        <thead><tr><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Actions</th></tr></thead>
+                        <thead>
+                            <tr><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Actions</th></tr>
+                        </thead>
                         <tbody>
                             ${data.data.map(s => `
                                 <tr>
-                                    <td><strong>${s.student_id}</strong><br><small style="color:#64748b;">${s.apaar_id || ''}</small></td>
+                                    <td>
+                                        <strong>${s.student_id}</strong>
+                                        <br/><small style="color:#64748b;">${s.apaar_id || ''}</small>
+                                    </td>
                                     <td>${s.name}</td>
                                     <td>${s.class || '-'}</td>
                                     <td>${s.session || '-'}</td>
                                     <td>
                                         <div class="action-group">
-                                            <button class="action-btn view" onclick="viewStudentDetails('${s.student_id}')"><i class="fas fa-eye"></i></button>
-                                            <button class="action-btn edit" onclick="editStudent('${s.student_id}')"><i class="fas fa-edit"></i></button>
-                                            <button class="action-btn upload" onclick="openMarksheetModal('${s.student_id}')"><i class="fas fa-upload"></i></button>
-                                            <button class="action-btn delete" onclick="deleteStudent('${s.student_id}')"><i class="fas fa-trash"></i></button>
+                                            <button class="action-btn view" onclick="viewStudentDetails('${s.student_id}')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" onclick="editStudent('${s.student_id}')">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn upload" onclick="openMarksheetModal('${s.student_id}')">
+                                                <i class="fas fa-upload"></i>
+                                            </button>
+                                            <button class="action-btn delete" onclick="deleteStudent('${s.student_id}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -896,11 +1034,16 @@ function searchAllStudents() {
                 container.innerHTML = `
                     <div class="table-container">
                         <table>
-                            <thead><tr><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Actions</th></tr></thead>
+                            <thead>
+                                <tr><th>Student ID</th><th>Name</th><th>Class</th><th>Session</th><th>Actions</th></tr>
+                            </thead>
                             <tbody>
                                 ${data.data.map(s => `
                                     <tr>
-                                        <td><strong>${s.student_id}</strong><br><small style="color:#64748b;">${s.apaar_id || ''}</small></td>
+                                        <td>
+                                            <strong>${s.student_id}</strong>
+                                            <br/><small style="color:#64748b;">${s.apaar_id || ''}</small>
+                                        </td>
                                         <td>${s.name}</td>
                                         <td>${s.class || '-'}</td>
                                         <td>${s.session || '-'}</td>
@@ -940,24 +1083,43 @@ async function loadAllMarksheets() {
             container.innerHTML = `
                 <div class="table-container">
                     <table>
-                        <thead><tr><th>Student</th><th>Session</th><th>Class</th><th>Exam Type</th><th>Status</th><th>Actions</th></tr></thead>
+                        <thead>
+                            <tr><th>Student</th><th>Session</th><th>Class</th><th>Exam Type</th><th>Status</th><th>Actions</th></tr>
+                        </thead>
                         <tbody>
                             ${data.data.map(m => `
                                 <tr>
-                                    <td><strong>${m.student_id}</strong><br/><small style="color:#64748b;">${m.name}</small></td>
+                                    <td>
+                                        <strong>${m.student_id}</strong>
+                                        <br/><small style="color:#64748b;">${m.name}</small>
+                                    </td>
                                     <td>${m.session}</td>
                                     <td>${m.class}</td>
                                     <td>${m.exam_type}</td>
-                                    <td><span class="badge ${m.is_published ? 'badge-success' : 'badge-warning'}">${m.is_published ? 'Published' : 'Unpublished'}</span></td>
+                                    <td>
+                                        <span class="badge ${m.is_published ? 'badge-success' : 'badge-warning'}">
+                                            ${m.is_published ? 'Published' : 'Unpublished'}
+                                        </span>
+                                    </td>
                                     <td>
                                         <div class="action-group">
-                                            <button class="action-btn view" onclick="viewMarksheet(${m.id})"><i class="fas fa-eye"></i></button>
-                                            <button class="action-btn download" onclick="downloadMarksheet(${m.id})"><i class="fas fa-download"></i></button>
+                                            <button class="action-btn view" onclick="viewMarksheet(${m.id})">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn download" onclick="downloadMarksheet(${m.id})">
+                                                <i class="fas fa-download"></i>
+                                            </button>
                                             ${m.is_published ?
-                                                `<button class="action-btn unpublish" onclick="unpublishMarksheet(${m.id})"><i class="fas fa-eye-slash"></i></button>` :
-                                                `<button class="action-btn publish" onclick="publishMarksheet(${m.id})"><i class="fas fa-check-circle"></i></button>`
+                                                `<button class="action-btn unpublish" onclick="unpublishMarksheet(${m.id})">
+                                                    <i class="fas fa-eye-slash"></i>
+                                                </button>` :
+                                                `<button class="action-btn publish" onclick="publishMarksheet(${m.id})">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </button>`
                                             }
-                                            <button class="action-btn delete" onclick="deleteMarksheet(${m.id})"><i class="fas fa-trash"></i></button>
+                                            <button class="action-btn delete" onclick="deleteMarksheet(${m.id})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -996,15 +1158,24 @@ function searchMarksheets() {
                 container.innerHTML = `
                     <div class="table-container">
                         <table>
-                            <thead><tr><th>Student</th><th>Session</th><th>Class</th><th>Exam Type</th><th>Status</th><th>Actions</th></tr></thead>
+                            <thead>
+                                <tr><th>Student</th><th>Session</th><th>Class</th><th>Exam Type</th><th>Status</th><th>Actions</th></tr>
+                            </thead>
                             <tbody>
                                 ${data.data.map(m => `
                                     <tr>
-                                        <td><strong>${m.student_id}</strong><br/><small style="color:#64748b;">${m.name}</small></td>
+                                        <td>
+                                            <strong>${m.student_id}</strong>
+                                            <br/><small style="color:#64748b;">${m.name}</small>
+                                        </td>
                                         <td>${m.session}</td>
                                         <td>${m.class}</td>
                                         <td>${m.exam_type}</td>
-                                        <td><span class="badge ${m.is_published ? 'badge-success' : 'badge-warning'}">${m.is_published ? 'Published' : 'Unpublished'}</span></td>
+                                        <td>
+                                            <span class="badge ${m.is_published ? 'badge-success' : 'badge-warning'}">
+                                                ${m.is_published ? 'Published' : 'Unpublished'}
+                                            </span>
+                                        </td>
                                         <td>
                                             <div class="action-group">
                                                 <button class="action-btn view" onclick="viewMarksheet(${m.id})"><i class="fas fa-eye"></i></button>
@@ -1040,12 +1211,11 @@ document.getElementById('marksheetSearchInput')?.addEventListener('keypress', fu
 //  REFRESH ALL
 // ================================================================
 function refreshAll() {
-    showToast('Refreshing...', 'info');
+    showToast('🔄 Refreshing...', 'info');
     loadDashboardStats();
     loadStudents(currentClass, currentPage);
     loadAllStudents();
     loadAllMarksheets();
-    loadAvailableClasses();
 }
 
 // ================================================================
@@ -1056,36 +1226,18 @@ document.getElementById('sessionFilter')?.addEventListener('change', function() 
 });
 
 // ================================================================
-//  AVAILABLE CLASSES FOR PUBLIC (Shown in dashboard)
-// ================================================================
-function loadAvailableClasses() {
-    // This is for the public portal, but we can still load it in background
-    fetch(`${PUBLIC_API}/public/classes`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                console.log('✅ Available classes loaded:', data.data);
-            }
-        })
-        .catch(err => console.error('Error loading available classes:', err));
-}
-
-// ================================================================
 //  INITIALIZATION
 // ================================================================
 document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ Result Management Module Loaded');
     console.log('📡 API Base:', API_BASE);
 
-    // Load all data
     loadDashboardStats();
     loadStudents(currentClass);
     loadAllStudents();
     loadAllMarksheets();
-    loadAvailableClasses();
 
-    // Show connection status
-    showToast('Connected to server', 'success');
+    showToast('✅ Connected to server', 'success');
 });
 </script>
 
