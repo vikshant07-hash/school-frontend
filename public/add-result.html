@@ -411,7 +411,6 @@
 
     <!-- ===== TAB: STUDENTS ===== -->
     <div id="tab-students" class="tab-content">
-        <!-- Class Navigation -->
         <div class="class-nav">
             <h3><i class="fas fa-school"></i> Select Class</h3>
             <div class="class-buttons" id="classButtons">
@@ -431,7 +430,6 @@
             </div>
         </div>
 
-        <!-- Student Table -->
         <div class="table-container">
             <h3>
                 <span><i class="fas fa-users"></i> Students <span id="studentCount">(0)</span></span>
@@ -470,7 +468,6 @@
 
             <form id="marksheetUploadForm" onsubmit="uploadMarksheet(event)" enctype="multipart/form-data">
                 <div class="upload-grid">
-                    <!-- Student ID - Auto-locked -->
                     <div class="form-group">
                         <label>Student ID <span class="required">*</span></label>
                         <input type="text" id="uploadStudentId" placeholder="Enter Student ID" required />
@@ -479,25 +476,21 @@
                         </button>
                     </div>
 
-                    <!-- Student Name - Auto-locked -->
                     <div class="form-group">
                         <label>Student Name <span class="required">*</span></label>
                         <input type="text" id="uploadStudentName" disabled placeholder="Will auto-fill" />
                     </div>
 
-                    <!-- Session - Auto-locked -->
                     <div class="form-group">
                         <label>Session <span class="required">*</span></label>
                         <input type="text" id="uploadSession" disabled placeholder="Will auto-fill" />
                     </div>
 
-                    <!-- Class - Auto-locked -->
                     <div class="form-group">
                         <label>Class <span class="required">*</span></label>
                         <input type="text" id="uploadClass" disabled placeholder="Will auto-fill" />
                     </div>
 
-                    <!-- Exam Type -->
                     <div class="form-group">
                         <label>Exam Type <span class="required">*</span></label>
                         <select id="uploadExamType" required>
@@ -511,13 +504,11 @@
                         </select>
                     </div>
 
-                    <!-- PDF File -->
                     <div class="form-group">
                         <label>PDF File <span class="required">*</span> (Max 10MB)</label>
                         <input type="file" id="uploadPdf" accept=".pdf" required />
                     </div>
 
-                    <!-- Status Message -->
                     <div class="form-group full-width">
                         <div id="uploadStatus" class="status-msg info">
                             <i class="fas fa-info-circle"></i> Enter Student ID and click Fetch
@@ -536,7 +527,6 @@
             </form>
         </div>
 
-        <!-- Recent Uploads -->
         <div class="table-container">
             <h3><i class="fas fa-history"></i> Recent Uploads <span id="recentUploadCount">(0)</span></h3>
             <table>
@@ -560,7 +550,6 @@
                 Select a class to view students with uploaded marksheets, then publish individually or bulk.
             </p>
 
-            <!-- Class Selection for Publish -->
             <div class="class-nav" style="box-shadow:none; padding:0 0 16px 0;">
                 <h3><i class="fas fa-school"></i> Select Class</h3>
                 <div class="class-buttons" id="publishClassButtons">
@@ -574,7 +563,6 @@
                 </div>
             </div>
 
-            <!-- Publish Date Selection -->
             <div class="publish-grid" style="margin-bottom:16px;">
                 <div class="form-group">
                     <label>Declaration Date <span class="required">*</span></label>
@@ -588,7 +576,6 @@
                 </div>
             </div>
 
-            <!-- Publishable Students Table -->
             <div class="table-container" style="box-shadow:none; padding:0;">
                 <h3>
                     <span><i class="fas fa-file-pdf"></i> Students with Marksheets <span id="publishCount">(0)</span></span>
@@ -618,7 +605,7 @@
     </div>
 </div>
 
-<!-- ===== MODAL: Add/Edit Student ===== -->
+<!-- ===== MODAL ===== -->
 <div class="modal-overlay" id="studentModal">
     <div class="modal-content">
         <h2 id="studentModalTitle"><i class="fas fa-user"></i> Add Student</h2>
@@ -663,7 +650,7 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <!-- ================================================================
-     COMPLETE JAVASCRIPT
+     COMPLETE JAVASCRIPT (FIXED)
      ================================================================ -->
 <script>
 // ================================================================
@@ -745,7 +732,7 @@ function switchTab(tab) {
 }
 
 // ================================================================
-//  DASHBOARD - Only Stats
+//  DASHBOARD
 // ================================================================
 async function loadDashboardStats() {
     try {
@@ -766,7 +753,7 @@ async function loadDashboardStats() {
 }
 
 // ================================================================
-//  CLASS SELECTION - STUDENTS TAB
+//  CLASS SELECTION
 // ================================================================
 function selectClass(classNum) {
     currentClass = classNum;
@@ -778,7 +765,7 @@ function selectClass(classNum) {
 }
 
 // ================================================================
-//  LOAD STUDENTS - With Marksheet Status
+//  LOAD STUDENTS
 // ================================================================
 async function loadStudents(classNum, page = 1) {
     currentPage = page;
@@ -970,7 +957,7 @@ function deleteStudent(studentId) {
 }
 
 // ================================================================
-//  UPLOAD SECTION - Auto-lock Student Details
+//  UPLOAD SECTION
 // ================================================================
 function fetchStudentForUpload() {
     const studentId = document.getElementById('uploadStudentId').value.trim();
@@ -992,7 +979,6 @@ function fetchStudentForUpload() {
                 document.getElementById('uploadSession').value = s.session || '2025-26';
                 document.getElementById('uploadClass').value = s.class || currentClass;
 
-                // Check if marksheet already exists
                 const hasMarksheet = data.data.marksheets && data.data.marksheets.length > 0;
                 if (hasMarksheet) {
                     statusDiv.className = 'status-msg success';
@@ -1029,10 +1015,8 @@ function resetUploadForm() {
 }
 
 function openUploadTab(studentId) {
-    // Switch to upload tab
     switchTab('upload');
     document.getElementById('uploadStudentId').value = studentId;
-    // Auto-fetch student
     setTimeout(fetchStudentForUpload, 300);
 }
 
@@ -1129,7 +1113,7 @@ async function loadRecentUploads() {
 }
 
 // ================================================================
-//  PUBLISH SECTION - Class-wise with Date
+//  PUBLISH SECTION - FIXED
 // ================================================================
 function selectPublishClass(classNum) {
     publishClass = classNum;
@@ -1141,7 +1125,8 @@ function selectPublishClass(classNum) {
 async function loadPublishableStudents(classNum) {
     try {
         const session = document.getElementById('sessionFilter').value;
-        const url = `${API_BASE}/class/${classNum}/marksheets?session=${session}&limit=100`;
+        // ✅ FIX: Use /marksheets endpoint with class filter
+        const url = `${API_BASE}/marksheets?class=${classNum}&session=${session}&limit=100`;
         const data = await apiCall(url);
         
         const tbody = document.getElementById('publishTableBody');
@@ -1182,8 +1167,12 @@ async function loadPublishableStudents(classNum) {
         console.error('Error loading publishable students:', error);
         document.getElementById('publishTableBody').innerHTML = `
             <tr><td colspan="6" style="text-align:center; color:#dc2626; padding:20px;">
-                <i class="fas fa-exclamation-circle"></i> Failed to load data
+                <i class="fas fa-exclamation-circle"></i> Failed to load data. 
+                <button class="retry-btn" onclick="loadPublishableStudents(${classNum})">
+                    <i class="fas fa-sync"></i> Retry
+                </button>
             </td></tr>`;
+        showToast('Failed to load publishable students', 'error');
     }
 }
 
@@ -1268,7 +1257,7 @@ function bulkPublish() {
         document.getElementById('selectAllPublish').checked = false;
     });
 }
-    
+
 // ===== UNPUBLISH SINGLE =====
 function unpublishSingle(id) {
     if (!confirm('Unpublish this marksheet? It will be hidden from public view.')) return;
@@ -1290,8 +1279,6 @@ function unpublishSingle(id) {
             showToast('Failed to unpublish', 'error');
         });
 }
-
-// ===== BULK PUBLISH =====
 
 // ================================================================
 //  REFRESH ALL
