@@ -650,7 +650,7 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <!-- ================================================================
-     COMPLETE JAVASCRIPT (FIXED)
+     COMPLETE JAVASCRIPT (FIXED PUBLISH)
      ================================================================ -->
 <script>
 // ================================================================
@@ -1113,7 +1113,7 @@ async function loadRecentUploads() {
 }
 
 // ================================================================
-//  PUBLISH SECTION - FIXED
+//  PUBLISH SECTION - COMPLETE FIX
 // ================================================================
 function selectPublishClass(classNum) {
     publishClass = classNum;
@@ -1154,6 +1154,9 @@ async function loadPublishableStudents(classNum) {
                                     <i class="fas fa-check-circle"></i> Publish
                                 </button>`
                             }
+                            <button class="action-btn view" onclick="viewMarksheet(${m.id})">
+                                <i class="fas fa-eye"></i> View
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -1181,43 +1184,92 @@ function toggleAllPublish() {
     document.querySelectorAll('.publish-checkbox').forEach(cb => cb.checked = checked);
 }
 
-// ===== PUBLISH SINGLE WITH DATE =====
+// ===== VIEW MARKSHEET =====
+function viewMarksheet(id) {
+    window.open(`${PUBLIC_API}/public/marksheet/${id}`, '_blank');
+}
+
+// ================================================================
+//  PUBLISH SINGLE - FIXED
+// ================================================================
 function publishSingle(id) {
     const publishDate = document.getElementById('publishDate').value;
     if (!publishDate) {
         showToast('Please select a Declaration Date first', 'warning');
+        document.getElementById('publishDate').focus();
         return;
     }
     
-    if (!confirm('Publish this marksheet? It will become publicly visible.')) return;
+    if (!confirm('✅ Publish this marksheet?\nIt will become publicly visible on the result portal.')) return;
+    
+    showToast('⏳ Publishing...', 'info');
     
     fetch(`${API_BASE}/marksheets/${id}/publish`, { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ declaration_date: publishDate })
     })
-    .then(res => res.json())
+    .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+    })
     .then(result => {
         if (result.success) {
             showToast('✅ Marksheet published successfully!', 'success');
+            // Reload all data
             loadPublishableStudents(publishClass);
             loadDashboardStats();
             loadRecentUploads();
+            loadStudents(currentClass, currentPage);
         } else {
-            showToast('Error: ' + result.message, 'error');
+            showToast('❌ Error: ' + result.message, 'error');
         }
     })
     .catch(err => {
         console.error('Error publishing:', err);
-        showToast('Failed to publish', 'error');
+        showToast('❌ Failed to publish. Please try again.', 'error');
     });
 }
 
-// ===== BULK PUBLISH WITH DATE =====
+// ================================================================
+//  UNPUBLISH SINGLE - FIXED
+// ================================================================
+function unpublishSingle(id) {
+    if (!confirm('🔒 Unpublish this marksheet?\nIt will be hidden from the public result portal.')) return;
+    
+    showToast('⏳ Unpublishing...', 'info');
+    
+    fetch(`${API_BASE}/marksheets/${id}/unpublish`, { method: 'POST' })
+    .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+    })
+    .then(result => {
+        if (result.success) {
+            showToast('🔒 Marksheet unpublished successfully!', 'success');
+            // Reload all data
+            loadPublishableStudents(publishClass);
+            loadDashboardStats();
+            loadRecentUploads();
+            loadStudents(currentClass, currentPage);
+        } else {
+            showToast('❌ Error: ' + result.message, 'error');
+        }
+    })
+    .catch(err => {
+        console.error('Error unpublishing:', err);
+        showToast('❌ Failed to unpublish. Please try again.', 'error');
+    });
+}
+
+// ================================================================
+//  BULK PUBLISH - FIXED
+// ================================================================
 function bulkPublish() {
     const publishDate = document.getElementById('publishDate').value;
     if (!publishDate) {
         showToast('Please select a Declaration Date first', 'warning');
+        document.getElementById('publishDate').focus();
         return;
     }
     
@@ -1227,13 +1279,16 @@ function bulkPublish() {
         return;
     }
     
-    if (!confirm(`Publish ${selected.length} marksheet(s)? They will become publicly visible with declaration date: ${new Date(publishDate).toLocaleDateString()}`)) {
+    if (!confirm(`📢 Publish ${selected.length} marksheet(s)?\nThey will become publicly visible with declaration date: ${new Date(publishDate).toLocaleDateString()}`)) {
         return;
     }
+    
+    showToast(`⏳ Publishing ${selected.length} marksheets...`, 'info');
     
     const ids = Array.from(selected).map(cb => cb.dataset.id);
     let published = 0;
     let failed = 0;
+    let errors = [];
     
     const promises = ids.map(id => 
         fetch(`${API_BASE}/marksheets/${id}/publish`, { 
@@ -1243,41 +1298,31 @@ function bulkPublish() {
         })
         .then(res => res.json())
         .then(result => {
-            if (result.success) published++;
-            else failed++;
+            if (result.success) {
+                published++;
+            } else {
+                failed++;
+                errors.push(result.message);
+            }
         })
-        .catch(() => failed++)
+        .catch(() => {
+            failed++;
+        })
     );
     
     Promise.all(promises).then(() => {
-        showToast(`✅ ${published} published, ${failed} failed`, published > 0 ? 'success' : 'error');
+        if (published > 0) {
+            showToast(`✅ ${published} published, ${failed} failed`, 'success');
+        } else {
+            showToast(`❌ All ${failed} failed to publish`, 'error');
+        }
+        // Reload all data
         loadPublishableStudents(publishClass);
         loadDashboardStats();
         loadRecentUploads();
+        loadStudents(currentClass, currentPage);
         document.getElementById('selectAllPublish').checked = false;
     });
-}
-
-// ===== UNPUBLISH SINGLE =====
-function unpublishSingle(id) {
-    if (!confirm('Unpublish this marksheet? It will be hidden from public view.')) return;
-    
-    fetch(`${API_BASE}/marksheets/${id}/unpublish`, { method: 'POST' })
-        .then(res => res.json())
-        .then(result => {
-            if (result.success) {
-                showToast('🔒 Marksheet unpublished', 'success');
-                loadPublishableStudents(publishClass);
-                loadDashboardStats();
-                loadRecentUploads();
-            } else {
-                showToast('Error: ' + result.message, 'error');
-            }
-        })
-        .catch(err => {
-            console.error('Error unpublishing:', err);
-            showToast('Failed to unpublish', 'error');
-        });
 }
 
 // ================================================================
