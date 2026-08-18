@@ -452,75 +452,92 @@
 
     async function deleteExam(id) { if(!confirm('Delete this marksheet?')) return; try{ await apiCall(`${API_BASE}/marksheets/${id}`,{method:'DELETE'}); showToast('Marksheet deleted','success'); const sid=document.getElementById('studentModal').dataset.studentId; if(sid) openStudentDetail(sid); }catch(e){ showToast(e.message,'error'); } }
     function viewMarksheet(id) { fetch(`${API_BASE}/marksheets/${id}`,{headers:getAuthHeaders()}).then(r=>r.json()).then(d=>{ if(d.success&&d.data.cloudinary_url) window.open(d.data.cloudinary_url,'_blank'); }).catch(e=>showToast('Failed to open','error')); }
+async function printStudent(studentId) {
+    try {
+        const data = await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`);
+        const s = data.data.student;
+        const marksheets = data.data.marksheets || [];
+        
+        // 🔥 STUDENT DETAILS PAGE URL (public portal)
+        const studentPageUrl = `https://gsssshilla.onrender.com/result.html?student_id=${s.student_id}&session=${s.session}&class=${s.class}`;
+        
+        let marksheetRows = '';
+        marksheets.forEach((m, idx) => {
+            const url = m.cloudinary_url || '#';
+            marksheetRows += `
+                <tr>
+                    <td>${idx+1}</td>
+                    <td>${esc(m.exam_type)}</td>
+                    <td>${esc(m.session)}</td>
+                    <td>${esc(m.class||'-')}</td>
+                    <td class="marksheet-url">${esc(url)}</td>
+                    <td><div class="qr-code-container" id="qr_${m.id}"></div></td>
+                </tr>`;
+        });
 
-    async function printStudent(studentId) {
-        try {
-            const data = await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`);
-            const s = data.data.student;
-            const marksheets = data.data.marksheets || [];
-            let marksheetRows = '';
-            marksheets.forEach((m, idx) => {
-                const url = m.cloudinary_url || '#';
-                marksheetRows += `<tr><td>${idx+1}</td><td>${esc(m.exam_type)}</td><td>${esc(m.session)}</td><td>${esc(m.class||'-')}</td><td class="marksheet-url">${esc(url)}</td><td><div class="qr-code-container" id="qr_${m.id}"></div></td></tr>`;
-            });
-            const printWindow = window.open('', '_blank', 'width=800,height=600');
-            printWindow.document.write(`
-                <html><head><title>Student Print - ${esc(s.name)}</title>
-                <style>
-                    body { font-family: 'Inter', sans-serif; color: #1a2332; padding: 20px; }
-                    .print-header { display: flex; align-items: center; justify-content: center; gap: 16px; border-bottom: 3px solid #c9972b; padding-bottom: 12px; margin-bottom: 20px; }
-                    .print-header img { width: 70px; height: 70px; border-radius: 50%; }
-                    .print-header h1 { font-size: 24px; margin:0; }
-                    .print-header p { font-size: 14px; color: #5a6a7e; margin:5px 0 0; }
-                    .print-student-details { width: 100%; border-collapse: collapse; margin: 16px 0; }
-                    .print-student-details td { padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 13px; }
-                    .print-student-details td:first-child { font-weight: 600; background: #f8fafc; width: 30%; }
-                    .print-marksheet-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
-                    .print-marksheet-table th, .print-marksheet-table td { padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 12px; }
-                    .print-marksheet-table th { background: #f1f5f9; }
-                    .print-footer { margin-top: 30px; display: flex; justify-content: space-between; font-size: 12px; color: #64748b; border-top: 1px solid #cbd5e1; padding-top: 10px; }
-                    .qr-code-container { display: flex; align-items: center; }
-                    .marksheet-url { font-size: 11px; color: #64748b; word-break: break-all; }
-                </style>
-                </head><body>
-                <div class="print-header">
-                    <img src="logo(1).png" alt="Logo">
-                    <div><h1>Govt. Sr. Sec. School Shilla</h1><p>Student Details Report</p></div>
-                </div>
-                <table class="print-student-details">
-                    <tr><td>Student ID</td><td>${esc(s.student_id)}</td><td>APAAR ID</td><td>${esc(s.apaar_id||'-')}</td></tr>
-                    <tr><td>Full Name</td><td>${esc(s.name)}</td><td>Father's Name</td><td>${esc(s.father_name||'-')}</td></tr>
-                    <tr><td>Mother's Name</td><td>${esc(s.mother_name||'-')}</td><td>Date of Birth</td><td>${s.dob?formatDate(s.dob):'-'}</td></tr>
-                    <tr><td>Session</td><td>${esc(s.session||'-')}</td><td>Class</td><td>${esc(s.class||'-')}</td></tr>
-                    <tr><td>Section</td><td>${esc(s.section||'-')}</td><td>Exam Roll No</td><td>${esc(s.exam_roll_no||'-')}</td></tr>
-                </table>
-                <h3>Available Marksheets</h3>
-                <table class="print-marksheet-table">
-                    <thead><tr><th>#</th><th>Exam Type</th><th>Session</th><th>Class</th><th>Marksheet URL</th><th>QR Code</th></tr></thead>
-                    <tbody>${marksheetRows || '<tr><td colspan="6">No marksheets</td></tr>'}</tbody>
-                </table>
-                <div class="print-footer">
-                    <span>Print Date: ${new Date().toLocaleString('en-IN')}</span>
-                    <span>Downloaded by: ${localStorage.getItem('adminName')||'Admin'}</span>
-                    <span>Page 1 of 1</span>
-                </div>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
-                <script>
-                    setTimeout(() => {
-                        const marksheets = ${JSON.stringify(marksheets)};
-                        marksheets.forEach(m => {
-                            if (m.cloudinary_url) {
-                                const container = document.getElementById('qr_' + m.id);
-                                if (container) new QRCode(container, { text: m.cloudinary_url, width: 70, height: 70 });
+        const printWindow = window.open('', '_blank', 'width=800,height=600');
+        printWindow.document.write(`
+            <html><head><title>Student Print - ${esc(s.name)}</title>
+            <style>
+                body { font-family: 'Inter', sans-serif; color: #1a2332; padding: 20px; }
+                .print-header { display: flex; align-items: center; justify-content: center; gap: 16px; border-bottom: 3px solid #c9972b; padding-bottom: 12px; margin-bottom: 20px; }
+                .print-header img { width: 70px; height: 70px; border-radius: 50%; }
+                .print-header h1 { font-size: 24px; margin:0; }
+                .print-header p { font-size: 14px; color: #5a6a7e; margin:5px 0 0; }
+                .print-student-details { width: 100%; border-collapse: collapse; margin: 16px 0; }
+                .print-student-details td { padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 13px; }
+                .print-student-details td:first-child { font-weight: 600; background: #f8fafc; width: 30%; }
+                .print-marksheet-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+                .print-marksheet-table th, .print-marksheet-table td { padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 12px; }
+                .print-marksheet-table th { background: #f1f5f9; }
+                .print-footer { margin-top: 30px; display: flex; justify-content: space-between; font-size: 12px; color: #64748b; border-top: 1px solid #cbd5e1; padding-top: 10px; }
+                .qr-code-container { display: flex; align-items: center; justify-content: center; }
+                .qr-code-container img, .qr-code-container canvas { width: 100px !important; height: 100px !important; }
+                .marksheet-url { font-size: 11px; color: #64748b; word-break: break-all; }
+            </style>
+            </head><body>
+            <div class="print-header">
+                <img src="logo(1).png" alt="Logo">
+                <div><h1>Govt. Sr. Sec. School Shilla</h1><p>Student Details Report</p></div>
+            </div>
+            <table class="print-student-details">
+                <tr><td>Student ID</td><td>${esc(s.student_id)}</td><td>APAAR ID</td><td>${esc(s.apaar_id||'-')}</td></tr>
+                <tr><td>Full Name</td><td>${esc(s.name)}</td><td>Father's Name</td><td>${esc(s.father_name||'-')}</td></tr>
+                <tr><td>Mother's Name</td><td>${esc(s.mother_name||'-')}</td><td>Date of Birth</td><td>${s.dob?formatDate(s.dob):'-'}</td></tr>
+                <tr><td>Session</td><td>${esc(s.session||'-')}</td><td>Class</td><td>${esc(s.class||'-')}</td></tr>
+                <tr><td>Section</td><td>${esc(s.section||'-')}</td><td>Exam Roll No</td><td>${esc(s.exam_roll_no||'-')}</td></tr>
+            </table>
+            <h3>Available Marksheets</h3>
+            <table class="print-marksheet-table">
+                <thead><tr><th>#</th><th>Exam Type</th><th>Session</th><th>Class</th><th>Marksheet URL</th><th>QR Code</th></tr></thead>
+                <tbody>${marksheetRows || '<tr><td colspan="6">No marksheets</td></tr>'}</tbody>
+            </table>
+            <div class="print-footer">
+                <span>Print Date: ${new Date().toLocaleString('en-IN')}</span>
+                <span>Downloaded by: ${localStorage.getItem('adminName')||'Admin'}</span>
+                <span>Page 1 of 1</span>
+            </div>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+            <script>
+                setTimeout(() => {
+                    const marksheets = ${JSON.stringify(marksheets)};
+                    const studentPageUrl = '${studentPageUrl}';
+                    marksheets.forEach(m => {
+                        if (m.id) {
+                            const container = document.getElementById('qr_' + m.id);
+                            if (container) {
+                                // 🔥 QR code ab STUDENT DETAILS PAGE kholta hai
+                                new QRCode(container, { text: studentPageUrl, width: 100, height: 100 });
                             }
-                        });
-                    }, 200);
-                <\/script>
-                </body></html>`);
-            printWindow.document.close();
-            setTimeout(() => { printWindow.print(); }, 500);
-        } catch(e) { showToast(e.message,'error'); }
-    }
+                        }
+                    });
+                }, 300);
+            <\/script>
+            </body></html>`);
+        printWindow.document.close();
+        setTimeout(() => { printWindow.print(); }, 600);
+    } catch(e) { showToast(e.message,'error'); }
+}
 
     async function printClassStudents() {
         try {
