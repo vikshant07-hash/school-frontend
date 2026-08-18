@@ -6,6 +6,7 @@
     <title>Results Manager - Admin | GSSS Shilla</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --bg: #f5f7fb; --bg-white: #ffffff; --text-primary: #1a2332; --text-secondary: #5a6a7e;
@@ -84,7 +85,7 @@
         .card-footer { padding: 10px 20px 14px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; } .exam-tag { font-size: 10px; padding: 2px 10px; border-radius: 12px; background: var(--bg); }
 
         .table-wrapper { overflow-x: auto; } table { width: 100%; border-collapse: collapse; font-size: 13px; } th { text-align: left; padding: 10px 14px; font-weight: 600; color: var(--text-secondary); border-bottom: 2px solid var(--border); background: var(--bg); } td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
-        .action-btns { display: flex; gap: 6px; flex-wrap: wrap; } .action-btn { padding: 4px 12px; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; } .edit { background: var(--orange-bg); color: var(--orange); } .delete { background: #fee2e2; color: var(--red); } .upload { background: var(--green-bg); color: var(--green); } .publish { background: var(--blue-bg); color: var(--blue); } .view { background: var(--purple-bg); color: var(--purple); }
+        .action-btns { display: flex; gap: 6px; flex-wrap: wrap; } .action-btn { padding: 4px 12px; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; } .edit { background: var(--orange-bg); color: var(--orange); } .delete { background: #fee2e2; color: var(--red); } .upload { background: var(--green-bg); color: var(--green); } .publish { background: var(--blue-bg); color: var(--blue); } .view { background: var(--purple-bg); color: var(--purple); } .print { background: var(--pink-bg); color: var(--pink); }
 
         .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 20px; } .pagination button { padding: 6px 14px; border: 1px solid var(--border); background: var(--bg-white); border-radius: var(--radius-sm); cursor: pointer; } .pagination button.active { background: var(--gold); color: #fff; border-color: var(--gold); }
 
@@ -99,6 +100,30 @@
         .alert-box { padding: 14px 18px; border-radius: var(--radius-sm); margin: 12px 0; } .alert-box.error { background: #fee2e2; color: var(--red); } .alert-box.success { background: var(--green-bg); color: var(--green); } .alert-box.info { background: var(--blue-bg); color: var(--blue); }
 
         .footer { background: var(--bg-white); border-top: 1px solid var(--border); padding: 20px 32px; text-align: center; font-size: 13px; color: var(--text-muted); }
+
+        /* PRINT STYLES */
+        @media print {
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; }
+            .no-print { display: none !important; }
+            .print-header { display: flex; align-items: center; justify-content: center; gap: 16px; border-bottom: 3px solid #c9972b; padding-bottom: 12px; margin-bottom: 20px; }
+            .print-header img { width: 70px; height: 70px; border-radius: 50%; }
+            .print-header h1 { font-size: 24px; color: #1a2332; }
+            .print-header p { font-size: 14px; color: #5a6a7e; }
+            .print-student-details { width: 100%; border-collapse: collapse; margin: 16px 0; }
+            .print-student-details td { padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 13px; }
+            .print-student-details td:first-child { font-weight: 600; background: #f8fafc; width: 30%; }
+            .print-marksheet-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+            .print-marksheet-table th, .print-marksheet-table td { padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 12px; }
+            .print-marksheet-table th { background: #f1f5f9; }
+            .print-footer { margin-top: 30px; display: flex; justify-content: space-between; font-size: 12px; color: #64748b; border-top: 1px solid #cbd5e1; padding-top: 10px; }
+            .qr-code-container { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+            .qr-code-container img, .qr-code-container canvas { width: 70px; height: 70px; }
+            .marksheet-url { font-size: 11px; color: #64748b; word-break: break-all; }
+            @page { size: A4; margin: 15mm; }
+        }
+
         @media (max-width: 768px) { .nav-links { display: none; flex-direction: column; position: absolute; top: 68px; left: 0; right: 0; background: var(--bg-white); padding: 16px; } .nav-links.open { display: flex; } .hamburger { display: block; } .form-row { grid-template-columns: 1fr; } .student-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -174,7 +199,12 @@
                 <button class="class-btn" data-class="11" onclick="selectClass(11)">Class 11</button>
                 <button class="class-btn" data-class="12" onclick="selectClass(12)">Class 12</button>
             </div>
-            <div class="class-stats"><span>👨‍🎓 Students: <strong id="classStudentCount">-</strong></span><span>📄 Marksheets: <strong id="classMarksheetCount">-</strong></span><span>✅ Published: <strong id="classPublishedCount">-</strong></span></div>
+            <div class="class-stats">
+                <span>👨‍🎓 Students: <strong id="classStudentCount">-</strong></span>
+                <span>📄 Marksheets: <strong id="classMarksheetCount">-</strong></span>
+                <span>✅ Published: <strong id="classPublishedCount">-</strong></span>
+                <button class="btn btn-sm btn-primary no-print" onclick="printClassStudents()" style="margin-left:auto;"><i class="fas fa-print"></i> Print All</button>
+            </div>
         </div>
         <div id="studentGridContainer"><div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading students...</div></div>
         <div class="pagination" id="pagination"></div>
@@ -340,7 +370,7 @@
     function renderStudentCards(students){
         const container=document.getElementById('studentGridContainer');
         if(!students||students.length===0){ container.innerHTML='<div class="empty-state">No students found</div>'; return; }
-        container.innerHTML=students.map(s=>{ const has=(Number(s.marksheet_count)||0)>0; return `<div class="student-card" onclick="openStudentDetail('${esc(s.student_id)}')"><div class="card-header"><div><div class="student-name">${esc(s.name)}</div><div class="student-id">ID: ${esc(s.student_id)}</div></div><span class="status-badge ${has?'uploaded':'pending'}">${has?'✅ Uploaded':'⏳ Pending'}</span></div><div class="card-body"><div class="detail"><label>Roll No</label><span>${esc(s.exam_roll_no||'-')}</span></div><div class="detail"><label>Session</label><span>${esc(s.session||'-')}</span></div><div class="detail"><label>Father</label><span>${esc(s.father_name||'-')}</span></div><div class="detail"><label>Section</label><span>${esc(s.section||'-')}</span></div></div><div class="card-footer"><span class="exam-tag">${s.marksheet_count} marksheet(s)</span><div class="action-btns"><button class="action-btn edit" onclick="event.stopPropagation();openEditStudent('${esc(s.student_id)}')"><i class="fas fa-edit"></i> Edit</button><button class="action-btn delete" onclick="event.stopPropagation();deleteStudent('${esc(s.student_id)}','${esc(s.name)}')"><i class="fas fa-trash"></i> Delete</button></div></div></div>`; }).join('');
+        container.innerHTML=students.map(s=>{ const has=(Number(s.marksheet_count)||0)>0; return `<div class="student-card"><div class="card-header" onclick="openStudentDetail('${esc(s.student_id)}')"><div><div class="student-name">${esc(s.name)}</div><div class="student-id">ID: ${esc(s.student_id)}</div></div><span class="status-badge ${has?'uploaded':'pending'}">${has?'✅ Uploaded':'⏳ Pending'}</span></div><div class="card-body" onclick="openStudentDetail('${esc(s.student_id)}')"><div class="detail"><label>Roll No</label><span>${esc(s.exam_roll_no||'-')}</span></div><div class="detail"><label>Session</label><span>${esc(s.session||'-')}</span></div><div class="detail"><label>Father</label><span>${esc(s.father_name||'-')}</span></div><div class="detail"><label>Section</label><span>${esc(s.section||'-')}</span></div></div><div class="card-footer"><span class="exam-tag">${s.marksheet_count} marksheet(s)</span><div class="action-btns"><button class="action-btn edit" onclick="openEditStudent('${esc(s.student_id)}')"><i class="fas fa-edit"></i> Edit</button><button class="action-btn delete" onclick="deleteStudent('${esc(s.student_id)}','${esc(s.name)}')"><i class="fas fa-trash"></i> Delete</button><button class="action-btn print" onclick="printStudent('${esc(s.student_id)}')"><i class="fas fa-print"></i> Print</button></div></div></div>`; }).join('');
     }
     function renderPagination(pagination, onPage){ const container=document.getElementById('pagination'); if(!pagination||pagination.totalPages<=1){ container.innerHTML=''; return; } const {page,totalPages}=pagination; let html=`<button ${page<=1?'disabled':''} onclick="onPage(${page-1})"><i class="fas fa-chevron-left"></i></button>`; for(let i=Math.max(1,page-2); i<=Math.min(totalPages,page+2); i++) html+=`<button class="${i===page?'active':''}" onclick="onPage(${i})">${i}</button>`; html+=`<button ${page>=totalPages?'disabled':''} onclick="onPage(${page+1})"><i class="fas fa-chevron-right"></i></button>`; container.innerHTML=html; window.onPage=onPage; }
 
@@ -384,6 +414,139 @@
     function refreshAll(){ loadDashboardStats(); loadStudents(currentClass,currentPage); loadRecentUploads(); loadPublishableStudents(publishClass); }
     document.getElementById('sessionFilter').addEventListener('change',()=>{ currentPage=1; loadStudents(currentClass,1); loadPublishableStudents(publishClass); });
     document.getElementById('publishDate').value=new Date().toISOString().split('T')[0];
+
+    // ========== PRINT FUNCTIONALITY ==========
+    async function openStudentDetail(studentId) {
+        const modalContent = document.getElementById('modalStudentContent');
+        modalContent.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading student details...</div>';
+        openModal('studentModal');
+        document.getElementById('studentModal').dataset.studentId = studentId;
+        try {
+            const data = await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`);
+            renderStudentDetail(data.data);
+        } catch (error) {
+            modalContent.innerHTML = `<div class="alert-box error">${esc(error.message)} <button onclick="openStudentDetail('${studentId}')">Retry</button></div>`;
+        }
+    }
+    function renderStudentDetail(data) {
+        const s = data.student;
+        const marksheets = data.marksheets || [];
+        const modalContent = document.getElementById('modalStudentContent');
+        document.getElementById('modalStudentName').innerHTML = `<i class="fas fa-user-graduate"></i> ${esc(s.name)}`;
+        let marksheetHtml = marksheets.length === 0 ? `<div class="alert-box info">No marksheets uploaded yet.</div>` : marksheets.map(m => `<div class="exam-item"><div class="exam-info"><span class="exam-name">${esc(m.exam_type)}</span><span class="exam-session">${esc(m.session)}</span><span class="badge ${m.is_published?'badge-success':'badge-warning'}">${m.is_published?'✅ Published':'⏳ Unpublished'}</span></div><div class="exam-actions"><button class="action-btn view" onclick="viewMarksheet(${m.id})"><i class="fas fa-eye"></i></button><button class="action-btn delete" onclick="deleteExam(${m.id})"><i class="fas fa-trash"></i></button></div></div>`).join('');
+        modalContent.innerHTML = `
+            <div class="student-detail-grid">
+                <div class="item"><label>Student ID</label><span>${esc(s.student_id)}</span></div>
+                <div class="item"><label>APAAR ID</label><span>${esc(s.apaar_id||'-')}</span></div>
+                <div class="item"><label>Father's Name</label><span>${esc(s.father_name||'-')}</span></div>
+                <div class="item"><label>Mother's Name</label><span>${esc(s.mother_name||'-')}</span></div>
+                <div class="item"><label>Date of Birth</label><span>${s.dob?formatDate(s.dob):'-'}</span></div>
+                <div class="item"><label>Session</label><span>${esc(s.session||'-')}</span></div>
+                <div class="item"><label>Class</label><span>${esc(s.class||'-')}</span></div>
+                <div class="item"><label>Roll No</label><span>${esc(s.exam_roll_no||'-')}</span></div>
+                <div class="item"><label>Section</label><span>${esc(s.section||'-')}</span></div>
+            </div>
+            <div class="exam-list"><h4><i class="fas fa-file-pdf"></i> Marksheets (${marksheets.length})</h4>${marksheetHtml}</div>
+            <div style="margin-top:16px; display:flex; gap:8px;"><button class="btn btn-sm btn-primary" onclick="printStudent('${esc(s.student_id)}')"><i class="fas fa-print"></i> Print Details</button></div>`;
+    }
+
+    async function deleteExam(id) { if(!confirm('Delete this marksheet?')) return; try{ await apiCall(`${API_BASE}/marksheets/${id}`,{method:'DELETE'}); showToast('Marksheet deleted','success'); const sid=document.getElementById('studentModal').dataset.studentId; if(sid) openStudentDetail(sid); }catch(e){ showToast(e.message,'error'); } }
+    function viewMarksheet(id) { fetch(`${API_BASE}/marksheets/${id}`,{headers:getAuthHeaders()}).then(r=>r.json()).then(d=>{ if(d.success&&d.data.cloudinary_url) window.open(d.data.cloudinary_url,'_blank'); }).catch(e=>showToast('Failed to open','error')); }
+
+    async function printStudent(studentId) {
+        try {
+            const data = await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`);
+            const s = data.data.student;
+            const marksheets = data.data.marksheets || [];
+            let marksheetRows = '';
+            marksheets.forEach((m, idx) => {
+                const url = m.cloudinary_url || '#';
+                marksheetRows += `<tr><td>${idx+1}</td><td>${esc(m.exam_type)}</td><td>${esc(m.session)}</td><td>${esc(m.class||'-')}</td><td class="marksheet-url">${esc(url)}</td><td><div class="qr-code-container" id="qr_${m.id}"></div></td></tr>`;
+            });
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            printWindow.document.write(`
+                <html><head><title>Student Print - ${esc(s.name)}</title>
+                <style>
+                    body { font-family: 'Inter', sans-serif; color: #1a2332; padding: 20px; }
+                    .print-header { display: flex; align-items: center; justify-content: center; gap: 16px; border-bottom: 3px solid #c9972b; padding-bottom: 12px; margin-bottom: 20px; }
+                    .print-header img { width: 70px; height: 70px; border-radius: 50%; }
+                    .print-header h1 { font-size: 24px; margin:0; }
+                    .print-header p { font-size: 14px; color: #5a6a7e; margin:5px 0 0; }
+                    .print-student-details { width: 100%; border-collapse: collapse; margin: 16px 0; }
+                    .print-student-details td { padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 13px; }
+                    .print-student-details td:first-child { font-weight: 600; background: #f8fafc; width: 30%; }
+                    .print-marksheet-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+                    .print-marksheet-table th, .print-marksheet-table td { padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 12px; }
+                    .print-marksheet-table th { background: #f1f5f9; }
+                    .print-footer { margin-top: 30px; display: flex; justify-content: space-between; font-size: 12px; color: #64748b; border-top: 1px solid #cbd5e1; padding-top: 10px; }
+                    .qr-code-container { display: flex; align-items: center; }
+                    .marksheet-url { font-size: 11px; color: #64748b; word-break: break-all; }
+                </style>
+                </head><body>
+                <div class="print-header">
+                    <img src="logo(1).png" alt="Logo">
+                    <div><h1>Govt. Sr. Sec. School Shilla</h1><p>Student Details Report</p></div>
+                </div>
+                <table class="print-student-details">
+                    <tr><td>Student ID</td><td>${esc(s.student_id)}</td><td>APAAR ID</td><td>${esc(s.apaar_id||'-')}</td></tr>
+                    <tr><td>Full Name</td><td>${esc(s.name)}</td><td>Father's Name</td><td>${esc(s.father_name||'-')}</td></tr>
+                    <tr><td>Mother's Name</td><td>${esc(s.mother_name||'-')}</td><td>Date of Birth</td><td>${s.dob?formatDate(s.dob):'-'}</td></tr>
+                    <tr><td>Session</td><td>${esc(s.session||'-')}</td><td>Class</td><td>${esc(s.class||'-')}</td></tr>
+                    <tr><td>Section</td><td>${esc(s.section||'-')}</td><td>Exam Roll No</td><td>${esc(s.exam_roll_no||'-')}</td></tr>
+                </table>
+                <h3>Available Marksheets</h3>
+                <table class="print-marksheet-table">
+                    <thead><tr><th>#</th><th>Exam Type</th><th>Session</th><th>Class</th><th>Marksheet URL</th><th>QR Code</th></tr></thead>
+                    <tbody>${marksheetRows || '<tr><td colspan="6">No marksheets</td></tr>'}</tbody>
+                </table>
+                <div class="print-footer">
+                    <span>Print Date: ${new Date().toLocaleString('en-IN')}</span>
+                    <span>Downloaded by: ${localStorage.getItem('adminName')||'Admin'}</span>
+                    <span>Page 1 of 1</span>
+                </div>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+                <script>
+                    setTimeout(() => {
+                        const marksheets = ${JSON.stringify(marksheets)};
+                        marksheets.forEach(m => {
+                            if (m.cloudinary_url) {
+                                const container = document.getElementById('qr_' + m.id);
+                                if (container) new QRCode(container, { text: m.cloudinary_url, width: 70, height: 70 });
+                            }
+                        });
+                    }, 200);
+                <\/script>
+                </body></html>`);
+            printWindow.document.close();
+            setTimeout(() => { printWindow.print(); }, 500);
+        } catch(e) { showToast(e.message,'error'); }
+    }
+
+    async function printClassStudents() {
+        try {
+            const session = document.getElementById('sessionFilter').value;
+            const params = new URLSearchParams({limit: 100});
+            if (session) params.set('session', session);
+            const data = await apiCall(`${API_BASE}/class/${currentClass}/students?${params}`);
+            const students = data.data;
+            if (!students.length) { showToast('No students to print', 'warning'); return; }
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            let rows = '';
+            students.forEach((s, i) => {
+                rows += `<tr><td>${i+1}</td><td>${esc(s.student_id)}</td><td>${esc(s.name)}</td><td>${esc(s.father_name||'-')}</td><td>${esc(s.session||'-')}</td><td>${esc(s.class||'-')}</td><td>${s.marksheet_count||0}</td><td>${s.published_count||0}</td></tr>`;
+            });
+            printWindow.document.write(`
+                <html><head><title>Class ${currentClass} Students Print</title>
+                <style>body{font-family:'Inter',sans-serif;padding:20px;} .print-header{display:flex;align-items:center;justify-content:center;gap:16px;border-bottom:3px solid #c9972b;padding-bottom:12px;margin-bottom:20px;} .print-header img{width:70px;height:70px;border-radius:50%;} table{width:100%;border-collapse:collapse;margin:16px 0;} th,td{padding:8px 12px;border:1px solid #cbd5e1;font-size:12px;} th{background:#f1f5f9;} .print-footer{margin-top:30px;display:flex;justify-content:space-between;font-size:12px;color:#64748b;border-top:1px solid #cbd5e1;padding-top:10px;}</style>
+                </head><body>
+                <div class="print-header"><img src="logo(1).png" alt="Logo"><div><h1>Govt. Sr. Sec. School Shilla</h1><p>Class ${currentClass} Students List</p></div></div>
+                <table><thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Father's Name</th><th>Session</th><th>Class</th><th>Marksheets</th><th>Published</th></tr></thead><tbody>${rows}</tbody></table>
+                <div class="print-footer"><span>Print Date: ${new Date().toLocaleString('en-IN')}</span><span>Downloaded by: ${localStorage.getItem('adminName')||'Admin'}</span><span>Page 1 of 1</span></div>
+                </body></html>`);
+            printWindow.document.close();
+            setTimeout(() => { printWindow.print(); }, 500);
+        } catch(e) { showToast(e.message,'error'); }
+    }
 
     window.addEventListener('DOMContentLoaded', async()=>{ if(await checkAuth()){ loadDashboardStats(); loadStudents(currentClass); loadRecentUploads(); loadPublishableStudents(publishClass); } });
 </script>
