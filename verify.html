@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Result - GSSS Shilla</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0d1b2a;
+            --primary-light: #1b3a5c;
+            --secondary: #2d5a8a;
+            --accent: #e8b84b;
+            --accent-light: #f5d78a;
+            --accent-dark: #c9972b;
+            --white: #ffffff;
+            --off-white: #f0f4f8;
+            --gray-light: #e2e8f0;
+            --gray: #94a3b8;
+            --text: #1a2332;
+            --text-light: #5a6a7e;
+            --success: #16a34a;
+            --success-light: #dcfce7;
+            --shadow-sm: 0 4px 20px rgba(0,0,0,0.06);
+            --shadow-md: 0 8px 40px rgba(0,0,0,0.10);
+            --radius: 20px;
+            --radius-sm: 12px;
+            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #f0f4f8 0%, #fef8ed 100%); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px;
+        }
+        
+        .verification-container {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px 30px;
+            text-align: center;
+            border: 1px solid var(--gray-light);
+        }
+        
+        .school-header {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--accent);
+        }
+        .school-logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            padding: 3px;
+            background: white;
+            margin: 0 auto 10px;
+            display: block;
+            object-fit: contain;
+        }
+        .school-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .school-tagline {
+            font-size: 10px;
+            color: var(--gray);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 3px;
+        }
+        
+        .verify-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            animation: pulse 2s infinite;
+        }
+        .verify-icon.verified {
+            background: var(--success-light);
+            color: var(--success);
+        }
+        .verify-icon.invalid {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .verify-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        .verify-subtitle {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+        
+        .student-details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .student-details-table td {
+            padding: 10px 12px;
+            border: 1px solid var(--gray-light);
+            font-size: 12px;
+            text-align: left;
+        }
+        .student-details-table td:first-child {
+            font-weight: 700;
+            background: #fef8ed;
+            color: var(--primary);
+            width: 35%;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+        }
+        .student-details-table td:last-child {
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        .confirmation-box {
+            background: var(--success-light);
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--success);
+        }
+        .confirmation-box i {
+            font-size: 20px;
+        }
+        .confirmation-box strong {
+            display: block;
+            font-size: 13px;
+        }
+        
+        .invalid-box {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 13px;
+            color: #dc2626;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: var(--white);
+        }
+        .btn-primary:hover {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
+        }
+        
+        .footer-text {
+            margin-top: 20px;
+            font-size: 9px;
+            color: var(--gray);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-top: 1px solid var(--gray-light);
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="verification-container">
+        <!-- School Header -->
+        <div class="school-header">
+            <img src="logo.png" alt="School Logo" class="school-logo" onerror="this.style.display='none'">
+            <div class="school-name">Govt. Sr. Sec. School Shilla</div>
+            <div class="school-tagline">Shilla • District Solan • Himachal Pradesh</div>
+        </div>
+        
+        <!-- Verification Result -->
+        <div id="verificationContent">
+            <div class="loading" style="text-align:center;padding:20px;">
+                <i class="fas fa-spinner fa-spin" style="font-size:30px;color:var(--accent);"></i>
+                <p style="margin-top:10px;color:var(--text-light);">Verifying document...</p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer-text">
+            GSSS Shilla - Official Document Verification
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const content = document.getElementById('verificationContent');
+            
+            // Get data from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const dataParam = urlParams.get('data');
+            
+            if (!dataParam) {
+                showInvalid('No verification data found. This document cannot be verified.');
+                return;
+            }
+            
+            try {
+                const data = JSON.parse(decodeURIComponent(dataParam));
+                
+                // Validate required fields
+                if (!data.student_id || !data.name) {
+                    showInvalid('Invalid verification data. This document may be tampered.');
+                    return;
+                }
+                
+                // Show verified content
+                showVerified(data);
+                
+            } catch(e) {
+                showInvalid('Invalid verification data format. This document may be tampered.');
+            }
+        });
+        
+        function showVerified(data) {
+            const content = document.getElementById('verificationContent');
+            
+            content.innerHTML = `
+                <div class="verify-icon verified">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 class="verify-title">Document Verified</h2>
+                <p class="verify-subtitle">This is an authentic document issued by GSSS Shilla</p>
+                
+                <table class="student-details-table">
+                    <tr><td>Student ID</td><td>${escapeHtml(data.student_id)}</td></tr>
+                    <tr><td>Student Name</td><td>${escapeHtml(data.name)}</td></tr>
+                    ${data.apaar_id ? `<tr><td>APAAR ID</td><td>${escapeHtml(data.apaar_id)}</td></tr>` : ''}
+                    ${data.father_name ? `<tr><td>Father's Name</td><td>${escapeHtml(data.father_name)}</td></tr>` : ''}
+                    ${data.mother_name ? `<tr><td>Mother's Name</td><td>${escapeHtml(data.mother_name)}</td></tr>` : ''}
+                    ${data.dob ? `<tr><td>Date of Birth</td><td>${formatDate(data.dob)}</td></tr>` : ''}
+                    ${data.session ? `<tr><td>Session</td><td>${escapeHtml(data.session)}</td></tr>` : ''}
+                    ${data.class ? `<tr><td>Class</td><td>${escapeHtml(data.class)}${data.section ? ' - ' + escapeHtml(data.section) : ''}</td></tr>` : ''}
+                    ${data.exam_roll_no ? `<tr><td>Exam Roll No</td><td>${escapeHtml(data.exam_roll_no)}</td></tr>` : ''}
+                </table>
+                
+                <div class="confirmation-box">
+                    <i class="fas fa-shield-alt"></i>
+                    <div>
+                        <strong>Confirmation</strong>
+                        This marksheet belongs to the student mentioned above. The details have been verified from the school's official records.
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print Verification
+                </button>
+            `;
+        }
+        
+        function showInvalid(message) {
+            const content = document.getElementById('verificationContent');
+            content.innerHTML = `
+                <div class="verify-icon invalid">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <h2 class="verify-title" style="color:#dc2626;">Verification Failed</h2>
+                <p class="verify-subtitle">This document could not be verified</p>
+                
+                <div class="invalid-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    ${message}
+                </div>
+                
+                <p style="font-size:11px;color:var(--gray);margin-top:10px;">
+                    If you believe this is an error, please contact the school administration.
+                </p>
+            `;
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            if (isNaN(date)) return dateStr;
+            return date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+    </script>
+</body>
+</html>
