@@ -452,14 +452,14 @@
 
     async function deleteExam(id) { if(!confirm('Delete this marksheet?')) return; try{ await apiCall(`${API_BASE}/marksheets/${id}`,{method:'DELETE'}); showToast('Marksheet deleted','success'); const sid=document.getElementById('studentModal').dataset.studentId; if(sid) openStudentDetail(sid); }catch(e){ showToast(e.message,'error'); } }
     function viewMarksheet(id) { fetch(`${API_BASE}/marksheets/${id}`,{headers:getAuthHeaders()}).then(r=>r.json()).then(d=>{ if(d.success&&d.data.cloudinary_url) window.open(d.data.cloudinary_url,'_blank'); }).catch(e=>showToast('Failed to open','error')); }
-async function printStudent(studentId) {
+
+
+
+    async function printStudent(studentId) {
     try {
         const data = await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`);
         const s = data.data.student;
         const marksheets = data.data.marksheets || [];
-        
-        // 🔥 STUDENT DETAILS PAGE URL (public portal)
-        const studentPageUrl = `https://gsssshilla.onrender.com/result.html?student_id=${s.student_id}&session=${s.session}&class=${s.class}`;
         
         let marksheetRows = '';
         marksheets.forEach((m, idx) => {
@@ -492,7 +492,7 @@ async function printStudent(studentId) {
                 .print-marksheet-table th { background: #f1f5f9; }
                 .print-footer { margin-top: 30px; display: flex; justify-content: space-between; font-size: 12px; color: #64748b; border-top: 1px solid #cbd5e1; padding-top: 10px; }
                 .qr-code-container { display: flex; align-items: center; justify-content: center; }
-                .qr-code-container img, .qr-code-container canvas { width: 100px !important; height: 100px !important; }
+                .qr-code-container img, .qr-code-container canvas { width: 120px !important; height: 120px !important; }
                 .marksheet-url { font-size: 11px; color: #64748b; word-break: break-all; }
             </style>
             </head><body>
@@ -521,13 +521,16 @@ async function printStudent(studentId) {
             <script>
                 setTimeout(() => {
                     const marksheets = ${JSON.stringify(marksheets)};
-                    const studentPageUrl = '${studentPageUrl}';
                     marksheets.forEach(m => {
-                        if (m.id) {
+                        if (m.id && m.cloudinary_url) {
                             const container = document.getElementById('qr_' + m.id);
                             if (container) {
-                                // 🔥 QR code ab STUDENT DETAILS PAGE kholta hai
-                                new QRCode(container, { text: studentPageUrl, width: 100, height: 100 });
+                                // 🔥 QR Code ab DIRECT MARKSHEET PDF kholta hai
+                                new QRCode(container, { 
+                                    text: m.cloudinary_url, 
+                                    width: 120, 
+                                    height: 120 
+                                });
                             }
                         }
                     });
@@ -538,6 +541,8 @@ async function printStudent(studentId) {
         setTimeout(() => { printWindow.print(); }, 600);
     } catch(e) { showToast(e.message,'error'); }
 }
+
+    
 
     async function printClassStudents() {
         try {
