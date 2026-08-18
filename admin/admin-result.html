@@ -438,10 +438,7 @@ document.getElementById('publishDate').value=new Date().toISOString().split('T')
                                         
 // 📸 PRINT STUDENT - Complete Professional Marksheet
 
-                                                
-                    // 📸 PRINT STUDENT - Updated with Security Text and Visible QR
-
-    // 📸 PRINT STUDENT - QR Fixed, Footer In Page, No Emojis
+                // 📸 COMPLETE PRINT STUDENT - With Both QR Codes + URL
 async function printStudent(studentId) {
     try {
         const data = await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`);
@@ -451,19 +448,43 @@ async function printStudent(studentId) {
         const downloadedBy = adminData.name || adminData.username || localStorage.getItem('adminName') || 'Admin';
         const studentPhoto = s.photo || s.photo_url || s.image_url || '';
         
+        // 🔥 VERIFICATION QR CODE DATA
+        const verificationData = {
+            student_id: s.student_id,
+            name: s.name,
+            father_name: s.father_name || '',
+            mother_name: s.mother_name || '',
+            dob: s.dob || '',
+            class: s.class || '',
+            section: s.section || '',
+            session: s.session || '',
+            exam_roll_no: s.exam_roll_no || '',
+            apaar_id: s.apaar_id || ''
+        };
+        
+        const verificationUrl = `https://gsssshilla.onrender.com/verify.html?data=${encodeURIComponent(JSON.stringify(verificationData))}`;
+        const verificationQRBase64 = await generateQRCodeBase64(verificationUrl);
+        
+        // 🔥 PER MARKSHEET QR CODES
+        const marksheetsWithQR = await Promise.all(marksheets.map(async (m) => {
+            const qrBase64 = await generateQRCodeBase64(m.cloudinary_url || '#');
+            return { ...m, qrBase64 };
+        }));
+        
         let marksheetRows = '';
-        marksheets.forEach((m, idx) => {
-            const url = m.cloudinary_url || '#';
-            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(url)}`;
+        marksheetsWithQR.forEach((m, idx) => {
             marksheetRows += `
                 <tr>
                     <td style="text-align:center;padding:8px;border:1px solid #d1d5db;">${idx+1}</td>
                     <td style="padding:8px;border:1px solid #d1d5db;font-weight:600;">${esc(m.exam_type)}</td>
                     <td style="padding:8px;border:1px solid #d1d5db;text-align:center;">${esc(m.session)}</td>
                     <td style="padding:8px;border:1px solid #d1d5db;text-align:center;">${esc(m.class||'-')}</td>
-                    <td style="padding:8px;border:1px solid #d1d5db;font-size:8px;word-break:break-all;color:#6b7280;">${esc(url)}</td>
+                    <td style="padding:8px;border:1px solid #d1d5db;font-size:7px;word-break:break-all;color:#6b7280;">${esc(m.cloudinary_url||'-')}</td>
                     <td style="text-align:center;padding:8px;border:1px solid #d1d5db;">
-                        <img src="${qrApiUrl}" width="80" height="80" alt="QR Code" style="border:2px solid #c9972b;padding:3px;background:white;border-radius:4px;display:inline-block;">
+                        ${m.qrBase64 ? 
+                            `<img src="${m.qrBase64}" width="70" height="70" style="border:1px solid #c9972b;padding:2px;background:white;">` : 
+                            '<div style="font-size:7px;color:#94a3b8;">N/A</div>'
+                        }
                     </td>
                 </tr>`;
         });
@@ -528,7 +549,7 @@ async function printStudent(studentId) {
                     }
                     .page-header .heading-box {
                         display: inline-block;
-                        background: linear-gradient(135deg, #0d1b2a, #2d5a8a);
+                        background: #0d1b2a;
                         color: #fff;
                         padding: 6px 25px;
                         border-radius: 25px;
@@ -555,7 +576,7 @@ async function printStudent(studentId) {
                     }
                     .student-info-table .label-cell {
                         font-weight: 700;
-                        background: linear-gradient(135deg, #fef8ed, #fdf2f8);
+                        background: #fef8ed;
                         color: #0d1b2a;
                         width: 18%;
                         letter-spacing: 0.5px;
@@ -633,11 +654,54 @@ async function printStudent(studentId) {
                         font-size: 9px;
                     }
                     
+                    /* VERIFICATION SECTION */
+                    .verification-section {
+                        display: flex;
+                        align-items: center;
+                        gap: 20px;
+                        margin: 20px 0;
+                        padding: 15px;
+                        border: 2px solid #c9972b;
+                        background: #fef8ed;
+                        border-radius: 8px;
+                    }
+                    .verification-qr {
+                        width: 100px;
+                        height: 100px;
+                        border: 2px solid #0d1b2a;
+                        border-radius: 5px;
+                        overflow: hidden;
+                        flex-shrink: 0;
+                        background: white;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .verification-qr img {
+                        width: 95px;
+                        height: 95px;
+                    }
+                    .verification-text {
+                        flex: 1;
+                        font-size: 10px;
+                        color: #0d1b2a;
+                    }
+                    .verification-text strong {
+                        display: block;
+                        font-size: 11px;
+                        margin-bottom: 5px;
+                    }
+                    .verification-text p {
+                        font-size: 9px;
+                        color: #5a6a7e;
+                        margin: 2px 0;
+                    }
+                    
                     /* SIGNATURE AREA */
                     .signature-area {
                         display: flex;
                         justify-content: space-between;
-                        margin-top: 30px;
+                        margin-top: 25px;
                         padding-top: 10px;
                     }
                     .signature-box {
@@ -703,7 +767,6 @@ async function printStudent(studentId) {
                         html, body { margin: 0; padding: 0; }
                         .page-container { max-width: 100%; }
                         .page-footer { page-break-inside: avoid; }
-                        .security-text-line { page-break-inside: avoid; }
                     }
                 </style>
             </head>
@@ -711,7 +774,6 @@ async function printStudent(studentId) {
                 <div class="watermark">GSSS SHILLA</div>
                 
                 <div class="page-container">
-                    <!-- HEADER -->
                     <div class="page-header">
                         <img src="logo(1).png" class="logo" onerror="this.style.display='none'">
                         <div class="school-name">Govt. Sr. Sec. School Shilla</div>
@@ -719,7 +781,6 @@ async function printStudent(studentId) {
                         <div class="heading-box">Student Marksheet</div>
                     </div>
                     
-                    <!-- STUDENT INFO TABLE -->
                     <table class="student-info-table">
                         <tr>
                             <td class="label-cell">Student ID</td>
@@ -757,11 +818,10 @@ async function printStudent(studentId) {
                             <td class="label-cell">Exam Roll No</td>
                             <td class="value-cell">${esc(s.exam_roll_no||'-')}</td>
                             <td class="label-cell">Status</td>
-                            <td class="value-cell">${marksheets.length > 0 ? 'Active' : 'Pending'}</td>
+                            <td class="value-cell">Active</td>
                         </tr>
                     </table>
                     
-                    <!-- MARKSHEETS -->
                     <div class="marksheet-heading">Available Marksheets (${marksheets.length})</div>
                     <table class="marksheet-table">
                         <thead>
@@ -771,7 +831,7 @@ async function printStudent(studentId) {
                                 <th style="width:55px;">Session</th>
                                 <th style="width:45px;">Class</th>
                                 <th>Marksheet URL</th>
-                                <th style="width:85px;">QR Code</th>
+                                <th style="width:75px;">QR Code</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -779,7 +839,21 @@ async function printStudent(studentId) {
                         </tbody>
                     </table>
                     
-                    <!-- SIGNATURE AREA -->
+                    <div class="verification-section">
+                        <div class="verification-qr">
+                            ${verificationQRBase64 ? 
+                                `<img src="${verificationQRBase64}" alt="Verification QR">` : 
+                                '<div style="font-size:8px;color:#94a3b8;text-align:center;">QR N/A</div>'
+                            }
+                        </div>
+                        <div class="verification-text">
+                            <strong>Verify This Document</strong>
+                            <p>Scan this QR code to verify the authenticity of this document.</p>
+                            <p><strong>Student:</strong> ${esc(s.name)} | <strong>ID:</strong> ${esc(s.student_id)}</p>
+                            <p><strong>DOB:</strong> ${s.dob ? new Date(s.dob).toLocaleDateString('en-IN', {day:'2-digit', month:'2-digit', year:'numeric'}) : '-'} | <strong>Father:</strong> ${esc(s.father_name||'-')}</p>
+                        </div>
+                    </div>
+                    
                     <div class="signature-area">
                         <div class="signature-box">
                             <div class="line"></div>
@@ -791,12 +865,10 @@ async function printStudent(studentId) {
                         </div>
                     </div>
                     
-                    <!-- SECURITY TEXT -->
                     <div class="security-text-line">
                         GSSS SHILLA OFFICIAL DOCUMENT&nbsp;&nbsp;|&nbsp;&nbsp;GSSS SHILLA OFFICIAL DOCUMENT&nbsp;&nbsp;|&nbsp;&nbsp;GSSS SHILLA OFFICIAL DOCUMENT
                     </div>
                     
-                    <!-- FOOTER -->
                     <div class="page-footer">
                         <div class="footer-left">
                             <strong>Print Date:</strong> ${new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})}<br>
@@ -816,9 +888,27 @@ async function printStudent(studentId) {
             </html>
         `);
         pw.document.close();
-        setTimeout(() => { pw.focus(); pw.print(); }, 1500);
+        setTimeout(() => { pw.focus(); pw.print(); }, 2000);
     } catch(e) { showToast(e.message,'error'); }
 }
+
+// 🔥 QR Code Generate Function (Base64)
+function generateQRCodeBase64(url) {
+    return new Promise((resolve) => {
+        const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(url)}`;
+        
+        fetch(apiUrl)
+            .then(res => res.blob())
+            .then(blob => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = () => resolve(null);
+                reader.readAsDataURL(blob);
+            })
+            .catch(() => resolve(null));
+    });
+}                                
+                    
 async function printClassStudents() {
     try {
         const session = document.getElementById('sessionFilter').value; const params = new URLSearchParams({limit: 100}); if (session) params.set('session', session);
