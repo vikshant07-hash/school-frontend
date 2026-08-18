@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Document - GSS School Shilla</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="logo.png" type="image/x-icon">
+    <style>
+        :root {
+            --primary: #0d1b2a;
+            --primary-light: #1b3a5c;
+            --secondary: #2d5a8a;
+            --accent: #e8b84b;
+            --accent-light: #f5d78a;
+            --accent-dark: #c9972b;
+            --white: #ffffff;
+            --off-white: #f0f4f8;
+            --gray-light: #e2e8f0;
+            --gray: #94a3b8;
+            --text: #1a2332;
+            --text-light: #5a6a7e;
+            --success: #16a34a;
+            --success-light: #dcfce7;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --shadow-sm: 0 4px 20px rgba(0,0,0,0.06);
+            --shadow-md: 0 8px 40px rgba(0,0,0,0.10);
+            --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
+            --radius: 20px;
+            --radius-sm: 12px;
+            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #fef8ed 50%, #f0f4f8 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .verification-container {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            max-width: 550px;
+            width: 100%;
+            padding: 0;
+            overflow: hidden;
+            border: 1px solid var(--gray-light);
+        }
+
+        /* HEADER */
+        .verify-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            padding: 30px 20px 25px;
+            text-align: center;
+            border-bottom: 3px solid var(--accent);
+            position: relative;
+        }
+        .verify-header .logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            padding: 3px;
+            background: var(--white);
+            margin: 0 auto 10px;
+            display: block;
+            object-fit: contain;
+        }
+        .verify-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--white);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .verify-header p {
+            color: rgba(255,255,255,0.5);
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 3px;
+        }
+
+        /* BODY */
+        .verify-body {
+            padding: 30px 25px;
+        }
+
+        /* ICON */
+        .verify-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            animation: pulse 2s infinite;
+        }
+        .verify-icon.verified {
+            background: var(--success-light);
+            color: var(--success);
+            border: 2px solid #bbf7d0;
+        }
+        .verify-icon.invalid {
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 2px solid #fecaca;
+            animation: shake 0.5s ease;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .verify-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .verify-subtitle {
+            font-size: 13px;
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* STUDENT DETAILS TABLE */
+        .student-details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--white);
+        }
+        .student-details-table td {
+            padding: 10px 12px;
+            border: 1px solid var(--gray-light);
+            font-size: 12px;
+            text-align: left;
+        }
+        .student-details-table td:first-child {
+            font-weight: 700;
+            background: #fef8ed;
+            color: var(--primary);
+            width: 35%;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+        }
+        .student-details-table td:last-child {
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        /* CONFIRMATION BOX */
+        .confirmation-box {
+            background: var(--success-light);
+            border: 1px solid #bbf7d0;
+            border-left: 4px solid var(--success);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin: 15px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--success);
+        }
+        .confirmation-box i {
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .confirmation-box strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+        .confirmation-box p {
+            font-size: 11px;
+            color: #166534;
+            line-height: 1.5;
+        }
+
+        .invalid-box {
+            background: var(--danger-light);
+            border: 1px solid #fecaca;
+            border-left: 4px solid var(--danger);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin: 15px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--danger);
+        }
+        .invalid-box i {
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* BUTTON */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+            margin-top: 10px;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: var(--white);
+        }
+        .btn-primary:hover {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(201, 151, 43, 0.3);
+        }
+
+        /* FOOTER */
+        .verify-footer {
+            padding: 15px 25px;
+            text-align: center;
+            border-top: 1px solid var(--gray-light);
+            background: var(--off-white);
+            font-size: 9px;
+            color: var(--gray);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* LOADING */
+        .loading-state {
+            text-align: center;
+            padding: 30px;
+        }
+        .loading-state i {
+            font-size: 40px;
+            color: var(--accent);
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-state p {
+            margin-top: 10px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .verification-container { margin: 0 5px; }
+            .verify-body { padding: 20px 15px; }
+            .student-details-table td { padding: 8px; font-size: 11px; }
+            .student-details-table td:first-child { font-size: 9px; }
+            .verify-header h1 { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="verification-container">
+        <!-- HEADER -->
+        <div class="verify-header">
+            <img src="logo.png" alt="School Logo" class="logo" onerror="this.style.display='none'">
+            <h1>Govt. Sr. Sec. School Shilla</h1>
+            <p>Document Verification</p>
+        </div>
+
+        <!-- BODY -->
+        <div class="verify-body" id="verifyBody">
+            <div class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Verifying document...</p>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="verify-footer">
+            GSSS Shilla - Official Document Verification System
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const verifyBody = document.getElementById('verifyBody');
+            
+            // Get data from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const dataParam = urlParams.get('data');
+            
+            if (!dataParam) {
+                showInvalid('No verification data found. This document cannot be verified.');
+                return;
+            }
+            
+            try {
+                const data = JSON.parse(decodeURIComponent(dataParam));
+                
+                // Validate required fields
+                if (!data.student_id || !data.name) {
+                    showInvalid('Invalid verification data. This document may be tampered.');
+                    return;
+                }
+                
+                // Show verified content
+                setTimeout(() => {
+                    showVerified(data);
+                }, 1000);
+                
+            } catch(e) {
+                showInvalid('Invalid verification data format. This document may be tampered.');
+            }
+        });
+        
+        function showVerified(data) {
+            const verifyBody = document.getElementById('verifyBody');
+            
+            verifyBody.innerHTML = `
+                <div class="verify-icon verified">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 class="verify-title">Document Verified</h2>
+                <p class="verify-subtitle">This is an authentic provisional marksheet issued by GSSS Shilla</p>
+                
+                <table class="student-details-table">
+                    ${data.student_id ? `<tr><td>Student ID</td><td>${escapeHtml(data.student_id)}</td></tr>` : ''}
+                    ${data.name ? `<tr><td>Student Name</td><td>${escapeHtml(data.name)}</td></tr>` : ''}
+                    ${data.apaar_id ? `<tr><td>APAAR ID</td><td>${escapeHtml(data.apaar_id)}</td></tr>` : ''}
+                    ${data.father_name ? `<tr><td>Father's Name</td><td>${escapeHtml(data.father_name)}</td></tr>` : ''}
+                    ${data.mother_name ? `<tr><td>Mother's Name</td><td>${escapeHtml(data.mother_name)}</td></tr>` : ''}
+                    ${data.dob ? `<tr><td>Date of Birth</td><td>${formatDate(data.dob)}</td></tr>` : ''}
+                    ${data.session ? `<tr><td>Session</td><td>${escapeHtml(data.session)}</td></tr>` : ''}
+                    ${data.class ? `<tr><td>Class</td><td>${escapeHtml(data.class)}${data.section ? ' - ' + escapeHtml(data.section) : ''}</td></tr>` : ''}
+                    ${data.exam_roll_no ? `<tr><td>Exam Roll No</td><td>${escapeHtml(data.exam_roll_no)}</td></tr>` : ''}
+                </table>
+                
+                <div class="confirmation-box">
+                    <i class="fas fa-shield-alt"></i>
+                    <div>
+                        <strong>Confirmation</strong>
+                        <p>This provisional marksheet belongs to the student mentioned above. The details have been verified from the school's official records.</p>
+                    </div>
+                </div>
+                
+                <div style="text-align:center;">
+                    <button class="btn btn-primary" onclick="window.print()">
+                        <i class="fas fa-print"></i> Print Verification
+                    </button>
+                </div>
+            `;
+        }
+        
+        function showInvalid(message) {
+            const verifyBody = document.getElementById('verifyBody');
+            
+            verifyBody.innerHTML = `
+                <div class="verify-icon invalid">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <h2 class="verify-title" style="color:#dc2626;">Verification Failed</h2>
+                <p class="verify-subtitle">This document could not be verified</p>
+                
+                <div class="invalid-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Invalid Document</strong>
+                        <p style="margin-top:3px;color:#991b1b;">${message}</p>
+                    </div>
+                </div>
+                
+                <p style="font-size:11px;color:var(--gray);text-align:center;margin-top:10px;">
+                    If you believe this is an error, please contact the school administration.
+                </p>
+            `;
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            if (isNaN(date)) return dateStr;
+            return date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+    </script>
+</body>
+</html>
