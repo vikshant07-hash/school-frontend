@@ -440,6 +440,8 @@ document.getElementById('publishDate').value=new Date().toISOString().split('T')
 
                                                 
                     // 📸 PRINT STUDENT - Updated with Security Text and Visible QR
+
+    // 📸 PRINT STUDENT - QR Fixed, Footer In Page, No Emojis
 async function printStudent(studentId) {
     try {
         const data = await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`);
@@ -452,6 +454,7 @@ async function printStudent(studentId) {
         let marksheetRows = '';
         marksheets.forEach((m, idx) => {
             const url = m.cloudinary_url || '#';
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(url)}`;
             marksheetRows += `
                 <tr>
                     <td style="text-align:center;padding:8px;border:1px solid #d1d5db;">${idx+1}</td>
@@ -460,7 +463,7 @@ async function printStudent(studentId) {
                     <td style="padding:8px;border:1px solid #d1d5db;text-align:center;">${esc(m.class||'-')}</td>
                     <td style="padding:8px;border:1px solid #d1d5db;font-size:8px;word-break:break-all;color:#6b7280;">${esc(url)}</td>
                     <td style="text-align:center;padding:8px;border:1px solid #d1d5db;">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(url)}&color=1a2332&bgcolor=ffffff&margin=5" width="90" height="90" style="border:2px solid #c9972b;padding:3px;background:white;border-radius:4px;display:block;margin:0 auto;">
+                        <img src="${qrApiUrl}" width="80" height="80" alt="QR Code" style="border:2px solid #c9972b;padding:3px;background:white;border-radius:4px;display:inline-block;">
                     </td>
                 </tr>`;
         });
@@ -472,7 +475,7 @@ async function printStudent(studentId) {
             <head>
                 <title>Student Marksheet - ${esc(s.name)}</title>
                 <style>
-                    @page { size: A4; margin: 10mm; }
+                    @page { size: A4; margin: 12mm; }
                     * { margin: 0; padding: 0; box-sizing: border-box; }
                     html, body { 
                         font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; 
@@ -484,13 +487,11 @@ async function printStudent(studentId) {
                         print-color-adjust: exact !important;
                     }
                     
-                    .content-wrapper {
-                        display: flex;
-                        flex-direction: column;
-                        min-height: 100vh;
-                    }
-                    .main-content {
-                        flex: 1;
+                    .page-container {
+                        width: 100%;
+                        max-width: 186mm;
+                        margin: 0 auto;
+                        position: relative;
                     }
                     
                     /* HEADER */
@@ -509,7 +510,6 @@ async function printStudent(studentId) {
                         background: white;
                         margin: 0 auto 5px;
                         display: block;
-                        box-shadow: 0 4px 15px rgba(201,151,43,0.3);
                     }
                     .page-header .school-name {
                         font-family: 'Georgia', serif;
@@ -606,7 +606,7 @@ async function printStudent(studentId) {
                         font-weight: 700;
                         margin: 15px 0 8px;
                         padding: 7px 12px;
-                        background: linear-gradient(90deg, #fef8ed, #fdf2f8);
+                        background: #fef8ed;
                         border-left: 4px solid #c9972b;
                         letter-spacing: 1px;
                     }
@@ -618,7 +618,7 @@ async function printStudent(studentId) {
                         background: white;
                     }
                     .marksheet-table th {
-                        background: linear-gradient(135deg, #0d1b2a, #2d5a8a);
+                        background: #0d1b2a;
                         color: #fff;
                         padding: 8px 10px;
                         border: 1px solid #0d1b2a;
@@ -651,19 +651,18 @@ async function printStudent(studentId) {
                         margin: 25px auto 5px;
                     }
                     
-                    /* SECURITY TEXT - 3 TIMES IN ONE LINE */
+                    /* SECURITY TEXT */
                     .security-text-line {
                         text-align: center;
                         font-size: 7px;
                         color: rgba(13, 27, 42, 0.35);
-                        letter-spacing: 3px;
+                        letter-spacing: 2px;
                         margin: 15px 0 10px;
                         padding: 5px 0;
                         border-top: 1px dashed #cbd5e1;
                         border-bottom: 1px dashed #cbd5e1;
                         text-transform: uppercase;
                         white-space: nowrap;
-                        overflow: hidden;
                     }
                     
                     /* FOOTER */
@@ -677,6 +676,7 @@ async function printStudent(studentId) {
                         justify-content: space-between;
                         align-items: center;
                         background: #fff;
+                        page-break-inside: avoid;
                     }
                     .footer-left { text-align: left; }
                     .footer-center { text-align: center; font-weight: 600; color: #0d1b2a; }
@@ -701,98 +701,99 @@ async function printStudent(studentId) {
                     
                     @media print {
                         html, body { margin: 0; padding: 0; }
+                        .page-container { max-width: 100%; }
+                        .page-footer { page-break-inside: avoid; }
+                        .security-text-line { page-break-inside: avoid; }
                     }
                 </style>
             </head>
             <body>
                 <div class="watermark">GSSS SHILLA</div>
                 
-                <div class="content-wrapper">
-                    <div class="main-content">
-                        <!-- HEADER -->
-                        <div class="page-header">
-                            <img src="logo(1).png" class="logo" onerror="this.style.display='none'">
-                            <div class="school-name">Govt. Sr. Sec. School Shilla</div>
-                            <div class="school-tagline">Shilla • District Solan • Himachal Pradesh - 173229</div>
-                            <div class="heading-box"> Student Marksheet</div>
+                <div class="page-container">
+                    <!-- HEADER -->
+                    <div class="page-header">
+                        <img src="logo(1).png" class="logo" onerror="this.style.display='none'">
+                        <div class="school-name">Govt. Sr. Sec. School Shilla</div>
+                        <div class="school-tagline">Shilla • District Solan • Himachal Pradesh - 173229</div>
+                        <div class="heading-box">Student Marksheet</div>
+                    </div>
+                    
+                    <!-- STUDENT INFO TABLE -->
+                    <table class="student-info-table">
+                        <tr>
+                            <td class="label-cell">Student ID</td>
+                            <td class="value-cell">${esc(s.student_id)}</td>
+                            <td class="label-cell">APAAR ID</td>
+                            <td class="value-cell">${esc(s.apaar_id||'-')}</td>
+                            <td class="photo-cell" rowspan="5">
+                                <div class="photo-box">
+                                    ${studentPhoto ? 
+                                        `<img src="${esc(studentPhoto)}" onerror="this.parentElement.innerHTML='<div class=&quot;photo-placeholder&quot;><i class=&quot;fas fa-user&quot;></i></div>'">` : 
+                                        `<div class="photo-placeholder"><i class="fas fa-user"></i></div>`
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">Student Name</td>
+                            <td class="value-cell" style="font-weight:700;font-size:12px;">${esc(s.name)}</td>
+                            <td class="label-cell">Father's Name</td>
+                            <td class="value-cell">${esc(s.father_name||'-')}</td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">Mother's Name</td>
+                            <td class="value-cell">${esc(s.mother_name||'-')}</td>
+                            <td class="label-cell">Date of Birth</td>
+                            <td class="value-cell">${s.dob ? new Date(s.dob).toLocaleDateString('en-IN', {day:'2-digit', month:'2-digit', year:'numeric'}) : '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">Session</td>
+                            <td class="value-cell">${esc(s.session||'-')}</td>
+                            <td class="label-cell">Class</td>
+                            <td class="value-cell">${esc(s.class||'-')}${s.section ? ' - ' + esc(s.section) : ''}</td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">Exam Roll No</td>
+                            <td class="value-cell">${esc(s.exam_roll_no||'-')}</td>
+                            <td class="label-cell">Status</td>
+                            <td class="value-cell">${marksheets.length > 0 ? 'Active' : 'Pending'}</td>
+                        </tr>
+                    </table>
+                    
+                    <!-- MARKSHEETS -->
+                    <div class="marksheet-heading">Available Marksheets (${marksheets.length})</div>
+                    <table class="marksheet-table">
+                        <thead>
+                            <tr>
+                                <th style="width:25px;">#</th>
+                                <th>Exam Type</th>
+                                <th style="width:55px;">Session</th>
+                                <th style="width:45px;">Class</th>
+                                <th>Marksheet URL</th>
+                                <th style="width:85px;">QR Code</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${marksheetRows || '<tr><td colspan="6" style="text-align:center;padding:20px;">No marksheets available</td></tr>'}
+                        </tbody>
+                    </table>
+                    
+                    <!-- SIGNATURE AREA -->
+                    <div class="signature-area">
+                        <div class="signature-box">
+                            <div class="line"></div>
+                            <strong>Class Teacher</strong>
                         </div>
-                        
-                        <!-- STUDENT INFO TABLE -->
-                        <table class="student-info-table">
-                            <tr>
-                                <td class="label-cell">Student ID</td>
-                                <td class="value-cell">${esc(s.student_id)}</td>
-                                <td class="label-cell">APAAR ID</td>
-                                <td class="value-cell">${esc(s.apaar_id||'-')}</td>
-                                <td class="photo-cell" rowspan="5">
-                                    <div class="photo-box">
-                                        ${studentPhoto ? 
-                                            `<img src="${esc(studentPhoto)}" onerror="this.parentElement.innerHTML='<div class=&quot;photo-placeholder&quot;><i class=&quot;fas fa-user&quot;></i></div>'">` : 
-                                            `<div class="photo-placeholder"><i class="fas fa-user"></i></div>`
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="label-cell">Student Name</td>
-                                <td class="value-cell" style="font-weight:700;font-size:12px;">${esc(s.name)}</td>
-                                <td class="label-cell">Father's Name</td>
-                                <td class="value-cell">${esc(s.father_name||'-')}</td>
-                            </tr>
-                            <tr>
-                                <td class="label-cell">Mother's Name</td>
-                                <td class="value-cell">${esc(s.mother_name||'-')}</td>
-                                <td class="label-cell">Date of Birth</td>
-                                <td class="value-cell">${s.dob ? new Date(s.dob).toLocaleDateString('en-IN', {day:'2-digit', month:'2-digit', year:'numeric'}) : '-'}</td>
-                            </tr>
-                            <tr>
-                                <td class="label-cell">Session</td>
-                                <td class="value-cell">${esc(s.session||'-')}</td>
-                                <td class="label-cell">Class</td>
-                                <td class="value-cell">${esc(s.class||'-')}${s.section ? ' - ' + esc(s.section) : ''}</td>
-                            </tr>
-                            <tr>
-                                <td class="label-cell">Exam Roll No</td>
-                                <td class="value-cell">${esc(s.exam_roll_no||'-')}</td>
-                                <td class="label-cell">Status</td>
-                                <td class="value-cell">${marksheets.length > 0 ? ' ACTIVE' : ' PENDING'}</td>
-                            </tr>
-                        </table>
-                        
-                        <!-- MARKSHEETS - WITHOUT RESULT DECLARED COLUMN -->
-                        <div class="marksheet-heading">AVAILABLE MARKSHEETS (${marksheets.length})</div>
-                        <table class="marksheet-table">
-                            <thead>
-                                <tr>
-                                    <th style="width:25px;">#</th>
-                                    <th>Exam Type</th>
-                                    <th style="width:55px;">Session</th>
-                                    <th style="width:45px;">Class</th>
-                                    <th>Marksheet URL</th>
-                                    <th style="width:85px;">QR Code</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${marksheetRows || '<tr><td colspan="6" style="text-align:center;padding:20px;">No marksheets available</td></tr>'}
-                            </tbody>
-                        </table>
-                        
-                        <!-- SIGNATURE AREA -->
-                        <div class="signature-area">
-                            <div class="signature-box">
-                                <div class="line"></div>
-                                <strong>Class Teacher</strong>
-                            </div>
-                            <div class="signature-box">
-                                <div class="line"></div>
-                                <strong>Principal</strong>
-                            </div>
+                        <div class="signature-box">
+                            <div class="line"></div>
+                            <strong>Principal</strong>
                         </div>
                     </div>
                     
-                    <!-- SECURITY TEXT - 3 TIMES IN ONE LINE -->
+                    <!-- SECURITY TEXT -->
                     <div class="security-text-line">
-                        GSSS SHILLA OFFICIAL DOCUMENT &nbsp;&nbsp;|&nbsp;&nbsp; GSSS SHILLA OFFICIAL DOCUMENT &nbsp;&nbsp;|&nbsp;&nbsp; GSSS SHILLA OFFICIAL DOCUMENT
+                        GSSS SHILLA OFFICIAL DOCUMENT&nbsp;&nbsp;|&nbsp;&nbsp;GSSS SHILLA OFFICIAL DOCUMENT&nbsp;&nbsp;|&nbsp;&nbsp;GSSS SHILLA OFFICIAL DOCUMENT
                     </div>
                     
                     <!-- FOOTER -->
@@ -802,7 +803,7 @@ async function printStudent(studentId) {
                             <strong>Time:</strong> ${new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'})}
                         </div>
                         <div class="footer-center">
-                            <strong> Downloaded by:</strong> ${esc(downloadedBy)}<br>
+                            <strong>Downloaded by:</strong> ${esc(downloadedBy)}<br>
                             <span style="font-size:7px;color:#94a3b8;">Authorized Signatory</span>
                         </div>
                         <div class="footer-right">
@@ -815,11 +816,9 @@ async function printStudent(studentId) {
             </html>
         `);
         pw.document.close();
-        setTimeout(() => { pw.focus(); pw.print(); }, 1200);
+        setTimeout(() => { pw.focus(); pw.print(); }, 1500);
     } catch(e) { showToast(e.message,'error'); }
 }
-
-    
 async function printClassStudents() {
     try {
         const session = document.getElementById('sessionFilter').value; const params = new URLSearchParams({limit: 100}); if (session) params.set('session', session);
