@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify Document - GSS School Shilla</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="shortcut icon" href="logo.png" type="image/x-icon">
     <style>
         :root {
-            --primary: #04eec1;
-            --primary-light: #1eaa;
-            --secondary: #2063ee;
+            --primary: #0d1b2a;
+            --primary-light: #1b3a5c;
+            --secondary: #2d5a8a;
             --accent: #e8b84b;
             --accent-light: #f5d78a;
             --accent-dark: #c9972b;
@@ -22,7 +23,7 @@
             --text: #1a2332;
             --text-light: #5a6a7e;
             --success: #16a34a;
-            --success-light: #dttce7;
+            --success-light: #dcfce7;
             --danger: #dc2626;
             --danger-light: #fee2e2;
             --warning: #f59e0b;
@@ -85,16 +86,165 @@
             letter-spacing: 1px;
         }
         .verify-header p {
-            color: rgba(255,255,255,0.5);
+            color: rgba(255,255,255,0.6);
             font-size: 11px;
             letter-spacing: 2px;
             text-transform: uppercase;
             margin-top: 3px;
         }
+        .provisional-badge {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            padding: 5px 20px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px dashed #92400e;
+            margin-top: 10px;
+        }
 
         /* BODY */
         .verify-body {
             padding: 30px 25px;
+        }
+
+        /* SCANNER OPTIONS */
+        .scanner-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .scan-option {
+            background: var(--off-white);
+            border: 2px solid var(--gray-light);
+            border-radius: var(--radius-sm);
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .scan-option:hover {
+            border-color: var(--accent);
+            background: #fef8ed;
+        }
+        .scan-option .scan-icon {
+            font-size: 30px;
+            color: var(--accent-dark);
+            margin-bottom: 8px;
+        }
+        .scan-option h4 {
+            font-size: 13px;
+            color: var(--text);
+            margin-bottom: 3px;
+        }
+        .scan-option p {
+            font-size: 10px;
+            color: var(--gray);
+        }
+
+        /* CAMERA MODAL */
+        .camera-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+        .camera-modal.active {
+            display: flex;
+        }
+        .camera-modal video {
+            max-width: 100%;
+            max-height: 60vh;
+            border-radius: 10px;
+            border: 3px solid var(--accent);
+        }
+        .camera-modal .camera-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .camera-modal .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-scan {
+            background: var(--accent);
+            color: var(--white);
+        }
+        .btn-close-camera {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        /* SCANNER SECTION */
+        .scanner-section {
+            background: var(--off-white);
+            border: 2px dashed var(--gray-light);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .scanner-section .scan-icon {
+            font-size: 40px;
+            color: var(--accent-dark);
+            margin-bottom: 10px;
+        }
+        .scanner-section h4 {
+            font-size: 14px;
+            color: var(--text);
+            margin-bottom: 5px;
+        }
+        .scanner-section p {
+            font-size: 11px;
+            color: var(--gray);
+            margin-bottom: 12px;
+        }
+        .scanner-section input[type="file"] {
+            display: none;
+        }
+        .scan-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--accent);
+            color: var(--white);
+            border: none;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+        .scan-btn:hover {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
+        }
+        .scan-preview {
+            margin-top: 10px;
+            display: none;
+        }
+        .scan-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            border: 2px solid var(--accent);
         }
 
         /* ICON */
@@ -204,6 +354,30 @@
             line-height: 1.5;
         }
 
+        .provisional-notice {
+            background: var(--warning-light);
+            border: 1px solid #fde68a;
+            border-left: 4px solid var(--warning);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin: 10px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 12px;
+            color: #92400e;
+        }
+        .provisional-notice i {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .provisional-notice strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+
         .invalid-box {
             background: var(--danger-light);
             border: 1px solid #fecaca;
@@ -247,6 +421,15 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(201, 151, 43, 0.3);
         }
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--text-light);
+            border: 1px solid var(--gray-light);
+        }
+        .btn-secondary:hover {
+            background: var(--gray-light);
+            color: var(--text);
+        }
 
         /* FOOTER */
         .verify-footer {
@@ -283,6 +466,7 @@
             .student-details-table td { padding: 8px; font-size: 11px; }
             .student-details-table td:first-child { font-size: 9px; }
             .verify-header h1 { font-size: 16px; }
+            .scanner-options { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -293,13 +477,32 @@
             <img src="logo.png" alt="School Logo" class="logo" onerror="this.style.display='none'">
             <h1>Govt. Sr. Sec. School Shilla</h1>
             <p>Document Verification</p>
+            <span class="provisional-badge"><i class="fas fa-file-alt"></i> Provisional Certificate</span>
         </div>
 
         <!-- BODY -->
         <div class="verify-body" id="verifyBody">
-            <div class="loading-state">
-                <i class="fas fa-spinner fa-spin"></i>
-                <p>Verifying document...</p>
+            <!-- SCANNER OPTIONS -->
+            <div class="scanner-options" id="scannerOptions">
+                <div class="scan-option" onclick="openCamera()">
+                    <div class="scan-icon"><i class="fas fa-camera"></i></div>
+                    <h4>Camera Scan</h4>
+                    <p>Use mobile camera</p>
+                </div>
+                <div class="scan-option" onclick="document.getElementById('qrFileInput').click()">
+                    <div class="scan-icon"><i class="fas fa-image"></i></div>
+                    <h4>Upload Image</h4>
+                    <p>Upload QR code photo</p>
+                </div>
+            </div>
+            <input type="file" id="qrFileInput" accept="image/*" onchange="scanQRCode(event)" style="display:none;">
+
+            <!-- VERIFICATION RESULT -->
+            <div id="verificationResult">
+                <div class="loading-state">
+                    <i class="fas fa-qrcode"></i>
+                    <p>Scan QR code to verify</p>
+                </div>
             </div>
         </div>
 
@@ -309,47 +512,173 @@
         </div>
     </div>
 
+    <!-- CAMERA MODAL -->
+    <div class="camera-modal" id="cameraModal">
+        <video id="cameraVideo" autoplay playsinline></video>
+        <div class="camera-controls">
+            <button class="btn btn-scan" onclick="captureAndScan()">
+                <i class="fas fa-camera"></i> Scan QR
+            </button>
+            <button class="btn btn-close-camera" onclick="closeCamera()">
+                <i class="fas fa-times"></i> Close
+            </button>
+        </div>
+    </div>
+
     <script>
+        let cameraStream = null;
+        
         document.addEventListener('DOMContentLoaded', function() {
-            const verifyBody = document.getElementById('verifyBody');
-            
-            // Get data from URL
+            // Check if data is in URL (from QR scan by mobile)
             const urlParams = new URLSearchParams(window.location.search);
             const dataParam = urlParams.get('data');
             
-            if (!dataParam) {
-                showInvalid('No verification data found. This document cannot be verified.');
-                return;
+            if (dataParam) {
+                processVerification(dataParam);
             }
+        });
+        
+        // ============================================================
+        // CAMERA SCANNER
+        // ============================================================
+        async function openCamera() {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+                const video = document.getElementById('cameraVideo');
+                video.srcObject = cameraStream;
+                document.getElementById('cameraModal').classList.add('active');
+            } catch(e) {
+                alert('Camera access denied. Please use Upload Image option.');
+            }
+        }
+        
+        function closeCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            document.getElementById('cameraModal').classList.remove('active');
+        }
+        
+        function captureAndScan() {
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+            
+            if (code && code.data) {
+                closeCamera();
+                extractAndVerify(code.data);
+            } else {
+                alert('QR code not detected. Please try again.');
+            }
+        }
+        
+        // ============================================================
+        // FILE UPLOAD SCANNER
+        // ============================================================
+        function scanQRCode(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height);
+                    
+                    if (code && code.data) {
+                        extractAndVerify(code.data);
+                    } else {
+                        showInvalid('Could not read QR code. Please try a clearer image.');
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // ============================================================
+        // EXTRACT DATA FROM QR URL
+        // ============================================================
+        function extractAndVerify(qrData) {
+            try {
+                // Check if it's a URL with data parameter
+                if (qrData.includes('verify.html') || qrData.includes('data=')) {
+                    const url = new URL(qrData);
+                    const dataParam = url.searchParams.get('data');
+                    if (dataParam) {
+                        processVerification(dataParam);
+                        return;
+                    }
+                }
+                
+                // Try direct JSON
+                const data = JSON.parse(qrData);
+                if (data.student_id && data.name) {
+                    showVerified(data);
+                    return;
+                }
+                
+                showInvalid('QR code does not contain valid verification data.');
+            } catch(e) {
+                showInvalid('Could not read QR code data.');
+            }
+        }
+        
+        // ============================================================
+        // PROCESS VERIFICATION
+        // ============================================================
+        function processVerification(dataParam) {
             try {
                 const data = JSON.parse(decodeURIComponent(dataParam));
                 
-                // Validate required fields
                 if (!data.student_id || !data.name) {
                     showInvalid('Invalid verification data. This document may be tampered.');
                     return;
                 }
                 
-                // Show verified content
-                setTimeout(() => {
-                    showVerified(data);
-                }, 1000);
-                
+                showVerified(data);
             } catch(e) {
                 showInvalid('Invalid verification data format. This document may be tampered.');
             }
-        });
+        }
         
+        // ============================================================
+        // SHOW VERIFIED
+        // ============================================================
         function showVerified(data) {
-            const verifyBody = document.getElementById('verifyBody');
+            const resultDiv = document.getElementById('verificationResult');
+            document.getElementById('scannerOptions').style.display = 'none';
             
-            verifyBody.innerHTML = `
+            resultDiv.innerHTML = `
                 <div class="verify-icon verified">
                     <i class="fas fa-check-circle"></i>
                 </div>
                 <h2 class="verify-title">Document Verified</h2>
                 <p class="verify-subtitle">This is an authentic provisional marksheet issued by GSSS Shilla</p>
+                
+                <div class="provisional-notice">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>Provisional Certificate</strong>
+                        <p style="font-size:11px;color:#92400e;">This is a provisional marksheet and not the original document.</p>
+                    </div>
+                </div>
                 
                 <table class="student-details-table">
                     ${data.student_id ? `<tr><td>Student ID</td><td>${escapeHtml(data.student_id)}</td></tr>` : ''}
@@ -371,18 +700,24 @@
                     </div>
                 </div>
                 
-                <div style="text-align:center;">
+                <div style="text-align:center;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
                     <button class="btn btn-primary" onclick="window.print()">
                         <i class="fas fa-print"></i> Print Verification
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetVerification()">
+                        <i class="fas fa-redo"></i> Verify Another
                     </button>
                 </div>
             `;
         }
         
+        // ============================================================
+        // SHOW INVALID
+        // ============================================================
         function showInvalid(message) {
-            const verifyBody = document.getElementById('verifyBody');
+            const resultDiv = document.getElementById('verificationResult');
             
-            verifyBody.innerHTML = `
+            resultDiv.innerHTML = `
                 <div class="verify-icon invalid">
                     <i class="fas fa-times-circle"></i>
                 </div>
@@ -397,10 +732,27 @@
                     </div>
                 </div>
                 
-                <p style="font-size:11px;color:var(--gray);text-align:center;margin-top:10px;">
-                    If you believe this is an error, please contact the school administration.
-                </p>
+                <div style="text-align:center;">
+                    <button class="btn btn-secondary" onclick="resetVerification()">
+                        <i class="fas fa-redo"></i> Try Again
+                    </button>
+                </div>
             `;
+        }
+        
+        // ============================================================
+        // RESET
+        // ============================================================
+        function resetVerification() {
+            const resultDiv = document.getElementById('verificationResult');
+            resultDiv.innerHTML = `
+                <div class="loading-state">
+                    <i class="fas fa-qrcode"></i>
+                    <p>Scan QR code to verify</p>
+                </div>
+            `;
+            document.getElementById('scannerOptions').style.display = 'grid';
+            document.getElementById('qrFileInput').value = '';
         }
         
         function escapeHtml(text) {
