@@ -441,6 +441,10 @@ document.getElementById('publishDate').value=new Date().toISOString().split('T')
                         // ================================================================
 // QR CODE GENERATE FUNCTION (Base64)
 // ================================================================
+                    
+                        // ================================================================
+// QR CODE GENERATE FUNCTION (Base64)
+// ================================================================
 function generateQRCodeBase64(url) {
     return new Promise((resolve) => {
         const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(url)}`;
@@ -458,7 +462,7 @@ function generateQRCodeBase64(url) {
 }
 
 // ================================================================
-// PRINT STUDENT - Main function called from UI
+// PRINT STUDENT - Complete Original Marksheet with Footer at Bottom
 // ================================================================
 async function printStudent(studentId) {
     try {
@@ -517,8 +521,15 @@ async function printStudent(studentId) {
             <head>
                 <title>Original Marksheet - ${esc(s.name)}</title>
                 <style>
-                    @page { size: A4; margin: 10mm; }
-                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    @page { 
+                        size: A4; 
+                        margin: 10mm; 
+                    }
+                    * { 
+                        margin: 0; 
+                        padding: 0; 
+                        box-sizing: border-box; 
+                    }
                     html, body { 
                         font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; 
                         color: #1a2332; 
@@ -890,7 +901,7 @@ async function printStudent(studentId) {
                         z-index: 1;
                     }
                     
-                    /* ===== FOOTER - AT THE BOTTOM ===== */
+                    /* ===== FOOTER - AT THE BOTTOM OF SAME PAGE ===== */
                     .page-footer {
                         margin-top: auto;
                         padding-top: 8px;
@@ -938,7 +949,7 @@ async function printStudent(studentId) {
                         <div class="heading-box">Original Marksheet</div>
                     </div>
                     
-                    <!-- CONTENT AREA -->
+                    <!-- CONTENT AREA - This grows to push footer down -->
                     <div class="content-area">
                         <!-- STUDENT INFORMATION -->
                         <table class="student-info-table">
@@ -1015,7 +1026,7 @@ async function printStudent(studentId) {
                                 }
                             </div>
                             <div class="verification-text">
-                                <strong>🔍 Scan to Verify</strong>
+                                <strong>Scan to Verify</strong>
                                 <p class="scan-label">Scan this QR code to verify the authenticity of this marksheet.</p>
                                 <p>This document is digitally verified and issued by Govt. Sr. Sec. School Shilla.</p>
                                 <p style="font-size:6.5px;color:#94a3b8;margin-top:2px;">Verification ID: ${esc(s.student_id)}-${Date.now().toString().substring(8)}</p>
@@ -1038,7 +1049,7 @@ async function printStudent(studentId) {
                         </div>
                     </div>
                     
-                    <!-- ===== FOOTER - AT THE BOTTOM ===== -->
+                    <!-- ===== FOOTER - AT THE BOTTOM OF SAME PAGE ===== -->
                     <div class="page-footer">
                         <div class="footer-left">
                             <strong>Print Date:</strong> ${new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})}<br>
@@ -1061,7 +1072,6 @@ async function printStudent(studentId) {
         setTimeout(() => { pw.focus(); pw.print(); }, 2000);
     } catch(e) { showToast(e.message,'error'); }
 }
-                        
 
                     
 async function printClassStudents() {
