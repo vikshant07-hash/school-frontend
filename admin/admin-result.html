@@ -433,7 +433,11 @@ document.getElementById('publishDate').value=new Date().toISOString().split('T')
 // ================================================================
 // PRINT STUDENT - SECURE WATERMARK + LOGO + DECLARATION
 // ================================================================
-async function printStudent(studentId) {
+
+              // ================================================================
+// ORIGINAL MARKSHEET GENERATION - With Footer at Bottom
+// ================================================================
+async function printOriginalMarksheet(studentId) {
     try {
         const data = await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`);
         const s = data.data.student;
@@ -488,7 +492,7 @@ async function printStudent(studentId) {
             <!DOCTYPE html>
             <html>
             <head>
-                <title>Student Marksheet - ${esc(s.name)}</title>
+                <title>Original Marksheet - ${esc(s.name)}</title>
                 <style>
                     @page { size: A4; margin: 10mm; }
                     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -500,20 +504,27 @@ async function printStudent(studentId) {
                         padding: 0;
                         -webkit-print-color-adjust: exact !important;
                         print-color-adjust: exact !important;
+                        height: 100%;
+                    }
+                    
+                    body {
+                        display: flex;
+                        flex-direction: column;
+                        min-height: 100vh;
                     }
                     
                     .page-container {
                         width: 100%;
                         max-width: 186mm;
                         margin: 0 auto;
-                        position: relative;
-                        background: #ffffff;
-                        padding: 6px;
-                        border-radius: 6px;
-                        min-height: 250mm;
+                        padding: 10px 12px;
+                        flex: 1;
+                        display: flex;
+                        flex-direction: column;
+                        min-height: 100vh;
                     }
                     
-                    /* ===== SECURE WATERMARK LAYER ===== */
+                    /* ===== WATERMARK LAYER ===== */
                     .watermark-container {
                         position: fixed;
                         top: 0;
@@ -525,94 +536,45 @@ async function printStudent(studentId) {
                         overflow: hidden;
                     }
                     
-                    /* Pattern 1 - Gold Diagonal Lines */
                     .watermark-pattern-1 {
                         position: absolute;
                         inset: 0;
                         background-image: 
-                            repeating-linear-gradient(45deg, 
-                                transparent, 
-                                transparent 35px, 
-                                rgba(201, 151, 43, 0.025) 35px, 
-                                rgba(201, 151, 43, 0.025) 37px
-                            ),
-                            repeating-linear-gradient(135deg, 
-                                transparent, 
-                                transparent 35px, 
-                                rgba(201, 151, 43, 0.015) 35px, 
-                                rgba(201, 151, 43, 0.015) 37px
-                            );
+                            repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(201,151,43,0.025) 35px, rgba(201,151,43,0.025) 37px),
+                            repeating-linear-gradient(135deg, transparent, transparent 35px, rgba(201,151,43,0.015) 35px, rgba(201,151,43,0.015) 37px);
                         background-size: 50px 50px;
                     }
-                    
-                    /* Pattern 2 - Blue Diagonal Lines */
                     .watermark-pattern-2 {
                         position: absolute;
                         inset: 0;
                         background-image: 
-                            repeating-linear-gradient(-45deg, 
-                                transparent, 
-                                transparent 40px, 
-                                rgba(74, 138, 244, 0.02) 40px, 
-                                rgba(74, 138, 244, 0.02) 42px
-                            ),
-                            repeating-linear-gradient(45deg, 
-                                transparent, 
-                                transparent 40px, 
-                                rgba(74, 138, 244, 0.015) 40px, 
-                                rgba(74, 138, 244, 0.015) 42px
-                            );
+                            repeating-linear-gradient(-45deg, transparent, transparent 40px, rgba(74,138,244,0.02) 40px, rgba(74,138,244,0.02) 42px),
+                            repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(74,138,244,0.015) 40px, rgba(74,138,244,0.015) 42px);
                         background-size: 56px 56px;
                     }
-                    
-                    /* Pattern 3 - Purple Dot Pattern */
                     .watermark-pattern-3 {
                         position: absolute;
                         inset: 0;
                         background-image: 
-                            radial-gradient(circle at 25px 25px, rgba(139, 92, 246, 0.02) 2px, transparent 2px),
-                            radial-gradient(circle at 75px 75px, rgba(139, 92, 246, 0.02) 2px, transparent 2px),
-                            radial-gradient(circle at 50px 50px, rgba(139, 92, 246, 0.015) 1.5px, transparent 1.5px);
+                            radial-gradient(circle at 25px 25px, rgba(139,92,246,0.02) 2px, transparent 2px),
+                            radial-gradient(circle at 75px 75px, rgba(139,92,246,0.02) 2px, transparent 2px),
+                            radial-gradient(circle at 50px 50px, rgba(139,92,246,0.015) 1.5px, transparent 1.5px);
                         background-size: 100px 100px;
                     }
-                    
-                    /* Pattern 4 - Green Crosshatch */
                     .watermark-pattern-4 {
                         position: absolute;
                         inset: 0;
                         background-image: 
-                            repeating-linear-gradient(0deg, 
-                                transparent, 
-                                transparent 30px, 
-                                rgba(16, 185, 129, 0.015) 30px, 
-                                rgba(16, 185, 129, 0.015) 31px
-                            ),
-                            repeating-linear-gradient(90deg, 
-                                transparent, 
-                                transparent 30px, 
-                                rgba(16, 185, 129, 0.015) 30px, 
-                                rgba(16, 185, 129, 0.015) 31px
-                            );
+                            repeating-linear-gradient(0deg, transparent, transparent 30px, rgba(16,185,129,0.015) 30px, rgba(16,185,129,0.015) 31px),
+                            repeating-linear-gradient(90deg, transparent, transparent 30px, rgba(16,185,129,0.015) 30px, rgba(16,185,129,0.015) 31px);
                         background-size: 62px 62px;
                     }
-                    
-                    /* Pattern 5 - Pink Wavy */
                     .watermark-pattern-5 {
                         position: absolute;
                         inset: 0;
                         background-image: 
-                            repeating-linear-gradient(25deg, 
-                                transparent, 
-                                transparent 45px, 
-                                rgba(236, 72, 153, 0.015) 45px, 
-                                rgba(236, 72, 153, 0.015) 46px
-                            ),
-                            repeating-linear-gradient(115deg, 
-                                transparent, 
-                                transparent 45px, 
-                                rgba(236, 72, 153, 0.015) 45px, 
-                                rgba(236, 72, 153, 0.015) 46px
-                            );
+                            repeating-linear-gradient(25deg, transparent, transparent 45px, rgba(236,72,153,0.015) 45px, rgba(236,72,153,0.015) 46px),
+                            repeating-linear-gradient(115deg, transparent, transparent 45px, rgba(236,72,153,0.015) 45px, rgba(236,72,153,0.015) 46px);
                         background-size: 64px 64px;
                     }
                     
@@ -633,49 +595,81 @@ async function printStudent(studentId) {
                     /* ===== HEADER ===== */
                     .page-header {
                         text-align: center;
-                        margin-bottom: 8px;
-                        padding-bottom: 6px;
+                        padding-bottom: 8px;
                         border-bottom: 3px solid #c9972b;
                         position: relative;
                         z-index: 1;
                         background: rgba(255,255,255,0.95);
+                        flex-shrink: 0;
                     }
                     .page-header .logo {
-                        width: 45px;
-                        height: 45px;
+                        width: 50px;
+                        height: 50px;
                         border-radius: 50%;
                         border: 3px solid #c9972b;
                         padding: 3px;
                         background: white;
-                        margin: 0 auto 3px;
+                        margin: 0 auto 4px;
                         display: block;
                     }
                     .page-header .school-name {
                         font-family: 'Georgia', serif;
-                        font-size: 14px;
+                        font-size: 16px;
                         font-weight: 900;
                         text-transform: uppercase;
                         letter-spacing: 1.5px;
                         color: #0d1b2a;
                     }
                     .page-header .school-tagline {
-                        font-size: 6.5px;
+                        font-size: 7px;
                         color: #5a6a7e;
                         letter-spacing: 2px;
                         text-transform: uppercase;
-                        margin-bottom: 3px;
                     }
                     .page-header .heading-box {
                         display: inline-block;
                         background: #0d1b2a;
                         color: #fff;
-                        padding: 2px 18px;
+                        padding: 3px 22px;
                         border-radius: 25px;
-                        font-size: 9px;
+                        font-size: 11px;
                         font-weight: 700;
                         letter-spacing: 2px;
                         text-transform: uppercase;
                         border: 2px solid #c9972b;
+                        margin-top: 4px;
+                    }
+                    
+                    /* ===== CONTENT - GROWS TO PUSH FOOTER DOWN ===== */
+                    .content-area {
+                        flex: 1;
+                        position: relative;
+                        z-index: 1;
+                    }
+                    
+                    /* ===== DECLARATION BOX ===== */
+                    .declaration-box {
+                        background: #fef8ed;
+                        border-left: 5px solid #c9972b;
+                        border-right: 5px solid #c9972b;
+                        padding: 8px 14px;
+                        margin: 8px 0 10px;
+                        border-radius: 4px;
+                        font-size: 10px;
+                        color: #1a2332;
+                        font-style: italic;
+                        text-align: center;
+                        position: relative;
+                        z-index: 1;
+                        background: rgba(254, 248, 237, 0.92);
+                    }
+                    .declaration-box i {
+                        color: #10b981;
+                        margin-right: 6px;
+                        font-size: 12px;
+                    }
+                    .declaration-box strong {
+                        color: #0d1b2a;
                     }
                     
                     /* ===== STUDENT INFO TABLE ===== */
@@ -683,13 +677,12 @@ async function printStudent(studentId) {
                         width: 100%;
                         border-collapse: collapse;
                         margin: 6px 0;
-                        border: 3px solid #0d1b2a;
-                        background: rgba(255,255,255,0.95);
+                        border: 2px solid #0d1b2a;
                         position: relative;
                         z-index: 1;
                     }
                     .student-info-table td {
-                        padding: 4px 6px;
+                        padding: 5px 8px;
                         border: 1px solid #d1d5db;
                         font-size: 8.5px;
                         vertical-align: middle;
@@ -741,51 +734,23 @@ async function printStudent(studentId) {
                         color: #cbd5e1;
                     }
                     
-                    /* ===== DECLARATION BOX - BETWEEN STUDENT INFO & MARKSHEET ===== */
-                    .declaration-box {
-                        background: #fef8ed;
-                        border-left: 5px solid #c9972b;
-                        border-right: 5px solid #c9972b;
-                        padding: 6px 14px;
-                        margin: 6px 0 8px;
-                        border-radius: 4px;
-                        font-size: 9.5px;
-                        color: #1a2332;
-                        font-style: italic;
-                        text-align: center;
-                        position: relative;
-                        z-index: 1;
-                        background: rgba(254, 248, 237, 0.92);
-                        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-                    }
-                    .declaration-box i {
-                        color: #10b981;
-                        margin-right: 6px;
-                        font-size: 11px;
-                    }
-                    .declaration-box strong {
-                        color: #0d1b2a;
-                    }
-                    
                     /* ===== MARKSHEET TABLE ===== */
                     .marksheet-heading {
-                        font-size: 9px;
+                        font-size: 10px;
                         font-weight: 700;
-                        margin: 6px 0 4px;
-                        padding: 3px 10px;
+                        margin: 8px 0 4px;
+                        padding: 4px 10px;
                         background: #fef8ed;
                         border-left: 4px solid #c9972b;
                         letter-spacing: 1px;
                         position: relative;
                         z-index: 1;
-                        background: rgba(254, 248, 237, 0.92);
                     }
                     .marksheet-table {
                         width: 100%;
                         border-collapse: collapse;
-                        margin: 3px 0;
+                        margin: 4px 0;
                         border: 2px solid #0d1b2a;
-                        background: rgba(255,255,255,0.95);
                         position: relative;
                         z-index: 1;
                     }
@@ -803,6 +768,7 @@ async function printStudent(studentId) {
                         padding: 4px 6px;
                         border: 1px solid #d1d5db;
                         font-size: 7.5px;
+                        text-align: center;
                     }
                     
                     /* ===== VERIFICATION SECTION ===== */
@@ -810,14 +776,13 @@ async function printStudent(studentId) {
                         display: flex;
                         align-items: center;
                         gap: 12px;
-                        margin: 10px 0;
+                        margin: 10px 0 12px;
                         padding: 8px 14px;
                         border: 2px solid #c9972b;
                         background: #fef8ed;
                         border-radius: 8px;
                         position: relative;
                         z-index: 1;
-                        background: rgba(254, 248, 237, 0.92);
                     }
                     .verification-qr {
                         width: 65px;
@@ -842,14 +807,9 @@ async function printStudent(studentId) {
                     }
                     .verification-text strong {
                         display: block;
-                        font-size: 9.5px;
+                        font-size: 10px;
                         margin-bottom: 2px;
                         color: #c9972b;
-                    }
-                    .verification-text p {
-                        font-size: 7px;
-                        color: #5a6a7e;
-                        margin: 1px 0;
                     }
                     .verification-text .scan-label {
                         font-size: 8.5px;
@@ -857,16 +817,20 @@ async function printStudent(studentId) {
                         color: #0d1b2a;
                         letter-spacing: 1px;
                     }
+                    .verification-text p {
+                        font-size: 7px;
+                        color: #5a6a7e;
+                        margin: 1px 0;
+                    }
                     
-                    /* ===== SIGNATURE AREA - ONLY PRINCIPAL ===== */
+                    /* ===== SIGNATURE - ONLY PRINCIPAL ===== */
                     .signature-area {
                         display: flex;
                         justify-content: flex-end;
-                        margin-top: 14px;
+                        margin-top: 10px;
                         padding-top: 6px;
                         position: relative;
                         z-index: 1;
-                        background: rgba(255,255,255,0.95);
                     }
                     .signature-box {
                         text-align: center;
@@ -890,49 +854,49 @@ async function printStudent(studentId) {
                     /* ===== SECURITY TEXT ===== */
                     .security-text-line {
                         text-align: center;
-                        font-size: 5px;
-                        color: rgba(13, 27, 42, 0.18);
+                        font-size: 5.5px;
+                        color: rgba(13, 27, 42, 0.2);
                         letter-spacing: 2px;
-                        margin: 6px 0 4px;
-                        padding: 2px 0;
+                        margin: 8px 0 6px;
+                        padding: 3px 0;
                         border-top: 1px dashed #cbd5e1;
                         border-bottom: 1px dashed #cbd5e1;
                         text-transform: uppercase;
                         white-space: nowrap;
                         position: relative;
                         z-index: 1;
-                        background: rgba(255,255,255,0.9);
                     }
                     
-                    /* ===== FOOTER ===== */
+                    /* ===== FOOTER - AT THE BOTTOM ===== */
                     .page-footer {
-                        margin-top: 4px;
-                        padding-top: 4px;
+                        margin-top: auto;
+                        padding-top: 8px;
                         border-top: 2px solid #c9972b;
-                        font-size: 6px;
+                        font-size: 6.5px;
                         color: #64748b;
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
-                        background: rgba(255,255,255,0.95);
                         page-break-inside: avoid;
                         position: relative;
                         z-index: 1;
+                        background: rgba(255,255,255,0.95);
+                        flex-shrink: 0;
                     }
                     .footer-left { text-align: left; }
                     .footer-center { text-align: center; font-weight: 600; color: #0d1b2a; }
                     .footer-right { text-align: right; }
                     
                     @media print {
-                        html, body { margin: 0; padding: 0; }
-                        .page-container { max-width: 100%; }
+                        html, body { margin: 0; padding: 0; height: 100%; }
+                        .page-container { max-width: 100%; min-height: 100vh; }
                         .page-footer { page-break-inside: avoid; }
                         .watermark-container { display: block !important; }
                     }
                 </style>
             </head>
             <body>
-                <!-- ===== WATERMARK LAYER - LOGO + SECURITY PATTERNS ===== -->
+                <!-- ===== WATERMARK LAYER ===== -->
                 <div class="watermark-container">
                     <div class="watermark-pattern-1"></div>
                     <div class="watermark-pattern-2"></div>
@@ -948,107 +912,110 @@ async function printStudent(studentId) {
                         <img src="logo(1).png" class="logo" onerror="this.style.display='none'">
                         <div class="school-name">Govt. Sr. Sec. School Shilla</div>
                         <div class="school-tagline">Shilla • District Solan • Himachal Pradesh - 173229</div>
-                        <div class="heading-box">Student Marksheet</div>
+                        <div class="heading-box">Original Marksheet</div>
                     </div>
                     
-                    <!-- STUDENT INFORMATION -->
-                    <table class="student-info-table">
-                        <tr>
-                            <td class="label-cell">Student ID</td>
-                            <td class="value-cell">${esc(s.student_id)}</td>
-                            <td class="label-cell">APAAR ID</td>
-                            <td class="value-cell">${esc(s.apaar_id||'-')}</td>
-                            <td class="photo-cell" rowspan="5">
-                                <div class="photo-box">
-                                    ${studentPhoto ? 
-                                        `<img src="${esc(studentPhoto)}" onerror="this.parentElement.innerHTML='<div class=&quot;photo-placeholder&quot;><i class=&quot;fas fa-user&quot;></i></div>'">` : 
-                                        `<div class="photo-placeholder"><i class="fas fa-user"></i></div>`
-                                    }
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label-cell">Student Name</td>
-                            <td class="value-cell" style="font-weight:700;font-size:10px;">${esc(s.name)}</td>
-                            <td class="label-cell">Father's Name</td>
-                            <td class="value-cell">${esc(s.father_name||'-')}</td>
-                        </tr>
-                        <tr>
-                            <td class="label-cell">Mother's Name</td>
-                            <td class="value-cell">${esc(s.mother_name||'-')}</td>
-                            <td class="label-cell">Date of Birth</td>
-                            <td class="value-cell">${s.dob ? new Date(s.dob).toLocaleDateString('en-IN', {day:'2-digit', month:'2-digit', year:'numeric'}) : '-'}</td>
-                        </tr>
-                        <tr>
-                            <td class="label-cell">Session</td>
-                            <td class="value-cell">${esc(s.session||'-')}</td>
-                            <td class="label-cell">Class</td>
-                            <td class="value-cell">${esc(s.class||'-')}${s.section ? ' - ' + esc(s.section) : ''}</td>
-                        </tr>
-                        <tr>
-                            <td class="label-cell">Exam Roll No</td>
-                            <td class="value-cell">${esc(s.exam_roll_no||'-')}</td>
-                            <td class="label-cell">Status</td>
-                            <td class="value-cell"><span style="color:#10b981;font-weight:700;">Active</span></td>
-                        </tr>
-                    </table>
-                    
-                    <!-- ===== DECLARATION BOX - BETWEEN STUDENT INFO & MARKSHEET ===== -->
-                    <div class="declaration-box">
-                        <i class="fas fa-check-circle"></i> 
-                        This is to certify that <strong>${esc(s.name)}</strong> (Student ID: ${esc(s.student_id)}) has successfully completed the <strong>${esc(s.session||'')}</strong> session and is declared <strong>PASS</strong>.
-                    </div>
-                    
-                    <!-- MARKSHEETS -->
-                    <div class="marksheet-heading">Available Marksheets (${marksheets.length})</div>
-                    <table class="marksheet-table">
-                        <thead>
+                    <!-- CONTENT AREA -->
+                    <div class="content-area">
+                        <!-- STUDENT INFORMATION -->
+                        <table class="student-info-table">
                             <tr>
-                                <th style="width:22px;">#</th>
-                                <th>Exam Type</th>
-                                <th style="width:45px;">Session</th>
-                                <th style="width:35px;">Class</th>
-                                <th>Marksheet URL</th>
-                                <th style="width:62px;">QR Code</th>
+                                <td class="label-cell">Student ID</td>
+                                <td class="value-cell">${esc(s.student_id)}</td>
+                                <td class="label-cell">APAAR ID</td>
+                                <td class="value-cell">${esc(s.apaar_id||'-')}</td>
+                                <td class="photo-cell" rowspan="5">
+                                    <div class="photo-box">
+                                        ${studentPhoto ? 
+                                            `<img src="${esc(studentPhoto)}" onerror="this.parentElement.innerHTML='<div class=&quot;photo-placeholder&quot;><i class=&quot;fas fa-user&quot;></i></div>'">` : 
+                                            `<div class="photo-placeholder"><i class="fas fa-user"></i></div>`
+                                        }
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            ${marksheetRows || '<tr><td colspan="6" style="text-align:center;padding:10px;">No marksheets available</td></tr>'}
-                        </tbody>
-                    </table>
-                    
-                    <!-- VERIFICATION SECTION - NO PERSONAL DETAILS -->
-                    <div class="verification-section">
-                        <div class="verification-qr">
-                            ${verificationQRBase64 ? 
-                                `<img src="${verificationQRBase64}" alt="Verification QR">` : 
-                                '<div style="font-size:6px;color:#94a3b8;text-align:center;">QR N/A</div>'
-                            }
+                            <tr>
+                                <td class="label-cell">Student Name</td>
+                                <td class="value-cell" style="font-weight:700;font-size:10px;">${esc(s.name)}</td>
+                                <td class="label-cell">Father's Name</td>
+                                <td class="value-cell">${esc(s.father_name||'-')}</td>
+                            </tr>
+                            <tr>
+                                <td class="label-cell">Mother's Name</td>
+                                <td class="value-cell">${esc(s.mother_name||'-')}</td>
+                                <td class="label-cell">Date of Birth</td>
+                                <td class="value-cell">${s.dob ? new Date(s.dob).toLocaleDateString('en-IN', {day:'2-digit', month:'2-digit', year:'numeric'}) : '-'}</td>
+                            </tr>
+                            <tr>
+                                <td class="label-cell">Session</td>
+                                <td class="value-cell">${esc(s.session||'-')}</td>
+                                <td class="label-cell">Class</td>
+                                <td class="value-cell">${esc(s.class||'-')}${s.section ? ' - ' + esc(s.section) : ''}</td>
+                            </tr>
+                            <tr>
+                                <td class="label-cell">Exam Roll No</td>
+                                <td class="value-cell">${esc(s.exam_roll_no||'-')}</td>
+                                <td class="label-cell">Status</td>
+                                <td class="value-cell"><span style="color:#10b981;font-weight:700;">PASS</span></td>
+                            </tr>
+                        </table>
+                        
+                        <!-- ===== DECLARATION BOX ===== -->
+                        <div class="declaration-box">
+                            <i class="fas fa-check-circle"></i> 
+                            This is to certify that <strong>${esc(s.name)}</strong> (Student ID: ${esc(s.student_id)}) has successfully completed the <strong>${esc(s.session||'')}</strong> session and is declared <strong>PASS</strong>.
                         </div>
-                        <div class="verification-text">
-                            <strong>🔍 Scan to Verify</strong>
-                            <p class="scan-label">Scan this QR code to verify the authenticity of this marksheet.</p>
-                            <p>This document is digitally verified and issued by Govt. Sr. Sec. School Shilla.</p>
-                            <p style="font-size:6.5px;color:#94a3b8;margin-top:2px;">Verification ID: ${esc(s.student_id)}-${Date.now().toString().substring(8)}</p>
+                        
+                        <!-- MARKSHEETS -->
+                        <div class="marksheet-heading">📄 Available Marksheets (${marksheets.length})</div>
+                        <table class="marksheet-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:22px;">#</th>
+                                    <th>Exam Type</th>
+                                    <th style="width:45px;">Session</th>
+                                    <th style="width:35px;">Class</th>
+                                    <th>Marksheet URL</th>
+                                    <th style="width:62px;">QR Code</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${marksheetRows || '<tr><td colspan="6" style="text-align:center;padding:10px;">No marksheets available</td></tr>'}
+                            </tbody>
+                        </table>
+                        
+                        <!-- VERIFICATION SECTION -->
+                        <div class="verification-section">
+                            <div class="verification-qr">
+                                ${verificationQRBase64 ? 
+                                    `<img src="${verificationQRBase64}" alt="Verification QR">` : 
+                                    '<div style="font-size:6px;color:#94a3b8;text-align:center;">QR N/A</div>'
+                                }
+                            </div>
+                            <div class="verification-text">
+                                <strong>🔍 Scan to Verify</strong>
+                                <p class="scan-label">Scan this QR code to verify the authenticity of this marksheet.</p>
+                                <p>This document is digitally verified and issued by Govt. Sr. Sec. School Shilla.</p>
+                                <p style="font-size:6.5px;color:#94a3b8;margin-top:2px;">Verification ID: ${esc(s.student_id)}-${Date.now().toString().substring(8)}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- SIGNATURE - ONLY PRINCIPAL -->
+                        <div class="signature-area">
+                            <div class="signature-box">
+                                <img src="principal.png" class="signature-img" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'line\\'></div><strong>Principal</strong>'">
+                                <div class="line"></div>
+                                <strong>Principal</strong>
+                                <div style="font-size:6.5px;color:#94a3b8;">Govt. Sr. Sec. School Shilla</div>
+                            </div>
+                        </div>
+                        
+                        <!-- SECURITY TEXT -->
+                        <div class="security-text-line">
+                            GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT
                         </div>
                     </div>
                     
-                    <!-- SIGNATURE AREA - ONLY PRINCIPAL -->
-                    <div class="signature-area">
-                        <div class="signature-box">
-                            <img src="principal.png" class="signature-img" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'line\\'></div><strong>Principal</strong>'">
-                            <div class="line"></div>
-                            <strong>Principal</strong>
-                            <div style="font-size:6.5px;color:#94a3b8;">Govt. Sr. Sec. School Shilla</div>
-                        </div>
-                    </div>
-                    
-                    <!-- SECURITY TEXT -->
-                    <div class="security-text-line">
-                        GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT
-                    </div>
-                    
-                    <!-- FOOTER -->
+                    <!-- ===== FOOTER - AT THE BOTTOM ===== -->
                     <div class="page-footer">
                         <div class="footer-left">
                             <strong>Print Date:</strong> ${new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})}<br>
@@ -1070,24 +1037,12 @@ async function printStudent(studentId) {
         pw.document.close();
         setTimeout(() => { pw.focus(); pw.print(); }, 2000);
     } catch(e) { showToast(e.message,'error'); }
-}
+}                  
+                    
+                        
+                        
+                        
 
-// QR Code Generate Function (Base64)
-function generateQRCodeBase64(url) {
-    return new Promise((resolve) => {
-        const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(url)}`;
-        
-        fetch(apiUrl)
-            .then(res => res.blob())
-            .then(blob => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.onerror = () => resolve(null);
-                reader.readAsDataURL(blob);
-            })
-            .catch(() => resolve(null));
-    });
-}                    
                     
 async function printClassStudents() {
     try {
