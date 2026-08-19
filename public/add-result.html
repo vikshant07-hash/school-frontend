@@ -1,4 +1,3 @@
-<!-- public/admin/result-dashboard.html - COMPLETE FIXED -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +6,6 @@
     <title>Result Management - GSSS Shilla</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
-        /* ===== CSS - SAME AS BEFORE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f4f8; color: #0f172a; }
         .result-dashboard { max-width: 1400px; margin: 0 auto; padding: 20px; }
@@ -101,6 +99,7 @@
         .action-btn.view { background: #e0e7ff; color: #3730a3; }
         .action-btn.unpublish { background: #fef3c7; color: #92400e; }
         .action-btn.download { background: #e0e7ff; color: #3730a3; }
+        .action-btn.generate { background: #fef3c7; color: #92400e; }
         .upload-section, .publish-section, .table-container { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 25px; }
         .upload-section h3, .publish-section h3 { font-size: 18px; color: #1e3a8a; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
         .upload-section h3 i, .publish-section h3 i { color: #1a56db; }
@@ -147,6 +146,204 @@
         .alert-box.success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
         .alert-box.info { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
         .retry-btn { background: none; border: none; color: #1a56db; font-weight: 600; cursor: pointer; text-decoration: underline; }
+        
+        /* ===== MARKSHEET GENERATION STYLES ===== */
+        .marksheet-preview {
+            background: white;
+            border: 2px solid #1e3a8a;
+            border-radius: 12px;
+            padding: 40px;
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 600px;
+        }
+        .marksheet-preview .watermark-container {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+        .marksheet-preview .watermark-pattern {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(30, 58, 138, 0.04) 20px, rgba(30, 58, 138, 0.04) 22px),
+                repeating-linear-gradient(-45deg, transparent, transparent 20px, rgba(30, 58, 138, 0.04) 20px, rgba(30, 58, 138, 0.04) 22px);
+            background-size: 40px 40px;
+        }
+        .marksheet-preview .watermark-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 120px;
+            font-weight: 900;
+            color: rgba(30, 58, 138, 0.06);
+            letter-spacing: 20px;
+            transform: rotate(-30deg);
+            font-family: 'Segoe UI', sans-serif;
+            pointer-events: none;
+        }
+        .marksheet-header {
+            text-align: center;
+            border-bottom: 3px solid #1e3a8a;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .marksheet-header .school-name {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1e3a8a;
+            letter-spacing: 2px;
+        }
+        .marksheet-header .school-address {
+            font-size: 14px;
+            color: #64748b;
+        }
+        .marksheet-header .marksheet-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a56db;
+            margin-top: 8px;
+            letter-spacing: 4px;
+        }
+        .marksheet-header .declaration {
+            font-size: 14px;
+            color: #334155;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #f0f4f8;
+            border-radius: 8px;
+            font-style: italic;
+            border-left: 4px solid #1a56db;
+        }
+        .marksheet-body {
+            position: relative;
+            z-index: 1;
+        }
+        .marksheet-body .student-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 30px;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .marksheet-body .student-info .info-item {
+            display: flex;
+            gap: 6px;
+            font-size: 14px;
+        }
+        .marksheet-body .student-info .info-item label {
+            font-weight: 600;
+            color: #334155;
+            min-width: 100px;
+        }
+        .marksheet-body .student-info .info-item span {
+            color: #0f172a;
+        }
+        .marksheet-body .marks-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+        .marksheet-body .marks-table th {
+            background: #1e3a8a;
+            color: white;
+            padding: 10px 12px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .marksheet-body .marks-table td {
+            padding: 8px 12px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+        .marksheet-body .marks-table tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+        .marksheet-body .marks-table .total-row td {
+            font-weight: 700;
+            background: #e0e7ff !important;
+            border-top: 2px solid #1e3a8a;
+        }
+        .marksheet-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+            position: relative;
+            z-index: 1;
+        }
+        .marksheet-footer .qr-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .marksheet-footer .qr-section .qr-code {
+            width: 100px;
+            height: 100px;
+            background: #f1f5f9;
+            border: 2px solid #1e3a8a;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            color: #1e3a8a;
+        }
+        .marksheet-footer .qr-section .qr-label {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .marksheet-footer .signature-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .marksheet-footer .signature-section .signature-img {
+            width: 160px;
+            height: 60px;
+            object-fit: contain;
+        }
+        .marksheet-footer .signature-section .signature-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 600;
+            border-top: 1px solid #cbd5e1;
+            padding-top: 4px;
+        }
+        .marksheet-footer .date-section {
+            text-align: right;
+            font-size: 13px;
+            color: #475569;
+        }
+        .marksheet-footer .date-section .label {
+            font-weight: 600;
+            color: #334155;
+        }
+        .marksheet-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
         @media (max-width: 768px) {
             .student-grid { grid-template-columns: 1fr; }
             .upload-grid { grid-template-columns: 1fr; }
@@ -157,6 +354,10 @@
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .dashboard-header { flex-direction: column; align-items: stretch; }
             .modal-content { padding: 20px; margin: 10px; }
+            .marksheet-preview { padding: 20px; }
+            .marksheet-body .student-info { grid-template-columns: 1fr; }
+            .marksheet-footer { flex-direction: column; align-items: center; gap: 20px; }
+            .marksheet-footer .date-section { text-align: center; }
         }
         @media (max-width: 480px) {
             .stats-grid { grid-template-columns: 1fr 1fr; }
@@ -186,6 +387,7 @@
         <button class="tab-btn" data-tab="students" onclick="switchTab('students')"><i class="fas fa-users"></i> Students</button>
         <button class="tab-btn" data-tab="upload" onclick="switchTab('upload')"><i class="fas fa-upload"></i> Upload</button>
         <button class="tab-btn" data-tab="publish" onclick="switchTab('publish')"><i class="fas fa-check-circle"></i> Publish</button>
+        <button class="tab-btn" data-tab="generate" onclick="switchTab('generate')"><i class="fas fa-file-pdf"></i> Generate Marksheet</button>
     </div>
 
     <div id="tab-dashboard" class="tab-content active">
@@ -264,7 +466,6 @@
         </div>
     </div>
 
-    <!-- ===== PUBLISH TAB - FIXED ===== -->
     <div id="tab-publish" class="tab-content">
         <div class="publish-section">
             <h3><i class="fas fa-check-circle"></i> Publish Results</h3>
@@ -332,6 +533,116 @@
             </div>
         </div>
     </div>
+
+    <!-- ===== GENERATE MARKSHEET TAB ===== -->
+    <div id="tab-generate" class="tab-content">
+        <div class="upload-section">
+            <h3><i class="fas fa-file-pdf"></i> Generate Marksheet</h3>
+            <p style="color:#64748b; margin-bottom:16px;">Select a student and exam type to generate a secure marksheet with watermark and QR verification.</p>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+                <div class="form-group">
+                    <label>Select Student <span class="required">*</span></label>
+                    <select id="generateStudentSelect" class="form-control" style="padding:10px 14px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px;">
+                        <option value="">Select Student</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Exam Type <span class="required">*</span></label>
+                    <select id="generateExamType" class="form-control" style="padding:10px 14px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px;">
+                        <option value="">Select Exam</option>
+                        <option value="Annual Examination">Annual Examination</option>
+                        <option value="Half Yearly Examination">Half Yearly</option>
+                        <option value="Pre Board">Pre Board</option>
+                        <option value="Board Examination">Board Examination</option>
+                        <option value="Final Examination">Final Examination</option>
+                        <option value="Monthly Test">Monthly Test</option>
+                        <option value="Unit Test">Unit Test</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <button class="btn btn-primary" onclick="loadMarksheetForGenerate()"><i class="fas fa-search"></i> Load Marksheet</button>
+                <button class="btn btn-success" onclick="generateMarksheet()"><i class="fas fa-file-pdf"></i> Generate & Download PDF</button>
+                <button class="btn btn-warning" onclick="printMarksheet()"><i class="fas fa-print"></i> Print</button>
+            </div>
+
+            <div id="marksheetPreviewContainer" style="display:none;">
+                <div id="marksheetPreview" class="marksheet-preview">
+                    <!-- Watermark -->
+                    <div class="watermark-container">
+                        <div class="watermark-pattern"></div>
+                        <div class="watermark-text">GSSS SHILLA</div>
+                    </div>
+
+                    <!-- Header -->
+                    <div class="marksheet-header">
+                        <div class="school-name">🏫 GSSS SHILLA</div>
+                        <div class="school-address">Government Senior Secondary School, Shilla, Himachal Pradesh</div>
+                        <div class="marksheet-title">📜 MARKSHEET</div>
+                        <div class="declaration">
+                            <i class="fas fa-check-circle" style="color:#16a34a;"></i>
+                            This is to certify that the student has successfully completed the examination and is declared PASS.
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="marksheet-body">
+                        <div class="student-info" id="marksheetStudentInfo">
+                            <div class="info-item"><label>Name:</label><span id="mName">-</span></div>
+                            <div class="info-item"><label>Student ID:</label><span id="mStudentId">-</span></div>
+                            <div class="info-item"><label>Father's Name:</label><span id="mFatherName">-</span></div>
+                            <div class="info-item"><label>Class:</label><span id="mClass">-</span></div>
+                            <div class="info-item"><label>Session:</label><span id="mSession">-</span></div>
+                            <div class="info-item"><label>Roll No:</label><span id="mRollNo">-</span></div>
+                            <div class="info-item"><label>Exam Type:</label><span id="mExamType">-</span></div>
+                            <div class="info-item"><label>Declaration Date:</label><span id="mDeclarationDate">-</span></div>
+                        </div>
+
+                        <table class="marks-table" id="marksTable">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Marks Obtained</th>
+                                    <th>Max Marks</th>
+                                    <th>Grade</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="marksTableBody">
+                                <tr><td colspan="5" style="text-align:center; color:#94a3b8;">No marks data available</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="marksheet-footer">
+                        <div class="qr-section">
+                            <div class="qr-code" id="qrCodeDisplay">
+                                <i class="fas fa-qrcode"></i>
+                            </div>
+                            <div class="qr-label">🔍 Scan to Verify</div>
+                        </div>
+                        <div class="signature-section">
+                            <img src="/api/placeholder/160/60" alt="Principal's Signature" class="signature-img" id="principalSignature" />
+                            <div class="signature-label">(Principal's Signature)</div>
+                        </div>
+                        <div class="date-section">
+                            <div class="label">Date of Declaration:</div>
+                            <div id="mFooterDate">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="marksheet-actions">
+                    <button class="btn btn-success" onclick="downloadMarksheetPDF()"><i class="fas fa-download"></i> Download PDF</button>
+                    <button class="btn btn-primary" onclick="printMarksheet()"><i class="fas fa-print"></i> Print</button>
+                    <button class="btn btn-outline" onclick="closeMarksheetPreview()"><i class="fas fa-times"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Modals -->
@@ -391,11 +702,13 @@
 // ================================================================
 const API_BASE = 'https://gsssshilla.onrender.com/api/admin/results';
 const PUBLIC_API = 'https://gsssshilla.onrender.com/api/results';
+const PRINCIPAL_SIGNATURE_URL = '/principal.png'; // Path to principal signature image
 
 let currentClass = 10;
 let currentPage = 1;
 let publishClass = 10;
 const PAGE_SIZE = 20;
+let currentMarksheetData = null;
 
 // ================================================================
 //  UTILITIES
@@ -481,6 +794,7 @@ function switchTab(tab) {
     if (tab === 'students') loadStudents(currentClass);
     if (tab === 'upload') loadRecentUploads();
     if (tab === 'publish') loadPublishableStudents(publishClass);
+    if (tab === 'generate') loadStudentsForGenerate();
 }
 
 // ================================================================
@@ -704,6 +1018,7 @@ function renderStudentDetail(data) {
                             ? `<button class="action-btn unpublish" onclick="unpublishSingle(${m.id})" title="Unpublish"><i class="fas fa-eye-slash"></i> Unpublish</button>`
                             : `<button class="action-btn publish" onclick="publishSingleFromModal(${m.id})" title="Publish"><i class="fas fa-check-circle"></i> Publish</button>`}
                         <button class="action-btn delete" onclick="deleteExam(${m.id})" title="Delete"><i class="fas fa-trash"></i></button>
+                        <button class="action-btn generate" onclick="generateMarksheetFromModal(${m.id})" title="Generate Marksheet"><i class="fas fa-file-pdf"></i> Generate</button>
                     </div>
                 </div>`;
         }).join('');
@@ -908,7 +1223,7 @@ async function loadRecentUploads() {
 }
 
 // ================================================================
-//  PUBLISH SECTION - FIXED
+//  PUBLISH SECTION
 // ================================================================
 function selectPublishClass(classNum) {
     publishClass = classNum;
@@ -930,9 +1245,7 @@ async function loadPublishableStudents(classNum) {
         if (session) url += `&session=${encodeURIComponent(session)}`;
         if (examFilter) url += `&exam_type=${encodeURIComponent(examFilter)}`;
         
-        console.log('🔍 Fetching marksheets from:', url);
         const data = await apiCall(url);
-        console.log('📊 Marksheets data:', data);
         
         const countEl = document.getElementById('publishCount');
         const total = data.pagination?.total ?? data.data?.length ?? 0;
@@ -958,6 +1271,7 @@ async function loadPublishableStudents(classNum) {
                             }
                             <button class="action-btn view" onclick="viewMarksheet(${m.id})"><i class="fas fa-eye"></i> View</button>
                             <button class="action-btn download" onclick="downloadMarksheet(${m.id})"><i class="fas fa-download"></i> Download</button>
+                            <button class="action-btn generate" onclick="generateMarksheetFromId(${m.id})"><i class="fas fa-file-pdf"></i> Generate</button>
                         </div>
                     </td>
                 </tr>
@@ -969,7 +1283,6 @@ async function loadPublishableStudents(classNum) {
             </td></tr>`;
         }
     } catch (error) {
-        console.error('Error loading publishable students:', error);
         tbody.innerHTML = `
             <tr><td colspan="6" style="text-align:center; color:#dc2626; padding:20px;">
                 <i class="fas fa-exclamation-circle"></i> ${esc(error.message || 'Failed to load data.')}
@@ -985,19 +1298,15 @@ function toggleAllPublish() {
 }
 
 // ================================================================
-//  MARKSHEET OPERATIONS - ✅ FIXED WITH DIRECT CLOUDINARY URL
+//  MARKSHEET OPERATIONS - VIEW, DOWNLOAD, PUBLISH, UNPUBLISH
 // ================================================================
 
-// ✅ VIEW marksheet - Direct Cloudinary URL from API
 function viewMarksheet(id) {
     showToast('Loading marksheet...', 'info');
-    
-    // Fetch marksheet details first
     fetch(`${API_BASE}/marksheets/${id}`)
         .then(res => res.json())
         .then(data => {
             if (data.success && data.data.cloudinary_url) {
-                // ✅ Open Cloudinary URL directly in new tab
                 window.open(data.data.cloudinary_url, '_blank');
                 showToast('Marksheet opened!', 'success');
             } else {
@@ -1010,15 +1319,12 @@ function viewMarksheet(id) {
         });
 }
 
-// ✅ DOWNLOAD marksheet - Direct Cloudinary URL with download flag
 function downloadMarksheet(id) {
     showToast('Preparing download...', 'info');
-    
     fetch(`${API_BASE}/marksheets/${id}`)
         .then(res => res.json())
         .then(data => {
             if (data.success && data.data.cloudinary_url) {
-                // ✅ Add download flag to Cloudinary URL
                 const downloadUrl = data.data.cloudinary_url.replace('/upload/', '/upload/fl_attachment/');
                 window.open(downloadUrl, '_blank');
                 showToast('Download started!', 'success');
@@ -1032,9 +1338,6 @@ function downloadMarksheet(id) {
         });
 }
 
-// ================================================================
-//  PUBLISH SINGLE
-// ================================================================
 async function publishSingle(id) {
     const publishDate = document.getElementById('publishDate').value;
     if (!publishDate) {
@@ -1096,9 +1399,6 @@ async function confirmPublishFromModal(id, overlay) {
     }
 }
 
-// ================================================================
-//  UNPUBLISH SINGLE
-// ================================================================
 async function unpublishSingle(id) {
     if (!confirm('🔒 Unpublish this marksheet?\nIt will be hidden from the public result portal.')) return;
     showToast('⏳ Unpublishing...', 'info');
@@ -1117,9 +1417,6 @@ async function unpublishSingle(id) {
     }
 }
 
-// ================================================================
-//  DELETE EXAM
-// ================================================================
 async function deleteExam(id) {
     if (!confirm('Delete this marksheet? This action cannot be undone.')) return;
     showToast('Deleting...', 'info');
@@ -1136,9 +1433,6 @@ async function deleteExam(id) {
     }
 }
 
-// ================================================================
-//  BULK PUBLISH
-// ================================================================
 async function bulkPublish() {
     const publishDate = document.getElementById('publishDate').value;
     if (!publishDate) {
@@ -1172,6 +1466,290 @@ async function bulkPublish() {
 }
 
 // ================================================================
+//  GENERATE MARKSHEET - NEW FEATURE
+// ================================================================
+
+// Load students for generate dropdown
+async function loadStudentsForGenerate() {
+    const select = document.getElementById('generateStudentSelect');
+    const session = document.getElementById('sessionFilter').value;
+    
+    // Clear existing options except first
+    select.innerHTML = '<option value="">Select Student</option>';
+    
+    try {
+        // Fetch all students (or filtered by session)
+        let url = `${API_BASE}/students?limit=100`;
+        if (session) url += `&session=${encodeURIComponent(session)}`;
+        
+        const data = await apiCall(url);
+        if (data.data && data.data.length > 0) {
+            data.data.forEach((student) => {
+                const option = document.createElement('option');
+                option.value = student.student_id;
+                option.textContent = `${student.student_id} - ${student.name} (Class ${student.class})`;
+                select.appendChild(option);
+            });
+        } else {
+            select.innerHTML = '<option value="">No students found</option>';
+        }
+    } catch (error) {
+        console.error('Error loading students for generate:', error);
+        select.innerHTML = '<option value="">Error loading students</option>';
+        showToast('Failed to load students', 'error');
+    }
+}
+
+// Load marksheet data for generation
+async function loadMarksheetForGenerate() {
+    const studentId = document.getElementById('generateStudentSelect').value;
+    const examType = document.getElementById('generateExamType').value;
+    
+    if (!studentId) {
+        showToast('Please select a student', 'warning');
+        return;
+    }
+    if (!examType) {
+        showToast('Please select an exam type', 'warning');
+        return;
+    }
+    
+    showToast('Loading marksheet data...', 'info');
+    
+    try {
+        // First get student details
+        const studentData = await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`);
+        const student = studentData.data.student;
+        
+        // Find the specific marksheet
+        const marksheets = studentData.data.marksheets || [];
+        const marksheet = marksheets.find(m => m.exam_type === examType);
+        
+        if (!marksheet) {
+            showToast(`No marksheet found for ${examType}`, 'warning');
+            return;
+        }
+        
+        // Get marksheet details with marks data
+        const marksheetData = await apiCall(`${API_BASE}/marksheets/${marksheet.id}`);
+        
+        // Store for later use
+        currentMarksheetData = {
+            student: student,
+            marksheet: marksheet,
+            marks: marksheetData.data.marks || []
+        };
+        
+        // Render the marksheet preview
+        renderMarksheetPreview(currentMarksheetData);
+        
+        document.getElementById('marksheetPreviewContainer').style.display = 'block';
+        showToast('Marksheet loaded successfully!', 'success');
+        
+    } catch (error) {
+        console.error('Error loading marksheet:', error);
+        showToast(error.message || 'Failed to load marksheet data', 'error');
+    }
+}
+
+// Render marksheet preview with watermark, QR, and signature
+function renderMarksheetPreview(data) {
+    const { student, marksheet, marks } = data;
+    
+    // Set student info
+    document.getElementById('mName').textContent = student.name || '-';
+    document.getElementById('mStudentId').textContent = student.student_id || '-';
+    document.getElementById('mFatherName').textContent = student.father_name || '-';
+    document.getElementById('mClass').textContent = student.class || '-';
+    document.getElementById('mSession').textContent = student.session || '-';
+    document.getElementById('mRollNo').textContent = student.exam_roll_no || '-';
+    document.getElementById('mExamType').textContent = marksheet.exam_type || '-';
+    
+    // Set declaration date
+    const declDate = marksheet.declaration_date || marksheet.updated_at || new Date().toISOString();
+    document.getElementById('mDeclarationDate').textContent = formatDate(declDate);
+    document.getElementById('mFooterDate').textContent = formatDate(declDate);
+    
+    // Set principal signature
+    const signatureImg = document.getElementById('principalSignature');
+    if (PRINCIPAL_SIGNATURE_URL) {
+        signatureImg.src = PRINCIPAL_SIGNATURE_URL;
+        signatureImg.onerror = function() {
+            // Fallback if image not found
+            this.outerHTML = `<div style="font-family: 'Brush Script MT', cursive; font-size: 24px; color: #1e3a8a; border-top: 2px solid #1e3a8a; padding-top: 4px;">Dr. Principal</div>`;
+        };
+    }
+    
+    // Generate QR Code (simulated)
+    const qrContainer = document.getElementById('qrCodeDisplay');
+    const verificationId = `${student.student_id}_${marksheet.id}_${Date.now()}`;
+    qrContainer.innerHTML = generateQRCode(verificationId);
+    
+    // Render marks table
+    renderMarksTable(marks);
+}
+
+// Generate QR Code (simulated with styled div)
+function generateQRCode(data) {
+    // In production, use a QR code library like qrcode.js
+    // For demo, we'll create a visual representation
+    return `
+        <div style="width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#f8fafc; border-radius:6px; padding:8px;">
+            <div style="display:grid; grid-template-columns:repeat(7, 1fr); gap:2px; width:80px; height:80px;">
+                ${Array.from({length: 49}, (_, i) => {
+                    const isBlack = (i % 3 === 0) || (i % 5 === 0) || (i % 7 === 0) || 
+                                   (i > 20 && i < 30) || (i % 2 === 0 && i > 10 && i < 40);
+                    return `<div style="background:${isBlack ? '#1e3a8a' : '#f8fafc'}; border-radius:1px;"></div>`;
+                }).join('')}
+            </div>
+            <span style="font-size:8px; color:#94a3b8; margin-top:4px;">${data.substring(0, 12)}...</span>
+        </div>
+    `;
+}
+
+// Render marks table
+function renderMarksTable(marks) {
+    const tbody = document.getElementById('marksTableBody');
+    
+    if (!marks || marks.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8;">No marks data available</td></tr>`;
+        return;
+    }
+    
+    let totalMarks = 0;
+    let maxMarks = 0;
+    
+    const rows = marks.map((m) => {
+        const marksObtained = parseFloat(m.marks_obtained) || 0;
+        const maxMarksVal = parseFloat(m.max_marks) || 100;
+        totalMarks += marksObtained;
+        maxMarks += maxMarksVal;
+        
+        const percentage = (marksObtained / maxMarksVal) * 100;
+        let grade = 'F';
+        let status = '❌ Fail';
+        
+        if (percentage >= 90) { grade = 'A+'; status = '✅ Pass'; }
+        else if (percentage >= 75) { grade = 'A'; status = '✅ Pass'; }
+        else if (percentage >= 60) { grade = 'B'; status = '✅ Pass'; }
+        else if (percentage >= 45) { grade = 'C'; status = '✅ Pass'; }
+        else if (percentage >= 33) { grade = 'D'; status = '✅ Pass'; }
+        else { grade = 'F'; status = '❌ Fail'; }
+        
+        return `
+            <tr>
+                <td style="text-align:left; font-weight:500;">${esc(m.subject_name || 'Subject')}</td>
+                <td>${marksObtained}</td>
+                <td>${maxMarksVal}</td>
+                <td><span class="badge ${grade === 'F' ? 'badge-danger' : 'badge-success'}">${grade}</span></td>
+                <td>${status}</td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Add total row
+    const overallPercentage = maxMarks > 0 ? (totalMarks / maxMarks) * 100 : 0;
+    const overallGrade = overallPercentage >= 90 ? 'A+' :
+                        overallPercentage >= 75 ? 'A' :
+                        overallPercentage >= 60 ? 'B' :
+                        overallPercentage >= 45 ? 'C' :
+                        overallPercentage >= 33 ? 'D' : 'F';
+    const overallStatus = overallPercentage >= 33 ? '✅ PASS' : '❌ FAIL';
+    
+    tbody.innerHTML = rows + `
+        <tr class="total-row">
+            <td style="text-align:right; font-weight:700;">TOTAL</td>
+            <td style="font-weight:700;">${totalMarks}</td>
+            <td style="font-weight:700;">${maxMarks}</td>
+            <td><span class="badge ${overallGrade === 'F' ? 'badge-danger' : 'badge-success'}">${overallGrade}</span></td>
+            <td style="font-weight:700;">${overallStatus}</td>
+        </tr>
+    `;
+}
+
+// Generate marksheet from modal
+async function generateMarksheetFromModal(marksheetId) {
+    try {
+        const data = await apiCall(`${API_BASE}/marksheets/${marksheetId}`);
+        if (data.success && data.data) {
+            // Get student details
+            const studentData = await apiCall(`${API_BASE}/students/${encodeURIComponent(data.data.student_id)}`);
+            
+            currentMarksheetData = {
+                student: studentData.data.student,
+                marksheet: data.data,
+                marks: data.data.marks || []
+            };
+            
+            renderMarksheetPreview(currentMarksheetData);
+            document.getElementById('marksheetPreviewContainer').style.display = 'block';
+            
+            // Switch to generate tab
+            switchTab('generate');
+            showToast('Marksheet loaded for generation!', 'success');
+        }
+    } catch (error) {
+        showToast(error.message || 'Failed to load marksheet', 'error');
+    }
+}
+
+// Generate marksheet from ID (for publish tab)
+async function generateMarksheetFromId(marksheetId) {
+    await generateMarksheetFromModal(marksheetId);
+}
+
+// Close marksheet preview
+function closeMarksheetPreview() {
+    document.getElementById('marksheetPreviewContainer').style.display = 'none';
+    currentMarksheetData = null;
+}
+
+// Print marksheet
+function printMarksheet() {
+    const preview = document.getElementById('marksheetPreview');
+    if (!preview) return;
+    
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    if (!printWindow) {
+        showToast('Please allow popups for printing', 'warning');
+        return;
+    }
+    
+    const styles = document.querySelector('style').innerHTML;
+    const content = preview.outerHTML;
+    
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+            <head><title>Marksheet</title>
+            <style>${styles}</style>
+            <style>
+                body { padding: 20px; background: white; }
+                .marksheet-preview { box-shadow: none; border: 1px solid #ddd; }
+                .watermark-container { opacity: 0.3; }
+                .marksheet-actions { display: none; }
+            </style>
+            </head>
+            <body>${content}</body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    
+    setTimeout(() => {
+        printWindow.print();
+    }, 500);
+}
+
+// Download marksheet as PDF (using html2pdf or similar)
+function downloadMarksheetPDF() {
+    showToast('PDF download feature - requires html2pdf library', 'info');
+    // In production, use html2pdf or jsPDF with html2canvas
+    // For now, we'll use print with save as PDF
+    printMarksheet();
+}
+
+// ================================================================
 //  REFRESH ALL
 // ================================================================
 function refreshAll() {
@@ -1200,6 +1778,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadStudents(currentClass);
     loadRecentUploads();
     loadPublishableStudents(publishClass);
+    loadStudentsForGenerate();
 });
 </script>
 
