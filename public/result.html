@@ -27,12 +27,12 @@
   --danger-light: #fee2e2;
   --warning: #f59e0b;
   --warning-light: #fef3c7;
-  --shadow-sm: 0 4px 20px rgba(0,0,0,0.06);
-  --shadow-md: 0 8px 40px rgba(0,0,0,0.10);
-  --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
+  --shadow-sm: 0 4px 20px rgba(0,0,0,0.04);
+  --shadow-md: 0 8px 40px rgba(0,0,0,0.08);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.12);
   --radius: 20px;
   --radius-sm: 12px;
-  --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -51,7 +51,9 @@ body {
 a { text-decoration: none; color: inherit; }
 ul { list-style: none; }
 
-/* NAVBAR */
+/* ============================================================
+   NAVBAR - Notification Page Style
+============================================================ */
 .navbar {
   position: fixed;
   top: 0;
@@ -78,13 +80,42 @@ body { padding-top: 70px; }
 
 .nav-links { display: flex; align-items: center; gap: 4px; }
 .nav-links > li { position: relative; }
-.nav-links > li > a { color: var(--text-light); font-size: 14px; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: var(--transition); display: flex; align-items: center; gap: 4px; }
+.nav-links > li > a {
+  color: var(--text-light); font-size: 14px; font-weight: 500; padding: 8px 16px; border-radius: 8px;
+  transition: var(--transition); display: flex; align-items: center; gap: 4px;
+}
 .nav-links > li > a:hover { color: var(--primary); background: var(--off-white); }
 .nav-links > li > a.active { color: var(--accent-dark); background: #fef8ed; }
+.nav-links > li > a i.fa-chevron-down { font-size: 10px; opacity: 0.5; }
+
+.dropdown-menu-nav {
+  position: absolute; top: calc(100% + 8px); left: 0; width: 200px; background: var(--white);
+  border-radius: var(--radius-sm); box-shadow: var(--shadow-lg); border: 1px solid var(--gray-light);
+  opacity: 0; visibility: hidden; transform: translateY(-10px); transition: var(--transition);
+  padding: 6px 0; z-index: 100;
+}
+.nav-links > li:hover .dropdown-menu-nav { opacity: 1; visibility: visible; transform: translateY(0); }
+.dropdown-menu-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 18px; font-size: 13px; font-weight: 500; color: var(--text); transition: var(--transition); }
+.dropdown-menu-nav a:hover { background: var(--off-white); color: var(--accent-dark); padding-left: 24px; }
+.dropdown-menu-nav a i { width: 18px; color: var(--accent-dark); font-size: 14px; }
 
 .nav-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-.login-btn { display: flex; align-items: center; gap: 8px; padding: 8px 20px; border: none; border-radius: 50px; background: var(--accent); color: var(--white); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: 'Inter', sans-serif; }
+.login-btn {
+  display: flex; align-items: center; gap: 8px; padding: 8px 20px; border: none; border-radius: 50px;
+  background: var(--accent); color: var(--white); font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: var(--transition); font-family: 'Inter', sans-serif;
+}
 .login-btn:hover { background: var(--accent-dark); transform: translateY(-2px); }
+.login-dropdown { position: relative; }
+.login-dropdown-menu {
+  position: absolute; top: calc(100% + 10px); right: 0; width: 200px; background: var(--white);
+  border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow-lg); border: 1px solid var(--gray-light);
+  opacity: 0; visibility: hidden; transform: translateY(-10px); transition: var(--transition);
+}
+.login-dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
+.login-dropdown-menu a { display: flex; align-items: center; gap: 10px; padding: 12px 18px; font-size: 13px; font-weight: 500; color: var(--text); border-bottom: 1px solid var(--gray-light); transition: var(--transition); }
+.login-dropdown-menu a:last-child { border-bottom: none; }
+.login-dropdown-menu a:hover { background: var(--off-white); color: var(--accent-dark); }
 
 .menu-toggle { display: none; flex-direction: column; gap: 5px; width: 40px; height: 40px; background: none; border: none; cursor: pointer; padding: 8px; }
 .menu-toggle .bar { display: block; width: 22px; height: 2px; background: var(--primary); transition: var(--transition); border-radius: 50px; }
@@ -98,17 +129,46 @@ body { padding-top: 70px; }
 @media (max-width: 900px) {
   .navbar { padding: 0 20px; height: 64px; }
   body { padding-top: 64px; }
-  .nav-links { position: fixed; top: 0; right: -100%; width: 280px; height: 100vh; background: var(--white); flex-direction: column; padding: 20px; gap: 2px; transition: right 0.3s ease; box-shadow: -8px 0 40px rgba(0,0,0,0.1); z-index: 10000; overflow-y: auto; }
+  .nav-links {
+    position: fixed; top: 0; right: -100%; width: 280px; height: 100vh; background: var(--white);
+    flex-direction: column; padding: 20px; gap: 2px; transition: right 0.3s ease;
+    box-shadow: -8px 0 40px rgba(0,0,0,0.1); z-index: 10000; overflow-y: auto;
+  }
   .nav-links.active { right: 0; }
-  .menu-toggle { display: flex; }
-  .nav-links > li > a { width: 100%; padding: 12px 16px; }
-  .desktop-login { display: none; }
+  .mobile-menu-header { display: flex !important; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--gray-light); margin-bottom: 12px; }
+  .mobile-menu-header .mobile-brand { display: flex; align-items: center; gap: 10px; }
+  .mobile-menu-header .mobile-brand img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; padding: 2px; }
+  .mobile-menu-header .mobile-brand span { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: var(--primary); }
+  .mobile-close-btn { display: flex !important; width: 36px; height: 36px; border: none; background: var(--off-white); border-radius: 50%; color: var(--text); font-size: 18px; cursor: pointer; align-items: center; justify-content: center; }
+  .mobile-close-btn:hover { background: var(--gray-light); }
+  .dropdown-menu-nav { position: static; width: 100%; box-shadow: none; border: none; padding: 0 0 0 16px; opacity: 1; visibility: visible; transform: none; display: none; background: transparent; }
+  .dropdown-menu-nav.show-mobile { display: block; }
+  .dropdown-menu-nav a { padding: 8px 14px; color: var(--text-light); }
+  .dropdown-menu-nav a:hover { background: var(--off-white); padding-left: 20px; }
+  .nav-links > li > a { width: 100%; padding: 12px 16px; border-radius: 8px; color: var(--text-light); font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+  .nav-links > li > a .dropdown-arrow { font-size: 12px; transition: var(--transition); }
+  .nav-links > li > a .dropdown-arrow.rotated { transform: rotate(180deg); }
+  .nav-links > li > a:hover { background: var(--off-white); color: var(--primary); }
+  .nav-links > li > a.active { background: #fef8ed; color: var(--accent-dark); }
+  .nav-links > li > a i:not(.dropdown-arrow) { width: 20px; text-align: center; font-size: 14px; color: var(--accent-dark); }
   .mobile-login-item { display: block !important; width: 100%; margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--gray-light); }
   .mobile-login-item .login-btn { width: 100%; justify-content: center; padding: 12px; }
+  .desktop-login { display: none !important; }
+  .menu-toggle { display: flex; }
 }
+.mobile-close-btn { display: none; }
+.mobile-menu-header { display: none; }
 .mobile-login-item { display: none; }
+@media (max-width: 480px) {
+  .logo-text .school-name { font-size: 14px; }
+  .logo img { width: 38px; height: 38px; }
+  .navbar { padding: 0 14px; height: 60px; }
+  body { padding-top: 60px; }
+}
 
-/* PAGE HEADER */
+/* ============================================================
+   PAGE HEADER
+============================================================ */
 .page-header {
   background: linear-gradient(135deg, var(--primary), var(--primary-light));
   padding: 50px 20px 40px;
@@ -117,7 +177,12 @@ body { padding-top: 70px; }
   position: relative;
   overflow: hidden;
 }
-.page-header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 50%, rgba(232, 184, 75, 0.05), transparent 60%); }
+.page-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(232, 184, 75, 0.05), transparent 60%);
+}
 .page-header h1 { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 800; color: var(--white); position: relative; z-index: 1; }
 .page-header h1 i { color: var(--accent-light); }
 .page-header p { color: rgba(255, 255, 255, 0.5); margin-top: 8px; font-size: 15px; position: relative; z-index: 1; }
@@ -125,7 +190,9 @@ body { padding-top: 70px; }
 /* CONTAINER */
 .container { max-width: 1100px; margin: 0 auto; padding: 30px 20px 60px; flex: 1; }
 
-/* ===== VERIFY BUTTON - Notification Page Style ===== */
+/* ============================================================
+   VERIFY BUTTON
+============================================================ */
 .verify-section {
   display: flex;
   justify-content: flex-end;
@@ -167,7 +234,9 @@ body { padding-top: 70px; }
   .verify-btn { width: 100%; justify-content: center; }
 }
 
-/* SECTION */
+/* ============================================================
+   CLASS SECTION
+============================================================ */
 .class-section { background: var(--white); border-radius: var(--radius); padding: 30px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-light); margin-bottom: 28px; }
 .section-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
 .section-header h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--primary); }
@@ -191,7 +260,9 @@ body { padding-top: 70px; }
 .click-hint { background: var(--accent); color: var(--white); padding: 5px 20px; border-radius: 50px; font-size: 13px; font-weight: 600; transition: var(--transition); display: flex; align-items: center; gap: 6px; }
 .class-card:hover .click-hint { background: var(--accent-dark); transform: scale(1.05); }
 
-/* SEARCH SECTION */
+/* ============================================================
+   SEARCH SECTION
+============================================================ */
 .search-section { background: var(--white); border-radius: var(--radius); padding: 32px 34px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-light); display: none; animation: fadeInUp 0.5s ease; }
 .search-section.active { display: block; }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
@@ -216,7 +287,9 @@ body { padding-top: 70px; }
 .btn-back { background: transparent; color: var(--accent-dark); border: 2px solid var(--accent); padding: 12px 24px; border-radius: 50px; font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 8px; }
 .btn-back:hover { background: var(--accent); color: var(--white); transform: translateY(-2px); }
 
-/* RESULT DISPLAY */
+/* ============================================================
+   RESULT DISPLAY
+============================================================ */
 .result-found-banner { display: flex; align-items: center; gap: 10px; background: var(--success-light); color: var(--success); padding: 12px 20px; border-radius: var(--radius-sm); margin-bottom: 16px; border-left: 4px solid var(--success); }
 .result-card { background: var(--white); border-radius: var(--radius); padding: 28px; margin-top: 16px; border: 1px solid var(--gray-light); box-shadow: var(--shadow-sm); animation: fadeInUp 0.5s ease; }
 .student-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; border-bottom: 2px solid var(--gray-light); padding-bottom: 14px; }
@@ -251,9 +324,34 @@ body { padding-top: 70px; }
 .toast-info { background: #1a56db; }
 @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-/* FOOTER */
-.footer { background: var(--primary); color: var(--white); padding: 40px 20px 20px; margin-top: auto; text-align: center; }
-.footer a { color: var(--accent-light); }
+/* ============================================================
+   FOOTER - Notification Page Style
+============================================================ */
+.footer { background: var(--primary); color: var(--white); padding: 50px 20px 0; margin-top: auto; }
+.footer-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 36px; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+@media (max-width: 992px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 540px) { .footer-grid { grid-template-columns: 1fr; } }
+.footer-brand .brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.footer-brand .brand-row img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid rgba(232, 184, 75, 0.2); background: var(--white); object-fit: cover; padding: 2px; }
+.footer-brand .brand-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; }
+.footer-brand p { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.8; max-width: 280px; }
+.footer-col h4 { font-size: 11px; text-transform: uppercase; color: var(--accent-light); font-weight: 700; margin-bottom: 14px; position: relative; }
+.footer-col h4::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 25px; height: 2px; background: var(--accent); border-radius: 50px; }
+.footer-col a { display: block; font-size: 13px; color: rgba(255,255,255,0.35); margin-bottom: 8px; transition: var(--transition); }
+.footer-col a:hover { color: var(--white); padding-left: 6px; }
+.social-links { display: flex; justify-content: center; gap: 14px; margin: 24px auto 20px; flex-wrap: wrap; }
+.social-icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: rgba(255,255,255,0.4); font-size: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); transition: var(--transition); }
+.social-icon:hover { transform: translateY(-4px) scale(1.05); color: var(--white); }
+.facebook:hover { background: #1877F2; border-color: #1877F2; }
+.instagram:hover { background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); border-color: transparent; }
+.youtube:hover { background: #FF0000; border-color: #FF0000; }
+.twitter:hover { background: #000; border-color: #000; }
+.whatsapp:hover { background: #25D366; border-color: #25D366; }
+.footer-bottom { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 16px 0; }
+.footer-bottom p, .footer-bottom a { font-size: 12px; color: rgba(255,255,255,0.25); }
+.footer-bottom a:hover { color: var(--accent-light); }
+.dev { font-size: 12px; color: rgba(255,255,255,0.25); text-align: center; padding: 12px 0 16px; }
+.dev b { color: var(--accent-light); }
 
 @media (max-width: 768px) {
   .page-header { padding: 40px 20px 30px; }
@@ -270,8 +368,10 @@ body { padding-top: 70px; }
 </head>
 <body>
 
+<!-- MOBILE OVERLAY -->
 <div class="mobile-overlay" id="mobileOverlay"></div>
 
+<!-- NAVBAR - Notification Page Style -->
 <header class="navbar" id="navbar">
   <div class="logo">
     <img src="logo.png" alt="School Logo">
@@ -281,28 +381,60 @@ body { padding-top: 70px; }
     </div>
   </div>
   <ul class="nav-links" id="navLinks">
+    <div class="mobile-menu-header">
+      <div class="mobile-brand"><img src="logo.png" alt="Logo"><span>GSSS <small>Shilla</small></span></div>
+      <button class="mobile-close-btn" id="mobileCloseBtn"><i class="fas fa-times"></i></button>
+    </div>
     <li><a href="../index.html"><i class="fas fa-home"></i> Home</a></li>
     <li><a href="pub-notif.html"><i class="fas fa-bell"></i> Notifications</a></li>
     <li><a href="result.html" class="active"><i class="fas fa-file-alt"></i> Results</a></li>
     <li><a href="downloads.html"><i class="fas fa-download"></i> Downloads</a></li>
+    <li>
+      <a href="#" class="dropdown-toggle" onclick="toggleMobileDropdown(event)">
+        <span><i class="fas fa-info-circle"></i> More</span>
+        <i class="fas fa-chevron-down dropdown-arrow"></i>
+      </a>
+      <div class="dropdown-menu-nav" id="aboutDropdown">
+        <a href="about.html"><i class="fas fa-info-circle"></i> About Us</a>
+        <a href="contact.html"><i class="fas fa-envelope"></i> Contact Us</a>
+      </div>
+    </li>
     <li class="mobile-login-item">
-      <button class="login-btn" onclick="window.location.href='../admin/login.html'"><i class="fas fa-sign-in-alt"></i> Login</button>
+      <div class="login-dropdown">
+        <button class="login-btn" id="loginBtnMobile"><i class="fas fa-sign-in-alt"></i> Login</button>
+        <div class="login-dropdown-menu" id="loginDropdownMobile">
+          <a href="../admin/login.html"><i class="fas fa-user-shield"></i> Admin Panel</a>
+          <a href="no.html"><i class="fas fa-user-graduate"></i> Student Portal</a>
+          <a href="no.html"><i class="fas fa-chalkboard-teacher"></i> Teacher Portal</a>
+        </div>
+      </div>
     </li>
   </ul>
   <div class="nav-actions">
-    <button class="login-btn desktop-login" onclick="window.location.href='../admin/login.html'"><i class="fas fa-sign-in-alt"></i> Login</button>
-    <button class="menu-toggle" id="menuToggle"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+    <div class="login-dropdown desktop-login">
+      <button class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+      <div class="login-dropdown-menu" id="loginDropdown">
+        <a href="../admin/login.html"><i class="fas fa-user-shield"></i> Admin Panel</a>
+        <a href="no.html"><i class="fas fa-user-graduate"></i> Student Portal</a>
+        <a href="no.html"><i class="fas fa-chalkboard-teacher"></i> Teacher Portal</a>
+      </div>
+    </div>
+    <button class="menu-toggle" id="menuToggle">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
   </div>
 </header>
 
+<!-- PAGE HEADER -->
 <div class="page-header">
   <h1><i class="fas fa-file-alt"></i> Exam Results</h1>
   <p>Check your academic performance and download marksheets</p>
 </div>
 
+<!-- CONTAINER -->
 <div class="container">
   
-  <!-- ===== VERIFY BUTTON - Notification Page Style ===== -->
+  <!-- VERIFY BUTTON -->
   <div class="verify-section">
     <a href="verify.html" class="verify-btn">
       <i class="fas fa-shield-alt"></i> Verify Document
@@ -343,8 +475,49 @@ body { padding-top: 70px; }
   </div>
 </div>
 
+<!-- FOOTER - Notification Page Style -->
 <footer class="footer">
-  <p>&copy; 2026 Govt. Sr. Sec. School Shilla. All rights reserved. | <a href="../school_privacy_policy.pdf">Privacy Policy</a></p>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="brand-row"><img src="logo.png" alt="School Logo"><div class="brand-name">Govt. Sr. Sec. School Shilla</div></div>
+      <p>Empowering students with quality education, discipline and a vision for a brighter India.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <a href="../index.html"><i class="fas fa-chevron-right"></i> Home</a>
+      <a href="pub-notif.html"><i class="fas fa-chevron-right"></i> Notices</a>
+      <a href="result.html"><i class="fas fa-chevron-right"></i> Results</a>
+      <a href="downloads.html"><i class="fas fa-chevron-right"></i> Downloads</a>
+      <a href="pub-gallery.html"><i class="fas fa-chevron-right"></i> Gallery</a>
+      <a href="contact.html"><i class="fas fa-chevron-right"></i> Contact</a>
+    </div>
+    <div class="footer-col">
+      <h4>Portals</h4>
+      <a href="../admin/login.html"><i class="fas fa-chevron-right"></i> Admin</a>
+      <a href="no.html"><i class="fas fa-chevron-right"></i> Student</a>
+      <a href="no.html"><i class="fas fa-chevron-right"></i> Teacher</a>
+    </div>
+    <div class="footer-col">
+      <h4>Government</h4>
+      <a href="https://www.hpbose.org/" target="_blank"><i class="fas fa-chevron-right"></i> HPBOSE</a>
+      <a href="https://scholarships.gov.in/" target="_blank"><i class="fas fa-chevron-right"></i> NSP Scholarship</a>
+      <a href="https://www.mygov.in/" target="_blank"><i class="fas fa-chevron-right"></i> My Govt.</a>
+      <a href="https://www.education.gov.in/" target="_blank"><i class="fas fa-chevron-right"></i> Edu Ministry</a>
+    </div>
+  </div>
+  <div class="social-links">
+    <a href="https://www.facebook.com/share/1BgkMoxXp3/" target="_blank" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
+    <a href="https://instagram.com/YOUR_PAGE" target="_blank" class="social-icon instagram"><i class="fab fa-instagram"></i></a>
+    <a href="https://youtube.com/YOUR_CHANNEL" target="_blank" class="social-icon youtube"><i class="fab fa-youtube"></i></a>
+    <a href="https://x.com/YOUR_ACCOUNT" target="_blank" class="social-icon twitter"><i class="fab fa-x-twitter"></i></a>
+    <a href="https://wa.me/919999999999" target="_blank" class="social-icon whatsapp"><i class="fab fa-whatsapp"></i></a>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Govt. Sr. Sec. School Shilla · All Rights Reserved</p>
+    <a href="../school_privacy_policy.pdf"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+    <a href="#"><i class="fas fa-clock"></i> Last Update: 08 Aug, 2026</a>
+  </div>
+  <div class="dev">Session: 2026-2027</div>
 </footer>
 
 <div class="toast-container" id="toastContainer"></div>
@@ -355,18 +528,69 @@ const DEFAULT_SESSION = '2025-26';
 let selectedClass = null, selectedSession = null;
 let currentStudentData = null;
 
-// Navbar
+// ========== NAVBAR, MOBILE MENU, DROPDOWN ==========
 var navbar = document.getElementById("navbar");
 window.addEventListener("scroll", function() { if (window.scrollY > 50) navbar.classList.add("scrolled"); else navbar.classList.remove("scrolled"); });
+
 var menuToggle = document.getElementById("menuToggle");
 var navLinks = document.getElementById("navLinks");
 var mobileOverlay = document.getElementById("mobileOverlay");
-function openMobileMenu() { navLinks.classList.add("active"); mobileOverlay.classList.add("active"); menuToggle.classList.add("active"); document.body.style.overflow = "hidden"; }
-function closeMobileMenu() { navLinks.classList.remove("active"); mobileOverlay.classList.remove("active"); menuToggle.classList.remove("active"); document.body.style.overflow = ""; }
-menuToggle.addEventListener("click", function(e) { e.stopPropagation(); if (navLinks.classList.contains("active")) closeMobileMenu(); else openMobileMenu(); });
-mobileOverlay.addEventListener("click", closeMobileMenu);
-navLinks.querySelectorAll("a").forEach(function(link) { link.addEventListener("click", function() { closeMobileMenu(); }); });
+var mobileCloseBtn = document.getElementById("mobileCloseBtn");
 
+function openMobileMenu() {
+  navLinks.classList.add("active");
+  mobileOverlay.classList.add("active");
+  menuToggle.classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+function closeMobileMenu() {
+  navLinks.classList.remove("active");
+  mobileOverlay.classList.remove("active");
+  menuToggle.classList.remove("active");
+  document.body.style.overflow = "";
+}
+menuToggle.addEventListener("click", function(e) {
+  e.stopPropagation();
+  if (navLinks.classList.contains("active")) closeMobileMenu();
+  else openMobileMenu();
+});
+mobileCloseBtn.addEventListener("click", closeMobileMenu);
+mobileOverlay.addEventListener("click", closeMobileMenu);
+navLinks.querySelectorAll("a:not(.dropdown-toggle)").forEach(function(link) {
+  link.addEventListener("click", function() { closeMobileMenu(); });
+});
+document.addEventListener("keydown", function(e) { if (e.key === "Escape") closeMobileMenu(); });
+
+function toggleMobileDropdown(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  var parent = e.currentTarget.parentElement;
+  var dropdown = parent.querySelector('.dropdown-menu-nav');
+  var arrow = e.currentTarget.querySelector('.dropdown-arrow');
+  if (dropdown) {
+    dropdown.classList.toggle('show-mobile');
+    if (arrow) arrow.classList.toggle('rotated');
+  }
+}
+
+function setupDropdown(btnId, menuId) {
+  var btn = document.getElementById(btnId);
+  var menu = document.getElementById(menuId);
+  if (!btn || !menu) return;
+  btn.addEventListener("click", function(e) {
+    e.stopPropagation();
+    menu.classList.toggle("show");
+  });
+  document.addEventListener("click", function(e) {
+    if (!menu.contains(e.target) && !btn.contains(e.target)) {
+      menu.classList.remove("show");
+    }
+  });
+}
+setupDropdown("loginBtn", "loginDropdown");
+setupDropdown("loginBtnMobile", "loginDropdownMobile");
+
+// ========== RESULT FUNCTIONALITY ==========
 // Elements
 const classGrid = document.getElementById('classGrid');
 const classCountBadge = document.getElementById('classCountBadge');
@@ -544,7 +768,7 @@ function renderResult(data) {
         ${marksheetHtml}
       </div>
       <div style="margin-top:20px;text-align:center;">
-        <button class="btn-primary" onclick="printProvisional('${s.student_id}')" style="margin:0 auto;"><i class="fas fa-print"></i> Download Provisional Marksheet</button>
+        <button class="btn-primary" onclick="printProvisional('${s.student_id}')" style="margin:0 auto;"><i class="fas fa-print"></i> Download Marksheet</button>
       </div>
     </div>
   `;
@@ -610,14 +834,14 @@ async function printProvisional(studentId) {
     <img src="logo.png" onerror="this.style.display='none'">
     <h1>Govt. Sr. Sec. School Shilla</h1>
     <p>Shilla, District Shimla, Himachal Pradesh - 171210</p>
-    <span class="provisional-badge">Provisional Marksheet</span>
+    <span class="provisional-badge"><i class="fas fa-clock"></i> PROVISIONAL MARKSHEET</span>
   </div>
   <table class="student-info-table">
     <tr><td>Student ID</td><td>${s.student_id}</td><td>APAAR ID</td><td>${s.apaar_id || '-'}</td><td class="photo-cell" rowspan="5"><div class="photo-box">${studentPhoto ? `<img src="${studentPhoto}">` : '<div style="font-size:30px;color:#cbd5e1;"><i class="fas fa-user"></i></div>'}</div></td></tr>
     <tr><td>Student Name</td><td style="font-weight:700;">${s.name}</td><td>Father's Name</td><td>${s.father_name || '-'}</td></tr>
     <tr><td>Mother's Name</td><td>${s.mother_name || '-'}</td><td>Date of Birth</td><td>${s.dob ? new Date(s.dob).toLocaleDateString('en-IN') : '-'}</td></tr>
     <tr><td>Session</td><td>${s.session || '-'}</td><td>Class</td><td>${s.class || '-'}${s.section ? ' - ' + s.section : ''}</td></tr>
-    <tr><td>Exam Roll No</td><td>${s.exam_roll_no || '-'}</td><td>Status</td><td>Provisional</td></tr>
+    <tr><td>Exam Roll No</td><td>${s.exam_roll_no || '-'}</td><td>Status</td><td><span style="color:#f59e0b;font-weight:700;">PROVISIONAL</span></td></tr>
   </table>
   <h3 style="font-size:12px;margin:10px 0;">Available Marksheets (${marksheets.length})</h3>
   <table class="marksheet-table">
@@ -626,13 +850,13 @@ async function printProvisional(studentId) {
   </table>
   <div class="verification-section">
     <div class="verification-qr"><img src="${verificationQR}"></div>
-    <div class="verification-text"><strong>Verify This Document</strong><p>Scan this QR code to verify the authenticity.</p><p><strong>Student:</strong> ${s.name}</p></div>
+    <div class="verification-text"><strong>🔍 Verify This Document</strong><p>Scan this QR code to verify the authenticity.</p><p><strong>Student:</strong> ${s.name}</p></div>
   </div>
 
-  <div class="security-text">GSSS SHILLA OFFICIAL DOCUMENT | INFORMATION USE ONLY| GSSS SHILLA OFFICIAL DOCUMENT</div>
+  <div class="security-text">GSSS SHILLA OFFICIAL DOCUMENT | PROVISIONAL | GSSS SHILLA OFFICIAL DOCUMENT</div>
   <div class="footer">
     <span>Print Date: ${new Date().toLocaleDateString('en-IN')}</span>
-    <span>Provisional Document - Not Valid for Official Use</span>
+    <span style="color:#f59e0b;font-weight:700;">⚠️ PROVISIONAL - Not Valid for Official Use</span>
     <span>Page 1 of 1</span>
   </div>
   </body></html>`);
