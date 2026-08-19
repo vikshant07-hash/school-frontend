@@ -6,6 +6,8 @@
     <title>Verify Result - GSSS Shilla</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         :root {
             --primary: #0d1b2a;
@@ -22,67 +24,164 @@
             --text-light: #5a6a7e;
             --success: #16a34a;
             --success-light: #dcfce7;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
             --shadow-sm: 0 4px 20px rgba(0,0,0,0.06);
             --shadow-md: 0 8px 40px rgba(0,0,0,0.10);
+            --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
             --radius: 20px;
             --radius-sm: 12px;
             --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: linear-gradient(135deg, #f0f4f8 0%, #fef8ed 100%); 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #fef8ed 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
         }
-        
+
         .verification-container {
             background: var(--white);
             border-radius: var(--radius);
-            box-shadow: var(--shadow-md);
-            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+            max-width: 520px;
             width: 100%;
-            padding: 40px 30px;
-            text-align: center;
+            padding: 0;
+            overflow: hidden;
             border: 1px solid var(--gray-light);
         }
-        
-        .school-header {
-            margin-bottom: 25px;
-            padding-bottom: 15px;
+
+        /* HEADER */
+        .verify-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            padding: 30px 20px 25px;
+            text-align: center;
             border-bottom: 3px solid var(--accent);
         }
-        .school-logo {
+        .verify-header .logo {
             width: 70px;
             height: 70px;
             border-radius: 50%;
             border: 3px solid var(--accent);
             padding: 3px;
-            background: white;
+            background: var(--white);
             margin: 0 auto 10px;
             display: block;
             object-fit: contain;
         }
-        .school-name {
+        .verify-header h1 {
             font-family: 'Playfair Display', serif;
             font-size: 20px;
             font-weight: 800;
-            color: var(--primary);
+            color: var(--white);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        .school-tagline {
+        .verify-header p {
+            color: rgba(255,255,255,0.6);
             font-size: 10px;
-            color: var(--gray);
             letter-spacing: 2px;
             text-transform: uppercase;
             margin-top: 3px;
         }
-        
+        .provisional-badge {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            padding: 5px 18px;
+            border-radius: 50px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px dashed #92400e;
+            margin-top: 10px;
+        }
+
+        /* BODY */
+        .verify-body {
+            padding: 25px;
+        }
+
+        /* SCANNER OPTIONS */
+        .scanner-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .scan-option {
+            background: var(--off-white);
+            border: 2px solid var(--gray-light);
+            border-radius: var(--radius-sm);
+            padding: 15px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .scan-option:hover {
+            border-color: var(--accent);
+            background: #fef8ed;
+            transform: translateY(-3px);
+        }
+        .scan-option .scan-icon {
+            font-size: 28px;
+            color: var(--accent-dark);
+            margin-bottom: 8px;
+        }
+        .scan-option h4 {
+            font-size: 12px;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+        .scan-option p {
+            font-size: 9px;
+            color: var(--gray);
+        }
+
+        /* CAMERA MODAL */
+        .camera-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+        .camera-modal.active { display: flex; }
+        .camera-modal video {
+            max-width: 100%;
+            max-height: 60vh;
+            border-radius: 10px;
+            border: 3px solid var(--accent);
+        }
+        .camera-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .camera-controls button {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-scan { background: var(--accent); color: var(--white); }
+        .btn-close-camera { background: var(--danger); color: var(--white); }
+
+        /* ICON */
         .verify-icon {
             width: 70px;
             height: 70px;
@@ -94,31 +193,15 @@
             font-size: 32px;
             animation: pulse 2s infinite;
         }
-        .verify-icon.verified {
-            background: var(--success-light);
-            color: var(--success);
-        }
-        .verify-icon.invalid {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        .verify-title {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-        .verify-subtitle {
-            font-size: 13px;
-            color: var(--text-light);
-            margin-bottom: 20px;
-        }
-        
+        .verify-icon.verified { background: var(--success-light); color: var(--success); border: 2px solid #bbf7d0; }
+        .verify-icon.invalid { background: var(--danger-light); color: var(--danger); border: 2px solid #fecaca; animation: shake 0.5s ease; }
+        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+
+        .verify-title { font-size: 20px; font-weight: 800; color: var(--primary); text-align: center; margin-bottom: 5px; }
+        .verify-subtitle { font-size: 13px; color: var(--text-light); text-align: center; margin-bottom: 20px; }
+
+        /* TABLE */
         .student-details-table {
             width: 100%;
             border-collapse: collapse;
@@ -142,46 +225,60 @@
             font-size: 10px;
             letter-spacing: 0.5px;
         }
-        .student-details-table td:last-child {
-            font-weight: 500;
-            color: var(--text);
-        }
-        
+
         .confirmation-box {
             background: var(--success-light);
             border: 1px solid #bbf7d0;
+            border-left: 4px solid var(--success);
             border-radius: 10px;
-            padding: 12px 15px;
+            padding: 14px 16px;
             margin: 15px 0;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 10px;
             font-size: 12px;
             color: var(--success);
         }
-        .confirmation-box i {
-            font-size: 20px;
-        }
-        .confirmation-box strong {
-            display: block;
-            font-size: 13px;
-        }
-        
-        .invalid-box {
-            background: #fee2e2;
-            border: 1px solid #fecaca;
+        .confirmation-box i { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+        .confirmation-box strong { display: block; font-size: 13px; margin-bottom: 2px; }
+        .confirmation-box p { font-size: 11px; color: #166534; line-height: 1.5; }
+
+        .provisional-notice {
+            background: var(--warning-light);
+            border: 1px solid #fde68a;
+            border-left: 4px solid var(--warning);
             border-radius: 10px;
-            padding: 15px;
-            margin: 15px 0;
-            font-size: 13px;
-            color: #dc2626;
+            padding: 12px 16px;
+            margin: 10px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 12px;
+            color: #92400e;
         }
-        
+        .provisional-notice i { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+        .provisional-notice strong { display: block; font-size: 13px; margin-bottom: 2px; }
+
+        .invalid-box {
+            background: var(--danger-light);
+            border: 1px solid #fecaca;
+            border-left: 4px solid var(--danger);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin: 15px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--danger);
+        }
+        .invalid-box i { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+
         .btn {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 25px;
+            padding: 12px 30px;
             border: none;
             border-radius: 50px;
             font-size: 13px;
@@ -189,151 +286,304 @@
             cursor: pointer;
             transition: var(--transition);
             font-family: 'Inter', sans-serif;
-            text-decoration: none;
             margin-top: 10px;
         }
-        .btn-primary {
-            background: var(--accent);
-            color: var(--white);
-        }
-        .btn-primary:hover {
-            background: var(--accent-dark);
-            transform: translateY(-2px);
-        }
-        
-        .footer-text {
-            margin-top: 20px;
+        .btn-primary { background: var(--accent); color: var(--white); }
+        .btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); }
+        .btn-secondary { background: var(--off-white); color: var(--text-light); border: 1px solid var(--gray-light); }
+        .btn-secondary:hover { background: var(--gray-light); color: var(--text); }
+
+        .verify-footer {
+            padding: 15px 25px;
+            text-align: center;
+            border-top: 1px solid var(--gray-light);
+            background: var(--off-white);
             font-size: 9px;
             color: var(--gray);
             letter-spacing: 1px;
             text-transform: uppercase;
-            border-top: 1px solid var(--gray-light);
-            padding-top: 10px;
+        }
+
+        @media (max-width: 480px) {
+            .verification-container { margin: 0 5px; }
+            .verify-body { padding: 20px 15px; }
+            .scanner-options { grid-template-columns: 1fr; }
+            .student-details-table td { padding: 8px; font-size: 11px; }
         }
     </style>
 </head>
 <body>
     <div class="verification-container">
-        <!-- School Header -->
-        <div class="school-header">
-            <img src="logo.png" alt="School Logo" class="school-logo" onerror="this.style.display='none'">
-            <div class="school-name">Govt. Sr. Sec. School Shilla</div>
-            <div class="school-tagline">Shilla • District Solan • Himachal Pradesh</div>
+        <!-- HEADER -->
+        <div class="verify-header">
+            <img src="logo.png" alt="School Logo" class="logo" onerror="this.style.display='none'">
+            <h1>Govt. Sr. Sec. School Shilla</h1>
+            <p>Document Verification</p>
+            <span class="provisional-badge"><i class="fas fa-file-alt"></i> Provisional Certificate</span>
         </div>
-        
-        <!-- Verification Result -->
-        <div id="verificationContent">
-            <div class="loading" style="text-align:center;padding:20px;">
-                <i class="fas fa-spinner fa-spin" style="font-size:30px;color:var(--accent);"></i>
-                <p style="margin-top:10px;color:var(--text-light);">Verifying document...</p>
+
+        <!-- BODY -->
+        <div class="verify-body">
+            <!-- SCANNER OPTIONS -->
+            <div class="scanner-options" id="scannerOptions">
+                <div class="scan-option" onclick="openCamera()">
+                    <div class="scan-icon"><i class="fas fa-camera"></i></div>
+                    <h4>Camera</h4>
+                    <p>Scan QR live</p>
+                </div>
+                <div class="scan-option" onclick="document.getElementById('imageInput').click()">
+                    <div class="scan-icon"><i class="fas fa-image"></i></div>
+                    <h4>Image</h4>
+                    <p>Upload QR photo</p>
+                </div>
+                <div class="scan-option" onclick="document.getElementById('pdfInput').click()">
+                    <div class="scan-icon"><i class="fas fa-file-pdf"></i></div>
+                    <h4>PDF</h4>
+                    <p>Upload marksheet</p>
+                </div>
+            </div>
+            <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="scanImage(event)">
+            <input type="file" id="pdfInput" accept=".pdf" style="display:none" onchange="scanPDF(event)">
+
+            <!-- RESULT -->
+            <div id="verificationResult">
+                <div style="text-align:center;padding:30px;">
+                    <i class="fas fa-qrcode" style="font-size:40px;color:var(--accent);"></i>
+                    <p style="margin-top:10px;color:var(--text-light);">Scan QR code to verify</p>
+                </div>
             </div>
         </div>
-        
-        <!-- Footer -->
-        <div class="footer-text">
-            GSSS Shilla - Official Document Verification
+
+        <!-- FOOTER -->
+        <div class="verify-footer">
+            GSSS Shilla - Official Document Verification System
+        </div>
+    </div>
+
+    <!-- CAMERA MODAL -->
+    <div class="camera-modal" id="cameraModal">
+        <video id="cameraVideo" autoplay playsinline></video>
+        <div class="camera-controls">
+            <button class="btn-scan" onclick="captureAndScan()"><i class="fas fa-camera"></i> Scan</button>
+            <button class="btn-close-camera" onclick="closeCamera()"><i class="fas fa-times"></i> Close</button>
         </div>
     </div>
 
     <script>
+        let cameraStream = null;
+        let currentVerifiedData = null;
+        
+        // Set PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
         document.addEventListener('DOMContentLoaded', function() {
-            const content = document.getElementById('verificationContent');
-            
-            // Get data from URL
             const urlParams = new URLSearchParams(window.location.search);
             const dataParam = urlParams.get('data');
-            
-            if (!dataParam) {
-                showInvalid('No verification data found. This document cannot be verified.');
-                return;
-            }
-            
-            try {
-                const data = JSON.parse(decodeURIComponent(dataParam));
-                
-                // Validate required fields
-                if (!data.student_id || !data.name) {
-                    showInvalid('Invalid verification data. This document may be tampered.');
-                    return;
-                }
-                
-                // Show verified content
-                showVerified(data);
-                
-            } catch(e) {
-                showInvalid('Invalid verification data format. This document may be tampered.');
+            if (dataParam) {
+                processVerification(dataParam);
             }
         });
-        
-        function showVerified(data) {
-            const content = document.getElementById('verificationContent');
+
+        // ============ CAMERA ============
+        async function openCamera() {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                const video = document.getElementById('cameraVideo');
+                video.srcObject = cameraStream;
+                document.getElementById('cameraModal').classList.add('active');
+            } catch(e) {
+                alert('Camera access denied. Please use Image or PDF upload.');
+            }
+        }
+
+        function closeCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(t => t.stop());
+                cameraStream = null;
+            }
+            document.getElementById('cameraModal').classList.remove('active');
+        }
+
+        function captureAndScan() {
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            content.innerHTML = `
-                <div class="verify-icon verified">
-                    <i class="fas fa-check-circle"></i>
-                </div>
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+            
+            if (code && code.data) {
+                closeCamera();
+                extractAndVerify(code.data);
+            } else {
+                alert('QR code not detected. Please try again.');
+            }
+        }
+
+        // ============ IMAGE UPLOAD ============
+        function scanImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height);
+                    
+                    if (code && code.data) {
+                        extractAndVerify(code.data);
+                    } else {
+                        showInvalid('Could not detect QR code in image. Please try a clearer photo.');
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ============ PDF UPLOAD ============
+        async function scanPDF(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
+                    const viewport = page.getViewport({ scale: 2 });
+                    const canvas = document.createElement('canvas');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    const ctx = canvas.getContext('2d');
+                    
+                    await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+                    
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height);
+                    
+                    if (code && code.data) {
+                        extractAndVerify(code.data);
+                        return;
+                    }
+                }
+                
+                showInvalid('No QR code found in the PDF document.');
+            } catch(e) {
+                showInvalid('Could not read PDF file. Please try again.');
+            }
+        }
+
+        // ============ EXTRACT & VERIFY ============
+        function extractAndVerify(qrData) {
+            try {
+                if (qrData.includes('data=')) {
+                    const url = new URL(qrData);
+                    const dataParam = url.searchParams.get('data');
+                    if (dataParam) {
+                        processVerification(dataParam);
+                        return;
+                    }
+                }
+                const data = JSON.parse(qrData);
+                if (data.student_id && data.name) {
+                    showVerified(data);
+                    return;
+                }
+                showInvalid('QR code does not contain valid verification data.');
+            } catch(e) {
+                showInvalid('Could not read QR code data.');
+            }
+        }
+
+        function processVerification(dataParam) {
+            try {
+                const data = JSON.parse(decodeURIComponent(dataParam));
+                if (!data.student_id || !data.name) {
+                    showInvalid('Invalid verification data.');
+                    return;
+                }
+                showVerified(data);
+            } catch(e) {
+                showInvalid('Invalid data format.');
+            }
+        }
+
+        // ============ SHOW RESULTS ============
+        function showVerified(data) {
+            currentVerifiedData = data;
+            const resultDiv = document.getElementById('verificationResult');
+            document.getElementById('scannerOptions').style.display = 'none';
+            
+            resultDiv.innerHTML = `
+                <div class="verify-icon verified"><i class="fas fa-check-circle"></i></div>
                 <h2 class="verify-title">Document Verified</h2>
-                <p class="verify-subtitle">This is an authentic document issued by GSSS Shilla</p>
+                <p class="verify-subtitle">Authentic provisional marksheet - GSSS Shilla</p>
+                
+                <div class="provisional-notice">
+                    <i class="fas fa-info-circle"></i>
+                    <div><strong>Provisional Certificate</strong>
+                    <p style="font-size:11px;">This is a provisional marksheet and not the original document.</p></div>
+                </div>
                 
                 <table class="student-details-table">
-                    <tr><td>Student ID</td><td>${escapeHtml(data.student_id)}</td></tr>
-                    <tr><td>Student Name</td><td>${escapeHtml(data.name)}</td></tr>
-                    ${data.apaar_id ? `<tr><td>APAAR ID</td><td>${escapeHtml(data.apaar_id)}</td></tr>` : ''}
-                    ${data.father_name ? `<tr><td>Father's Name</td><td>${escapeHtml(data.father_name)}</td></tr>` : ''}
-                    ${data.mother_name ? `<tr><td>Mother's Name</td><td>${escapeHtml(data.mother_name)}</td></tr>` : ''}
-                    ${data.dob ? `<tr><td>Date of Birth</td><td>${formatDate(data.dob)}</td></tr>` : ''}
-                    ${data.session ? `<tr><td>Session</td><td>${escapeHtml(data.session)}</td></tr>` : ''}
-                    ${data.class ? `<tr><td>Class</td><td>${escapeHtml(data.class)}${data.section ? ' - ' + escapeHtml(data.section) : ''}</td></tr>` : ''}
-                    ${data.exam_roll_no ? `<tr><td>Exam Roll No</td><td>${escapeHtml(data.exam_roll_no)}</td></tr>` : ''}
+                    <tr><td>Student ID</td><td>${esc(data.student_id)}</td></tr>
+                    <tr><td>Student Name</td><td>${esc(data.name)}</td></tr>
+                    ${data.apaar_id ? `<tr><td>APAAR ID</td><td>${esc(data.apaar_id)}</td></tr>` : ''}
+                    ${data.father_name ? `<tr><td>Father's Name</td><td>${esc(data.father_name)}</td></tr>` : ''}
+                    ${data.mother_name ? `<tr><td>Mother's Name</td><td>${esc(data.mother_name)}</td></tr>` : ''}
+                    ${data.dob ? `<tr><td>Date of Birth</td><td>${fmtDate(data.dob)}</td></tr>` : ''}
+                    ${data.session ? `<tr><td>Session</td><td>${esc(data.session)}</td></tr>` : ''}
+                    ${data.class ? `<tr><td>Class</td><td>${esc(data.class)}${data.section ? ' - ' + esc(data.section) : ''}</td></tr>` : ''}
+                    ${data.exam_roll_no ? `<tr><td>Exam Roll No</td><td>${esc(data.exam_roll_no)}</td></tr>` : ''}
                 </table>
                 
                 <div class="confirmation-box">
                     <i class="fas fa-shield-alt"></i>
-                    <div>
-                        <strong>Confirmation</strong>
-                        This marksheet belongs to the student mentioned above. The details have been verified from the school's official records.
-                    </div>
+                    <div><strong>Confirmation</strong>
+                    <p>This marksheet belongs to the student mentioned above. Verified from school records.</p></div>
                 </div>
                 
-                <button class="btn btn-primary" onclick="window.print()">
-                    <i class="fas fa-print"></i> Print Verification
-                </button>
+                <div style="text-align:center;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+                    <button class="btn btn-secondary" onclick="resetVerification()"><i class="fas fa-redo"></i> Verify Another</button>
+                </div>
             `;
         }
-        
-        function showInvalid(message) {
-            const content = document.getElementById('verificationContent');
-            content.innerHTML = `
-                <div class="verify-icon invalid">
-                    <i class="fas fa-times-circle"></i>
-                </div>
+
+        function showInvalid(msg) {
+            const resultDiv = document.getElementById('verificationResult');
+            resultDiv.innerHTML = `
+                <div class="verify-icon invalid"><i class="fas fa-times-circle"></i></div>
                 <h2 class="verify-title" style="color:#dc2626;">Verification Failed</h2>
-                <p class="verify-subtitle">This document could not be verified</p>
-                
-                <div class="invalid-box">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    ${message}
-                </div>
-                
-                <p style="font-size:11px;color:var(--gray);margin-top:10px;">
-                    If you believe this is an error, please contact the school administration.
-                </p>
+                <p class="verify-subtitle">Document could not be verified</p>
+                <div class="invalid-box"><i class="fas fa-exclamation-triangle"></i><div>${msg}</div></div>
+                <div style="text-align:center;"><button class="btn btn-secondary" onclick="resetVerification()"><i class="fas fa-redo"></i> Try Again</button></div>
             `;
         }
-        
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = String(text);
-            return div.innerHTML;
+
+        function resetVerification() {
+            document.getElementById('verificationResult').innerHTML = `
+                <div style="text-align:center;padding:30px;"><i class="fas fa-qrcode" style="font-size:40px;color:var(--accent);"></i><p style="margin-top:10px;color:var(--text-light);">Scan QR code to verify</p></div>`;
+            document.getElementById('scannerOptions').style.display = 'grid';
+            document.getElementById('imageInput').value = '';
+            document.getElementById('pdfInput').value = '';
         }
-        
-        function formatDate(dateStr) {
-            if (!dateStr) return '-';
-            const date = new Date(dateStr);
-            if (isNaN(date)) return dateStr;
-            return date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        }
+
+        function esc(t) { if(!t) return ''; const d = document.createElement('div'); d.textContent = String(t); return d.innerHTML; }
+        function fmtDate(d) { if(!d) return '-'; const dt = new Date(d); return isNaN(dt) ? d : dt.toLocaleDateString('en-IN', {day:'2-digit',month:'2-digit',year:'numeric'}); }
     </script>
 </body>
 </html>
