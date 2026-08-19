@@ -192,7 +192,7 @@
     .container { max-width: 1100px; margin: 0 auto; padding: 30px 20px 60px; flex: 1; }
 
     /* ============================================================
-       VERIFY BUTTON - Top Right
+       VERIFY BUTTON
     ============================================================ */
     .verify-section {
       display: flex;
@@ -231,7 +231,7 @@
     }
 
     /* ============================================================
-       STATS TOGGLE BUTTON
+       STATS TOGGLE
     ============================================================ */
     .stats-toggle-wrapper {
       text-align: center;
@@ -472,7 +472,7 @@
     }
 
     /* ============================================================
-       SEARCH FORM - Shows when "Check Result" is clicked
+       SEARCH SECTION
     ============================================================ */
     .search-section {
       background: var(--white);
@@ -900,7 +900,7 @@
 <!-- CONTAINER -->
 <div class="container">
 
-  <!-- VERIFY BUTTON - Top Right -->
+  <!-- VERIFY BUTTON -->
   <div class="verify-section">
     <a href="verify.html" class="verify-btn">
       <i class="fas fa-shield-alt"></i> Verify Document
@@ -908,7 +908,7 @@
     </a>
   </div>
 
-  <!-- STATS TOGGLE BUTTON -->
+  <!-- STATS TOGGLE -->
   <div class="stats-toggle-wrapper">
     <button class="stats-toggle-btn" id="statsToggleBtn" aria-controls="statsBar" aria-expanded="false">
       <i class="fas fa-chart-bar"></i> See Details 
@@ -936,7 +936,7 @@
     </div>
   </div>
 
-  <!-- SEARCH SECTION - Hidden by default -->
+  <!-- SEARCH SECTION -->
   <div class="search-section" id="searchSection">
     <div class="form-header">
       <h3><i class="fas fa-search"></i> Check Your Result</h3>
@@ -964,7 +964,7 @@
       <div class="form-actions">
         <button type="submit" class="btn-primary" id="searchBtn"><i class="fas fa-search"></i> View Result</button>
         <button type="button" class="btn-secondary" onclick="clearForm()"><i class="fas fa-undo"></i> Clear</button>
-        <button type="button" class="btn-back" onclick="closeSearch()"><i class="fas fa-arrow-left"></i> Back to Results</button>
+        <button type="button" class="btn-back" onclick="goBackToCards()"><i class="fas fa-arrow-left"></i> Back to Results</button>
       </div>
     </form>
     <div id="resultDisplay"></div>
@@ -1100,15 +1100,30 @@
     statsToggleBtn.setAttribute('aria-expanded', isOpen);
   });
 
-  // ========== RESULT SEARCH VARIABLES ==========
+  // ========== RESULT VARIABLES ==========
+  const API_BASE = "https://gsssshilla.onrender.com/api/results";
+  const DEFAULT_SESSION = '2025-26';
   let selectedClass = null;
-  let selectedSession = '2025-26';
+  let selectedSession = null;
   let currentStudentData = null;
 
-  // ========== RESULTS FETCH ==========
-  const API_BASE = "https://gsssshilla.onrender.com/api/results";
+  // ========== DOB AUTO-FORMAT ==========
+  document.getElementById('dobInput').addEventListener('input', function() {
+    var val = this.value.replace(/\D/g, '');
+    if (val.length > 8) val = val.substring(0, 8);
+    var result = '';
+    if (val.length > 4) result = val.substring(0,2) + '/' + val.substring(2,4) + '/' + val.substring(4);
+    else if (val.length > 2) result = val.substring(0,2) + '/' + val.substring(2);
+    else result = val;
+    this.value = result;
+  });
 
-  async function fetchResults() {
+  document.getElementById('studentIdInput').addEventListener('input', function() {
+    this.value = this.value.toUpperCase();
+  });
+
+  // ========== FETCH RESULTS ==========
+  async function loadAvailableClasses() {
     var grid = document.getElementById('resultsGrid');
     var totalClassesEl = document.getElementById('totalClasses');
     var totalMarksheetsEl = document.getElementById('totalMarksheets');
@@ -1118,7 +1133,6 @@
     try {
       // Fetch available classes
       var response = await fetch(API_BASE + '/public/classes');
-      if (!response.ok) throw new Error('Failed to fetch');
       var data = await response.json();
       var classes = data.data || [];
 
@@ -1146,7 +1160,7 @@
       }
 
       grid.innerHTML = classes.map(function(cls) {
-        // CORRECT STATUS CHECK - Check if any marksheet is published for this class
+        // Check if class has published marksheets
         var classMarksheets = marksheets.filter(m => m.class == cls.class);
         var hasPublished = classMarksheets.some(m => m.is_published == 1);
         var totalMarksheetCount = classMarksheets.length;
@@ -1164,7 +1178,7 @@
             </div>
             <div class="card-body">
               <div class="exam-info">
-                <span class="tag"><i class="fas fa-calendar-alt"></i> Session: <strong>2025-26</strong></span>
+                <span class="tag"><i class="fas fa-calendar-alt"></i> Session: <strong>${DEFAULT_SESSION}</strong></span>
                 <span class="tag"><i class="fas fa-file-alt"></i> ${escapeHtml(examType)}</span>
               </div>
               <div class="declared-date">
@@ -1173,7 +1187,7 @@
             </div>
             <div class="card-footer">
               <span class="result-count"><i class="fas fa-file-pdf"></i> <strong>${totalMarksheetCount}</strong> marksheets</span>
-              <button class="check-btn" onclick="openSearchForClass(${cls.class})">
+              <button class="check-btn" onclick="selectClass(${cls.class})">
                 <i class="fas fa-search"></i> Check Result
               </button>
             </div>
@@ -1181,7 +1195,7 @@
         `;
       }).join('');
 
-    } catch (error) {
+    } catch(error) {
       console.error('Error fetching results:', error);
       grid.innerHTML = `
         <div class="empty-state" style="grid-column:1/-1;border-color:#fee2e2;">
@@ -1193,9 +1207,10 @@
     }
   }
 
-  // ========== OPEN SEARCH FORM FOR CLASS ==========
-  function openSearchForClass(classNum) {
+  // ========== SELECT CLASS (opens search form) ==========
+  function selectClass(classNum) {
     selectedClass = classNum;
+    selectedSession = DEFAULT_SESSION;
     var searchSection = document.getElementById('searchSection');
     searchSection.classList.add('active');
     document.getElementById('formSession').value = selectedSession;
@@ -1210,7 +1225,8 @@
     setTimeout(() => document.getElementById('studentIdInput').focus(), 300);
   }
 
-  function closeSearch() {
+  // ========== GO BACK TO CARDS ==========
+  function goBackToCards() {
     document.getElementById('searchSection').classList.remove('active');
     selectedClass = null;
     document.getElementById('studentIdInput').value = '';
@@ -1220,6 +1236,7 @@
     document.getElementById('resultsGrid').scrollIntoView({ behavior: 'smooth' });
   }
 
+  // ========== CLEAR FORM ==========
   function clearForm() {
     document.getElementById('studentIdInput').value = '';
     document.getElementById('dobInput').value = '';
@@ -1231,37 +1248,22 @@
     }
   }
 
-  // ========== DOB AUTO-FORMAT ==========
-  document.getElementById('dobInput').addEventListener('input', function() {
-    var val = this.value.replace(/\D/g, '');
-    if (val.length > 8) val = val.substring(0, 8);
-    var result = '';
-    if (val.length > 4) result = val.substring(0,2) + '/' + val.substring(2,4) + '/' + val.substring(4);
-    else if (val.length > 2) result = val.substring(0,2) + '/' + val.substring(2);
-    else result = val;
-    this.value = result;
-  });
-
-  document.getElementById('studentIdInput').addEventListener('input', function() {
-    this.value = this.value.toUpperCase();
-  });
-
   // ========== SEARCH RESULT ==========
   async function searchResult(e) {
     e.preventDefault();
     const studentId = document.getElementById('studentIdInput').value.trim().toUpperCase();
     const dobRaw = document.getElementById('dobInput').value.trim();
     if (!studentId || !dobRaw) {
-      showAlert('Please enter Student ID and DOB', 'warning');
+      showToast('Enter Student ID and DOB', 'warning');
       return;
     }
     if (!selectedClass) {
-      showAlert('Please select a class first', 'warning');
+      showToast('Select a class first', 'warning');
       return;
     }
     const dobParts = dobRaw.split('/');
     if (dobParts.length !== 3) {
-      showAlert('Invalid DOB format. Use DD/MM/YYYY', 'error');
+      showToast('Invalid DOB format. Use DD/MM/YYYY', 'error');
       return;
     }
     const dob = dobParts[2] + '-' + dobParts[1] + '-' + dobParts[0];
@@ -1285,20 +1287,24 @@
         document.getElementById('formStatus').textContent = 'Result Found!';
         document.getElementById('formStatus').style.color = 'var(--success)';
         renderResult(data.data);
+        showToast('Result found successfully!', 'success');
       } else {
         document.getElementById('formStatus').textContent = data.message || 'No result found';
         document.getElementById('formStatus').style.color = 'var(--danger)';
         resultDisplay.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ' + (data.message || 'No result found') + '</div>';
+        showToast(data.message || 'No result found', 'error');
       }
     } catch(error) {
       document.getElementById('formStatus').textContent = 'Search failed';
       document.getElementById('formStatus').style.color = 'var(--danger)';
       resultDisplay.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Network error. Please try again.</div>';
+      showToast('Network error', 'error');
     }
     searchBtn.disabled = false;
     searchBtn.innerHTML = '<i class="fas fa-search"></i> View Result';
   }
 
+  // ========== RENDER RESULT ==========
   function renderResult(data) {
     const s = data.student;
     const marksheets = data.marksheets || [];
@@ -1344,17 +1350,21 @@
     resultDisplay.scrollIntoView({ behavior: 'smooth' });
   }
 
-  function showAlert(msg, type) {
+  // ========== TOAST NOTIFICATION ==========
+  function showToast(msg, type) {
     const resultDisplay = document.getElementById('resultDisplay');
     if (type === 'warning') {
       resultDisplay.innerHTML = '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> ' + msg + '</div>';
     } else if (type === 'error') {
       resultDisplay.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ' + msg + '</div>';
+    } else if (type === 'success') {
+      // Don't overwrite result display with toast
     } else {
       resultDisplay.innerHTML = '<div class="alert alert-info"><i class="fas fa-info-circle"></i> ' + msg + '</div>';
     }
   }
 
+  // ========== UTILITY FUNCTIONS ==========
   function formatDate(dateStr) {
     if (!dateStr) return 'Not Declared';
     var date = new Date(dateStr);
@@ -1374,15 +1384,16 @@
     const classParam = urlParams.get('class');
     if (classParam) {
       setTimeout(() => {
-        openSearchForClass(parseInt(classParam));
+        selectClass(parseInt(classParam));
       }, 800);
     }
   }
 
+  // ========== INIT ==========
   document.addEventListener('DOMContentLoaded', function() {
-    fetchResults();
+    loadAvailableClasses();
     handleURLParams();
-    setInterval(fetchResults, 60000);
+    setInterval(loadAvailableClasses, 60000);
   });
 </script>
 </body>
