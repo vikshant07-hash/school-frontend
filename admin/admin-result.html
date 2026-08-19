@@ -435,14 +435,7 @@ document.getElementById('publishDate').value=new Date().toISOString().split('T')
 // ================================================================
 
               // ================================================================
-// ORIGINAL MARKSHEET GENERATION - With Footer at Bottom
-// ================================================================
-
-                        // ================================================================
-// QR CODE GENERATE FUNCTION (Base64)
-// ================================================================
-                    
-                        // ================================================================
+                   // ================================================================
 // QR CODE GENERATE FUNCTION (Base64)
 // ================================================================
 function generateQRCodeBase64(url) {
@@ -530,7 +523,10 @@ async function printStudent(studentId) {
                         padding: 0; 
                         box-sizing: border-box; 
                     }
-                    html, body { 
+                    html { 
+                        height: 100%;
+                    }
+                    body { 
                         font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; 
                         color: #1a2332; 
                         background: #ffffff; 
@@ -539,12 +535,8 @@ async function printStudent(studentId) {
                         -webkit-print-color-adjust: exact !important;
                         print-color-adjust: exact !important;
                         height: 100%;
-                    }
-                    
-                    body {
                         display: flex;
                         flex-direction: column;
-                        min-height: 100vh;
                     }
                     
                     .page-container {
@@ -555,6 +547,7 @@ async function printStudent(studentId) {
                         flex: 1;
                         display: flex;
                         flex-direction: column;
+                        height: 100%;
                         min-height: 100vh;
                     }
                     
@@ -676,7 +669,7 @@ async function printStudent(studentId) {
                     
                     /* ===== CONTENT - GROWS TO PUSH FOOTER DOWN ===== */
                     .content-area {
-                        flex: 1;
+                        flex: 1 0 auto;
                         position: relative;
                         z-index: 1;
                     }
@@ -885,25 +878,32 @@ async function printStudent(studentId) {
                         margin: 15px auto 2px;
                     }
                     
-                    /* ===== SECURITY TEXT ===== */
+                    /* ===== FOOTER WRAPPER - Pushes footer to bottom ===== */
+                    .footer-wrapper {
+                        margin-top: auto;
+                        flex-shrink: 0;
+                        position: relative;
+                        z-index: 1;
+                    }
+                    
+                    /* ===== SECURITY TEXT - Just above footer ===== */
                     .security-text-line {
                         text-align: center;
                         font-size: 5.5px;
                         color: rgba(13, 27, 42, 0.2);
                         letter-spacing: 2px;
-                        margin: 8px 0 6px;
-                        padding: 3px 0;
+                        padding: 4px 0;
                         border-top: 1px dashed #cbd5e1;
                         border-bottom: 1px dashed #cbd5e1;
                         text-transform: uppercase;
                         white-space: nowrap;
                         position: relative;
                         z-index: 1;
+                        background: rgba(255,255,255,0.9);
                     }
                     
-                    /* ===== FOOTER - AT THE BOTTOM OF SAME PAGE ===== */
+                    /* ===== FOOTER - AT THE BOTTOM ===== */
                     .page-footer {
-                        margin-top: auto;
                         padding-top: 8px;
                         border-top: 2px solid #c9972b;
                         font-size: 6.5px;
@@ -915,17 +915,31 @@ async function printStudent(studentId) {
                         position: relative;
                         z-index: 1;
                         background: rgba(255,255,255,0.95);
-                        flex-shrink: 0;
                     }
                     .footer-left { text-align: left; }
                     .footer-center { text-align: center; font-weight: 600; color: #0d1b2a; }
                     .footer-right { text-align: right; }
                     
                     @media print {
-                        html, body { margin: 0; padding: 0; height: 100%; }
-                        .page-container { max-width: 100%; min-height: 100vh; }
-                        .page-footer { page-break-inside: avoid; }
-                        .watermark-container { display: block !important; }
+                        html, body { 
+                            margin: 0; 
+                            padding: 0; 
+                            height: 100%;
+                        }
+                        .page-container { 
+                            max-width: 100%; 
+                            min-height: 100vh;
+                            height: 100%;
+                        }
+                        .page-footer { 
+                            page-break-inside: avoid; 
+                        }
+                        .watermark-container { 
+                            display: block !important; 
+                        }
+                        .footer-wrapper {
+                            page-break-inside: avoid;
+                        }
                     }
                 </style>
             </head>
@@ -945,8 +959,8 @@ async function printStudent(studentId) {
                     <div class="page-header">
                         <img src="logo(1).png" class="logo" onerror="this.style.display='none'">
                         <div class="school-name">Govt. Sr. Sec. School Shilla</div>
-                        <div class="school-tagline">Shilla • District Solan • Himachal Pradesh - 173229</div>
-                        <div class="heading-box">Original Marksheet</div>
+                        <div class="school-tagline">Shilla • Nerwa • Distt. Shimla • Himachal Pradesh - 171210</div>
+                        <div class="heading-box">Student Marksheet</div>
                     </div>
                     
                     <!-- CONTENT AREA - This grows to push footer down -->
@@ -986,10 +1000,10 @@ async function printStudent(studentId) {
                                 <td class="value-cell">${esc(s.class||'-')}${s.section ? ' - ' + esc(s.section) : ''}</td>
                             </tr>
                             <tr>
-                                <td class="label-cell">Exam Roll No</td>
+                                <td class="label-cell">Enrollment Number</td>
                                 <td class="value-cell">${esc(s.exam_roll_no||'-')}</td>
                                 <td class="label-cell">Status</td>
-                                <td class="value-cell"><span style="color:#10b981;font-weight:700;">PASS</span></td>
+                                <td class="value-cell">PASS</td>
                             </tr>
                         </table>
                         
@@ -1000,7 +1014,7 @@ async function printStudent(studentId) {
                         </div>
                         
                         <!-- MARKSHEETS -->
-                        <div class="marksheet-heading">Available Marksheets (${marksheets.length})</div>
+                        <div class="marksheet-heading"> Available Marksheets (${marksheets.length})</div>
                         <table class="marksheet-table">
                             <thead>
                                 <tr>
@@ -1042,26 +1056,29 @@ async function printStudent(studentId) {
                                 <div style="font-size:6.5px;color:#94a3b8;">Govt. Sr. Sec. School Shilla</div>
                             </div>
                         </div>
-                        
-                        <!-- SECURITY TEXT -->
-                        <div class="security-text-line">
-                            GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT
-                        </div>
                     </div>
                     
-                    <!-- ===== FOOTER - AT THE BOTTOM OF SAME PAGE ===== -->
-                    <div class="page-footer">
-                        <div class="footer-left">
-                            <strong>Print Date:</strong> ${new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})}<br>
-                            <strong>Time:</strong> ${new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'})}
+                    <!-- ===== FOOTER WRAPPER - Pushes everything to bottom ===== -->
+                    <div class="footer-wrapper">
+                        <!-- SECURITY TEXT - Just above footer -->
+                        <div class="security-text-line">
+                            GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; ORIGINAL MARKSHEET &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT
                         </div>
-                        <div class="footer-center">
-                            <strong>Downloaded by:</strong> ${esc(downloadedBy)}<br>
-                            <span style="font-size:5px;color:#94a3b8;">Authorized Signatory</span>
-                        </div>
-                        <div class="footer-right">
-                            <strong>Page 1 of 1</strong><br>
-                            <span style="font-size:5px;">GSSS Shilla - Official Document</span>
+                        
+                        <!-- ===== FOOTER - AT THE BOTTOM ===== -->
+                        <div class="page-footer">
+                            <div class="footer-left">
+                                <strong>Print Date:</strong> ${new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})}<br>
+                                <strong>Time:</strong> ${new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'})}
+                            </div>
+                            <div class="footer-center">
+                                <strong>Issued by:</strong> ${esc(downloadedBy)}<br>
+                                <span style="font-size:5px;color:#94a3b8;">Authorized Signatory</span>
+                            </div>
+                            <div class="footer-right">
+                                <strong>Page 1 of 1</strong><br>
+                                <span style="font-size:5px;">GSSS Shilla - Official Document</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1072,6 +1089,9 @@ async function printStudent(studentId) {
         setTimeout(() => { pw.focus(); pw.print(); }, 2000);
     } catch(e) { showToast(e.message,'error'); }
 }
+
+
+    
 
                     
 async function printClassStudents() {
