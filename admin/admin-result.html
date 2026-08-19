@@ -178,7 +178,16 @@
                 <span>📄 Marksheets: <strong id="classMarksheetCount">-</strong></span>
                 <span>✅ Published: <strong id="classPublishedCount">-</strong></span>
                 <button class="btn btn-sm btn-primary" onclick="printClassStudents()" style="margin-left:auto;"><i class="fas fa-print"></i> Print All</button>
-            </div>
+            
+            <select id="sortSelect" class="btn btn-outline" style="padding:6px 14px; font-family:'Inter',sans-serif; font-size:12px; border-radius:8px; cursor:pointer;">
+        <option value="roll_asc">Roll No ↑</option>
+        <option value="roll_desc">Roll No ↓</option>
+        <option value="name_asc">Name A-Z</option>
+        <option value="name_desc">Name Z-A</option>
+            </select>
+    <button class="btn btn-sm btn-primary" onclick="printClassStudents()"><i class="fas fa-print"></i> Print All</button>
+        </div>
+            
         </div>
         <div id="studentGridContainer"><div class="loading" style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Loading students...</div></div>
         <div class="pagination" id="pagination" style="display:flex;justify-content:center;gap:6px;margin-top:20px;"></div>
@@ -304,6 +313,114 @@ function switchTab(tab){
     if(tab==='upload') loadRecentUploads();
     if(tab==='publish') loadPublishableStudents(publishClass);
 }
+// ================================================================
+// SORT CONFIGURATION
+// ================================================================
+let sortField = 'roll';   // 'roll' or 'name'
+let sortOrder = 'asc';    // 'asc' or 'desc'
+
+// ================================================================
+// SORT STUDENTS FUNCTION
+// ================================================================
+function sortStudents(students) {
+    return students.sort((a, b) => {
+        let valA, valB;
+        
+        if (sortField === 'roll') {
+            valA = parseInt(a.exam_roll_no) || 0;
+            valB = parseInt(b.exam_roll_no) || 0;
+        } else if (sortField === 'name') {
+            valA = (a.name || '').toLowerCase();
+            valB = (b.name || '').toLowerCase();
+        } else {
+            valA = parseInt(a.exam_roll_no) || 0;
+            valB = parseInt(b.exam_roll_no) || 0;
+        }
+        
+        if (sortOrder === 'asc') {
+            return valA > valB ? 1 : valA < valB ? -1 : 0;
+        } else {
+            return valA < valB ? 1 : valA > valB ? -1 : 0;
+        }
+    });
+}
+
+// ================================================================
+// APPLY SORT - Called when dropdown changes
+// ================================================================
+function applySort() {
+    const sortValue = document.getElementById('sortSelect').value;
+    
+    switch(sortValue) {
+        case 'roll_asc':
+            sortField = 'roll';
+            sortOrder = 'asc';
+            break;
+        case 'roll_desc':
+            sortField = 'roll';
+            sortOrder = 'desc';
+            break;
+        case 'name_asc':
+            sortField = 'name';
+            sortOrder = 'asc';
+            break;
+        case 'name_desc':
+            sortField = 'name';
+            sortOrder = 'desc';
+            break;
+        default:
+            sortField = 'roll';
+            sortOrder = 'asc';
+    }
+    
+    // Reload current page with new sort
+    loadStudents(currentClass, currentPage);
+}
+
+// ================================================================
+// MODIFIED LOAD STUDENTS - WITH SORT
+// ================================================================
+async function loadStudents(classNum, page = 1) {
+    currentPage = page;
+    const session = document.getElementById('sessionFilter').value;
+    const params = new URLSearchParams({page, limit: PAGE_SIZE});
+    if (session) params.set('session', session);
+    
+    const container = document.getElementById('studentGridContainer');
+    container.innerHTML = '<div class="loading" style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+    
+    try {
+        const data = await apiCall(`${API_BASE}/class/${classNum}/students?${params}`);
+        
+        // ✅ SORT STUDENTS
+        let students = data.data || [];
+        students = sortStudents(students);
+        
+        renderStudentCards(students);
+        renderPagination(data.pagination, (p) => loadStudents(classNum, p));
+        
+        document.getElementById('classStudentCount').textContent = data.pagination?.total ?? students.length;
+        document.getElementById('classMarksheetCount').textContent = students.reduce((s, x) => s + (Number(x.marksheet_count) || 0), 0);
+        document.getElementById('classPublishedCount').textContent = students.reduce((s, x) => s + (Number(x.published_count) || 0), 0);
+        
+    } catch(e) {
+        if(e.message !== 'Session expired') {
+            container.innerHTML = `<div class="alert-box error">${esc(e.message)} <button onclick="loadStudents(${classNum},${page})" style="background:none;border:none;color:var(--gold);cursor:pointer;font-weight:600;">Retry</button></div>`;
+        }
+    }
+}
+
+// ================================================================
+// EVENT LISTENER FOR SORT DROPDOWN
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Set default sort to Roll No ↑
+    document.getElementById('sortSelect').value = 'roll_asc';
+    
+    // Add event listener for sort dropdown
+    document.getElementById('sortSelect').addEventListener('change', applySort);
+});
+    
 
 function selectClass(c){ currentClass=c; currentPage=1; document.querySelectorAll('#classButtons .class-btn').forEach(b=>b.classList.remove('active')); document.querySelector(`#classButtons .class-btn[data-class="${c}"]`).classList.add('active'); loadStudents(c); }
 
