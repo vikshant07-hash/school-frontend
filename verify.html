@@ -41,6 +41,7 @@
             background: linear-gradient(135deg, #f0f4f8 0%, #fef8ed 100%);
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
@@ -64,7 +65,7 @@
             text-align: center;
             border-bottom: 3px solid var(--accent);
         }
-        .verify-header .logo {
+        .school-logo {
             width: 70px;
             height: 70px;
             border-radius: 50%;
@@ -75,7 +76,7 @@
             display: block;
             object-fit: contain;
         }
-        .verify-header h1 {
+        .school-name {
             font-family: 'Playfair Display', serif;
             font-size: 20px;
             font-weight: 800;
@@ -83,25 +84,12 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        .verify-header p {
+        .school-tagline {
             color: rgba(255,255,255,0.6);
             font-size: 10px;
             letter-spacing: 2px;
             text-transform: uppercase;
             margin-top: 3px;
-        }
-        .provisional-badge {
-            display: inline-block;
-            background: #fef3c7;
-            color: #92400e;
-            padding: 5px 18px;
-            border-radius: 50px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 1px dashed #92400e;
-            margin-top: 10px;
         }
 
         /* BODY */
@@ -129,8 +117,9 @@
             border-color: var(--accent);
             background: #fef8ed;
             transform: translateY(-3px);
+            box-shadow: var(--shadow-sm);
         }
-        .scan-option .scan-icon {
+        .scan-icon {
             font-size: 28px;
             color: var(--accent-dark);
             margin-bottom: 8px;
@@ -225,6 +214,10 @@
             font-size: 10px;
             letter-spacing: 0.5px;
         }
+        .student-details-table td:last-child {
+            font-weight: 500;
+            color: var(--text);
+        }
 
         .confirmation-box {
             background: var(--success-light);
@@ -242,22 +235,6 @@
         .confirmation-box i { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
         .confirmation-box strong { display: block; font-size: 13px; margin-bottom: 2px; }
         .confirmation-box p { font-size: 11px; color: #166534; line-height: 1.5; }
-
-        .provisional-notice {
-            background: var(--warning-light);
-            border: 1px solid #fde68a;
-            border-left: 4px solid var(--warning);
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin: 10px 0;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            font-size: 12px;
-            color: #92400e;
-        }
-        .provisional-notice i { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
-        .provisional-notice strong { display: block; font-size: 13px; margin-bottom: 2px; }
 
         .invalid-box {
             background: var(--danger-light);
@@ -289,7 +266,7 @@
             margin-top: 10px;
         }
         .btn-primary { background: var(--accent); color: var(--white); }
-        .btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); }
+        .btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,151,43,0.3); }
         .btn-secondary { background: var(--off-white); color: var(--text-light); border: 1px solid var(--gray-light); }
         .btn-secondary:hover { background: var(--gray-light); color: var(--text); }
 
@@ -309,6 +286,20 @@
             .verify-body { padding: 20px 15px; }
             .scanner-options { grid-template-columns: 1fr; }
             .student-details-table td { padding: 8px; font-size: 11px; }
+            .student-details-table td:first-child { font-size: 9px; }
+        }
+
+        /* PRINT STYLES */
+        @media print {
+            body { background: #fff; padding: 0; }
+            .verification-container { box-shadow: none; border: none; max-width: 100%; }
+            .scanner-options, .camera-modal, .btn, .verify-footer { display: none !important; }
+            .verify-header { background: #fff; border-bottom: 3px solid var(--accent); }
+            .school-name { color: var(--primary); }
+            .school-tagline { color: var(--gray); }
+            .verify-body { padding: 0; }
+            .student-details-table { border: 2px solid var(--primary); }
+            .confirmation-box { border: 1px solid #bbf7d0; }
         }
     </style>
 </head>
@@ -316,10 +307,9 @@
     <div class="verification-container">
         <!-- HEADER -->
         <div class="verify-header">
-            <img src="logo.png" alt="School Logo" class="logo" onerror="this.style.display='none'">
-            <h1>Govt. Sr. Sec. School Shilla</h1>
-            <p>Document Verification</p>
-            <span class="provisional-badge"><i class="fas fa-file-alt"></i> Provisional Certificate</span>
+            <img src="logo.png" alt="School Logo" class="school-logo" onerror="this.style.display='none'">
+            <div class="school-name">Govt. Sr. Sec. School Shilla</div>
+            <div class="school-tagline">Shilla • District Solan • Himachal Pradesh</div>
         </div>
 
         <!-- BODY -->
@@ -339,17 +329,17 @@
                 <div class="scan-option" onclick="document.getElementById('pdfInput').click()">
                     <div class="scan-icon"><i class="fas fa-file-pdf"></i></div>
                     <h4>PDF</h4>
-                    <p>Upload marksheet</p>
+                    <p>Upload document</p>
                 </div>
             </div>
             <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="scanImage(event)">
             <input type="file" id="pdfInput" accept=".pdf" style="display:none" onchange="scanPDF(event)">
 
-            <!-- RESULT -->
+            <!-- VERIFICATION RESULT -->
             <div id="verificationResult">
                 <div style="text-align:center;padding:30px;">
                     <i class="fas fa-qrcode" style="font-size:40px;color:var(--accent);"></i>
-                    <p style="margin-top:10px;color:var(--text-light);">Scan QR code to verify</p>
+                    <p style="margin-top:10px;color:var(--text-light);">Scan QR code to verify document</p>
                 </div>
             </div>
         </div>
@@ -364,19 +354,19 @@
     <div class="camera-modal" id="cameraModal">
         <video id="cameraVideo" autoplay playsinline></video>
         <div class="camera-controls">
-            <button class="btn-scan" onclick="captureAndScan()"><i class="fas fa-camera"></i> Scan</button>
+            <button class="btn-scan" onclick="captureAndScan()"><i class="fas fa-camera"></i> Scan QR</button>
             <button class="btn-close-camera" onclick="closeCamera()"><i class="fas fa-times"></i> Close</button>
         </div>
     </div>
 
     <script>
         let cameraStream = null;
-        let currentVerifiedData = null;
         
         // Set PDF.js worker
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Check URL for data (mobile scanner)
             const urlParams = new URLSearchParams(window.location.search);
             const dataParam = urlParams.get('data');
             if (dataParam) {
@@ -392,7 +382,7 @@
                 video.srcObject = cameraStream;
                 document.getElementById('cameraModal').classList.add('active');
             } catch(e) {
-                alert('Camera access denied. Please use Image or PDF upload.');
+                alert('Camera access denied. Please use Image or PDF upload option.');
             }
         }
 
@@ -444,7 +434,7 @@
                     if (code && code.data) {
                         extractAndVerify(code.data);
                     } else {
-                        showInvalid('Could not detect QR code in image. Please try a clearer photo.');
+                        showInvalid('Could not detect QR code in the image. Please try a clearer photo.');
                     }
                 };
                 img.src = e.target.result;
@@ -512,31 +502,24 @@
             try {
                 const data = JSON.parse(decodeURIComponent(dataParam));
                 if (!data.student_id || !data.name) {
-                    showInvalid('Invalid verification data.');
+                    showInvalid('Invalid verification data. This document may be tampered.');
                     return;
                 }
                 showVerified(data);
             } catch(e) {
-                showInvalid('Invalid data format.');
+                showInvalid('Invalid verification data format.');
             }
         }
 
-        // ============ SHOW RESULTS ============
+        // ============ SHOW VERIFIED ============
         function showVerified(data) {
-            currentVerifiedData = data;
             const resultDiv = document.getElementById('verificationResult');
             document.getElementById('scannerOptions').style.display = 'none';
             
             resultDiv.innerHTML = `
                 <div class="verify-icon verified"><i class="fas fa-check-circle"></i></div>
                 <h2 class="verify-title">Document Verified</h2>
-                <p class="verify-subtitle">Authentic provisional marksheet - GSSS Shilla</p>
-                
-                <div class="provisional-notice">
-                    <i class="fas fa-info-circle"></i>
-                    <div><strong>Provisional Certificate</strong>
-                    <p style="font-size:11px;">This is a provisional marksheet and not the original document.</p></div>
-                </div>
+                <p class="verify-subtitle">This is an authentic document issued by GSSS Shilla</p>
                 
                 <table class="student-details-table">
                     <tr><td>Student ID</td><td>${esc(data.student_id)}</td></tr>
@@ -552,31 +535,35 @@
                 
                 <div class="confirmation-box">
                     <i class="fas fa-shield-alt"></i>
-                    <div><strong>Confirmation</strong>
-                    <p>This marksheet belongs to the student mentioned above. Verified from school records.</p></div>
+                    <div>
+                        <strong>Confirmation</strong>
+                        <p>This marksheet belongs to the student mentioned above. The details have been verified from the school's official records.</p>
+                    </div>
                 </div>
                 
                 <div style="text-align:center;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
-                    <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+                    <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Print Verification</button>
                     <button class="btn btn-secondary" onclick="resetVerification()"><i class="fas fa-redo"></i> Verify Another</button>
                 </div>
             `;
         }
 
+        // ============ SHOW INVALID ============
         function showInvalid(msg) {
             const resultDiv = document.getElementById('verificationResult');
             resultDiv.innerHTML = `
                 <div class="verify-icon invalid"><i class="fas fa-times-circle"></i></div>
                 <h2 class="verify-title" style="color:#dc2626;">Verification Failed</h2>
-                <p class="verify-subtitle">Document could not be verified</p>
+                <p class="verify-subtitle">This document could not be verified</p>
                 <div class="invalid-box"><i class="fas fa-exclamation-triangle"></i><div>${msg}</div></div>
+                <p style="font-size:11px;color:var(--gray);text-align:center;margin-top:10px;">If you believe this is an error, please contact the school administration.</p>
                 <div style="text-align:center;"><button class="btn btn-secondary" onclick="resetVerification()"><i class="fas fa-redo"></i> Try Again</button></div>
             `;
         }
 
         function resetVerification() {
             document.getElementById('verificationResult').innerHTML = `
-                <div style="text-align:center;padding:30px;"><i class="fas fa-qrcode" style="font-size:40px;color:var(--accent);"></i><p style="margin-top:10px;color:var(--text-light);">Scan QR code to verify</p></div>`;
+                <div style="text-align:center;padding:30px;"><i class="fas fa-qrcode" style="font-size:40px;color:var(--accent);"></i><p style="margin-top:10px;color:var(--text-light);">Scan QR code to verify document</p></div>`;
             document.getElementById('scannerOptions').style.display = 'grid';
             document.getElementById('imageInput').value = '';
             document.getElementById('pdfInput').value = '';
