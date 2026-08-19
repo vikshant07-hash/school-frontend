@@ -457,6 +457,31 @@ function generateQRCodeBase64(url) {
 // ================================================================
 // PRINT STUDENT - Complete Original Marksheet with Footer at Bottom
 // ================================================================
+
+                                                
+                                        
+                     // ================================================================
+// QR CODE GENERATE FUNCTION (Base64)
+// ================================================================
+function generateQRCodeBase64(url) {
+    return new Promise((resolve) => {
+        const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(url)}`;
+        
+        fetch(apiUrl)
+            .then(res => res.blob())
+            .then(blob => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = () => resolve(null);
+                reader.readAsDataURL(blob);
+            })
+            .catch(() => resolve(null));
+    });
+}
+
+// ================================================================
+// PRINT STUDENT - Complete Original Marksheet with Footer at Bottom
+// ================================================================
 async function printStudent(studentId) {
     try {
         const data = await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`);
@@ -493,14 +518,14 @@ async function printStudent(studentId) {
         marksheetsWithQR.forEach((m, idx) => {
             marksheetRows += `
                 <tr>
-                    <td style="text-align:center;padding:5px 8px;border:1px solid #d1d5db;">${idx+1}</td>
-                    <td style="padding:5px 8px;border:1px solid #d1d5db;font-weight:600;">${esc(m.exam_type)}</td>
-                    <td style="padding:5px 8px;border:1px solid #d1d5db;text-align:center;">${esc(m.session)}</td>
-                    <td style="padding:5px 8px;border:1px solid #d1d5db;text-align:center;">${esc(m.class||'-')}</td>
-                    <td style="padding:5px 8px;border:1px solid #d1d5db;font-size:6.5px;word-break:break-all;color:#6b7280;">${esc(m.cloudinary_url||'-')}</td>
-                    <td style="text-align:center;padding:5px 8px;border:1px solid #d1d5db;">
+                    <td style="text-align:center;padding:4px 6px;border:1px solid #d1d5db;">${idx+1}</td>
+                    <td style="padding:4px 6px;border:1px solid #d1d5db;font-weight:600;">${esc(m.exam_type)}</td>
+                    <td style="padding:4px 6px;border:1px solid #d1d5db;text-align:center;">${esc(m.session)}</td>
+                    <td style="padding:4px 6px;border:1px solid #d1d5db;text-align:center;">${esc(m.class||'-')}</td>
+                    <td style="padding:4px 6px;border:1px solid #d1d5db;font-size:6px;word-break:break-all;color:#6b7280;">${esc(m.cloudinary_url||'-')}</td>
+                    <td style="text-align:center;padding:4px 6px;border:1px solid #d1d5db;">
                         ${m.qrBase64 ? 
-                            `<img src="${m.qrBase64}" width="55" height="55" style="border:1px solid #c9972b;padding:2px;background:white;">` : 
+                            `<img src="${m.qrBase64}" width="50" height="50" style="border:1px solid #c9972b;padding:2px;background:white;">` : 
                             '<div style="font-size:6px;color:#94a3b8;">N/A</div>'
                         }
                     </td>
@@ -516,7 +541,7 @@ async function printStudent(studentId) {
                 <style>
                     @page { 
                         size: A4; 
-                        margin: 10mm; 
+                        margin: 5mm 8mm 5mm 8mm;
                     }
                     * { 
                         margin: 0; 
@@ -543,7 +568,7 @@ async function printStudent(studentId) {
                         width: 100%;
                         max-width: 186mm;
                         margin: 0 auto;
-                        padding: 10px 12px;
+                        padding: 4px 6px;
                         flex: 1;
                         display: flex;
                         flex-direction: column;
@@ -622,7 +647,7 @@ async function printStudent(studentId) {
                     /* ===== HEADER ===== */
                     .page-header {
                         text-align: center;
-                        padding-bottom: 8px;
+                        padding-bottom: 6px;
                         border-bottom: 3px solid #c9972b;
                         position: relative;
                         z-index: 1;
@@ -630,25 +655,25 @@ async function printStudent(studentId) {
                         flex-shrink: 0;
                     }
                     .page-header .logo {
-                        width: 50px;
-                        height: 50px;
+                        width: 45px;
+                        height: 45px;
                         border-radius: 50%;
                         border: 3px solid #c9972b;
-                        padding: 3px;
+                        padding: 2px;
                         background: white;
-                        margin: 0 auto 4px;
+                        margin: 0 auto 2px;
                         display: block;
                     }
                     .page-header .school-name {
                         font-family: 'Georgia', serif;
-                        font-size: 16px;
+                        font-size: 14px;
                         font-weight: 900;
                         text-transform: uppercase;
                         letter-spacing: 1.5px;
                         color: #0d1b2a;
                     }
                     .page-header .school-tagline {
-                        font-size: 7px;
+                        font-size: 6px;
                         color: #5a6a7e;
                         letter-spacing: 2px;
                         text-transform: uppercase;
@@ -657,14 +682,14 @@ async function printStudent(studentId) {
                         display: inline-block;
                         background: #0d1b2a;
                         color: #fff;
-                        padding: 3px 22px;
+                        padding: 2px 18px;
                         border-radius: 25px;
-                        font-size: 11px;
+                        font-size: 10px;
                         font-weight: 700;
                         letter-spacing: 2px;
                         text-transform: uppercase;
                         border: 2px solid #c9972b;
-                        margin-top: 4px;
+                        margin-top: 2px;
                     }
                     
                     /* ===== CONTENT - GROWS TO PUSH FOOTER DOWN ===== */
@@ -677,12 +702,12 @@ async function printStudent(studentId) {
                     /* ===== DECLARATION BOX ===== */
                     .declaration-box {
                         background: #fef8ed;
-                        border-left: 5px solid #c9972b;
-                        border-right: 5px solid #c9972b;
-                        padding: 8px 14px;
-                        margin: 8px 0 10px;
+                        border-left: 4px solid #c9972b;
+                        border-right: 4px solid #c9972b;
+                        padding: 5px 12px;
+                        margin: 5px 0 6px;
                         border-radius: 4px;
-                        font-size: 10px;
+                        font-size: 9px;
                         color: #1a2332;
                         font-style: italic;
                         text-align: center;
@@ -692,8 +717,8 @@ async function printStudent(studentId) {
                     }
                     .declaration-box i {
                         color: #10b981;
-                        margin-right: 6px;
-                        font-size: 12px;
+                        margin-right: 4px;
+                        font-size: 10px;
                     }
                     .declaration-box strong {
                         color: #0d1b2a;
@@ -703,15 +728,15 @@ async function printStudent(studentId) {
                     .student-info-table {
                         width: 100%;
                         border-collapse: collapse;
-                        margin: 6px 0;
+                        margin: 4px 0;
                         border: 2px solid #0d1b2a;
                         position: relative;
                         z-index: 1;
                     }
                     .student-info-table td {
-                        padding: 5px 8px;
+                        padding: 4px 6px;
                         border: 1px solid #d1d5db;
-                        font-size: 8.5px;
+                        font-size: 8px;
                         vertical-align: middle;
                     }
                     .student-info-table .label-cell {
@@ -721,7 +746,7 @@ async function printStudent(studentId) {
                         width: 14%;
                         letter-spacing: 0.5px;
                         text-transform: uppercase;
-                        font-size: 7px;
+                        font-size: 6.5px;
                     }
                     .student-info-table .value-cell {
                         font-weight: 500;
@@ -729,14 +754,14 @@ async function printStudent(studentId) {
                         width: 30%;
                     }
                     .photo-cell {
-                        width: 72px;
+                        width: 65px;
                         text-align: center;
                         vertical-align: middle;
                         background: #f8fafc;
                     }
                     .photo-box {
-                        width: 62px;
-                        height: 80px;
+                        width: 55px;
+                        height: 70px;
                         border: 3px solid #c9972b;
                         border-radius: 6px;
                         overflow: hidden;
@@ -757,16 +782,16 @@ async function printStudent(studentId) {
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        font-size: 25px;
+                        font-size: 20px;
                         color: #cbd5e1;
                     }
                     
                     /* ===== MARKSHEET TABLE ===== */
                     .marksheet-heading {
-                        font-size: 10px;
+                        font-size: 9px;
                         font-weight: 700;
-                        margin: 8px 0 4px;
-                        padding: 4px 10px;
+                        margin: 5px 0 3px;
+                        padding: 3px 8px;
                         background: #fef8ed;
                         border-left: 4px solid #c9972b;
                         letter-spacing: 1px;
@@ -776,7 +801,7 @@ async function printStudent(studentId) {
                     .marksheet-table {
                         width: 100%;
                         border-collapse: collapse;
-                        margin: 4px 0;
+                        margin: 3px 0;
                         border: 2px solid #0d1b2a;
                         position: relative;
                         z-index: 1;
@@ -784,17 +809,17 @@ async function printStudent(studentId) {
                     .marksheet-table th {
                         background: #0d1b2a;
                         color: #fff;
-                        padding: 4px 6px;
+                        padding: 3px 5px;
                         border: 1px solid #0d1b2a;
-                        font-size: 6.5px;
+                        font-size: 6px;
                         text-transform: uppercase;
                         letter-spacing: 1px;
                         text-align: center;
                     }
                     .marksheet-table td {
-                        padding: 4px 6px;
+                        padding: 3px 5px;
                         border: 1px solid #d1d5db;
-                        font-size: 7.5px;
+                        font-size: 7px;
                         text-align: center;
                     }
                     
@@ -802,9 +827,9 @@ async function printStudent(studentId) {
                     .verification-section {
                         display: flex;
                         align-items: center;
-                        gap: 12px;
-                        margin: 10px 0 12px;
-                        padding: 8px 14px;
+                        gap: 10px;
+                        margin: 6px 0 8px;
+                        padding: 6px 12px;
                         border: 2px solid #c9972b;
                         background: #fef8ed;
                         border-radius: 8px;
@@ -812,8 +837,8 @@ async function printStudent(studentId) {
                         z-index: 1;
                     }
                     .verification-qr {
-                        width: 65px;
-                        height: 65px;
+                        width: 55px;
+                        height: 55px;
                         border: 2px solid #0d1b2a;
                         border-radius: 5px;
                         overflow: hidden;
@@ -824,28 +849,28 @@ async function printStudent(studentId) {
                         justify-content: center;
                     }
                     .verification-qr img {
-                        width: 60px;
-                        height: 60px;
+                        width: 50px;
+                        height: 50px;
                     }
                     .verification-text {
                         flex: 1;
-                        font-size: 8px;
+                        font-size: 7px;
                         color: #0d1b2a;
                     }
                     .verification-text strong {
                         display: block;
-                        font-size: 10px;
-                        margin-bottom: 2px;
+                        font-size: 8.5px;
+                        margin-bottom: 1px;
                         color: #c9972b;
                     }
                     .verification-text .scan-label {
-                        font-size: 8.5px;
+                        font-size: 7.5px;
                         font-weight: 700;
                         color: #0d1b2a;
                         letter-spacing: 1px;
                     }
                     .verification-text p {
-                        font-size: 7px;
+                        font-size: 6.5px;
                         color: #5a6a7e;
                         margin: 1px 0;
                     }
@@ -854,28 +879,28 @@ async function printStudent(studentId) {
                     .signature-area {
                         display: flex;
                         justify-content: flex-end;
-                        margin-top: 10px;
-                        padding-top: 6px;
+                        margin-top: 6px;
+                        padding-top: 4px;
                         position: relative;
                         z-index: 1;
                     }
                     .signature-box {
                         text-align: center;
-                        font-size: 7.5px;
-                        width: 180px;
+                        font-size: 7px;
+                        width: 160px;
                     }
                     .signature-box .signature-img {
-                        height: 40px;
-                        max-width: 140px;
+                        height: 35px;
+                        max-width: 120px;
                         object-fit: contain;
                         display: block;
                         margin: 0 auto 2px;
                     }
                     .signature-box .line {
-                        width: 120px;
+                        width: 100px;
                         height: 1px;
                         border-top: 1px dashed #94a3b8;
-                        margin: 15px auto 2px;
+                        margin: 12px auto 2px;
                     }
                     
                     /* ===== FOOTER WRAPPER - Pushes footer to bottom ===== */
@@ -889,10 +914,10 @@ async function printStudent(studentId) {
                     /* ===== SECURITY TEXT - Just above footer ===== */
                     .security-text-line {
                         text-align: center;
-                        font-size: 5.5px;
-                        color: rgba(13, 27, 42, 0.2);
+                        font-size: 5px;
+                        color: rgba(13, 27, 42, 0.18);
                         letter-spacing: 2px;
-                        padding: 4px 0;
+                        padding: 3px 0;
                         border-top: 1px dashed #cbd5e1;
                         border-bottom: 1px dashed #cbd5e1;
                         text-transform: uppercase;
@@ -904,9 +929,9 @@ async function printStudent(studentId) {
                     
                     /* ===== FOOTER - AT THE BOTTOM ===== */
                     .page-footer {
-                        padding-top: 8px;
+                        padding-top: 5px;
                         border-top: 2px solid #c9972b;
-                        font-size: 6.5px;
+                        font-size: 6px;
                         color: #64748b;
                         display: flex;
                         justify-content: space-between;
@@ -959,11 +984,11 @@ async function printStudent(studentId) {
                     <div class="page-header">
                         <img src="logo(1).png" class="logo" onerror="this.style.display='none'">
                         <div class="school-name">Govt. Sr. Sec. School Shilla</div>
-                        <div class="school-tagline">Shilla • Nerwa • Distt. Shimla • Himachal Pradesh - 171210</div>
-                        <div class="heading-box">Student Marksheet</div>
+                        <div class="school-tagline">Shilla • District Solan • Himachal Pradesh - 173229</div>
+                        <div class="heading-box">Original Marksheet</div>
                     </div>
                     
-                    <!-- CONTENT AREA - This grows to push footer down -->
+                    <!-- CONTENT AREA -->
                     <div class="content-area">
                         <!-- STUDENT INFORMATION -->
                         <table class="student-info-table">
@@ -983,7 +1008,7 @@ async function printStudent(studentId) {
                             </tr>
                             <tr>
                                 <td class="label-cell">Student Name</td>
-                                <td class="value-cell" style="font-weight:700;font-size:10px;">${esc(s.name)}</td>
+                                <td class="value-cell" style="font-weight:700;font-size:9.5px;">${esc(s.name)}</td>
                                 <td class="label-cell">Father's Name</td>
                                 <td class="value-cell">${esc(s.father_name||'-')}</td>
                             </tr>
@@ -1003,11 +1028,11 @@ async function printStudent(studentId) {
                                 <td class="label-cell">Enrollment Number</td>
                                 <td class="value-cell">${esc(s.exam_roll_no||'-')}</td>
                                 <td class="label-cell">Status</td>
-                                <td class="value-cell">PASS</td>
+                                <td class="value-cell"><span style="color:#10b981;font-weight:700;">PASS</span></td>
                             </tr>
                         </table>
                         
-                        <!-- ===== DECLARATION BOX ===== -->
+                        <!-- DECLARATION BOX -->
                         <div class="declaration-box">
                             <i class="fas fa-check-circle"></i> 
                             This is to certify that <strong>${esc(s.name)}</strong> (Student ID: ${esc(s.student_id)}) has successfully completed the <strong>${esc(s.session||'')}</strong> session and is declared <strong>PASS</strong>.
@@ -1018,16 +1043,16 @@ async function printStudent(studentId) {
                         <table class="marksheet-table">
                             <thead>
                                 <tr>
-                                    <th style="width:22px;">#</th>
+                                    <th style="width:20px;">#</th>
                                     <th>Exam Type</th>
-                                    <th style="width:45px;">Session</th>
-                                    <th style="width:35px;">Class</th>
+                                    <th style="width:40px;">Session</th>
+                                    <th style="width:30px;">Class</th>
                                     <th>Marksheet URL</th>
-                                    <th style="width:62px;">QR Code</th>
+                                    <th style="width:55px;">QR Code</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${marksheetRows || '<tr><td colspan="6" style="text-align:center;padding:10px;">No marksheets available</td></tr>'}
+                                ${marksheetRows || '<tr><td colspan="6" style="text-align:center;padding:8px;">No marksheets available</td></tr>'}
                             </tbody>
                         </table>
                         
@@ -1043,7 +1068,7 @@ async function printStudent(studentId) {
                                 <strong>Scan to Verify</strong>
                                 <p class="scan-label">Scan this QR code to verify the authenticity of this marksheet.</p>
                                 <p>This document is digitally verified and issued by Govt. Sr. Sec. School Shilla.</p>
-                                <p style="font-size:6.5px;color:#94a3b8;margin-top:2px;">Verification ID: ${esc(s.student_id)}-${Date.now().toString().substring(8)}</p>
+                                <p style="font-size:6px;color:#94a3b8;margin-top:1px;">Verification ID: ${esc(s.student_id)}-${Date.now().toString().substring(8)}</p>
                             </div>
                         </div>
                         
@@ -1053,19 +1078,19 @@ async function printStudent(studentId) {
                                 <img src="principal.png" class="signature-img" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'line\\'></div><strong>Principal</strong>'">
                                 <div class="line"></div>
                                 <strong>Principal</strong>
-                                <div style="font-size:6.5px;color:#94a3b8;">Govt. Sr. Sec. School Shilla</div>
+                                <div style="font-size:6px;color:#94a3b8;">Govt. Sr. Sec. School Shilla</div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- ===== FOOTER WRAPPER - Pushes everything to bottom ===== -->
+                    <!-- FOOTER WRAPPER -->
                     <div class="footer-wrapper">
                         <!-- SECURITY TEXT - Just above footer -->
                         <div class="security-text-line">
-                            GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; ORIGINAL MARKSHEET &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT
+                            GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT
                         </div>
                         
-                        <!-- ===== FOOTER - AT THE BOTTOM ===== -->
+                        <!-- FOOTER - AT THE BOTTOM -->
                         <div class="page-footer">
                             <div class="footer-left">
                                 <strong>Print Date:</strong> ${new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})}<br>
@@ -1073,11 +1098,11 @@ async function printStudent(studentId) {
                             </div>
                             <div class="footer-center">
                                 <strong>Issued by:</strong> ${esc(downloadedBy)}<br>
-                                <span style="font-size:5px;color:#94a3b8;">Authorized Signatory</span>
+                                <span style="font-size:4.5px;color:#94a3b8;">Authorized Signatory</span>
                             </div>
                             <div class="footer-right">
                                 <strong>Page 1 of 1</strong><br>
-                                <span style="font-size:5px;">GSSS Shilla - Official Document</span>
+                                <span style="font-size:4.5px;">GSSS Shilla - Official Document</span>
                             </div>
                         </div>
                     </div>
@@ -1088,6 +1113,7 @@ async function printStudent(studentId) {
         pw.document.close();
         setTimeout(() => { pw.focus(); pw.print(); }, 2000);
     } catch(e) { showToast(e.message,'error'); }
+}       
 }
 
 
