@@ -437,7 +437,30 @@ document.getElementById('publishDate').value=new Date().toISOString().split('T')
               // ================================================================
 // ORIGINAL MARKSHEET GENERATION - With Footer at Bottom
 // ================================================================
-async function printOriginalMarksheet(studentId) {
+
+                        // ================================================================
+// QR CODE GENERATE FUNCTION (Base64)
+// ================================================================
+function generateQRCodeBase64(url) {
+    return new Promise((resolve) => {
+        const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(url)}`;
+        
+        fetch(apiUrl)
+            .then(res => res.blob())
+            .then(blob => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = () => resolve(null);
+                reader.readAsDataURL(blob);
+            })
+            .catch(() => resolve(null));
+    });
+}
+
+// ================================================================
+// PRINT STUDENT - Main function called from UI
+// ================================================================
+async function printStudent(studentId) {
     try {
         const data = await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`);
         const s = data.data.student;
@@ -966,7 +989,7 @@ async function printOriginalMarksheet(studentId) {
                         </div>
                         
                         <!-- MARKSHEETS -->
-                        <div class="marksheet-heading">📄 Available Marksheets (${marksheets.length})</div>
+                        <div class="marksheet-heading">Available Marksheets (${marksheets.length})</div>
                         <table class="marksheet-table">
                             <thead>
                                 <tr>
@@ -1037,10 +1060,7 @@ async function printOriginalMarksheet(studentId) {
         pw.document.close();
         setTimeout(() => { pw.focus(); pw.print(); }, 2000);
     } catch(e) { showToast(e.message,'error'); }
-}                  
-                    
-                        
-                        
+}
                         
 
                     
