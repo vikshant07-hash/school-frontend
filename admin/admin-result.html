@@ -254,7 +254,7 @@
             </div>
             <div class="form-group" style="margin-bottom:14px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Date of Birth</label><input type="date" id="sDob" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);"></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                <div class="form-group" style="margin-bottom:14px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Session <span style="color:var(--red);">*</span></label><select id="sSession" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);"><option value="2025-26" selected>2025-26</option><option value="2024-25">2024-25</option><option value="2023-24">2023-24</option></select></div>
+                <div class="form-group" style="margin-bottom:14px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Session <span style="color:var(--red);">*</span></label><select id="sSession" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);"><option>2025-26</option><option>2024-25</option><option>2023-24</option></select></div>
                 <div class="form-group" style="margin-bottom:14px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Class <span style="color:var(--red);">*</span></label><select id="sClass" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);"><option>6</option><option>7</option><option>8</option><option>9</option><option selected>10</option><option>11</option><option>12</option></select></div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
@@ -275,23 +275,47 @@ const API_BASE = 'https://gsssshilla.onrender.com/api/admin/results';
 let currentClass = 10, currentPage = 1, publishClass = 10;
 const PAGE_SIZE = 20;
 
+// ================================================================
+// SORT CONFIGURATION
+// ================================================================
 let sortField = 'roll';
 let sortOrder = 'asc';
 
+// ================================================================
+// SORT STUDENTS FUNCTION
+// ================================================================
 function sortStudents(students) {
     return students.sort((a, b) => {
         let valA, valB;
-        if (sortField === 'roll') { valA = parseInt(a.exam_roll_no) || 0; valB = parseInt(b.exam_roll_no) || 0; }
-        else if (sortField === 'name') { valA = (a.name || '').toLowerCase(); valB = (b.name || '').toLowerCase(); }
-        else if (sortField === 'student_id') { valA = (a.student_id || '').toUpperCase(); valB = (b.student_id || '').toUpperCase(); }
-        else { valA = parseInt(a.exam_roll_no) || 0; valB = parseInt(b.exam_roll_no) || 0; }
-        if (sortOrder === 'asc') { return valA > valB ? 1 : valA < valB ? -1 : 0; }
-        else { return valA < valB ? 1 : valA > valB ? -1 : 0; }
+        
+        if (sortField === 'roll') {
+            valA = parseInt(a.exam_roll_no) || 0;
+            valB = parseInt(b.exam_roll_no) || 0;
+        } else if (sortField === 'name') {
+            valA = (a.name || '').toLowerCase();
+            valB = (b.name || '').toLowerCase();
+        } else if (sortField === 'student_id') {
+            valA = (a.student_id || '').toUpperCase();
+            valB = (b.student_id || '').toUpperCase();
+        } else {
+            valA = parseInt(a.exam_roll_no) || 0;
+            valB = parseInt(b.exam_roll_no) || 0;
+        }
+        
+        if (sortOrder === 'asc') {
+            return valA > valB ? 1 : valA < valB ? -1 : 0;
+        } else {
+            return valA < valB ? 1 : valA > valB ? -1 : 0;
+        }
     });
 }
 
+// ================================================================
+// APPLY SORT
+// ================================================================
 function applySort() {
     const sortValue = document.getElementById('sortSelect').value;
+    
     switch(sortValue) {
         case 'roll_asc': sortField = 'roll'; sortOrder = 'asc'; break;
         case 'roll_desc': sortField = 'roll'; sortOrder = 'desc'; break;
@@ -304,6 +328,9 @@ function applySort() {
     loadStudents(currentClass, currentPage);
 }
 
+// ================================================================
+// GET AUTH HEADERS
+// ================================================================
 function getAuthHeaders() {
     try { const token = localStorage.getItem('adminToken'); if (!token) { showPopup('invalid'); return null; } return {'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json'}; }
     catch(e) { showPopup('invalid'); return null; }
@@ -339,8 +366,10 @@ function showToast(msg, type='info'){ const c=document.getElementById('toastCont
 async function apiCall(url, options={}) { const headers=getAuthHeaders(); if(!headers) throw new Error('Not authenticated'); let res; try { res=await fetch(url,{...options, headers:{...headers, ...(options.headers||{})}}); } catch(e){ throw new Error('Network error'); } if(res.status===401){ showPopup('expired'); throw new Error('Session expired'); } let data; try{ data=await res.json(); }catch(e){ throw new Error(`Server error ${res.status}`); } if(!res.ok) throw new Error(data.message||`Request failed ${res.status}`); return data; }
 
 function toggleNav(){ document.getElementById('navLinks').classList.toggle('open'); }
+
 function openModal(id){ document.getElementById(id).classList.add('active'); }
 function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+
 document.addEventListener('click',(e)=>{ if(e.target.classList.contains('modal-overlay')) closeModal(e.target.id); });
 
 function switchTab(tab){
@@ -353,15 +382,29 @@ function switchTab(tab){
     if(tab==='publish') loadPublishableStudents(publishClass);
 }
 
-function selectClass(c){ currentClass=c; currentPage=1; document.querySelectorAll('#classButtons .class-btn').forEach(b=>b.classList.remove('active')); document.querySelector(`#classButtons .class-btn[data-class="${c}"]`).classList.add('active'); loadStudents(c); }
+// ================================================================
+// SELECT CLASS
+// ================================================================
+function selectClass(c){ 
+    currentClass=c; 
+    currentPage=1; 
+    document.querySelectorAll('#classButtons .class-btn').forEach(b=>b.classList.remove('active')); 
+    document.querySelector(`#classButtons .class-btn[data-class="${c}"]`).classList.add('active'); 
+    loadStudents(c); 
+}
 
+// ================================================================
+// LOAD STUDENTS - WITH SORT
+// ================================================================
 async function loadStudents(classNum, page = 1) {
     currentPage = page;
     const session = document.getElementById('sessionFilter').value;
     const params = new URLSearchParams({page, limit: PAGE_SIZE});
     if (session) params.set('session', session);
+    
     const container = document.getElementById('studentGridContainer');
     container.innerHTML = '<div class="loading" style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+    
     try {
         const data = await apiCall(`${API_BASE}/class/${classNum}/students?${params}`);
         let students = data.data || [];
@@ -378,32 +421,65 @@ async function loadStudents(classNum, page = 1) {
     }
 }
 
+// ================================================================
+// RENDER STUDENT CARDS
+// ================================================================
 function renderStudentCards(students){
     const container=document.getElementById('studentGridContainer');
     if(!students||students.length===0){ container.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-users" style="font-size:40px;"></i><p>No students found</p></div>'; return; }
     container.innerHTML=students.map(s=>{ const has=(Number(s.marksheet_count)||0)>0; return `<div class="student-card" onclick="openStudentDetail('${esc(s.student_id)}')"><div class="card-header"><div><div class="student-name">${esc(s.name)}</div><div class="student-id">ID: ${esc(s.student_id)}</div></div><span class="status-badge ${has?'uploaded':'pending'}">${has?'✅ Uploaded':'⏳ Pending'}</span></div><div class="card-body"><div class="detail"><label>Roll No</label><span>${esc(s.exam_roll_no||'-')}</span></div><div class="detail"><label>Session</label><span>${esc(s.session||'-')}</span></div><div class="detail"><label>Father</label><span>${esc(s.father_name||'-')}</span></div><div class="detail"><label>Section</label><span>${esc(s.section||'-')}</span></div></div><div class="card-footer"><span class="exam-tag">${s.marksheet_count} marksheet(s)</span><div class="action-btns"><button class="action-btn edit" onclick="event.stopPropagation();openEditStudent('${esc(s.student_id)}')"><i class="fas fa-edit"></i> Edit</button><button class="action-btn delete" onclick="event.stopPropagation();deleteStudent('${esc(s.student_id)}','${esc(s.name)}')"><i class="fas fa-trash"></i> Delete</button><button class="action-btn print" onclick="event.stopPropagation();printStudent('${esc(s.student_id)}')"><i class="fas fa-print"></i> Print</button></div></div></div>`; }).join('');
 }
 
-function renderPagination(pagination, onPage){ const container=document.getElementById('pagination'); if(!pagination||pagination.totalPages<=1){ container.innerHTML=''; return; } const {page,totalPages}=pagination; let html=`<button ${page<=1?'disabled':''} onclick="onPage(${page-1})" style="padding:6px 14px;border:1px solid var(--border);background:var(--bg-white);border-radius:var(--radius-sm);cursor:pointer;"><i class="fas fa-chevron-left"></i></button>`; for(let i=Math.max(1,page-2); i<=Math.min(totalPages,page+2); i++) html+=`<button class="${i===page?'active':''}" onclick="onPage(${i})" style="padding:6px 14px;border:1px solid var(--border);background:${i===page?'var(--gold)':'var(--bg-white)'};color:${i===page?'#fff':'var(--text-secondary)'};border-radius:var(--radius-sm);cursor:pointer;font-weight:600;">${i}</button>`; html+=`<button ${page>=totalPages?'disabled':''} onclick="onPage(${page+1})" style="padding:6px 14px;border:1px solid var(--border);background:var(--bg-white);border-radius:var(--radius-sm);cursor:pointer;"><i class="fas fa-chevron-right"></i></button>`; container.innerHTML=html; window.onPage=onPage; }
+// ================================================================
+// RENDER PAGINATION
+// ================================================================
+function renderPagination(pagination, onPage){ 
+    const container=document.getElementById('pagination'); 
+    if(!pagination||pagination.totalPages<=1){ container.innerHTML=''; return; } 
+    const {page,totalPages}=pagination; 
+    let html=`<button ${page<=1?'disabled':''} onclick="onPage(${page-1})" style="padding:6px 14px;border:1px solid var(--border);background:var(--bg-white);border-radius:var(--radius-sm);cursor:pointer;"><i class="fas fa-chevron-left"></i></button>`; 
+    for(let i=Math.max(1,page-2); i<=Math.min(totalPages,page+2); i++) html+=`<button class="${i===page?'active':''}" onclick="onPage(${i})" style="padding:6px 14px;border:1px solid var(--border);background:${i===page?'var(--gold)':'var(--bg-white)'};color:${i===page?'#fff':'var(--text-secondary)'};border-radius:var(--radius-sm);cursor:pointer;font-weight:600;">${i}</button>`; 
+    html+=`<button ${page>=totalPages?'disabled':''} onclick="onPage(${page+1})" style="padding:6px 14px;border:1px solid var(--border);background:var(--bg-white);border-radius:var(--radius-sm);cursor:pointer;"><i class="fas fa-chevron-right"></i></button>`; 
+    container.innerHTML=html; 
+    window.onPage=onPage; 
+}
 
+// ================================================================
+// EVENT LISTENER FOR SORT DROPDOWN
+// ================================================================
 document.addEventListener('DOMContentLoaded', function() {
     const sortSelect = document.getElementById('sortSelect');
-    if (sortSelect) { sortSelect.value = 'roll_asc'; sortSelect.addEventListener('change', applySort); }
+    if (sortSelect) {
+        sortSelect.value = 'roll_asc';
+        sortSelect.addEventListener('change', applySort);
+    }
 });
 
+// ================================================================
+// OPEN ADD STUDENT
+// ================================================================
 function openAddStudent(){ document.getElementById('studentModalTitle').innerHTML='<i class="fas fa-user-plus"></i> Add Student'; document.getElementById('editStudentId').value=''; document.getElementById('sStudentId').disabled=false; document.getElementById('sStudentId').value=''; document.getElementById('sApaarId').value=''; document.getElementById('sName').value=''; document.getElementById('sFatherName').value=''; document.getElementById('sMotherName').value=''; document.getElementById('sDob').value=''; document.getElementById('sSession').value=document.getElementById('sessionFilter').value||'2025-26'; document.getElementById('sClass').value=currentClass; document.getElementById('sSection').value=''; document.getElementById('sRollNo').value=''; document.getElementById('sPhoto').value=''; const existingPreview=document.getElementById('photoPreview'); if(existingPreview) existingPreview.remove(); openModal('studentAddModal'); }
 
+// ================================================================
+// OPEN EDIT STUDENT
+// ================================================================
 async function openEditStudent(studentId){
     try{ const data=await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`); const s=data.data.student; document.getElementById('studentModalTitle').innerHTML='<i class="fas fa-edit"></i> Edit Student'; document.getElementById('editStudentId').value=studentId; document.getElementById('sStudentId').value=s.student_id; document.getElementById('sStudentId').disabled=true; document.getElementById('sApaarId').value=s.apaar_id||''; document.getElementById('sName').value=s.name||''; document.getElementById('sFatherName').value=s.father_name||''; document.getElementById('sMotherName').value=s.mother_name||''; document.getElementById('sDob').value=s.dob||''; document.getElementById('sSession').value=s.session||'2025-26'; document.getElementById('sClass').value=s.class||10; document.getElementById('sSection').value=s.section||''; document.getElementById('sRollNo').value=s.exam_roll_no||''; document.getElementById('sPhoto').value=''; openModal('studentAddModal'); }
     catch(e){ if(e.message!=='Session expired') showToast(e.message,'error'); }
 }
 
+// ================================================================
+// DELETE STUDENT
+// ================================================================
 async function deleteStudent(studentId, name){
     if(!confirm(`Delete student ${name} (${studentId})? This will also delete all their marksheets.`)) return;
     try{ const res=await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`,{method:'DELETE'}); showToast(res.message||'Student deleted','success'); loadStudents(currentClass,currentPage); }
     catch(e){ if(e.message!=='Session expired') showToast(e.message,'error'); }
 }
 
+// ================================================================
+// SAVE STUDENT
+// ================================================================
 async function saveStudent(e){
     e.preventDefault();
     const studentId=document.getElementById('sStudentId').value.trim(); const isEdit=document.getElementById('editStudentId').value;
@@ -425,6 +501,9 @@ async function saveStudent(e){
     catch(e){ if(e.message!=='Session expired') showToast(e.message,'error'); }
 }
 
+// ================================================================
+// COMPRESS IMAGE
+// ================================================================
 function compressImage(file, maxWidth=200, maxHeight=250){
     return new Promise((resolve,reject)=>{
         const reader=new FileReader();
@@ -449,6 +528,9 @@ function compressImage(file, maxWidth=200, maxHeight=250){
     });
 }
 
+// ================================================================
+// PHOTO PREVIEW
+// ================================================================
 document.getElementById('sPhoto').addEventListener('change', function(e){
     const file=e.target.files[0];
     if(file){
@@ -463,10 +545,66 @@ document.getElementById('sPhoto').addEventListener('change', function(e){
     }
 });
 
-async function fetchStudentForUpload(){ const studentId=document.getElementById('uploadStudentId').value.trim(); if(!studentId) return; try{ const data=await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`); const s=data.data.student; document.getElementById('uploadStudentName').value=s.name; document.getElementById('uploadSession').value=s.session; document.getElementById('uploadClass').value=s.class; document.getElementById('uploadStatus').className='alert-box success'; document.getElementById('uploadStatus').innerHTML='<i class="fas fa-check-circle"></i> Student found: ' + esc(s.name) + ' | Session: ' + esc(s.session) + ' | Class: ' + esc(s.class); }catch(e){ document.getElementById('uploadStatus').className='alert-box error'; document.getElementById('uploadStatus').innerHTML='<i class="fas fa-exclamation-circle"></i> '+esc(e.message); } }
+// ================================================================
+// FETCH STUDENT FOR UPLOAD
+// ================================================================
+async function fetchStudentForUpload(){ 
+    const studentId = document.getElementById('uploadStudentId').value.trim(); 
+    if(!studentId) { showToast('Please enter Student ID', 'warning'); return; }
+    try{ 
+        const data=await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`); 
+        const s=data.data.student; 
+        document.getElementById('uploadStudentName').value=s.name; 
+        document.getElementById('uploadSession').value=s.session || '2025-26'; 
+        document.getElementById('uploadClass').value=s.class; 
+        document.getElementById('uploadStatus').className='alert-box success'; 
+        document.getElementById('uploadStatus').innerHTML='<i class="fas fa-check-circle"></i> Student found. Session: ' + esc(s.session || '2025-26'); 
+    }catch(e){ 
+        document.getElementById('uploadStatus').className='alert-box error'; 
+        document.getElementById('uploadStatus').innerHTML='<i class="fas fa-exclamation-circle"></i> '+esc(e.message); 
+    } 
+}
 
-document.getElementById('marksheetUploadForm').addEventListener('submit', async function(e){ e.preventDefault(); const studentId=document.getElementById('uploadStudentId').value.trim(); const studentName=document.getElementById('uploadStudentName').value; const session=document.getElementById('uploadSession').value; const classNum=document.getElementById('uploadClass').value; const pdf=document.getElementById('uploadPdf').files[0]; if(!studentId||!pdf){ showToast('Please enter Student ID and select PDF','warning'); return; } if(!studentName){ showToast('Please fetch student first','warning'); return; } if(!session){ showToast('Session is required','warning'); return; } if(pdf.size>10*1024*1024){ showToast('PDF under 10MB','warning'); return; } const formData=new FormData(); formData.append('student_id',studentId); formData.append('session',session); formData.append('class',classNum); formData.append('exam_type',document.getElementById('uploadExamType').value); formData.append('pdf',pdf); const uploadBtn=document.getElementById('uploadSubmitBtn'); uploadBtn.disabled=true; uploadBtn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Uploading...'; try{ const headers=getAuthHeaders(); const res=await fetch(`${API_BASE}/marksheets/upload`,{method:'POST',headers:{Authorization:headers.Authorization},body:formData}); if(res.status===401){ showPopup('expired'); return; } const result=await res.json(); if(!result.success) throw new Error(result.message||'Upload failed'); showToast('Marksheet uploaded successfully','success'); document.getElementById('marksheetUploadForm').reset(); document.getElementById('uploadStudentName').value=''; document.getElementById('uploadSession').value=''; document.getElementById('uploadClass').value=''; document.getElementById('uploadStatus').className='alert-box success'; document.getElementById('uploadStatus').innerHTML='<i class="fas fa-check-circle"></i> Marksheet uploaded successfully!'; loadStudents(currentClass); }catch(err){ document.getElementById('uploadStatus').className='alert-box error'; document.getElementById('uploadStatus').innerHTML='<i class="fas fa-exclamation-circle"></i> '+esc(err.message); showToast(err.message,'error'); }finally{ uploadBtn.disabled=false; uploadBtn.innerHTML='<i class="fas fa-upload"></i> Upload Marksheet'; } });
+// ================================================================
+// UPLOAD MARKSHEET
+// ================================================================
+document.getElementById('marksheetUploadForm').addEventListener('submit', async function(e){ 
+    e.preventDefault(); 
+    const studentId=document.getElementById('uploadStudentId').value; 
+    const pdf=document.getElementById('uploadPdf').files[0]; 
+    if(!studentId||!pdf) { showToast('Please fill all required fields', 'warning'); return; }
+    if(pdf.size>10*1024*1024){ showToast('PDF under 10MB','warning'); return; } 
+    const formData=new FormData(); 
+    formData.append('student_id',studentId); 
+    const sessionVal = document.getElementById('uploadSession').value || '2025-26';
+    formData.append('session', sessionVal); 
+    formData.append('class',document.getElementById('uploadClass').value); 
+    formData.append('exam_type',document.getElementById('uploadExamType').value); 
+    formData.append('pdf',pdf); 
+    try{ 
+        const headers=getAuthHeaders(); 
+        const res=await fetch(`${API_BASE}/marksheets/upload`,{method:'POST',headers:{Authorization:headers.Authorization},body:formData}); 
+        if(res.status===401){ showPopup('expired'); return; } 
+        const result=await res.json(); 
+        if(!result.success) throw new Error(result.message); 
+        showToast('Marksheet uploaded successfully with session: ' + sessionVal,'success'); 
+        loadStudents(currentClass); 
+        // Clear form
+        document.getElementById('uploadStudentId').value = '';
+        document.getElementById('uploadStudentName').value = '';
+        document.getElementById('uploadSession').value = '';
+        document.getElementById('uploadClass').value = '';
+        document.getElementById('uploadPdf').value = '';
+        document.getElementById('uploadStatus').className='alert-box info'; 
+        document.getElementById('uploadStatus').innerHTML='<i class="fas fa-info-circle"></i> Marksheet uploaded successfully!';
+    }catch(err){ 
+        showToast(err.message,'error'); 
+    } 
+});
 
+// ================================================================
+// OPEN STUDENT DETAIL
+// ================================================================
 async function openStudentDetail(studentId) {
     const modalContent = document.getElementById('modalStudentContent');
     modalContent.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
@@ -476,51 +614,94 @@ async function openStudentDetail(studentId) {
     catch (error) { modalContent.innerHTML = `<div class="alert-box error">${esc(error.message)} <button onclick="openStudentDetail('${studentId}')" style="background:none;border:none;color:var(--gold);cursor:pointer;font-weight:600;">Retry</button></div>`; }
 }
 
+// ================================================================
+// RENDER STUDENT DETAIL
+// ================================================================
 function renderStudentDetail(data) {
     const s = data.student; const marksheets = data.marksheets || [];
     document.getElementById('modalStudentName').innerHTML = `<i class="fas fa-user-graduate"></i> ${esc(s.name)}`;
     const modalContent = document.getElementById('modalStudentContent');
-    const academicSession = s.session || '-';
     let marksheetHtml = marksheets.length === 0 ? `<div class="alert-box info">No marksheets uploaded yet.</div>` : marksheets.map(m => `<div class="exam-item"><div class="exam-info"><span class="exam-name">${esc(m.exam_type)}</span><span class="exam-session">${esc(m.session)}</span><span class="badge ${m.is_published?'badge-success':'badge-warning'}">${m.is_published?' Published':' Unpublished'}</span></div><div class="action-btns"><button class="action-btn view" onclick="viewMarksheet(${m.id})"><i class="fas fa-eye"></i> View</button><button class="action-btn delete" onclick="deleteExam(${m.id})"><i class="fas fa-trash"></i> Delete</button></div></div>`).join('');
-    modalContent.innerHTML = `<div class="student-detail-grid"><div class="item"><label>Student ID</label><span>${esc(s.student_id)}</span></div><div class="item"><label>APAAR ID</label><span>${esc(s.apaar_id||'-')}</span></div><div class="item"><label>Father's Name</label><span>${esc(s.father_name||'-')}</span></div><div class="item"><label>Mother's Name</label><span>${esc(s.mother_name||'-')}</span></div><div class="item"><label>Date of Birth</label><span>${s.dob?formatDate(s.dob):'-'}</span></div><div class="item"><label>Session</label><span>${esc(academicSession)}</span></div><div class="item"><label>Class</label><span>${esc(s.class||'-')}${s.section ? ' - ' + esc(s.section) : ''}</span></div><div class="item"><label>Roll No</label><span>${esc(s.exam_roll_no||'-')}</span></div></div><div class="exam-list"><h4 style="font-size:14px;color:var(--text-secondary);margin-bottom:10px;"><i class="fas fa-file-pdf"></i> Marksheets (${marksheets.length})</h4>${marksheetHtml}</div><div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-sm btn-primary" onclick="printStudent('${esc(s.student_id)}')"><i class="fas fa-print"></i> Print Details</button><button class="btn btn-sm btn-outline" onclick="closeModal('studentModal')"><i class="fas fa-times"></i> Close</button></div>`;
+    modalContent.innerHTML = `<div class="student-detail-grid"><div class="item"><label>Student ID</label><span>${esc(s.student_id)}</span></div><div class="item"><label>APAAR ID</label><span>${esc(s.apaar_id||'-')}</span></div><div class="item"><label>Father's Name</label><span>${esc(s.father_name||'-')}</span></div><div class="item"><label>Mother's Name</label><span>${esc(s.mother_name||'-')}</span></div><div class="item"><label>Date of Birth</label><span>${s.dob?formatDate(s.dob):'-'}</span></div><div class="item"><label>Session</label><span>${esc(s.session||'-')}</span></div><div class="item"><label>Class</label><span>${esc(s.class||'-')}${s.section ? ' - ' + esc(s.section) : ''}</span></div><div class="item"><label>Roll No</label><span>${esc(s.exam_roll_no||'-')}</span></div></div><div class="exam-list"><h4 style="font-size:14px;color:var(--text-secondary);margin-bottom:10px;"><i class="fas fa-file-pdf"></i> Marksheets (${marksheets.length})</h4>${marksheetHtml}</div><div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-sm btn-primary" onclick="printStudent('${esc(s.student_id)}')"><i class="fas fa-print"></i> Print Details</button><button class="btn btn-sm btn-outline" onclick="closeModal('studentModal')"><i class="fas fa-times"></i> Close</button></div>`;
 }
 
+// ================================================================
+// DELETE EXAM
+// ================================================================
 async function deleteExam(id) { if(!confirm('Delete this marksheet?')) return; try{ await apiCall(`${API_BASE}/marksheets/${id}`,{method:'DELETE'}); showToast('Marksheet deleted','success'); const sid=document.getElementById('studentModal').dataset.studentId; if(sid) openStudentDetail(sid); }catch(e){ showToast(e.message,'error'); } }
 
+// ================================================================
+// VIEW MARKSHEET
+// ================================================================
 function viewMarksheet(id) { fetch(`${API_BASE}/marksheets/${id}`,{headers:getAuthHeaders()}).then(r=>r.json()).then(d=>{ if(d.success&&d.data.cloudinary_url) window.open(d.data.cloudinary_url,'_blank'); }).catch(e=>showToast('Failed to open','error')); }
 
+// ================================================================
+// LOAD RECENT UPLOADS
+// ================================================================
 async function loadRecentUploads(){ }
 
+// ================================================================
+// SELECT PUBLISH CLASS
+// ================================================================
 function selectPublishClass(c){ publishClass=c; document.querySelectorAll('#publishClassButtons .class-btn').forEach(b=>b.classList.remove('active')); document.querySelector(`#publishClassButtons .class-btn[data-class="${c}"]`).classList.add('active'); loadPublishableStudents(c); }
 
-async function loadPublishableStudents(classNum){ const tbody=document.getElementById('publishTableBody'); tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr>'; try{ const session=document.getElementById('sessionFilter').value; const examFilter=document.getElementById('publishExamFilter').value; let url=`${API_BASE}/marksheets?limit=100`; if(classNum) url+=`&class=${classNum}`; if(session) url+=`&session=${session}`; if(examFilter) url+=`&exam_type=${examFilter}`; const data=await apiCall(url); if(!data.data||data.data.length===0){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">No marksheets found</td></tr>'; return; } tbody.innerHTML=data.data.map(m=>`<tr><td><input type="checkbox" class="publish-checkbox" data-id="${m.id}"></td><td>${esc(m.student_id)}</td><td>${esc(m.name)}</td><td>${esc(m.exam_type)}</td><td><span class="badge ${m.is_published?'badge-success':'badge-warning'}">${m.is_published?'✅ Published':'⏳ Unpublished'}</span></td><td><button class="btn btn-xs btn-success" onclick="publishSingle(${m.id})" ${m.is_published?'disabled':''}>Publish</button> <button class="btn btn-xs btn-danger" onclick="unpublishSingle(${m.id})" ${!m.is_published?'disabled':''}>Unpublish</button></td></tr>`).join(''); }catch(e){ tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--red);">${esc(e.message)}</td></tr>`; } }
+// ================================================================
+// LOAD PUBLISHABLE STUDENTS
+// ================================================================
+async function loadPublishableStudents(classNum){ const tbody=document.getElementById('publishTableBody'); tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr>'; try{ const session=document.getElementById('sessionFilter').value; const examFilter=document.getElementById('publishExamFilter').value; let url=`${API_BASE}/marksheets?limit=100`; if(classNum) url+=`&class=${classNum}`; if(session) url+=`&session=${session}`; if(examFilter) url+=`&exam_type=${examFilter}`; const data=await apiCall(url); tbody.innerHTML=data.data.map(m=>`<tr><td><input type="checkbox" class="publish-checkbox" data-id="${m.id}"></td><td>${esc(m.student_id)}</td><td>${esc(m.name)}</td><td>${esc(m.exam_type)}</td><td><span class="badge ${m.is_published?'badge-success':'badge-warning'}">${m.is_published?'✅ Published':'⏳ Unpublished'}</span></td><td><button class="btn btn-xs btn-success" onclick="publishSingle(${m.id})" ${m.is_published?'disabled':''}>Publish</button> <button class="btn btn-xs btn-danger" onclick="unpublishSingle(${m.id})" ${!m.is_published?'disabled':''}>Unpublish</button></td></tr>`).join(''); }catch(e){ tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--red);">${esc(e.message)}</td></tr>`; } }
 
+// ================================================================
+// TOGGLE ALL PUBLISH
+// ================================================================
 function toggleAllPublish(){ const checked=document.getElementById('selectAllPublish').checked; document.querySelectorAll('.publish-checkbox').forEach(cb=>cb.checked=checked); }
 
+// ================================================================
+// PUBLISH SINGLE
+// ================================================================
 async function publishSingle(id){ const date=document.getElementById('publishDate').value; if(!date) return showToast('Select date','warning'); try{ await apiCall(`${API_BASE}/marksheets/${id}/publish`,{method:'POST',body:JSON.stringify({declaration_date:date})}); showToast('Published','success'); loadPublishableStudents(publishClass); }catch(e){ showToast(e.message,'error'); } }
 
+// ================================================================
+// UNPUBLISH SINGLE
+// ================================================================
 async function unpublishSingle(id){ try{ await apiCall(`${API_BASE}/marksheets/${id}/unpublish`,{method:'POST'}); showToast('Unpublished','success'); loadPublishableStudents(publishClass); }catch(e){ showToast(e.message,'error'); } }
 
+// ================================================================
+// BULK PUBLISH
+// ================================================================
 async function bulkPublish(){ const date=document.getElementById('publishDate').value; if(!date) return showToast('Select date','warning'); const selected=[...document.querySelectorAll('.publish-checkbox:checked')].map(cb=>cb.dataset.id); if(selected.length===0) return showToast('Select at least one','warning'); try{ await apiCall(`${API_BASE}/marksheets/bulk-publish`,{method:'POST',body:JSON.stringify({ids:selected,declaration_date:date})}); showToast('Bulk published','success'); loadPublishableStudents(publishClass); }catch(e){ showToast(e.message,'error'); } }
 
-function refreshAll(){ loadStudents(currentClass); loadPublishableStudents(publishClass); showToast('Refreshed','success'); }
+// ================================================================
+// REFRESH ALL
+// ================================================================
+function refreshAll(){ loadStudents(currentClass); loadPublishableStudents(publishClass); }
 
+// ================================================================
+// SESSION FILTER
+// ================================================================
 document.getElementById('sessionFilter').addEventListener('change',()=>{ currentPage=1; loadStudents(currentClass,1); loadPublishableStudents(publishClass); });
-document.getElementById('sortSelect').addEventListener('change', applySort);
 document.getElementById('publishDate').value=new Date().toISOString().split('T')[0];
 
+// ================================================================
+// QR CODE GENERATE FUNCTION
+// ================================================================
 function generateQRCodeBase64(url) {
     return new Promise((resolve) => {
         const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(url)}`;
-        fetch(apiUrl).then(res => res.blob()).then(blob => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.onerror = () => resolve(null);
-            reader.readAsDataURL(blob);
-        }).catch(() => resolve(null));
+        fetch(apiUrl)
+            .then(res => res.blob())
+            .then(blob => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = () => resolve(null);
+                reader.readAsDataURL(blob);
+            })
+            .catch(() => resolve(null));
     });
 }
 
+// ================================================================
+// PRINT STUDENT - Original Marksheet
+// ================================================================
 async function printStudent(studentId) {
     try {
         const data = await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`);
@@ -529,12 +710,17 @@ async function printStudent(studentId) {
         const adminData = JSON.parse(localStorage.getItem('adminData') || '{}');
         const downloadedBy = adminData.name || adminData.username || localStorage.getItem('adminName') || 'Admin';
         const studentPhoto = s.photo || s.photo_url || s.image_url || '';
-        const academicSession = s.session || '-';
         
         const verificationData = {
-            student_id: s.student_id, name: s.name, father_name: s.father_name || '',
-            mother_name: s.mother_name || '', dob: s.dob || '', class: s.class || '',
-            section: s.section || '', session: academicSession, exam_roll_no: s.exam_roll_no || '',
+            student_id: s.student_id,
+            name: s.name,
+            father_name: s.father_name || '',
+            mother_name: s.mother_name || '',
+            dob: s.dob || '',
+            class: s.class || '',
+            section: s.section || '',
+            session: s.session || '',
+            exam_roll_no: s.exam_roll_no || '',
             apaar_id: s.apaar_id || ''
         };
         
@@ -548,16 +734,194 @@ async function printStudent(studentId) {
         
         let marksheetRows = '';
         marksheetsWithQR.forEach((m, idx) => {
-            marksheetRows += `<tr><td style="text-align:center;padding:4px 6px;border:1px solid #d1d5db;">${idx+1}</td><td style="padding:4px 6px;border:1px solid #d1d5db;font-weight:600;">${esc(m.exam_type)}</td><td style="padding:4px 6px;border:1px solid #d1d5db;text-align:center;">${esc(m.session)}</td><td style="padding:4px 6px;border:1px solid #d1d5db;text-align:center;">${esc(m.class||'-')}</td><td style="padding:4px 6px;border:1px solid #d1d5db;font-size:6px;word-break:break-all;color:#6b7280;">${esc(m.cloudinary_url||'-')}</td><td style="text-align:center;padding:4px 6px;border:1px solid #d1d5db;">${m.qrBase64 ? `<img src="${m.qrBase64}" width="50" height="50" style="border:1px solid #c9972b;padding:2px;background:white;">` : '<div style="font-size:6px;color:#94a3b8;">N/A</div>'}</td></tr>`;
+            marksheetRows += `
+                <tr>
+                    <td style="text-align:center;padding:4px 6px;border:1px solid #d1d5db;">${idx+1}</td>
+                    <td style="padding:4px 6px;border:1px solid #d1d5db;font-weight:600;">${esc(m.exam_type)}</td>
+                    <td style="padding:4px 6px;border:1px solid #d1d5db;text-align:center;">${esc(m.session || s.session || '2025-26')}</td>
+                    <td style="padding:4px 6px;border:1px solid #d1d5db;text-align:center;">${esc(m.class||s.class||'-')}</td>
+                    <td style="padding:4px 6px;border:1px solid #d1d5db;font-size:6px;word-break:break-all;color:#6b7280;">${esc(m.cloudinary_url||'-')}</td>
+                    <td style="text-align:center;padding:4px 6px;border:1px solid #d1d5db;">
+                        ${m.qrBase64 ? 
+                            `<img src="${m.qrBase64}" width="50" height="50" style="border:1px solid #c9972b;padding:2px;background:white;">` : 
+                            '<div style="font-size:6px;color:#94a3b8;">N/A</div>'
+                        }
+                    </td>
+                </tr>`;
         });
 
         const pw = window.open('', '_blank', 'width=1000,height=800');
-        pw.document.write(`<!DOCTYPE html><html><head><title>Marksheet: ${esc(s.name)} - ${esc(s.student_id)}</title><style>@page{size:A4;margin:5mm 8mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Georgia,Arial,sans-serif;color:#1a2332;background:#fff;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}.page-container{width:100%;max-width:186mm;margin:0 auto;padding:4px 6px 46px;position:relative}.page-header{text-align:center;padding-bottom:8px;border-bottom:3px solid #c9972b}.page-header .logo{width:58px;height:58px;border-radius:50%;border:2px solid #c9972b;padding:2px;background:#fff;margin:0 auto 2px;display:block}.school-name{font-family:Georgia,serif;font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:1.5px}.school-tagline{font-size:6px;color:#5a6a7e;letter-spacing:2px;text-transform:uppercase}.heading-box{display:inline-block;background:#0d1b2a;color:#fff;padding:2px 18px;border-radius:25px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:2px solid #c9972b;margin-top:2px}.student-info-table{width:100%;border-collapse:collapse;margin:10px 0;border:2px solid #0d1b2a}.student-info-table td{padding:4px 6px;border:1px solid #d1d5db;font-size:8px}.label-cell{font-weight:700;background:#fef8ed;width:14%;font-size:6.5px;text-transform:uppercase}.value-cell{font-weight:500;width:30%}.photo-cell{width:65px;text-align:center;background:#f8fafc}.photo-box{width:55px;height:67px;border:3px solid #c9972b;border-radius:6px;overflow:hidden;margin:0 auto;background:#fff}.photo-box img{width:100%;height:100%;object-fit:cover}.photo-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#cbd5e1}.declaration-box{background:#fef8ed;border-left:4px solid #c9972b;border-right:4px solid #c9972b;padding:5px 12px;margin:10px 0;font-size:9px;font-style:italic;text-align:center}.marksheet-heading{font-size:9px;font-weight:700;margin:7px 0 4px;padding:3px 8px;background:#fef8ed;border-left:4px solid #c9972b}.marksheet-table{width:100%;border-collapse:collapse;margin:3px 0;border:2px solid #0d1b2a}.marksheet-table th{background:#0d1b2a;color:#fff;padding:3px 5px;border:1px solid #0d1b2a;font-size:6px;text-transform:uppercase}.marksheet-table td{padding:3px 5px;border:1px solid #d1d5db;font-size:7px;text-align:center}.verification-section{display:flex;align-items:center;gap:10px;margin:10px 0;padding:6px 12px;border:2px solid #c9972b;background:#fef8ed;border-radius:8px}.verification-qr{width:55px;height:55px;border:2px solid #0d1b2a;border-radius:5px;overflow:hidden;background:#fff}.verification-qr img{width:50px;height:50px}.verification-text{flex:1;font-size:7px}.verification-text strong{display:block;font-size:8.5px;color:#c9972b}.signature-area{display:flex;justify-content:flex-end;margin-top:6px}.signature-box{text-align:center;font-size:7px;width:160px}.signature-box .line{width:100px;height:1px;border-top:1px dashed #94a3b8;margin:12px auto 2px}.footer-wrapper{position:fixed;left:50%;transform:translateX(-50%);width:186mm;bottom:0}.security-text-line{text-align:center;font-size:5px;color:rgba(13,27,42,0.18);letter-spacing:2px;padding:3px 0;border-top:1px dashed #cbd5e1;border-bottom:1px dashed #cbd5e1;text-transform:uppercase}.page-footer{padding-top:5px;border-top:2px solid #c9972b;font-size:6px;color:#64748b;display:flex;justify-content:space-between}.footer-left{text-align:left}.footer-center{text-align:center;font-weight:600}.footer-right{text-align:right}@media print{.page-container{max-width:100%}}</style></head><body><div class="page-container"><div class="page-header"><img src="logo(1).png" class="logo" onerror="this.style.display='none'"><div class="school-name">Govt. Sr. Sec. School Shilla</div><div class="school-tagline">Shilla • Nerwa • District Shimla • Himachal Pradesh - 171210</div><div class="heading-box">Student Marksheet</div></div><table class="student-info-table"><tr><td class="label-cell">Student ID</td><td class="value-cell">${esc(s.student_id)}</td><td class="label-cell">APAAR ID</td><td class="value-cell">${esc(s.apaar_id||'-')}</td><td class="photo-cell" rowspan="5"><div class="photo-box">${studentPhoto ? `<img src="${esc(studentPhoto)}">` : `<div class="photo-placeholder"><i class="fas fa-user"></i></div>`}</div></td></tr><tr><td class="label-cell">Student Name</td><td class="value-cell" style="font-weight:700;font-size:9.5px;">${esc(s.name)}</td><td class="label-cell">Father's Name</td><td class="value-cell">${esc(s.father_name||'-')}</td></tr><tr><td class="label-cell">Mother's Name</td><td class="value-cell">${esc(s.mother_name||'-')}</td><td class="label-cell">Date of Birth</td><td class="value-cell">${s.dob ? new Date(s.dob).toLocaleDateString('en-IN', {day:'2-digit', month:'2-digit', year:'numeric'}) : '-'}</td></tr><tr><td class="label-cell">Session</td><td class="value-cell">${esc(academicSession)}</td><td class="label-cell">Class</td><td class="value-cell">${esc(s.class||'-')}${s.section ? ' - ' + esc(s.section) : ''}</td></tr><tr><td class="label-cell">Roll Number</td><td class="value-cell">${esc(s.exam_roll_no||'-')}</td><td class="label-cell">Status</td><td class="value-cell">PASS</td></tr></table><div class="declaration-box"><i class="fas fa-check-circle"></i> This is to certify that <strong>${esc(s.name)}</strong> (Student ID: ${esc(s.student_id)}) has successfully completed the <strong>${esc(academicSession)}</strong> session and is declared <strong>PASS</strong>.</div><div class="marksheet-heading">Available Marksheets (${marksheets.length})</div><table class="marksheet-table"><thead><tr><th style="width:20px;">#</th><th>Exam Type</th><th style="width:40px;">Session</th><th style="width:30px;">Class</th><th>Marksheet URL</th><th style="width:65px;">QR Code</th></tr></thead><tbody>${marksheetRows || '<tr><td colspan="6" style="text-align:center;padding:8px;">No marksheets available</td></tr>'}</tbody></table><div class="verification-section"><div class="verification-qr">${verificationQRBase64 ? `<img src="${verificationQRBase64}" alt="Verification QR">` : '<div style="font-size:6px;color:#94a3b8;text-align:center;">QR N/A</div>'}</div><div class="verification-text"><strong>Scan to Verify</strong><p>Scan this QR code to verify the authenticity of this marksheet.</p><p>This document is digitally verified and issued by Govt. Sr. Sec. School Shilla.</p></div></div><div class="signature-area"><div class="signature-box"><div class="line"></div><strong>Principal</strong><div style="font-size:6px;color:#94a3b8;">Govt. Sr. Sec. School Shilla</div></div></div><div class="footer-wrapper"><div class="security-text-line">GSSS SHILLA OFFICIAL DOCUMENT | GSSS SHILLA OFFICIAL DOCUMENT | GSSS SHILLA OFFICIAL DOCUMENT</div><div class="page-footer"><div class="footer-left"><strong>Print Date:</strong> ${new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})}</div><div class="footer-center"><strong>Issued by:</strong> ${esc(downloadedBy)}</div><div class="footer-right"><strong>Page 1 of 1</strong></div></div></div></div></body></html>`);
+        pw.document.write(`<!DOCTYPE html>
+<html>
+<head>
+<title>Marksheet: ${esc(s.name)} - ${esc(s.student_id)} - ${esc(s.exam_roll_no)}</title>
+<style>
+@page { size: A4; margin: 5mm 8mm 5mm 8mm; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { height: auto; }
+body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; background: #ffffff; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; height: auto; }
+.page-container { width: 100%; max-width: 186mm; margin: 0 auto; padding: 4px 6px 46px; position: relative; }
+.watermark-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 9999; overflow: hidden; }
+.watermark-pattern-1 { position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(201,151,43,0.07) 35px, rgba(201,151,43,0.07) 37px), repeating-linear-gradient(135deg, transparent, transparent 35px, rgba(201,151,43,0.05) 35px, rgba(201,151,43,0.05) 37px); background-size: 50px 50px; }
+.watermark-pattern-2 { position: absolute; inset: 0; background-image: repeating-linear-gradient(-45deg, transparent, transparent 40px, rgba(74,138,244,0.06) 40px, rgba(74,138,244,0.06) 42px), repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(74,138,244,0.045) 40px, rgba(74,138,244,0.045) 42px); background-size: 56px 56px; }
+.watermark-pattern-3 { position: absolute; inset: 0; background-image: radial-gradient(circle at 25px 25px, rgba(139,92,246,0.06) 2px, transparent 2px), radial-gradient(circle at 75px 75px, rgba(139,92,246,0.06) 2px, transparent 2px), radial-gradient(circle at 50px 50px, rgba(139,92,246,0.045) 1.5px, transparent 1.5px); background-size: 100px 100px; }
+.watermark-pattern-4 { position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 30px, rgba(16,185,129,0.045) 30px, rgba(16,185,129,0.045) 31px), repeating-linear-gradient(90deg, transparent, transparent 30px, rgba(16,185,129,0.045) 30px, rgba(16,185,129,0.045) 31px); background-size: 62px 62px; }
+.watermark-pattern-5 { position: absolute; inset: 0; background-image: repeating-linear-gradient(25deg, transparent, transparent 45px, rgba(236,72,153,0.045) 45px, rgba(236,72,153,0.045) 46px), repeating-linear-gradient(115deg, transparent, transparent 45px, rgba(236,72,153,0.045) 45px, rgba(236,72,153,0.045) 46px); background-size: 64px 64px; }
+.watermark-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 450px; height: 450px; opacity: 0.12; background: url('logo(1).png') center/contain no-repeat; filter: grayscale(100%) blur(0.5px); border-radius: 50%; }
+.page-header { text-align: center; padding-bottom: 8px; border-bottom: 3px solid #c9972b; position: relative; z-index: 1; background: rgba(255,255,255,0.95); flex-shrink: 0; }
+.page-header .logo { width: 58px; height: 58px; border-radius: 50%; border: 2px solid #c9972b; padding: 2px; background: white; margin: 0 auto 2px; display: block; }
+.page-header .school-name { font-family: 'Georgia', serif; font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; color: #0d1b2a; }
+.page-header .school-tagline { font-size: 6px; color: #5a6a7e; letter-spacing: 2px; text-transform: uppercase; }
+.page-header .heading-box { display: inline-block; background: #0d1b2a; color: #fff; padding: 2px 18px; border-radius: 25px; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: 2px solid #c9972b; margin-top: 2px; }
+.content-area { position: relative; z-index: 1; }
+.declaration-box { background: #fef8ed; border-left: 4px solid #c9972b; border-right: 4px solid #c9972b; padding: 5px 12px; margin: 20px 0 16px; border-radius: 4px; font-size: 9px; color: #1a2332; font-style: italic; text-align: center; position: relative; z-index: 1; background: rgba(254, 248, 237, 0.92); }
+.declaration-box i { color: #10b981; margin-right: 4px; font-size: 10px; }
+.declaration-box strong { color: #0d1b2a; }
+.student-info-table { width: 100%; border-collapse: collapse; margin: 10px 4px; border: 2px solid #0d1b2a; position: relative; z-index: 1; }
+.student-info-table td { padding: 4px 6px; border: 1px solid #d1d5db; font-size: 8px; vertical-align: middle; }
+.student-info-table .label-cell { font-weight: 700; background: #fef8ed; color: #0d1b2a; width: 14%; letter-spacing: 0.5px; text-transform: uppercase; font-size: 6.5px; }
+.student-info-table .value-cell { font-weight: 500; color: #1a2332; width: 30%; }
+.photo-cell { width: 65px; text-align: center; vertical-align: middle; background: #f8fafc; }
+.photo-box { width: 55px; height: 67px; border: 3px solid #c9972b; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; margin: 0 auto; }
+.photo-box img { width: 100%; height: 100%; object-fit: cover; }
+.photo-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #cbd5e1; }
+.marksheet-heading { font-size: 9px; font-weight: 700; margin: 7px 0 4px; padding: 3px 8px; background: #fef8ed; border-left: 4px solid #c9972b; letter-spacing: 1px; position: relative; z-index: 1; }
+.marksheet-table { width: 100%; border-collapse: collapse; margin: 3px 0; border: 2px solid #0d1b2a; position: relative; z-index: 1; }
+.marksheet-table th { background: #0d1b2a; color: #fff; padding: 3px 5px; border: 1px solid #0d1b2a; font-size: 6px; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
+.marksheet-table td { padding: 3px 5px; border: 1px solid #d1d5db; font-size: 7px; text-align: center; }
+.verification-section { display: flex; align-items: center; gap: 10px; margin: 20px 0 15px; padding: 6px 12px; border: 2px solid #c9972b; background: #fef8ed; border-radius: 8px; position: relative; z-index: 1; }
+.verification-qr { width: 55px; height: 55px; border: 2px solid #0d1b2a; border-radius: 5px; overflow: hidden; flex-shrink: 0; background: white; display: flex; align-items: center; justify-content: center; }
+.verification-qr img { width: 50px; height: 50px; }
+.verification-text { flex: 1; font-size: 7px; color: #0d1b2a; }
+.verification-text strong { display: block; font-size: 8.5px; margin-bottom: 1px; color: #c9972b; }
+.verification-text .scan-label { font-size: 7.5px; font-weight: 700; color: #0d1b2a; letter-spacing: 1px; }
+.verification-text p { font-size: 6.5px; color: #5a6a7e; margin: 1px 0; }
+.signature-area { display: flex; justify-content: flex-end; margin-top: 6px; padding-top: 4px; position: relative; z-index: 1; }
+.signature-box { text-align: center; font-size: 7px; width: 160px; }
+.signature-box .signature-img { height: 100px; max-width: 180px; object-fit: contain; display: block; margin: 0 auto 2px; }
+.signature-box .line { width: 100px; height: 1px; border-top: 1px dashed #94a3b8; margin: 12px auto 2px; }
+.footer-wrapper { position: fixed; left: 50%; transform: translateX(-50%); width: 186mm; bottom: 0; z-index: 1; }
+.security-text-line { text-align: center; font-size: 5px; color: rgba(13, 27, 42, 0.18); letter-spacing: 2px; padding: 3px 0; border-top: 1px dashed #cbd5e1; border-bottom: 1px dashed #cbd5e1; text-transform: uppercase; white-space: nowrap; position: relative; z-index: 1; background: rgba(255,255,255,0.9); }
+.page-footer { padding-top: 5px; border-top: 2px solid #c9972b; font-size: 6px; color: #64748b; display: flex; justify-content: space-between; align-items: center; page-break-inside: avoid; position: relative; z-index: 1; background: rgba(255,255,255,0.95); }
+.footer-left { text-align: left; }
+.footer-center { text-align: center; font-weight: 600; color: #0d1b2a; }
+.footer-right { text-align: right; }
+@media print { html, body { margin: 0; padding: 0; height: auto; } .page-container { max-width: 100%; } .page-footer { page-break-inside: avoid; } .watermark-container { display: block !important; } .footer-wrapper { page-break-inside: avoid; } }
+</style>
+</head>
+<body>
+<div class="watermark-container">
+    <div class="watermark-pattern-1"></div>
+    <div class="watermark-pattern-2"></div>
+    <div class="watermark-pattern-3"></div>
+    <div class="watermark-pattern-4"></div>
+    <div class="watermark-pattern-5"></div>
+    <div class="watermark-logo"></div>
+</div>
+<div class="page-container">
+    <div class="page-header">
+        <img src="logo(1).png" class="logo" onerror="this.style.display='none'">
+        <div class="school-name">Govt. Sr. Sec. School Shilla</div>
+        <div class="school-tagline">Shilla • Nerwa • District Shimla • Himachal Pradesh - 171210</div>
+        <div class="heading-box"> Student Marksheet</div>
+    </div>
+    <div class="content-area">
+        <table class="student-info-table">
+            <tr>
+                <td class="label-cell">Student ID</td>
+                <td class="value-cell">${esc(s.student_id)}</td>
+                <td class="label-cell">APAAR ID</td>
+                <td class="value-cell">${esc(s.apaar_id||'-')}</td>
+                <td class="photo-cell" rowspan="5">
+                    <div class="photo-box">
+                        ${studentPhoto ? `<img src="${esc(studentPhoto)}" onerror="this.parentElement.innerHTML='<div class=&quot;photo-placeholder&quot;><i class=&quot;fas fa-user&quot;></i></div>'">` : `<div class="photo-placeholder"><i class="fas fa-user"></i></div>`}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="label-cell">Student Name</td>
+                <td class="value-cell" style="font-weight:700;font-size:9.5px;">${esc(s.name)}</td>
+                <td class="label-cell">Father's Name</td>
+                <td class="value-cell">${esc(s.father_name||'-')}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Mother's Name</td>
+                <td class="value-cell">${esc(s.mother_name||'-')}</td>
+                <td class="label-cell">Date of Birth</td>
+                <td class="value-cell">${s.dob ? new Date(s.dob).toLocaleDateString('en-IN', {day:'2-digit', month:'2-digit', year:'numeric'}) : '-'}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Session</td>
+                <td class="value-cell" style="font-weight:700;color:#0d1b2a;">${esc(s.session || '2025-26')}</td>
+                <td class="label-cell">Class</td>
+                <td class="value-cell">${esc(s.class||'-')}${s.section ? ' - ' + esc(s.section) : ''}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Enrollment Number</td>
+                <td class="value-cell">${esc(s.exam_roll_no||'-')}</td>
+                <td class="label-cell">Status</td>
+                <td class="value-cell">PASS</td>
+            </tr>
+        </table>
+        <div class="declaration-box">
+            <i class="fas fa-check-circle"></i> 
+            This is to certify that <strong>${esc(s.name)}</strong> (Student ID: ${esc(s.student_id)}) has successfully completed the <strong>${esc(s.session || '2025-26')}</strong> session and is declared <strong>PASS</strong>.
+        </div>
+        <div class="marksheet-heading"> Available Marksheets (${marksheets.length})</div>
+        <table class="marksheet-table">
+            <thead>
+                <tr>
+                    <th style="width:20px;">#</th>
+                    <th>Exam Type</th>
+                    <th style="width:50px;">Session</th>
+                    <th style="width:30px;">Class</th>
+                    <th>Marksheet URL</th>
+                    <th style="width:65px;">QR Code</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${marksheetRows || '<tr><td colspan="6" style="text-align:center;padding:8px;">No marksheets available</td></tr>'}
+            </tbody>
+        </table>
+        <div class="verification-section">
+            <div class="verification-qr">
+                ${verificationQRBase64 ? `<img src="${verificationQRBase64}" alt="Verification QR">` : '<div style="font-size:6px;color:#94a3b8;text-align:center;">QR N/A</div>'}
+            </div>
+            <div class="verification-text">
+                <strong>Scan to Verify</strong>
+                <p class="scan-label">Scan this QR code to verify the authenticity of this marksheet.</p>
+                <p>This document is digitally verified and issued by Govt. Sr. Sec. School Shilla.</p>
+                <p style="font-size:6px;color:#94a3b8;margin-top:1px;">Verification ID: ${esc(s.student_id)}-${Date.now().toString().substring(8)}</p>
+            </div>
+        </div>
+        <div class="signature-area">
+            <div class="signature-box">
+                <img src="../principal.png" class="signature-img" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'line\\'></div><strong>Principal</strong>'">
+                <div class="line"></div>
+                <strong>Principal</strong>
+                <div style="font-size:6px;color:#94a3b8;">Govt. Sr. Sec. School Shilla</div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-wrapper">
+        <div class="security-text-line">GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT</div>
+        <div class="page-footer">
+            <div class="footer-left"><strong>Print Date:</strong> ${new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})}<br></div>
+            <div class="footer-center"><strong>Issued by:</strong> ${esc(downloadedBy)}<br><span style="font-size:4.5px;color:#94a3b8;">Authorized Signatory</span></div>
+            <div class="footer-right"><strong>Page 1 of 1</strong><br><span style="font-size:4.5px;">GSSS Shilla - Official Document</span></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>`);
         pw.document.close();
         setTimeout(() => { pw.focus(); pw.print(); }, 2000);
     } catch(e) { showToast(e.message,'error'); }
 }
 
+// ================================================================
+// PRINT CLASS STUDENTS
+// ================================================================
 async function printClassStudents() {
     try {
         const session = document.getElementById('sessionFilter').value; const params = new URLSearchParams({limit: 100}); if (session) params.set('session', session);
@@ -571,6 +935,9 @@ async function printClassStudents() {
     } catch(e) { showToast(e.message,'error'); }
 }
 
+// ================================================================
+// INIT
+// ================================================================
 window.addEventListener('DOMContentLoaded', async()=>{ if(await checkAuth()){ loadStudents(currentClass); loadPublishableStudents(publishClass); } });
 </script>
 </body>
