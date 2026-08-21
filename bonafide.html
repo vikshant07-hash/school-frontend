@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bonafide Certificate - Admin | GSSS Shilla</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --bg-white: #ffffff;
+            --text-primary: #1a2332;
+            --text-secondary: #5a6a7e;
+            --text-muted: #94a3b8;
+            --gold: #c9972b;
+            --gold-light: #e8b84b;
+            --gold-bg: #fef8ed;
+            --blue: #4a8af4;
+            --blue-bg: #eef4ff;
+            --green: #10b981;
+            --green-bg: #ecfdf5;
+            --purple: #8b5cf6;
+            --purple-bg: #f5f0ff;
+            --red: #ef4444;
+            --border: #e8edf8;
+            --shadow: 0 2px 12px rgba(0,0,0,0.04);
+            --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        .navbar .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .navbar .brand .logo-placeholder {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-sm);
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .navbar .brand .logo-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 4px;
+        }
+        .navbar .brand .name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .navbar .brand .name span { color: var(--gold); }
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            list-style: none;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .nav-links a:hover {
+            background: var(--bg);
+            color: var(--text-primary);
+        }
+        .nav-links a.active {
+            background: var(--gold-bg);
+            color: var(--gold);
+        }
+        .nav-links a i { margin-right: 6px; }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .admin-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px 6px 10px;
+            background: var(--bg);
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .online-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+        }
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .main-container {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 32px 40px;
+            width: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 28px;
+            padding: 20px 28px;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+        .page-header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .page-header h1 i { color: var(--gold); }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-primary {
+            background: var(--gold);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: var(--gold-light);
+            transform: translateY(-2px);
+        }
+        .btn-success {
+            background: var(--green);
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background: var(--red);
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+        .btn-outline {
+            background: var(--bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .btn-outline:hover {
+            background: var(--border);
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+
+        /* ===== FORM ===== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 4px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        .form-group label .required {
+            color: var(--red);
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            transition: var(--transition);
+        }
+        .form-control:focus {
+            border-color: var(--gold);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(201, 151, 43, 0.1);
+            background: white;
+        }
+        .form-control:disabled {
+            background: #f1f5f9;
+            cursor: not-allowed;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            background: var(--bg-white);
+            padding: 6px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 10px 24px;
+            border: none;
+            background: transparent;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-btn:hover {
+            background: var(--bg);
+        }
+        .tab-btn.active {
+            background: var(--gold);
+            color: #fff;
+        }
+        .tab-btn i { margin-right: 6px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .card-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .card-header h3 i {
+            color: var(--gold);
+            margin-right: 8px;
+        }
+
+        /* ===== CERTIFICATE PREVIEW ===== */
+        .certificate-box {
+            background: white;
+            border: 4px solid #2c3e50;
+            padding: 40px 50px;
+            border-radius: 12px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.08);
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.9;
+            position: relative;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+        .certificate-box .school-header {
+            text-align: center;
+            border-bottom: 3px solid #2c3e50;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        .certificate-box .school-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1a1a2e;
+            letter-spacing: 1px;
+        }
+        .certificate-box .school-address {
+            font-size: 13px;
+            font-weight: normal;
+            color: #555;
+            margin-top: 2px;
+        }
+        .certificate-box .cert-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #1a1a2e;
+            margin: 10px 0 15px 0;
+        }
+        .certificate-box .cert-meta {
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .certificate-box .cert-meta span {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .certificate-box .body-text {
+            font-size: 17px;
+            text-align: justify;
+            margin: 15px 0;
+        }
+        .certificate-box .bold-field {
+            font-weight: 700;
+            color: #1a1a2e;
+            background: #f0f4ff;
+            padding: 1px 10px;
+            border-radius: 4px;
+            border-bottom: 2px solid #667eea;
+            display: inline-block;
+        }
+        .certificate-box .qr-verify-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px dashed #ddd;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .certificate-box .qr-container {
+            text-align: center;
+        }
+        .certificate-box .qr-container img {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 5px;
+            background: white;
+        }
+        .certificate-box .qr-container .qr-label {
+            font-size: 11px;
+            color: #666;
+            margin-top: 3px;
+        }
+        .certificate-box .verification-box {
+            text-align: right;
+        }
+        .certificate-box .verification-box .verify-code {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            letter-spacing: 2px;
+            background: #f8f9fa;
+            padding: 5px 15px;
+            border-radius: 6px;
+            border: 2px solid #667eea;
+            display: inline-block;
+        }
+        .certificate-box .verification-box .verify-label {
+            font-size: 12px;
+            color: #666;
+            display: block;
+            margin-top: 3px;
+        }
+        .certificate-box .signature-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .certificate-box .signature-block {
+            text-align: center;
+            min-width: 150px;
+        }
+        .certificate-box .signature-block .sig-line {
+            width: 180px;
+            border-top: 1px solid #333;
+            margin: 5px auto 2px auto;
+        }
+        .certificate-box .signature-block .sig-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .certificate-box .signature-block .sig-title {
+            font-size: 13px;
+            color: #555;
+        }
+        .certificate-box .school-stamp {
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+            border: 2px solid #2c3e50;
+            border-radius: 50%;
+            padding: 8px 12px;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background: #f8f9fa;
+            margin: 0 auto;
+        }
+        .certificate-box .footer-note {
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+            margin-top: 15px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            padding: 14px 24px;
+            border-radius: var(--radius-sm);
+            color: #fff;
+            font-weight: 600;
+            font-size: 13px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            min-width: 250px;
+            animation: slideIn 0.3s ease;
+        }
+        .toast-success { background: var(--green); }
+        .toast-error { background: var(--red); }
+        .toast-warning { background: #f59e0b; }
+        .toast-info { background: var(--text-primary); }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ===== ALERT ===== */
+        .alert-box {
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            margin: 12px 0;
+        }
+        .alert-box.error {
+            background: #fee2e2;
+            color: var(--red);
+            border: 1px solid #fecaca;
+        }
+        .alert-box.success {
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid #bbf7d0;
+        }
+        .alert-box.info {
+            background: var(--blue-bg);
+            color: var(--blue);
+            border: 1px solid #bfdbfe;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .navbar { padding: 0 20px; }
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 68px;
+                left: 0;
+                right: 0;
+                background: var(--bg-white);
+                padding: 16px;
+                border-bottom: 1px solid var(--border);
+            }
+            .nav-links.open { display: flex; }
+            .hamburger { display: block; }
+            .main-container { padding: 16px; }
+            .page-header { padding: 16px; flex-direction: column; align-items: stretch; }
+            .form-grid { grid-template-columns: 1fr; }
+            .certificate-box { padding: 20px; }
+            .certificate-box .qr-verify-section {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            .certificate-box .verification-box { text-align: center; }
+            .certificate-box .signature-section {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <a href="#" class="brand">
+            <div class="logo-placeholder">
+                <img src="logo(1).png" alt="Logo" style="width:46px;height:46px;border-radius:10px;object-fit:contain;background:#fff;padding:4px;">
+            </div>
+            <div class="name">GSSS<span> SHILLA</span></div>
+        </a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="admin-result.html"><i class="fas fa-graduation-cap"></i> Results</a></li>
+            <li><a href="bonafide.html" class="active"><i class="fas fa-certificate"></i> Bonafide</a></li>
+        </ul>
+        <div class="nav-right">
+            <div class="admin-badge">
+                <span class="avatar" id="adminAvatar">🛡️</span>
+                <span id="adminName">Admin</span>
+                <span class="online-dot"></span>
+            </div>
+            <button class="hamburger" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTAINER ===== -->
+    <div class="main-container">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-certificate"></i> Bonafide Certificate</h1>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="fetchStudent()"><i class="fas fa-sync-alt"></i> Fetch Student</button>
+                <button class="btn btn-success" onclick="generateCertificate()"><i class="fas fa-file-pdf"></i> Generate Certificate</button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="generate" onclick="switchTab('generate')"><i class="fas fa-plus-circle"></i> Generate</button>
+            <button class="tab-btn" data-tab="history" onclick="switchTab('history')"><i class="fas fa-history"></i> History</button>
+        </div>
+
+        <!-- ===== TAB 1: GENERATE ===== -->
+        <div id="tab-generate" class="tab-content active">
+
+            <!-- Student Search -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-search"></i> Student Information</h3>
+                    <span style="font-size:12px;color:var(--text-muted);">Enter Student ID to auto-fill</span>
+                </div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+                    <input type="text" id="searchStudentId" class="form-control" style="flex:1;min-width:200px;" placeholder="Enter Student ID (e.g., ST10A025)">
+                    <button class="btn btn-primary" onclick="fetchStudent()"><i class="fas fa-user-check"></i> Fetch</button>
+                </div>
+                <div id="fetchStatus" class="alert-box info"><i class="fas fa-info-circle"></i> Enter Student ID and click Fetch</div>
+            </div>
+
+            <!-- Student Details Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-user-edit"></i> Student Details</h3>
+                    <span style="font-size:12px;color:var(--text-muted);">Fields with <span style="color:var(--red);">*</span> are required</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Student ID <span class="required">*</span></label>
+                        <input type="text" id="studentId" class="form-control" placeholder="e.g., ST10A025" required>
+                    </div>
+                    <div class="form-group">
+                        <label>APAAR ID</label>
+                        <input type="text" id="apaarId" class="form-control" placeholder="11-digit APAAR ID">
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Student Name <span class="required">*</span></label>
+                        <input type="text" id="studentName" class="form-control" placeholder="Full Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Father's Name <span class="required">*</span></label>
+                        <input type="text" id="fatherName" class="form-control" placeholder="Father's Name" required>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Mother's Name</label>
+                        <input type="text" id="motherName" class="form-control" placeholder="Mother's Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Date of Birth</label>
+                        <input type="date" id="dob" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Class <span class="required">*</span></label>
+                        <select id="className" class="form-control">
+                            <option value="6">Class 6</option>
+                            <option value="7">Class 7</option>
+                            <option value="8">Class 8</option>
+                            <option value="9">Class 9</option>
+                            <option value="10" selected>Class 10</option>
+                            <option value="11">Class 11</option>
+                            <option value="12">Class 12</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Section</label>
+                        <input type="text" id="section" class="form-control" placeholder="A, B, C">
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Admission Number <span class="required">*</span></label>
+                        <input type="text" id="admissionNo" class="form-control" placeholder="e.g., 2024-010" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Academic Session</label>
+                        <select id="session" class="form-control">
+                            <option value="2025-26">2025-26</option>
+                            <option value="2024-25">2024-25</option>
+                            <option value="2023-24">2023-24</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Exam Roll No</label>
+                        <input type="text" id="examRollNo" class="form-control" placeholder="Roll Number">
+                    </div>
+                    <div class="form-group">
+                        <label>Purpose <span class="required">*</span></label>
+                        <select id="purpose" class="form-control">
+                            <option value="Passport Application">Passport Application</option>
+                            <option value="Educational Loan">Educational Loan</option>
+                            <option value="Scholarship">Scholarship</option>
+                            <option value="Visa Processing">Visa Processing</option>
+                            <option value="Transfer Certificate">Transfer Certificate</option>
+                            <option value="Police Verification">Police Verification</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" id="address" class="form-control" placeholder="Residential Address">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="text" id="phone" class="form-control" placeholder="Contact Number">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Student Photo</label>
+                    <input type="file" id="photo" class="form-control" accept="image/*">
+                    <div id="photoPreview" style="margin-top:8px;"></div>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:20px 0;">
+                <button class="btn btn-success" onclick="generateCertificate()" style="padding:14px 40px;font-size:16px;">
+                    <i class="fas fa-file-pdf"></i> Generate Bonafide Certificate
+                </button>
+                <button class="btn btn-outline" onclick="resetForm()"><i class="fas fa-undo"></i> Reset</button>
+            </div>
+
+            <!-- Certificate Preview -->
+            <div id="certificatePreview" style="display:none; margin-top:30px;">
+                <h2 style="text-align:center;color:var(--text-primary);margin-bottom:20px;">
+                    <i class="fas fa-certificate" style="color:var(--gold);"></i> Certificate Preview
+                </h2>
+                <div id="certificateContent"></div>
+                <div style="text-align:center;margin-top:20px;">
+                    <button class="btn btn-success" onclick="downloadPDF()" style="padding:12px 40px;">
+                        <i class="fas fa-download"></i> Download PDF
+                    </button>
+                    <button class="btn btn-primary" onclick="window.print()">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB 2: HISTORY ===== -->
+        <div id="tab-history" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-history"></i> Generated Certificates</h3>
+                    <button class="btn btn-sm btn-outline" onclick="loadHistory()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                        <thead>
+                            <tr style="background:var(--bg);">
+                                <th style="padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);">#</th>
+                                <th style="padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);">Student ID</th>
+                                <th style="padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);">Name</th>
+                                <th style="padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);">Class</th>
+                                <th style="padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);">Verification Code</th>
+                                <th style="padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);">Issue Date</th>
+                                <th style="padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">No certificates generated yet</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer style="background:var(--bg-white);border-top:1px solid var(--border);padding:20px 32px;text-align:center;font-size:13px;color:var(--text-muted);">
+        <span>&copy; 2026 Govt. Sr. Sec. School Shilla. All rights reserved.</span>
+    </footer>
+
+    <script>
+        // ================================================================
+        // CONFIGURATION
+        // ================================================================
+        const API_BASE = 'https://gsssshilla.onrender.com/api';
+        let currentCertificateData = null;
+        let certificatesHistory = [];
+
+        // ================================================================
+        // AUTH HELPERS
+        // ================================================================
+        function getAuthHeaders() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                showToast('Please login first', 'error');
+                window.location.href = 'login.html';
+                return null;
+            }
+            return {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+        }
+
+        function getToken() {
+            return localStorage.getItem('adminToken');
+        }
+
+        // ================================================================
+        // TOAST
+        // ================================================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }
+
+        // ================================================================
+        // NAVIGATION
+        // ================================================================
+        function toggleNav() {
+            document.getElementById('navLinks').classList.toggle('open');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+            if (tab === 'history') loadHistory();
+        }
+
+        // ================================================================
+        // PHOTO PREVIEW
+        // ================================================================
+        document.getElementById('photo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('photoPreview');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    preview.innerHTML =
+                        `<img src="${event.target.result}" style="width:100px;height:120px;object-fit:cover;border:2px solid #c9972b;border-radius:8px;">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = '';
+            }
+        });
+
+        // ================================================================
+        // FETCH STUDENT
+        // ================================================================
+        async function fetchStudent() {
+            const studentId = document.getElementById('searchStudentId').value.trim();
+            if (!studentId) {
+                showToast('Please enter Student ID', 'warning');
+                return;
+            }
+
+            const status = document.getElementById('fetchStatus');
+            status.className = 'alert-box info';
+            status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching student...';
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/results/students/${encodeURIComponent(studentId)}`, {
+                    headers: getAuthHeaders()
+                });
+
+                if (!response.ok) {
+                    throw new Error('Student not found');
+                }
+
+                const data = await response.json();
+                const student = data.data?.student || data.data;
+
+                if (student) {
+                    document.getElementById('studentId').value = student.student_id || studentId;
+                    document.getElementById('apaarId').value = student.apaar_id || '';
+                    document.getElementById('studentName').value = student.name || '';
+                    document.getElementById('fatherName').value = student.father_name || '';
+                    document.getElementById('motherName').value = student.mother_name || '';
+                    document.getElementById('dob').value = student.dob || '';
+                    document.getElementById('className').value = student.class || '10';
+                    document.getElementById('section').value = student.section || '';
+                    document.getElementById('admissionNo').value = student.admission_no || student.admission || student.student_id;
+                    document.getElementById('session').value = student.session || '2025-26';
+                    document.getElementById('examRollNo').value = student.exam_roll_no || '';
+
+                    status.className = 'alert-box success';
+                    status.innerHTML = `<i class="fas fa-check-circle"></i> Student found: ${student.name}`;
+                    showToast('Student loaded successfully', 'success');
+                } else {
+                    throw new Error('No data found');
+                }
+            } catch (error) {
+                status.className = 'alert-box error';
+                status.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error.message}`;
+                showToast(error.message, 'error');
+            }
+        }
+
+        // ================================================================
+        // GENERATE CERTIFICATE
+        // ================================================================
+        async function generateCertificate() {
+            const data = {
+                studentId: document.getElementById('studentId').value.trim(),
+                apaarId: document.getElementById('apaarId').value.trim(),
+                studentName: document.getElementById('studentName').value.trim(),
+                fatherName: document.getElementById('fatherName').value.trim(),
+                motherName: document.getElementById('motherName').value.trim(),
+                dob: document.getElementById('dob').value,
+                className: document.getElementById('className').value,
+                section: document.getElementById('section').value.trim(),
+                admissionNo: document.getElementById('admissionNo').value.trim(),
+                session: document.getElementById('session').value,
+                examRollNo: document.getElementById('examRollNo').value.trim(),
+                purpose: document.getElementById('purpose').value,
+                address: document.getElementById('address').value.trim(),
+                phone: document.getElementById('phone').value.trim()
+            };
+
+            // Validate
+            if (!data.studentId) { showToast('Student ID is required', 'error'); return; }
+            if (!data.studentName) { showToast('Student Name is required', 'error'); return; }
+            if (!data.fatherName) { showToast('Father\'s Name is required', 'error'); return; }
+            if (!data.admissionNo) { showToast('Admission Number is required', 'error'); return; }
+
+            // Handle photo
+            const photoInput = document.getElementById('photo');
+            if (photoInput.files && photoInput.files[0]) {
+                const file = photoInput.files[0];
+                if (file.size > 1 * 1024 * 1024) {
+                    showToast('Photo must be under 1MB', 'warning');
+                    return;
+                }
+                data.photo = await compressImage(file);
+            }
+
+            try {
+                showToast('Generating certificate...', 'info');
+
+                const response = await fetch(`${API_BASE}/bonafide/generate`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Failed to generate');
+                }
+
+                const result = await response.json();
+                if (!result.success) {
+                    throw new Error(result.message || 'Generation failed');
+                }
+
+                currentCertificateData = result.data;
+                renderCertificate(result.data);
+                document.getElementById('certificatePreview').style.display = 'block';
+                showToast('Certificate generated successfully!', 'success');
+
+                // Scroll to preview
+                document.getElementById('certificatePreview').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        // ================================================================
+        // COMPRESS IMAGE
+        // ================================================================
+        function compressImage(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width,
+                            height = img.height;
+                        const maxWidth = 200,
+                            maxHeight = 250;
+                        if (width > height) {
+                            if (width > maxWidth) { height *= maxWidth / width;
+                                width = maxWidth; }
+                        } else {
+                            if (height > maxHeight) { width *= maxHeight / height;
+                                height = maxHeight; }
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, width, height);
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.7));
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // ================================================================
+        // RENDER CERTIFICATE
+        // ================================================================
+        function renderCertificate(data) {
+            const c = data.certificate || data;
+            const qrCode = c.qrCode || data.qrCode || '';
+            const verificationCode = c.verificationCode || data.verificationCode || 'BC-XXXX-XXXX-XXXX';
+            const issueDate = c.issueDate ? new Date(c.issueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'long',
+                    year: 'numeric' }) : new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long',
+                    year: 'numeric' });
+
+            const html = `
+                <div class="certificate-box" id="certToPrint">
+                    <div class="school-header">
+                        <div class="school-name">🏫 DELHI PUBLIC SCHOOL</div>
+                        <div class="school-address">Sector-12, Dwarka, New Delhi - 110078 | Ph: 011-4567890</div>
+                    </div>
+
+                    <div class="cert-title">Bonafide Certificate</div>
+
+                    <div class="cert-meta">
+                        Certificate No: <span>${verificationCode}</span> &nbsp;|&nbsp; Date: <span>${issueDate}</span>
+                    </div>
+
+                    <div class="body-text">
+                        This is to certify that <span class="bold-field">${c.studentName}</span>, 
+                        son/daughter of <span class="bold-field">${c.fatherName}</span>, 
+                        bearing Admission/Enrollment No. <span class="bold-field">${c.admissionNo}</span>, 
+                        is a bonafide student of our institution. 
+                        He/She is currently studying in <span class="bold-field">${c.className}</span> 
+                        for the academic session <span class="bold-field">${c.session || '2025-26'}</span>.
+                    </div>
+
+                    <div class="body-text">
+                        Date of Birth (as per school records): <span class="bold-field">${c.dob || 'N/A'}</span>
+                    </div>
+
+                    <div class="body-text">
+                        This certificate is issued for <span class="bold-field">${c.purpose || 'General'}</span> 
+                        and is valid as long as the student remains enrolled in this school.
+                    </div>
+
+                    <div class="qr-verify-section">
+                        <div class="qr-container">
+                            ${qrCode ? `<img src="${qrCode}" alt="QR Code">` : '<div style="width:100px;height:100px;border:2px dashed #ccc;display:flex;align-items:center;justify-content:center;font-size:12px;color:#999;">QR</div>'}
+                            <div class="qr-label">Scan to Verify</div>
+                        </div>
+                        <div class="verification-box">
+                            <div class="verify-code">${verificationCode}</div>
+                            <span class="verify-label">🔐 Verification Code</span>
+                        </div>
+                    </div>
+
+                    <div class="signature-section">
+                        <div class="signature-block">
+                            <div class="school-stamp">SCHOOL<br>STAMP</div>
+                        </div>
+                        <div class="signature-block">
+                            <div class="sig-line"></div>
+                            <div class="sig-name">(Dr. S.K. Mehta)</div>
+                            <div class="sig-title">Principal</div>
+                        </div>
+                        <div class="signature-block">
+                            <div style="font-size:12px; color:#666;">📅 ${issueDate}</div>
+                        </div>
+                    </div>
+
+                    <div class="footer-note">
+                        ⚡ Verify online at: gsssshilla07.pages.dev/verify?code=${verificationCode}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('certificateContent').innerHTML = html;
+        }
+
+        // ================================================================
+        // DOWNLOAD PDF
+        // ================================================================
+        function downloadPDF() {
+            const element = document.getElementById('certToPrint');
+            if (!element) {
+                showToast('Please generate certificate first', 'warning');
+                return;
+            }
+
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5],
+                filename: `Bonafide_Certificate_${currentCertificateData?.verificationCode || 'cert'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true,
+                    width: 850
+                },
+                jsPDF: {
+                    unit: 'in',
+                    format: 'a4',
+                    orientation: 'portrait'
+                }
+            };
+
+            showToast('Generating PDF...', 'info');
+            html2pdf().set(opt).from(element).save()
+                .then(() => {
+                    showToast('PDF downloaded successfully!', 'success');
+                })
+                .catch((error) => {
+                    showToast('Error generating PDF: ' + error.message, 'error');
+                });
+        }
+
+        // ================================================================
+        // LOAD HISTORY
+        // ================================================================
+        async function loadHistory() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+
+            try {
+                const response = await fetch(`${API_BASE}/bonafide/all?limit=50`, {
+                    headers: getAuthHeaders()
+                });
+
+                if (!response.ok) throw new Error('Failed to load history');
+
+                const result = await response.json();
+                const certificates = result.data || [];
+
+                if (certificates.length === 0) {
+                    tbody.innerHTML =
+                        '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">No certificates generated yet</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = certificates.map((c, i) => `
+                    <tr>
+                        <td style="padding:10px 14px;">${i + 1}</td>
+                        <td style="padding:10px 14px;font-weight:600;">${c.studentId}</td>
+                        <td style="padding:10px 14px;">${c.studentName}</td>
+                        <td style="padding:10px 14px;">${c.className}</td>
+                        <td style="padding:10px 14px;font-size:11px;color:var(--gold);">${c.verificationCode}</td>
+                        <td style="padding:10px 14px;">${new Date(c.issueDate).toLocaleDateString('en-IN')}</td>
+                        <td style="padding:10px 14px;">
+                            <button class="btn btn-sm btn-primary" onclick="viewCertificate('${c.verificationCode}')"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCertificate('${c.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                tbody.innerHTML =
+                    `<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--red);">${error.message}</td></tr>`;
+                showToast(error.message, 'error');
+            }
+        }
+
+        // ================================================================
+        // VIEW CERTIFICATE
+        // ================================================================
+        function viewCertificate(code) {
+            const cert = certificatesHistory.find(c => c.verificationCode === code);
+            if (cert) {
+                // Generate QR for view
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(`https://gsssshilla07.pages.dev/verify.html?code=${code}`)}`;
+                renderCertificate({
+                    ...cert,
+                    qrCode: qrUrl,
+                    studentName: cert.studentName,
+                    fatherName: cert.fatherName,
+                    className: cert.className,
+                    admissionNo: cert.admissionNo
+                });
+                document.getElementById('certificatePreview').style.display = 'block';
+                document.getElementById('certificatePreview').scrollIntoView({ behavior: 'smooth' });
+                switchTab('generate');
+            }
+        }
+
+        // ================================================================
+        // DELETE CERTIFICATE
+        // ================================================================
+        async function deleteCertificate(id) {
+            if (!confirm('Delete this certificate?')) return;
+            try {
+                const response = await fetch(`${API_BASE}/bonafide/${id}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+                if (!response.ok) throw new Error('Delete failed');
+                showToast('Certificate deleted', 'success');
+                loadHistory();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        // ================================================================
+        // RESET FORM
+        // ================================================================
+        function resetForm() {
+            document.getElementById('searchStudentId').value = '';
+            document.getElementById('studentId').value = '';
+            document.getElementById('apaarId').value = '';
+            document.getElementById('studentName').value = '';
+            document.getElementById('fatherName').value = '';
+            document.getElementById('motherName').value = '';
+            document.getElementById('dob').value = '';
+            document.getElementById('className').value = '10';
+            document.getElementById('section').value = '';
+            document.getElementById('admissionNo').value = '';
+            document.getElementById('session').value = '2025-26';
+            document.getElementById('examRollNo').value = '';
+            document.getElementById('purpose').value = 'Passport Application';
+            document.getElementById('address').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('photo').value = '';
+            document.getElementById('photoPreview').innerHTML = '';
+            document.getElementById('fetchStatus').className = 'alert-box info';
+            document.getElementById('fetchStatus').innerHTML =
+                '<i class="fas fa-info-circle"></i> Enter Student ID and click Fetch';
+            document.getElementById('certificatePreview').style.display = 'none';
+            currentCertificateData = null;
+        }
+
+        // ================================================================
+        // AUTO-LOAD FROM URL PARAM (for direct student view)
+        // ================================================================
+        window.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const studentId = params.get('student');
+            if (studentId) {
+                document.getElementById('searchStudentId').value = studentId;
+                fetchStudent();
+            }
+            // Load history
+            loadHistory();
+        });
+    </script>
+
+</body>
+</html>
