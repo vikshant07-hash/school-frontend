@@ -210,7 +210,8 @@
                 <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Class</label><input type="text" id="uploadClass" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" disabled></div>
                 <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Exam Type *</label><select id="uploadExamType" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);"><option>Annual Examination</option><option>Half Yearly Examination</option><option>Pre Board</option><option>Board Examination</option><option>Final Examination</option><option>Monthly Test</option><option>Unit Test</option></select></div>
                 <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Exam Session (When exam was held) *</label><input type="month" id="uploadExamSession" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" required></div>
-                <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Marks *</label><input type="text" id="uploadMarks" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" placeholder="e.g. 407/500" required></div>
+                <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Total Obtained Marks</label><input type="text" id="uploadObtainedMarks" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" placeholder="e.g. 407"></div>
+                <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Maximum Marks</label><input type="text" id="uploadMaxMarks" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" placeholder="e.g. 500"></div>
                 <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">PDF File * (Max 10MB)</label><input type="file" id="uploadPdf" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" accept=".pdf" required></div>
                 <div style="grid-column:1/-1;display:flex;gap:10px;"><button type="button" class="btn btn-primary" onclick="fetchStudentForUpload()"><i class="fas fa-search"></i> Fetch Student</button><button type="submit" class="btn btn-success" id="uploadSubmitBtn"><i class="fas fa-upload"></i> Upload Marksheet</button></div>
             </form>
@@ -565,9 +566,9 @@ document.getElementById('sPhoto').addEventListener('change', function(e){
 async function fetchStudentForUpload(){ const studentId=document.getElementById('uploadStudentId').value.trim(); if(!studentId) return; try{ const data=await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`); const s=data.data.student; document.getElementById('uploadStudentName').value=s.name; document.getElementById('uploadSession').value=s.session; document.getElementById('uploadClass').value=s.class; document.getElementById('uploadStatus').className='alert-box success'; document.getElementById('uploadStatus').innerHTML='<i class="fas fa-check-circle"></i> Student found'; }catch(e){ document.getElementById('uploadStatus').className='alert-box error'; document.getElementById('uploadStatus').innerHTML='<i class="fas fa-exclamation-circle"></i> '+esc(e.message); } }
 
 // ================================================================
-// UPLOAD MARKSHEET - WITH MARKS FIELD
+// UPLOAD MARKSHEET - WITH OBTAINED MARKS AND MAX MARKS
 // ================================================================
-document.getElementById('marksheetUploadForm').addEventListener('submit', async function(e){ e.preventDefault(); const studentId=document.getElementById('uploadStudentId').value; const pdf=document.getElementById('uploadPdf').files[0]; const examSession=document.getElementById('uploadExamSession').value; const marks=document.getElementById('uploadMarks').value.trim(); if(!studentId||!pdf||!examSession||!marks) { showToast('All fields are required','warning'); return; } if(pdf.size>10*1024*1024){ showToast('PDF under 10MB','warning'); return; } const formData=new FormData(); formData.append('student_id',studentId); formData.append('session',document.getElementById('uploadSession').value); formData.append('class',document.getElementById('uploadClass').value); formData.append('exam_type',document.getElementById('uploadExamType').value); formData.append('exam_session',examSession); formData.append('marks',marks); formData.append('pdf',pdf); try{ const headers=getAuthHeaders(); const res=await fetch(`${API_BASE}/marksheets/upload`,{method:'POST',headers:{Authorization:headers.Authorization},body:formData}); if(res.status===401){ showPopup('expired'); return; } const result=await res.json(); if(!result.success) throw new Error(result.message); showToast('Marksheet uploaded','success'); loadStudents(currentClass); }catch(err){ showToast(err.message,'error'); } });
+document.getElementById('marksheetUploadForm').addEventListener('submit', async function(e){ e.preventDefault(); const studentId=document.getElementById('uploadStudentId').value; const pdf=document.getElementById('uploadPdf').files[0]; const examSession=document.getElementById('uploadExamSession').value; const obtainedMarks=document.getElementById('uploadObtainedMarks').value.trim(); const maxMarks=document.getElementById('uploadMaxMarks').value.trim(); if(!studentId||!pdf||!examSession) { showToast('Student ID, Exam Session and PDF are required','warning'); return; } if(pdf.size>10*1024*1024){ showToast('PDF under 10MB','warning'); return; } const formData=new FormData(); formData.append('student_id',studentId); formData.append('session',document.getElementById('uploadSession').value); formData.append('class',document.getElementById('uploadClass').value); formData.append('exam_type',document.getElementById('uploadExamType').value); formData.append('exam_session',examSession); formData.append('obtained_marks',obtainedMarks); formData.append('max_marks',maxMarks); formData.append('pdf',pdf); try{ const headers=getAuthHeaders(); const res=await fetch(`${API_BASE}/marksheets/upload`,{method:'POST',headers:{Authorization:headers.Authorization},body:formData}); if(res.status===401){ showPopup('expired'); return; } const result=await res.json(); if(!result.success) throw new Error(result.message); showToast('Marksheet uploaded','success'); loadStudents(currentClass); }catch(err){ showToast(err.message,'error'); } });
 
 // ================================================================
 // OPEN STUDENT DETAIL
@@ -582,13 +583,13 @@ async function openStudentDetail(studentId) {
 }
 
 // ================================================================
-// RENDER STUDENT DETAIL - with exam_session and marks displayed
+// RENDER STUDENT DETAIL - with obtained_marks and max_marks
 // ================================================================
 function renderStudentDetail(data) {
     const s = data.student; const marksheets = data.marksheets || [];
     document.getElementById('modalStudentName').innerHTML = `<i class="fas fa-user-graduate"></i> ${esc(s.name)}`;
     const modalContent = document.getElementById('modalStudentContent');
-    let marksheetHtml = marksheets.length === 0 ? `<div class="alert-box info">No marksheets uploaded yet.</div>` : marksheets.map(m => `<div class="exam-item"><div class="exam-info"><span class="exam-name">${esc(m.exam_type)}</span><span class="exam-session"><i class="far fa-calendar-alt"></i> Exam: ${formatMonth(m.exam_session)}</span><span class="exam-session"><i class="fas fa-school"></i> Session: ${esc(m.session)}</span><span class="exam-session"><i class="fas fa-star"></i> Marks: ${esc(m.marks||'-')}</span><span class="badge ${m.is_published?'badge-success':'badge-warning'}">${m.is_published?' Published':' Unpublished'}</span></div><div class="action-btns"><button class="action-btn view" onclick="viewMarksheet(${m.id})"><i class="fas fa-eye"></i> View</button><button class="action-btn delete" onclick="deleteExam(${m.id})"><i class="fas fa-trash"></i> Delete</button></div></div>`).join('');
+    let marksheetHtml = marksheets.length === 0 ? `<div class="alert-box info">No marksheets uploaded yet.</div>` : marksheets.map(m => `<div class="exam-item"><div class="exam-info"><span class="exam-name">${esc(m.exam_type)}</span><span class="exam-session"><i class="far fa-calendar-alt"></i> Exam: ${formatMonth(m.exam_session)}</span><span class="exam-session"><i class="fas fa-school"></i> Session: ${esc(m.session)}</span><span class="exam-session"><i class="fas fa-star"></i> Marks: ${esc(m.obtained_marks||'-')}/${esc(m.max_marks||'-')}</span><span class="badge ${m.is_published?'badge-success':'badge-warning'}">${m.is_published?' Published':' Unpublished'}</span></div><div class="action-btns"><button class="action-btn view" onclick="viewMarksheet(${m.id})"><i class="fas fa-eye"></i> View</button><button class="action-btn delete" onclick="deleteExam(${m.id})"><i class="fas fa-trash"></i> Delete</button></div></div>`).join('');
     modalContent.innerHTML = `<div class="student-detail-grid"><div class="item"><label>Student ID</label><span>${esc(s.student_id)}</span></div><div class="item"><label>APAAR ID</label><span>${esc(s.apaar_id||'-')}</span></div><div class="item"><label>Father's Name</label><span>${esc(s.father_name||'-')}</span></div><div class="item"><label>Mother's Name</label><span>${esc(s.mother_name||'-')}</span></div><div class="item"><label>Date of Birth</label><span>${s.dob?formatDate(s.dob):'-'}</span></div><div class="item"><label>Academic Session</label><span>${esc(s.session||'-')}</span></div><div class="item"><label>Class</label><span>${esc(s.class||'-')}${s.section ? ' - ' + esc(s.section) : ''}</span></div><div class="item"><label>Roll No</label><span>${esc(s.exam_roll_no||'-')}</span></div></div><div class="exam-list"><h4 style="font-size:14px;color:var(--text-secondary);margin-bottom:10px;"><i class="fas fa-file-pdf"></i> Marksheets (${marksheets.length})</h4>${marksheetHtml}</div><div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-sm btn-primary" onclick="printStudent('${esc(s.student_id)}')"><i class="fas fa-print"></i> Print Details</button><button class="btn btn-sm btn-outline" onclick="closeModal('studentModal')"><i class="fas fa-times"></i> Close</button></div>`;
 }
 
@@ -667,7 +668,7 @@ function generateQRCodeBase64(url) {
 }
 
 // ================================================================
-// PRINT STUDENT - WITH MARKS INSTEAD OF CLASS IN MARKSHEET TABLE
+// PRINT STUDENT - WITH OBTAINED MARKS AND MAX MARKS BOX
 // ================================================================
 async function printStudent(studentId) {
     try {
@@ -706,7 +707,8 @@ async function printStudent(studentId) {
                     <td style="text-align:center;padding:4px 6px;border:1px solid #d1d5db;">${idx+1}</td>
                     <td style="padding:4px 6px;border:1px solid #d1d5db;font-weight:600;">${esc(m.exam_type)}</td>
                     <td style="padding:4px 6px;border:1px solid #d1d5db;text-align:center;">${formatMonth(m.exam_session)}</td>
-                    <td style="padding:4px 6px;border:1px solid #d1d5db;text-align:center;font-weight:700;color:var(--gold);">${esc(m.marks||'-')}</td>
+                    <td style="padding:4px 6px;border:1px solid #d1d5db;text-align:center;font-weight:700;color:#0d1b2a;">${esc(m.obtained_marks||'-')}</td>
+                    <td style="padding:4px 6px;border:1px solid #d1d5db;text-align:center;font-weight:700;color:#0d1b2a;">${esc(m.max_marks||'-')}</td>
                     <td style="padding:4px 6px;border:1px solid #d1d5db;font-size:6px;word-break:break-all;color:#6b7280;">${esc(m.cloudinary_url||'-')}</td>
                     <td style="text-align:center;padding:4px 6px;border:1px solid #d1d5db;">
                         ${m.qrBase64 ? 
@@ -753,6 +755,14 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
 .photo-box img { width: 100%; height: 100%; object-fit: cover; }
 .photo-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #cbd5e1; }
 .marksheet-heading { font-size: 9px; font-weight: 700; margin: 7px 0 4px; padding: 3px 8px; background: #fef8ed; border-left: 4px solid #c9972b; letter-spacing: 1px; position: relative; z-index: 1; }
+
+/* Marks Summary Box */
+.marks-summary-box { border: 2px solid #c9972b; border-radius: 8px; padding: 8px 12px; margin: 8px 0 12px; background: #fef8ed; display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+.marks-summary-box .summary-item { text-align: center; }
+.marks-summary-box .summary-item .label { font-size: 6.5px; text-transform: uppercase; color: #5a6a7e; letter-spacing: 0.5px; font-weight: 600; }
+.marks-summary-box .summary-item .value { font-size: 11px; font-weight: 800; color: #0d1b2a; }
+.marks-summary-box .summary-item .value.gold { color: #c9972b; }
+
 .marksheet-table { width: 100%; border-collapse: collapse; margin: 3px 0; border: 2px solid #0d1b2a; position: relative; z-index: 1; }
 .marksheet-table th { background: #0d1b2a; color: #fff; padding: 3px 5px; border: 1px solid #0d1b2a; font-size: 6px; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
 .marksheet-table td { padding: 3px 5px; border: 1px solid #d1d5db; font-size: 7px; text-align: center; }
@@ -834,6 +844,28 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
             <i class="fas fa-check-circle"></i> 
             This is to certify that <strong>${esc(s.name)}</strong> (Student ID: ${esc(s.student_id)}) has successfully completed the <strong>${esc(s.session||'')}</strong> academic session and is declared <strong>PASS</strong>.
         </div>
+
+        <!-- MARKS SUMMARY BOX -->
+        <div class="marks-summary-box">
+            <div class="summary-item">
+                <div class="label">Total Obtained Marks</div>
+                <div class="value gold">${marksheets.reduce((sum, m) => sum + (parseInt(m.obtained_marks) || 0), 0)}</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Maximum Marks</div>
+                <div class="value">${marksheets.reduce((sum, m) => sum + (parseInt(m.max_marks) || 0), 0)}</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Percentage</div>
+                <div class="value gold">${(() => {
+                    const totalObtained = marksheets.reduce((sum, m) => sum + (parseInt(m.obtained_marks) || 0), 0);
+                    const totalMax = marksheets.reduce((sum, m) => sum + (parseInt(m.max_marks) || 0), 0);
+                    if (totalMax === 0) return '-';
+                    return ((totalObtained / totalMax) * 100).toFixed(2) + '%';
+                })()}</div>
+            </div>
+        </div>
+
         <div class="marksheet-heading"> Available Marksheets (${marksheets.length})</div>
         <table class="marksheet-table">
             <thead>
@@ -841,13 +873,14 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
                     <th style="width:20px;">#</th>
                     <th>Exam Type</th>
                     <th style="width:55px;">Exam Session</th>
-                    <th style="width:55px;">Marks</th>
+                    <th style="width:45px;">Obtained</th>
+                    <th style="width:45px;">Maximum</th>
                     <th>Marksheet URL</th>
                     <th style="width:65px;">QR Code</th>
                 </tr>
             </thead>
             <tbody>
-                ${marksheetRows || '<tr><td colspan="6" style="text-align:center;padding:8px;">No marksheets available</td></tr>'}
+                ${marksheetRows || '<tr><td colspan="7" style="text-align:center;padding:8px;">No marksheets available</td></tr>'}
             </tbody>
         </table>
         <div class="verification-section">
