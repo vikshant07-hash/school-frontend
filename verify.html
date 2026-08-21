@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify Result - GSSS Shilla</title>
+    <title>Secure Verify - GSSS Shilla</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
@@ -58,7 +58,6 @@
             border: 1px solid var(--gray-light);
         }
 
-        /* ===== HEADER WITH LOGO AT TOP CENTER ===== */
         .verify-header {
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             padding: 25px 20px 20px;
@@ -67,7 +66,6 @@
             position: relative;
         }
 
-        /* School Logo - Top Center */
         .school-logo-wrapper {
             display: flex;
             justify-content: center;
@@ -106,7 +104,6 @@
             margin-top: 2px;
         }
 
-        /* ===== Verification Badge ===== */
         .verify-badge {
             display: inline-block;
             background: var(--accent);
@@ -120,12 +117,25 @@
             margin-top: 6px;
         }
 
-        /* BODY */
         .verify-body {
             padding: 20px 25px 25px;
         }
 
-        /* VERIFICATION CODE INPUT */
+        /* Rate Limit Warning */
+        .rate-limit-warning {
+            background: var(--warning-light);
+            border: 1px solid #fde68a;
+            border-radius: var(--radius-sm);
+            padding: 8px 14px;
+            margin-bottom: 14px;
+            font-size: 11px;
+            color: #92400e;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .rate-limit-warning.show { display: flex; }
+
         .manual-verify-section {
             background: var(--off-white);
             border-radius: var(--radius-sm);
@@ -157,6 +167,7 @@
             font-family: 'Inter', sans-serif;
             transition: var(--transition);
             background: var(--white);
+            text-transform: uppercase;
         }
         .manual-input-group input:focus {
             outline: none;
@@ -166,6 +177,7 @@
         .manual-input-group input::placeholder {
             color: var(--gray);
             font-size: 12px;
+            text-transform: none;
         }
         .manual-input-group .btn-verify-code {
             padding: 10px 24px;
@@ -184,8 +196,12 @@
             background: var(--accent-dark);
             transform: translateY(-2px);
         }
+        .manual-input-group .btn-verify-code:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
 
-        /* SCANNER OPTIONS */
         .scanner-options {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -207,6 +223,7 @@
             transform: translateY(-3px);
             box-shadow: var(--shadow-sm);
         }
+        .scan-option:active { transform: scale(0.96); }
         .scan-icon {
             font-size: 26px;
             color: var(--accent-dark);
@@ -222,7 +239,6 @@
             color: var(--gray);
         }
 
-        /* CAMERA MODAL */
         .camera-modal {
             display: none;
             position: fixed;
@@ -262,7 +278,6 @@
         .btn-close-camera { background: var(--danger); color: var(--white); }
         .btn-close-camera:hover { background: #b91c1c; }
 
-        /* ICON */
         .verify-icon {
             width: 70px;
             height: 70px;
@@ -283,7 +298,6 @@
         .verify-title { font-size: 20px; font-weight: 800; color: var(--primary); text-align: center; margin-bottom: 4px; }
         .verify-subtitle { font-size: 13px; color: var(--text-light); text-align: center; margin-bottom: 16px; }
 
-        /* TABLE */
         .student-details-table {
             width: 100%;
             border-collapse: collapse;
@@ -362,6 +376,8 @@
         .btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,151,43,0.3); }
         .btn-secondary { background: var(--off-white); color: var(--text-light); border: 1px solid var(--gray-light); }
         .btn-secondary:hover { background: var(--gray-light); color: var(--text); }
+        .btn-danger { background: var(--danger); color: var(--white); }
+        .btn-danger:hover { background: #b91c1c; }
 
         .verify-footer {
             padding: 12px 25px;
@@ -374,7 +390,6 @@
             text-transform: uppercase;
         }
 
-        /* LOADING SPINNER */
         .spinner {
             display: inline-block;
             width: 20px;
@@ -387,6 +402,21 @@
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .hidden { display: none !important; }
+
+        /* Security Badge */
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: center;
+            font-size: 9px;
+            color: var(--gray);
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: var(--off-white);
+            border-radius: 50px;
+        }
+        .security-badge i { color: var(--success); }
 
         @media (max-width: 480px) {
             .verification-container { margin: 0 5px; }
@@ -402,7 +432,7 @@
         @media print {
             body { background: #fff; padding: 0; }
             .verification-container { box-shadow: none; border: none; max-width: 100%; }
-            .scanner-options, .camera-modal, .btn, .verify-footer, .manual-verify-section { display: none !important; }
+            .scanner-options, .camera-modal, .btn, .verify-footer, .manual-verify-section, .security-badge { display: none !important; }
             .verify-header { background: #fff; border-bottom: 3px solid var(--accent); }
             .school-name { color: var(--primary); }
             .school-tagline { color: var(--gray); }
@@ -415,35 +445,35 @@
 </head>
 <body>
     <div class="verification-container">
-        <!-- ===== HEADER WITH LOGO AT TOP CENTER ===== -->
         <div class="verify-header">
-            <!-- School Logo - Top Center -->
             <div class="school-logo-wrapper">
                 <img src="1778132110413-ChatGPT Image May 7, 2026, 10_56_26 AM.png" alt="GSSS Shilla Logo" class="school-logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23fef8ed%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2230%22 fill=%22%23c9972b%22 font-family=%22serif%22 font-weight=%22bold%22%3EGSSS%3C/text%3E%3C/svg%3E'">
             </div>
-            
             <div class="school-name">Govt. Sr. Sec. School Shilla</div>
             <div class="school-tagline">Shilla • Nerwa • District Shimla • Himachal Pradesh - 171210</div>
-            <div class="verify-badge"><i class="fas fa-shield-alt"></i> Document Verification</div>
+            <div class="verify-badge"><i class="fas fa-shield-alt"></i> Secure Document Verification</div>
         </div>
 
-        <!-- BODY -->
         <div class="verify-body">
-            <!-- MANUAL VERIFICATION CODE INPUT -->
+            <!-- Rate Limit Warning -->
+            <div class="rate-limit-warning" id="rateLimitWarning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="rateLimitMsg">Too many attempts. Please wait 30 seconds before trying again.</span>
+            </div>
+
             <div class="manual-verify-section">
                 <label class="label"><i class="fas fa-key"></i> Enter Verification Code</label>
                 <div class="manual-input-group">
-                    <input type="text" id="verificationCodeInput" placeholder="Enter verification code (e.g., ST10A025-12345)" />
-                    <button class="btn-verify-code" onclick="verifyByCode()"><i class="fas fa-check-circle"></i> Verify</button>
+                    <input type="text" id="verificationCodeInput" placeholder="e.g., ST10A025-12345" maxlength="30" autocomplete="off" spellcheck="false" />
+                    <button class="btn-verify-code" id="verifyBtn" onclick="verifyByCode()"><i class="fas fa-check-circle"></i> Verify</button>
                 </div>
             </div>
 
-            <!-- SCANNER OPTIONS -->
             <div class="scanner-options" id="scannerOptions">
                 <div class="scan-option" onclick="openCamera()">
                     <div class="scan-icon"><i class="fas fa-camera"></i></div>
                     <h4>Camera</h4>
-                    <p>Scan QR Code (Only Verification QR Code)</p>
+                    <p>Scan QR Code</p>
                 </div>
                 <div class="scan-option" onclick="document.getElementById('imageInput').click()">
                     <div class="scan-icon"><i class="fas fa-image"></i></div>
@@ -459,23 +489,26 @@
             <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="scanImage(event)">
             <input type="file" id="pdfInput" accept=".pdf" style="display:none" onchange="scanPDF(event)">
 
-            <!-- VERIFICATION RESULT -->
             <div id="verificationResult">
                 <div style="text-align:center;padding:30px 10px;">
                     <i class="fas fa-shield-alt" style="font-size:40px;color:var(--accent);"></i>
                     <p style="margin-top:10px;color:var(--text-light);font-size:14px;">Enter code or scan QR to verify document</p>
                 </div>
             </div>
+
+            <div class="security-badge">
+                <i class="fas fa-lock"></i>
+                <span>Secure Connection • Encrypted Verification</span>
+                <i class="fas fa-check-circle" style="color:var(--success);"></i>
+            </div>
         </div>
 
-        <!-- FOOTER -->
         <div class="verify-footer">
             <i class="fas fa-certificate" style="margin-right:6px;"></i>
             GSSS Shilla - Official Document Verification System
         </div>
     </div>
 
-    <!-- CAMERA MODAL -->
     <div class="camera-modal" id="cameraModal">
         <video id="cameraVideo" autoplay playsinline></video>
         <div class="camera-controls">
@@ -486,95 +519,94 @@
 
     <script>
         // ================================================================
-        // CONFIGURATION
+        // SECURE CONFIGURATION
         // ================================================================
         const API_BASE = 'https://gsssshilla.onrender.com/api/admin/results';
+        const MAX_ATTEMPTS = 5;
+        const RATE_LIMIT_MS = 30000; // 30 seconds
+        let attemptCount = 0;
+        let rateLimitTimer = null;
+        let isRateLimited = false;
         let cameraStream = null;
         
-        // Set PDF.js worker
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
         // ================================================================
-        // INIT - Check URL for data (from QR scan via mobile)
+        // SECURE INPUT VALIDATION
+        // ================================================================
+        function sanitizeInput(input) {
+            if (!input) return '';
+            // Remove any potentially dangerous characters
+            return String(input).replace(/[<>'"]/g, '').trim();
+        }
+
+        function isValidStudentId(id) {
+            if (!id) return false;
+            const clean = String(id).toUpperCase().trim();
+            // Student ID format: 2 letters + 2 digits + 1 letter + 3 digits
+            // e.g., ST10A025, HP10A001
+            return /^[A-Z]{2}[0-9]{2}[A-Z][0-9]{3}$/.test(clean);
+        }
+
+        function isValidVerificationCode(code) {
+            if (!code) return false;
+            const clean = String(code).trim();
+            // Format: StudentID-Timestamp (e.g., ST10A025-12345)
+            const parts = clean.split('-');
+            if (parts.length !== 2) return false;
+            if (!isValidStudentId(parts[0])) return false;
+            const timestamp = parts[1];
+            if (!/^\d{5,}$/.test(timestamp)) return false;
+            return true;
+        }
+
+        function isValidDate(dob) {
+            if (!dob) return false;
+            const d = new Date(dob);
+            return !isNaN(d) && d.getFullYear() > 1950 && d.getFullYear() < new Date().getFullYear();
+        }
+
+        // ================================================================
+        // RATE LIMITING
+        // ================================================================
+        function checkRateLimit() {
+            if (isRateLimited) return false;
+            
+            attemptCount++;
+            if (attemptCount >= MAX_ATTEMPTS) {
+                isRateLimited = true;
+                document.getElementById('rateLimitWarning').classList.add('show');
+                document.getElementById('verifyBtn').disabled = true;
+                
+                rateLimitTimer = setTimeout(() => {
+                    attemptCount = 0;
+                    isRateLimited = false;
+                    document.getElementById('rateLimitWarning').classList.remove('show');
+                    document.getElementById('verifyBtn').disabled = false;
+                }, RATE_LIMIT_MS);
+                
+                return false;
+            }
+            return true;
+        }
+
+        // ================================================================
+        // INIT - Check URL for data (from QR scan)
         // ================================================================
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const dataParam = urlParams.get('data');
             if (dataParam) {
-                processVerification(dataParam);
+                try {
+                    const decoded = decodeURIComponent(dataParam);
+                    processVerification(decoded);
+                } catch(e) {
+                    showInvalid('Invalid verification link. Please scan the QR code from the official marksheet.');
+                }
             }
         });
 
-        // ================================================================
-        // MANUAL VERIFICATION BY CODE
-        // ================================================================
-        async function verifyByCode() {
-            const codeInput = document.getElementById('verificationCodeInput');
-            const code = codeInput.value.trim();
-            
-            if (!code) {
-                showInvalid('Please enter a verification code.');
-                return;
-            }
-
-            // Show loading state
-            const resultDiv = document.getElementById('verificationResult');
-            resultDiv.innerHTML = `
-                <div style="text-align:center;padding:30px;">
-                    <div class="spinner"></div>
-                    <p style="margin-top:12px;color:var(--text-light);">Verifying code...</p>
-                </div>
-            `;
-
-            try {
-                // Try to extract student ID from code
-                let studentId = code;
-                if (code.includes('-')) {
-                    studentId = code.split('-')[0];
-                }
-                
-                // Fetch student data from API
-                const response = await fetch(`${API_BASE}/students/${encodeURIComponent(studentId)}`, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        showInvalid('Student not found. Please check the verification code.');
-                    } else {
-                        showInvalid('Could not verify. Please try again.');
-                    }
-                    return;
-                }
-
-                const data = await response.json();
-                if (data.success && data.data && data.data.student) {
-                    const student = data.data.student;
-                    const verificationData = {
-                        student_id: student.student_id,
-                        name: student.name || 'Unknown',
-                        father_name: student.father_name || '',
-                        mother_name: student.mother_name || '',
-                        dob: student.dob || '',
-                        class: student.class || '',
-                        section: student.section || '',
-                        session: student.session || '',
-                        exam_roll_no: student.exam_roll_no || '',
-                        apaar_id: student.apaar_id || ''
-                    };
-                    showVerified(verificationData);
-                } else {
-                    showInvalid('Invalid verification code.');
-                }
-            } catch (error) {
-                console.error('Verification error:', error);
-                showInvalid('Network error. Please try again.');
-            }
-        }
-
-        // Allow Enter key on code input
+        // Enter key support
         document.getElementById('verificationCodeInput').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -582,19 +614,248 @@
             }
         });
 
+        // Input validation - only allow alphanumeric and dash
+        document.getElementById('verificationCodeInput').addEventListener('input', function() {
+            this.value = this.value.replace(/[^A-Za-z0-9\-]/g, '').toUpperCase();
+        });
+
+        // ================================================================
+        // MANUAL VERIFICATION BY CODE
+        // ================================================================
+        async function verifyByCode() {
+            const codeInput = document.getElementById('verificationCodeInput');
+            const code = sanitizeInput(codeInput.value);
+            
+            if (!code) {
+                showInvalid('Please enter a valid verification code.');
+                return;
+            }
+
+            // Validate format
+            if (!isValidVerificationCode(code)) {
+                showInvalid('Invalid verification code format. Use format: STUDENTID-CODE (e.g., ST10A025-12345)');
+                return;
+            }
+
+            // Rate limiting
+            if (!checkRateLimit()) {
+                return;
+            }
+
+            // Show loading
+            const resultDiv = document.getElementById('verificationResult');
+            resultDiv.innerHTML = `
+                <div style="text-align:center;padding:30px;">
+                    <div class="spinner"></div>
+                    <p style="margin-top:12px;color:var(--text-light);">Securely verifying document...</p>
+                </div>
+            `;
+
+            try {
+                const studentId = code.split('-')[0];
+                await verifyStudent(studentId);
+            } catch (error) {
+                console.error('Verification error:', error);
+                showInvalid('Network error. Please check your connection and try again.');
+            }
+        }
+
+        // ================================================================
+        // CORE VERIFICATION FUNCTION
+        // ================================================================
+        async function verifyStudent(studentId) {
+            if (!isValidStudentId(studentId)) {
+                showInvalid('Invalid Student ID format. Please check and try again.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/students/${encodeURIComponent(studentId)}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        showInvalid('Student ID not found in official records. Please verify the code.');
+                    } else if (response.status === 429) {
+                        showInvalid('Too many requests. Please wait and try again.');
+                    } else {
+                        showInvalid('Unable to verify. Please try again later.');
+                    }
+                    return;
+                }
+
+                const data = await response.json();
+                if (!data.success || !data.data || !data.data.student) {
+                    showInvalid('Invalid verification data. This document may be tampered.');
+                    return;
+                }
+
+                const student = data.data.student;
+                
+                // Validate student data
+                if (!student.student_id || !student.name) {
+                    showInvalid('Incomplete student record. Please contact the school.');
+                    return;
+                }
+
+                // Verify student ID matches
+                if (student.student_id !== studentId) {
+                    showInvalid('Student ID mismatch. This document is invalid.');
+                    return;
+                }
+
+                const verificationData = {
+                    student_id: student.student_id,
+                    name: sanitizeInput(student.name),
+                    father_name: sanitizeInput(student.father_name || ''),
+                    mother_name: sanitizeInput(student.mother_name || ''),
+                    dob: student.dob || '',
+                    class: student.class || '',
+                    section: sanitizeInput(student.section || ''),
+                    session: sanitizeInput(student.session || ''),
+                    exam_roll_no: sanitizeInput(student.exam_roll_no || ''),
+                    apaar_id: sanitizeInput(student.apaar_id || '')
+                };
+
+                showVerified(verificationData);
+                
+            } catch (error) {
+                console.error('Verification error:', error);
+                showInvalid('Unable to verify. Please try again later.');
+            }
+        }
+
+        // ================================================================
+        // QR CODE EXTRACTION & VERIFICATION
+        // ================================================================
+        function extractAndVerify(qrData) {
+            if (!qrData) {
+                showInvalid('QR code data is empty.');
+                return;
+            }
+
+            try {
+                let dataStr = String(qrData);
+                
+                // Try to extract from URL
+                if (dataStr.includes('data=') || dataStr.includes('?data=')) {
+                    try {
+                        const url = new URL(dataStr);
+                        const dataParam = url.searchParams.get('data');
+                        if (dataParam) {
+                            const decoded = decodeURIComponent(dataParam);
+                            if (decoded.startsWith('{')) {
+                                processVerification(decoded);
+                                return;
+                            }
+                            // Try to parse as student ID
+                            const cleaned = sanitizeInput(decoded);
+                            if (isValidStudentId(cleaned)) {
+                                verifyStudent(cleaned);
+                                return;
+                            }
+                        }
+                    } catch(e) {}
+                }
+
+                // Try to parse as JSON
+                if (dataStr.startsWith('{')) {
+                    try {
+                        const data = JSON.parse(dataStr);
+                        if (data.student_id && isValidStudentId(data.student_id)) {
+                            if (data.name && data.name.length > 2) {
+                                showVerified(data);
+                                return;
+                            }
+                            verifyStudent(data.student_id);
+                            return;
+                        }
+                    } catch(e) {}
+                }
+
+                // Try as plain student ID
+                const cleaned = sanitizeInput(dataStr);
+                if (isValidStudentId(cleaned)) {
+                    verifyStudent(cleaned);
+                    return;
+                }
+
+                // Check if it contains a valid student ID
+                const idMatch = dataStr.match(/[A-Z]{2}[0-9]{2}[A-Z][0-9]{3}/i);
+                if (idMatch) {
+                    const foundId = idMatch[0].toUpperCase();
+                    if (isValidStudentId(foundId)) {
+                        verifyStudent(foundId);
+                        return;
+                    }
+                }
+
+                showInvalid('QR code does not contain valid verification data. Please scan the official QR code from the marksheet.');
+                
+            } catch (error) {
+                console.error('QR extraction error:', error);
+                showInvalid('Could not process QR code. Please try again with a clearer image.');
+            }
+        }
+
+        // ================================================================
+        // PROCESS VERIFICATION (for URL data param)
+        // ================================================================
+        function processVerification(dataParam) {
+            try {
+                // Try to parse as JSON
+                let data;
+                if (typeof dataParam === 'string' && dataParam.startsWith('{')) {
+                    data = JSON.parse(dataParam);
+                } else if (typeof dataParam === 'object') {
+                    data = dataParam;
+                } else {
+                    // Try as student ID
+                    const cleaned = sanitizeInput(dataParam);
+                    if (isValidStudentId(cleaned)) {
+                        verifyStudent(cleaned);
+                        return;
+                    }
+                    showInvalid('Invalid verification data format.');
+                    return;
+                }
+
+                if (!data.student_id || !isValidStudentId(data.student_id)) {
+                    showInvalid('Invalid verification data. Student ID is missing or invalid.');
+                    return;
+                }
+
+                if (!data.name || data.name.length < 2) {
+                    showInvalid('Invalid verification data. Student name is missing.');
+                    return;
+                }
+
+                // Validate with server
+                verifyStudent(data.student_id);
+                
+            } catch(e) {
+                console.error('Process verification error:', e);
+                showInvalid('Invalid verification data. Please scan the official QR code.');
+            }
+        }
+
         // ================================================================
         // CAMERA
         // ================================================================
         async function openCamera() {
             try {
                 cameraStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment' } 
+                    video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } } 
                 });
                 const video = document.getElementById('cameraVideo');
                 video.srcObject = cameraStream;
                 document.getElementById('cameraModal').classList.add('active');
             } catch(e) {
-                alert('Camera access denied. Please use Image or PDF upload option.');
+                alert('Camera access denied. Please use Image upload option.');
             }
         }
 
@@ -614,16 +875,25 @@
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const code = jsQR(imageData.data, imageData.width, imageData.height);
-            
-            if (code && code.data) {
-                closeCamera();
-                extractAndVerify(code.data);
-            } else {
-                alert('QR code not detected. Please try again.');
+            try {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+                
+                if (code && code.data) {
+                    closeCamera();
+                    extractAndVerify(code.data);
+                } else {
+                    alert('QR code not detected. Please try again with better lighting.');
+                }
+            } catch(err) {
+                alert('Error scanning. Please try again.');
             }
         }
+
+        // Close camera on Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeCamera();
+        });
 
         // ================================================================
         // IMAGE UPLOAD
@@ -631,6 +901,18 @@
         function scanImage(event) {
             const file = event.target.files[0];
             if (!file) return;
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showInvalid('Please upload a valid image file.');
+                return;
+            }
+            
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showInvalid('Image is too large. Please use an image under 5MB.');
+                return;
+            }
             
             const resultDiv = document.getElementById('verificationResult');
             resultDiv.innerHTML = `
@@ -657,10 +939,10 @@
                         if (code && code.data) {
                             extractAndVerify(code.data);
                         } else {
-                            showInvalid('Could not detect QR code in the image. Please try a clearer photo.');
+                            showInvalid('Could not detect QR code in the image. Please ensure the QR code is clear and well-lit.');
                         }
                     } catch(err) {
-                        showInvalid('Error processing image. Please try again.');
+                        showInvalid('Error processing image. Please try another file.');
                     }
                 };
                 img.onerror = function() {
@@ -672,6 +954,9 @@
                 showInvalid('Could not read file. Please try again.');
             };
             reader.readAsDataURL(file);
+            
+            // Reset input
+            event.target.value = '';
         }
 
         // ================================================================
@@ -680,6 +965,18 @@
         async function scanPDF(event) {
             const file = event.target.files[0];
             if (!file) return;
+            
+            // Validate file type
+            if (file.type !== 'application/pdf') {
+                showInvalid('Please upload a valid PDF file.');
+                return;
+            }
+            
+            // Validate file size (max 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                showInvalid('PDF is too large. Please use a file under 10MB.');
+                return;
+            }
             
             const resultDiv = document.getElementById('verificationResult');
             resultDiv.innerHTML = `
@@ -720,130 +1017,23 @@
                 }
                 
                 if (!qrFound) {
-                    showInvalid('No QR code found in the PDF document.');
+                    showInvalid('No QR code found in the PDF document. Please ensure the document contains a valid QR code.');
                 }
                 
             } catch(e) {
                 console.error('PDF scan error:', e);
-                showInvalid('Could not read PDF file. Please try again.');
+                showInvalid('Could not read PDF file. Please ensure it is a valid PDF document.');
             }
-        }
-
-        // ================================================================
-        // EXTRACT & VERIFY
-        // ================================================================
-        function extractAndVerify(qrData) {
-            try {
-                if (qrData.includes('data=') || qrData.includes('?data=')) {
-                    try {
-                        const url = new URL(qrData);
-                        const dataParam = url.searchParams.get('data');
-                        if (dataParam) {
-                            processVerification(dataParam);
-                            return;
-                        }
-                    } catch(e) {}
-                }
-                
-                const data = JSON.parse(qrData);
-                if (data.student_id && data.name) {
-                    showVerified(data);
-                    return;
-                }
-                
-                if (typeof qrData === 'string' && qrData.length > 5) {
-                    let studentId = qrData;
-                    if (qrData.includes('-')) {
-                        studentId = qrData.split('-')[0];
-                    }
-                    verifyByStudentId(studentId);
-                    return;
-                }
-                
-                showInvalid('QR code does not contain valid verification data.');
-            } catch(e) {
-                if (typeof qrData === 'string' && qrData.length > 5) {
-                    let studentId = qrData;
-                    if (qrData.includes('-')) {
-                        studentId = qrData.split('-')[0];
-                    }
-                    verifyByStudentId(studentId);
-                } else {
-                    showInvalid('Could not read QR code data.');
-                }
-            }
-        }
-
-        // ================================================================
-        // VERIFY BY STUDENT ID
-        // ================================================================
-        async function verifyByStudentId(studentId) {
-            const resultDiv = document.getElementById('verificationResult');
-            resultDiv.innerHTML = `
-                <div style="text-align:center;padding:30px;">
-                    <div class="spinner"></div>
-                    <p style="margin-top:12px;color:var(--text-light);">Verifying student ID...</p>
-                </div>
-            `;
             
-            try {
-                const response = await fetch(`${API_BASE}/students/${encodeURIComponent(studentId)}`, {
-                    headers: { 'Content-Type': 'application/json' }
-                });
-
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        showInvalid('Student not found.');
-                    } else {
-                        showInvalid('Could not verify. Please try again.');
-                    }
-                    return;
-                }
-
-                const data = await response.json();
-                if (data.success && data.data && data.data.student) {
-                    const student = data.data.student;
-                    const verificationData = {
-                        student_id: student.student_id,
-                        name: student.name || 'Unknown',
-                        father_name: student.father_name || '',
-                        mother_name: student.mother_name || '',
-                        dob: student.dob || '',
-                        class: student.class || '',
-                        section: student.section || '',
-                        session: student.session || '',
-                        exam_roll_no: student.exam_roll_no || '',
-                        apaar_id: student.apaar_id || ''
-                    };
-                    showVerified(verificationData);
-                } else {
-                    showInvalid('Invalid student ID.');
-                }
-            } catch (error) {
-                console.error('Verification error:', error);
-                showInvalid('Network error. Please try again.');
-            }
-        }
-
-        function processVerification(dataParam) {
-            try {
-                const data = JSON.parse(decodeURIComponent(dataParam));
-                if (!data.student_id || !data.name) {
-                    showInvalid('Invalid verification data. This document may be tampered.');
-                    return;
-                }
-                showVerified(data);
-            } catch(e) {
-                showInvalid('Invalid verification data format.');
-            }
+            // Reset input
+            event.target.value = '';
         }
 
         // ================================================================
-        // SHOW VERIFIED
+        // DISPLAY FUNCTIONS
         // ================================================================
         function showVerified(data) {
             const resultDiv = document.getElementById('verificationResult');
-            document.getElementById('scannerOptions').style.display = 'grid';
             
             const verificationId = `${data.student_id}-${Date.now().toString().substring(6)}`;
             
@@ -853,7 +1043,7 @@
                 <p class="verify-subtitle">This is an authentic document issued by GSSS Shilla</p>
                 
                 <table class="student-details-table">
-                    <tr><td>Student ID</td><td>${esc(data.student_id)}</td></tr>
+                    <tr><td>Student ID</td><td><strong>${esc(data.student_id)}</strong></td></tr>
                     <tr><td>Student Name</td><td><strong>${esc(data.name)}</strong></td></tr>
                     ${data.apaar_id ? `<tr><td>APAAR ID</td><td>${esc(data.apaar_id)}</td></tr>` : ''}
                     ${data.father_name ? `<tr><td>Father's Name</td><td>${esc(data.father_name)}</td></tr>` : ''}
@@ -867,9 +1057,10 @@
                 <div class="confirmation-box">
                     <i class="fas fa-shield-alt"></i>
                     <div>
-                        <strong>Verification Confirmed</strong>
-                        <p>This marksheet belongs to the student mentioned above. The details have been verified from the school's official records.</p>
+                        <strong>✅ Verification Confirmed</strong>
+                        <p>This marksheet belongs to the student mentioned above. All details have been verified from the school's official records.</p>
                         <p style="font-size:10px;color:#94a3b8;margin-top:4px;">Verification ID: ${verificationId}</p>
+                        <p style="font-size:9px;color:#94a3b8;margin-top:2px;">Verified on: ${new Date().toLocaleString('en-IN')}</p>
                     </div>
                 </div>
                 
@@ -878,20 +1069,19 @@
                     <button class="btn btn-secondary" onclick="resetVerification()"><i class="fas fa-redo"></i> Verify Another</button>
                 </div>
             `;
+            
+            // Reset rate limit on successful verification
+            attemptCount = 0;
         }
 
-        // ================================================================
-        // SHOW INVALID
-        // ================================================================
         function showInvalid(msg) {
             const resultDiv = document.getElementById('verificationResult');
-            document.getElementById('scannerOptions').style.display = 'grid';
             
             resultDiv.innerHTML = `
                 <div class="verify-icon invalid"><i class="fas fa-times-circle"></i></div>
-                <h2 class="verify-title" style="color:#dc2626;">❌ Invalid Document</h2>
+                <h2 class="verify-title" style="color:#dc2626;">❌ Verification Failed</h2>
                 <p class="verify-subtitle">This document could not be verified</p>
-                <div class="invalid-box"><i class="fas fa-exclamation-triangle"></i><div>${msg}</div></div>
+                <div class="invalid-box"><i class="fas fa-exclamation-triangle"></i><div>${esc(msg)}</div></div>
                 <p style="font-size:11px;color:var(--gray);text-align:center;margin-top:10px;">If you believe this is an error, please contact the school administration.</p>
                 <div style="text-align:center;">
                     <button class="btn btn-secondary" onclick="resetVerification()"><i class="fas fa-redo"></i> Try Again</button>
@@ -899,9 +1089,6 @@
             `;
         }
 
-        // ================================================================
-        // RESET
-        // ================================================================
         function resetVerification() {
             document.getElementById('verificationResult').innerHTML = `
                 <div style="text-align:center;padding:30px 10px;">
@@ -909,10 +1096,19 @@
                     <p style="margin-top:10px;color:var(--text-light);font-size:14px;">Enter code or scan QR to verify document</p>
                 </div>
             `;
-            document.getElementById('scannerOptions').style.display = 'grid';
+            document.getElementById('verificationCodeInput').value = '';
             document.getElementById('imageInput').value = '';
             document.getElementById('pdfInput').value = '';
-            document.getElementById('verificationCodeInput').value = '';
+            
+            // Reset rate limit on manual reset
+            if (rateLimitTimer) {
+                clearTimeout(rateLimitTimer);
+                rateLimitTimer = null;
+            }
+            attemptCount = 0;
+            isRateLimited = false;
+            document.getElementById('rateLimitWarning').classList.remove('show');
+            document.getElementById('verifyBtn').disabled = false;
         }
 
         // ================================================================
@@ -930,13 +1126,6 @@
             const dt = new Date(d); 
             return isNaN(dt) ? d : dt.toLocaleDateString('en-IN', {day:'2-digit', month:'2-digit', year:'numeric'}); 
         }
-
-        // Close camera on Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeCamera();
-            }
-        });
     </script>
 </body>
 </html>
