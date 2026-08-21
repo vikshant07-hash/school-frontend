@@ -191,50 +191,6 @@ body { padding-top: 70px; }
 .container { max-width: 1100px; margin: 0 auto; padding: 30px 20px 60px; flex: 1; }
 
 /* ============================================================
-   VERIFY BUTTON
-============================================================ */
-.verify-section {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 20px;
-}
-.verify-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 28px;
-  background: var(--white);
-  border: 2px solid var(--accent);
-  border-radius: 50px;
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--primary);
-  cursor: pointer;
-  transition: var(--transition);
-  box-shadow: var(--shadow-sm);
-  text-decoration: none;
-}
-.verify-btn i {
-  color: var(--accent-dark);
-  font-size: 16px;
-}
-.verify-btn:hover {
-  background: var(--accent);
-  color: var(--white);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-.verify-btn:hover i {
-  color: var(--white);
-}
-
-@media (max-width: 480px) {
-  .verify-section { justify-content: center; }
-  .verify-btn { width: 100%; justify-content: center; }
-}
-
-/* ============================================================
    CLASS SECTION
 ============================================================ */
 .class-section { background: var(--white); border-radius: var(--radius); padding: 30px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-light); margin-bottom: 28px; }
@@ -316,6 +272,33 @@ body { padding-top: 70px; }
 .alert-warning { background: var(--warning-light); color: #92400e; border: 1px solid #fde68a; }
 .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
 
+/* MARKS SUMMARY BOX - ORIGINAL STYLE */
+.marks-summary-box {
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 16px 0 20px;
+  background: #fef8ed;
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  flex-wrap: wrap;
+}
+.marks-summary-box .summary-item { text-align: center; }
+.marks-summary-box .summary-item .label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--text-light);
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+.marks-summary-box .summary-item .value {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--primary);
+}
+.marks-summary-box .summary-item .value.gold { color: var(--accent-dark); }
+
 .toast-container { position: fixed; top: 90px; right: 20px; z-index: 99999; }
 .toast { padding: 14px 24px; border-radius: var(--radius-sm); color: white; font-weight: 500; margin-bottom: 10px; box-shadow: var(--shadow-lg); animation: slideIn 0.35s ease; min-width: 240px; }
 .toast-success { background: var(--success); }
@@ -363,6 +346,8 @@ body { padding-top: 70px; }
   .class-grid { grid-template-columns: 1fr; }
   .form-actions { flex-direction: column; }
   .btn-primary, .btn-secondary, .btn-back { width: 100%; justify-content: center; }
+  .marks-summary-box { gap: 25px; }
+  .marks-summary-box .summary-item .value { font-size: 17px; }
 }
 </style>
 </head>
@@ -371,7 +356,7 @@ body { padding-top: 70px; }
 <!-- MOBILE OVERLAY -->
 <div class="mobile-overlay" id="mobileOverlay"></div>
 
-<!-- NAVBAR - Notification Page Style -->
+<!-- NAVBAR -->
 <header class="navbar" id="navbar">
   <div class="logo">
     <img src="logo.png" alt="School Logo">
@@ -434,14 +419,6 @@ body { padding-top: 70px; }
 <!-- CONTAINER -->
 <div class="container">
   
-  <!-- VERIFY BUTTON -->
-  <div class="verify-section">
-    <a href="../verify.html" class="verify-btn">
-      <i class="fas fa-shield-alt"></i> Verify Document
-      <i class="fas fa-arrow-right" style="font-size:12px;"></i>
-    </a>
-  </div>
-
   <div class="class-section" id="classSection">
     <div class="section-header">
       <h2><i class="fas fa-school"></i> Available Results</h2>
@@ -475,7 +452,7 @@ body { padding-top: 70px; }
   </div>
 </div>
 
-<!-- FOOTER - Notification Page Style -->
+<!-- FOOTER -->
 <footer class="footer">
   <div class="footer-grid">
     <div class="footer-brand">
@@ -591,7 +568,6 @@ setupDropdown("loginBtn", "loginDropdown");
 setupDropdown("loginBtnMobile", "loginDropdownMobile");
 
 // ========== RESULT FUNCTIONALITY ==========
-// Elements
 const classGrid = document.getElementById('classGrid');
 const classCountBadge = document.getElementById('classCountBadge');
 const searchSection = document.getElementById('searchSection');
@@ -735,6 +711,15 @@ function renderResult(data) {
   const s = data.student;
   const marksheets = data.marksheets || [];
   
+  // Calculate total marks from all marksheets
+  let totalObtained = 0;
+  let totalMax = 0;
+  marksheets.forEach(m => {
+    totalObtained += parseInt(m.obtained_marks) || 0;
+    totalMax += parseInt(m.max_marks) || 0;
+  });
+  const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) + '%' : '-';
+  
   let marksheetHtml = marksheets.length === 0 ? 
     '<div class="alert alert-warning"><i class="fas fa-info-circle"></i> No published marksheets available.</div>' : 
     marksheets.map(m => `
@@ -756,107 +741,182 @@ function renderResult(data) {
         <span class="badge badge-info">Class ${s.class || '-'}</span>
       </div>
       <div class="result-grid">
-        <div class="item"><label>Session</label><span>${s.session || '-'}</span></div>
-        <div class="item"><label>Roll No</label><span>${s.exam_roll_no || '-'}</span></div>
         <div class="item"><label>Student ID</label><span>${s.student_id}</span></div>
+        <div class="item"><label>Student Name</label><span>${s.name}</span></div>
         <div class="item"><label>Father's Name</label><span>${s.father_name || '-'}</span></div>
-        <div class="item"><label>Mother's Name</label><span>${s.mother_name || '-'}</span></div>
         <div class="item"><label>Date of Birth</label><span>${s.dob ? new Date(s.dob).toLocaleDateString('en-IN') : '-'}</span></div>
+        <div class="item"><label>Session</label><span>${s.session || '-'}</span></div>
+        <div class="item"><label>Class</label><span>${s.class || '-'}${s.section ? ' - ' + s.section : ''}</span></div>
+        <div class="item"><label>Roll No</label><span>${s.exam_roll_no || '-'}</span></div>
+        <div class="item"><label>Mother's Name</label><span>${s.mother_name || '-'}</span></div>
       </div>
+      
+      <!-- MARKS SUMMARY BOX - FINAL TOTAL -->
+      <div class="marks-summary-box">
+        <div class="summary-item">
+          <div class="label">Total Obtained Marks</div>
+          <div class="value gold">${totalObtained}</div>
+        </div>
+        <div class="summary-item">
+          <div class="label">Total Maximum Marks</div>
+          <div class="value">${totalMax}</div>
+        </div>
+        <div class="summary-item">
+          <div class="label">Overall Percentage</div>
+          <div class="value gold">${percentage}</div>
+        </div>
+      </div>
+      
       <div class="marksheet-list">
         <h4><i class="fas fa-file-pdf"></i> Available Marksheets</h4>
         ${marksheetHtml}
       </div>
       <div style="margin-top:20px;text-align:center;">
-        <button class="btn-primary" onclick="printProvisional('${s.student_id}')" style="margin:0 auto;"><i class="fas fa-print"></i> Download Marksheet</button>
+        <button class="btn-primary" onclick="printMarksheet('${s.student_id}')" style="margin:0 auto;"><i class="fas fa-print"></i> Download Marksheet</button>
       </div>
     </div>
   `;
   resultDisplay.scrollIntoView({ behavior: 'smooth' });
 }
 
-async function printProvisional(studentId) {
+async function printMarksheet(studentId) {
   if (!currentStudentData) { showToast('No data available', 'error'); return; }
   const s = currentStudentData.student;
   const marksheets = currentStudentData.marksheets || [];
   const studentPhoto = s.photo || '';
   
-  const verificationData = {
-    student_id: s.student_id, name: s.name, father_name: s.father_name || '',
-    mother_name: s.mother_name || '', dob: s.dob || '', class: s.class || '',
-    section: s.section || '', session: s.session || '', exam_roll_no: s.exam_roll_no || ''
-  };
-  const verificationUrl = `https://gsssshilla07.pages.dev/verify2.html?data=${encodeURIComponent(JSON.stringify(verificationData))}`;
+  // Calculate total marks
+  let totalObtained = 0;
+  let totalMax = 0;
+  marksheets.forEach(m => {
+    totalObtained += parseInt(m.obtained_marks) || 0;
+    totalMax += parseInt(m.max_marks) || 0;
+  });
+  const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) + '%' : '-';
   
   let marksheetRows = '';
-  for (let i = 0; i < marksheets.length; i++) {
-    const m = marksheets[i];
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(m.cloudinary_url || '#')}`;
-    marksheetRows += `<tr><td>${i+1}</td><td>${m.exam_type}</td><td>${m.session}</td><td>${m.class || '-'}</td><td style="font-size:7px;word-break:break-all;">${m.cloudinary_url || '-'}</td><td><img src="${qrUrl}" width="70" height="70"></td></tr>`;
-  }
-  
-  const verificationQR = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(verificationUrl)}`;
+  marksheets.forEach((m, idx) => {
+    marksheetRows += `<tr>
+      <td style="text-align:center;padding:6px 8px;border:1px solid #d1d5db;">${idx+1}</td>
+      <td style="padding:6px 8px;border:1px solid #d1d5db;font-weight:600;">${m.exam_type}</td>
+      <td style="padding:6px 8px;border:1px solid #d1d5db;text-align:center;">${m.session || '-'}</td>
+      <td style="padding:6px 8px;border:1px solid #d1d5db;text-align:center;font-weight:700;color:#0d1b2a;">${m.obtained_marks || '-'}</td>
+      <td style="padding:6px 8px;border:1px solid #d1d5db;text-align:center;font-weight:700;color:#0d1b2a;">${m.max_marks || '-'}</td>
+    </tr>`;
+  });
   
   const pw = window.open('', '_blank', 'width=900,height=700');
-  pw.document.write(`<!DOCTYPE html><html><head><title>Provisional Marksheet - ${s.name}</title>
+  pw.document.write(`<!DOCTYPE html><html><head><title>Marksheet - ${s.name}</title>
   <style>
-    @page { size: A4; margin: 12mm; }
+    @page { size: A4; margin: 10mm 12mm; }
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family:'Segoe UI',Arial,sans-serif; color:#1a2332; background:#fff; -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
-    .provisional-badge { display:inline-block; background:#fef3c7; color:#92400e; padding:5px 20px; border-radius:50px; font-size:11px; font-weight:700; text-transform:uppercase; border:1px dashed #92400e; }
-    .page-header { text-align:center; margin-bottom:20px; padding-bottom:15px; border-bottom:3px solid #c9972b; }
-    .page-header img { width:60px; height:60px; border-radius:50%; border:2px solid #c9972b; padding:2px; background:#fff; }
-    .page-header h1 { font-size:18px; font-weight:900; text-transform:uppercase; }
-    .page-header p { font-size:10px; color:#5a6a7e; }
-    .student-info-table { width:100%; border-collapse:collapse; margin:15px 0; border:2px solid #0d1b2a; }
-    .student-info-table td { padding:8px 10px; border:1px solid #d1d5db; font-size:10px; }
-    .student-info-table td:first-child, .student-info-table td:nth-child(3) { font-weight:700; background:#fef8ed; width:18%; text-transform:uppercase; font-size:9px; }
-    .photo-cell { width:90px; text-align:center; }
-    .photo-box { width:80px; height:100px; border:2px solid #c9972b; border-radius:5px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:#fff; margin:0 auto; }
-    .photo-box img { width:100%; height:100%; object-fit:cover; }
-    .marksheet-table { width:100%; border-collapse:collapse; margin:10px 0; border:2px solid #0d1b2a; }
-    .marksheet-table th { background:#0d1b2a; color:#fff; padding:8px; border:1px solid #0d1b2a; font-size:9px; text-transform:uppercase; }
-    .marksheet-table td { padding:8px; border:1px solid #d1d5db; font-size:9px; text-align:center; }
-    .verification-section { display:flex; align-items:center; gap:15px; margin:15px 0; padding:12px; border:2px solid #c9972b; background:#fef8ed; border-radius:8px; }
-    .verification-qr { width:90px; height:90px; border:2px solid #0d1b2a; border-radius:5px; overflow:hidden; background:#fff; }
-    .verification-qr img { width:85px; height:85px; }
-    .verification-text { flex:1; font-size:9px; }
-    .verification-text strong { display:block; font-size:10px; }
-    .signature-area { display:flex; justify-content:space-between; margin-top:25px; }
-    .signature-box { text-align:center; font-size:9px; }
-    .signature-box .line { width:140px; border-top:1px dashed #94a3b8; margin:25px auto 5px; }
-    .security-text { text-align:center; font-size:7px; color:rgba(13,27,42,0.35); letter-spacing:2px; margin:15px 0; text-transform:uppercase; }
-    .footer { margin-top:15px; padding-top:8px; border-top:2px solid #c9972b; display:flex; justify-content:space-between; font-size:8px; color:#64748b; }
     .watermark { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-35deg); font-size:70px; font-weight:900; color:rgba(201,151,43,0.04); letter-spacing:8px; text-transform:uppercase; pointer-events:none; z-index:9999; }
+    .page-header { text-align:center; padding-bottom:12px; border-bottom:3px solid #c9972b; margin-bottom:16px; }
+    .page-header img { width:60px; height:60px; border-radius:50%; border:2px solid #c9972b; padding:2px; background:#fff; }
+    .page-header .school-name { font-size:16px; font-weight:900; text-transform:uppercase; letter-spacing:1px; color:#0d1b2a; }
+    .page-header .tagline { font-size:9px; color:#5a6a7e; letter-spacing:2px; text-transform:uppercase; }
+    .page-header .heading-box { display:inline-block; background:#0d1b2a; color:#fff; padding:4px 24px; border-radius:25px; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; border:2px solid #c9972b; margin-top:6px; }
+    
+    .student-info-table { width:100%; border-collapse:collapse; margin:12px 0; border:2px solid #0d1b2a; }
+    .student-info-table td { padding:6px 8px; border:1px solid #d1d5db; font-size:10px; vertical-align:middle; }
+    .student-info-table .label-cell { font-weight:700; background:#fef8ed; width:16%; text-transform:uppercase; font-size:9px; }
+    .photo-cell { width:80px; text-align:center; }
+    .photo-box { width:70px; height:90px; border:2px solid #c9972b; border-radius:5px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:#fff; margin:0 auto; }
+    .photo-box img { width:100%; height:100%; object-fit:cover; }
+    .photo-placeholder { font-size:30px; color:#cbd5e1; }
+    
+    .declaration-box { background:#fef8ed; border-left:4px solid #c9972b; border-right:4px solid #c9972b; padding:8px 14px; margin:12px 0; border-radius:4px; font-size:10px; text-align:center; font-style:italic; }
+    .declaration-box strong { color:#0d1b2a; }
+    
+    .marks-summary-box { border:2px solid #c9972b; border-radius:10px; padding:14px 20px; margin:14px 0 18px; background:#fef8ed; display:flex; justify-content:center; gap:50px; flex-wrap:wrap; }
+    .marks-summary-box .summary-item { text-align:center; }
+    .marks-summary-box .summary-item .label { font-size:8px; text-transform:uppercase; color:#5a6a7e; letter-spacing:0.5px; font-weight:600; }
+    .marks-summary-box .summary-item .value { font-size:20px; font-weight:800; color:#0d1b2a; }
+    .marks-summary-box .summary-item .value.gold { color:#c9972b; }
+    
+    .marksheet-table { width:100%; border-collapse:collapse; margin:8px 0; border:2px solid #0d1b2a; }
+    .marksheet-table th { background:#0d1b2a; color:#fff; padding:6px 8px; border:1px solid #0d1b2a; font-size:8px; text-transform:uppercase; letter-spacing:1px; text-align:center; }
+    .marksheet-table td { padding:6px 8px; border:1px solid #d1d5db; font-size:9px; text-align:center; }
+    
+    .signature-area { display:flex; justify-content:flex-end; margin-top:20px; }
+    .signature-box { text-align:center; font-size:9px; width:160px; }
+    .signature-box .line { width:120px; border-top:1px dashed #94a3b8; margin:25px auto 4px; }
+    
+    .footer { margin-top:16px; padding-top:8px; border-top:2px solid #c9972b; display:flex; justify-content:space-between; font-size:8px; color:#64748b; }
+    .security-text { text-align:center; font-size:6px; color:rgba(13,27,42,0.2); letter-spacing:2px; margin:10px 0; text-transform:uppercase; }
   </style></head><body>
-  <div class="watermark">PROVISIONAL GSSS SHILLA</div>
+  <div class="watermark">GSSS SHILLA</div>
   <div class="page-header">
     <img src="logo.png" onerror="this.style.display='none'">
-    <h1>Govt. Sr. Sec. School Shilla</h1>
-    <p>Shilla, District Shimla, Himachal Pradesh - 171210</p>
-    <span class="provisional-badge"><i class="fas fa-clock"></i> PROVISIONAL MARKSHEET</span>
+    <div class="school-name">Govt. Sr. Sec. School Shilla</div>
+    <div class="tagline">Shilla • Nerwa • District Shimla • Himachal Pradesh - 171210</div>
+    <div class="heading-box">Student Marksheet</div>
   </div>
+  
   <table class="student-info-table">
-    <tr><td>Student ID</td><td>${s.student_id}</td><td>APAAR ID</td><td>${s.apaar_id || '-'}</td><td class="photo-cell" rowspan="5"><div class="photo-box">${studentPhoto ? `<img src="${studentPhoto}">` : '<div style="font-size:30px;color:#cbd5e1;"><i class="fas fa-user"></i></div>'}</div></td></tr>
-    <tr><td>Student Name</td><td style="font-weight:700;">${s.name}</td><td>Father's Name</td><td>${s.father_name || '-'}</td></tr>
-    <tr><td>Mother's Name</td><td>${s.mother_name || '-'}</td><td>Date of Birth</td><td>${s.dob ? new Date(s.dob).toLocaleDateString('en-IN') : '-'}</td></tr>
-    <tr><td>Session</td><td>${s.session || '-'}</td><td>Class</td><td>${s.class || '-'}${s.section ? ' - ' + s.section : ''}</td></tr>
-    <tr><td>Exam Roll No</td><td>${s.exam_roll_no || '-'}</td><td>Status</td><td><span style="color:#f59e0b;font-weight:700;">PROVISIONAL</span></td></tr>
+    <tr>
+      <td class="label-cell">Student ID</td>
+      <td>${s.student_id}</td>
+      <td class="label-cell">Student Name</td>
+      <td style="font-weight:700;">${s.name}</td>
+      <td class="photo-cell" rowspan="3">
+        <div class="photo-box">${studentPhoto ? `<img src="${studentPhoto}">` : '<div class="photo-placeholder"><i class="fas fa-user"></i></div>'}</div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label-cell">Father's Name</td>
+      <td>${s.father_name || '-'}</td>
+      <td class="label-cell">Date of Birth</td>
+      <td>${s.dob ? new Date(s.dob).toLocaleDateString('en-IN') : '-'}</td>
+    </tr>
+    <tr>
+      <td class="label-cell">Session</td>
+      <td>${s.session || '-'}</td>
+      <td class="label-cell">Class</td>
+      <td>${s.class || '-'}${s.section ? ' - ' + s.section : ''}</td>
+    </tr>
   </table>
-  <h3 style="font-size:12px;margin:10px 0;">Available Marksheets (${marksheets.length})</h3>
-  <table class="marksheet-table">
-    <thead><tr><th>#</th><th>Exam Type</th><th>Session</th><th>Class</th><th>URL</th><th>QR Code</th></tr></thead>
-    <tbody>${marksheetRows || '<tr><td colspan="6">No marksheets</td></tr>'}</tbody>
-  </table>
-  <div class="verification-section">
-    <div class="verification-qr"><img src="${verificationQR}"></div>
-    <div class="verification-text"><strong>🔍 Verify This Document</strong><p>Scan this QR code to verify the authenticity.</p><p><strong>Student:</strong> ${s.name}</p></div>
+  
+  <div class="declaration-box">
+    <i class="fas fa-check-circle" style="color:#16a34a;margin-right:6px;"></i> 
+    This is to certify that <strong>${s.name}</strong> (Student ID: ${s.student_id}) has successfully completed the <strong>${s.session || ''}</strong> academic session and is declared <strong>PASS</strong>.
   </div>
-
-  <div class="security-text">GSSS SHILLA OFFICIAL DOCUMENT | PROVISIONAL | GSSS SHILLA OFFICIAL DOCUMENT</div>
+  
+  <!-- MARKS SUMMARY BOX - FINAL TOTAL -->
+  <div class="marks-summary-box">
+    <div class="summary-item">
+      <div class="label">Total Obtained Marks</div>
+      <div class="value gold">${totalObtained}</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">Total Maximum Marks</div>
+      <div class="value">${totalMax}</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">Overall Percentage</div>
+      <div class="value gold">${percentage}</div>
+    </div>
+  </div>
+  
+  <h4 style="font-size:11px;margin:8px 0 4px;">Available Marksheets (${marksheets.length})</h4>
+  <table class="marksheet-table">
+    <thead><tr><th>#</th><th>Exam Type</th><th>Session</th><th>Obtained</th><th>Maximum</th></tr></thead>
+    <tbody>${marksheetRows || '<tr><td colspan="5" style="padding:12px;">No marksheets available</td></tr>'}</tbody>
+  </table>
+  
+  <div class="signature-area">
+    <div class="signature-box">
+      <div class="line"></div>
+      <strong>Principal</strong>
+      <div style="font-size:7px;color:#94a3b8;">Govt. Sr. Sec. School Shilla</div>
+    </div>
+  </div>
+  
+  <div class="security-text">GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT</div>
   <div class="footer">
-    <span>Print Date: ${new Date().toLocaleDateString('en-IN')}</span>
-    <span style="color:#f59e0b;font-weight:700;">⚠️ PROVISIONAL - Not Valid for Official Use</span>
+    <span><strong>Print Date:</strong> ${new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})}</span>
+    <span><strong>Issued by:</strong> ${localStorage.getItem('adminName') || 'School Administration'}</span>
     <span>Page 1 of 1</span>
   </div>
   </body></html>`);
