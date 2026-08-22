@@ -727,6 +727,13 @@
             color: #5a6a7e;
             font-family: 'Inter', sans-serif;
         }
+        .certificate-box .signature-box .signature-img {
+            width: 120px;
+            height: 40px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
         .certificate-box .footer-line {
             text-align: center;
             font-size: 7px;
@@ -790,6 +797,90 @@
             to {
                 opacity: 1;
                 transform: translateX(0);
+            }
+        }
+
+        /* ===== PRINT STYLES ===== */
+        @media print {
+            body {
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .navbar,
+            .page-header,
+            .form-card,
+            .tabs,
+            .filter-bar,
+            .cert-header,
+            .cert-actions,
+            .btn,
+            .toast-container,
+            .table-wrapper,
+            #certificatePreview .cert-header,
+            #certificatePreview .cert-actions {
+                display: none !important;
+            }
+            #certificatePreview {
+                display: block !important;
+                margin-top: 0 !important;
+                padding: 0 !important;
+            }
+            .certificate-wrapper {
+                box-shadow: none !important;
+                padding: 0 !important;
+                border: none !important;
+                max-width: 100% !important;
+                background: white !important;
+            }
+            .certificate-box {
+                border: 2px solid #000 !important;
+                border-radius: 0 !important;
+                padding: 20px 25px 15px !important;
+                box-shadow: none !important;
+                max-width: 100% !important;
+            }
+            .certificate-box .school-logo {
+                width: 50px !important;
+                height: 50px !important;
+            }
+            .certificate-box .school-name {
+                font-size: 18px !important;
+            }
+            .certificate-box .info-table {
+                font-size: 12px !important;
+            }
+            .certificate-box .info-table .label-cell {
+                font-size: 10px !important;
+            }
+            .certificate-box .info-table .photo-cell {
+                width: 60px !important;
+            }
+            .certificate-box .info-table .photo-box {
+                width: 50px !important;
+                height: 62px !important;
+            }
+            .certificate-box .watermark {
+                width: 250px !important;
+                height: 250px !important;
+            }
+            .certificate-box .verify-section {
+                padding: 8px 12px !important;
+            }
+            .certificate-box .qr-box {
+                width: 60px !important;
+                height: 60px !important;
+            }
+            .certificate-box .qr-box img {
+                width: 55px !important;
+                height: 55px !important;
+            }
+            .certificate-box .signature-box .signature-img {
+                width: 100px !important;
+                height: 35px !important;
+            }
+            .certificate-box .signature-box .line {
+                width: 120px !important;
             }
         }
 
@@ -873,35 +964,6 @@
             .table-wrapper th,
             .table-wrapper td {
                 padding: 8px 10px;
-            }
-        }
-
-        @media print {
-            body {
-                background: white;
-            }
-            .navbar,
-            .page-header,
-            .form-card,
-            .tabs,
-            .filter-bar,
-            .certificate-actions,
-            .btn,
-            .toast-container,
-            .table-wrapper {
-                display: none !important;
-            }
-            #certificatePreview {
-                display: block !important;
-                margin-top: 0;
-            }
-            .certificate-wrapper {
-                box-shadow: none;
-                padding: 0;
-                border: none;
-            }
-            .certificate-box {
-                border: 2px solid #000;
             }
         }
     </style>
@@ -1555,10 +1617,10 @@
                     </div>
                     <div class="signature-area">
                         <div class="signature-box">
+                            <img src="principal.png" class="signature-img" onerror="this.style.display='none'">
                             <div class="line"></div>
-                            
-                            <div class="sig-title">Principal</div>
-                            <div style="font-size:8px;color:#94a3b8;">Govt. Sr. Sec. School Shilla</div>
+                            <div class="sig-name">Principal</div>
+                            <div class="sig-title">Govt. Sr. Sec. School Shilla</div>
                         </div>
                     </div>
                     <div class="footer-line">GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT</div>
@@ -1583,29 +1645,63 @@
                 return;
             }
 
+            // Temporarily hide the header and actions for clean PDF
+            const header = document.querySelector('.cert-header');
+            const actions = document.querySelector('.cert-actions');
+            if (header) header.style.display = 'none';
+            if (actions) actions.style.display = 'none';
+
             const opt = {
-                margin: [0.4, 0.4, 0.4, 0.4],
+                margin: [0.3, 0.3, 0.3, 0.3],
                 filename: `Bonafide_Certificate_${currentCertificateData?.verificationCode || 'cert'}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: {
                     scale: 2,
                     useCORS: true,
                     letterRendering: true,
-                    width: 850
+                    width: 850,
+                    height: 1100
                 },
                 jsPDF: {
                     unit: 'in',
                     format: 'a4',
                     orientation: 'portrait'
-                }
+                },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
             showToast('Generating PDF...', 'info');
-            html2pdf().set(opt).from(element).save()
+
+            // Clone the element for PDF generation to avoid affecting the display
+            const clone = element.cloneNode(true);
+            clone.style.width = '850px';
+            clone.style.margin = '0 auto';
+            clone.style.padding = '20px 25px 15px';
+            clone.style.background = 'white';
+            
+            // Create a temporary container
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '0';
+            tempContainer.style.width = '850px';
+            tempContainer.style.background = 'white';
+            tempContainer.appendChild(clone);
+            document.body.appendChild(tempContainer);
+
+            html2pdf().set(opt).from(clone).save()
                 .then(() => {
+                    // Restore header and actions
+                    if (header) header.style.display = 'flex';
+                    if (actions) actions.style.display = 'flex';
+                    document.body.removeChild(tempContainer);
                     showToast('PDF downloaded successfully!', 'success');
                 })
                 .catch((error) => {
+                    // Restore header and actions
+                    if (header) header.style.display = 'flex';
+                    if (actions) actions.style.display = 'flex';
+                    document.body.removeChild(tempContainer);
                     showToast('Error generating PDF: ' + error.message, 'error');
                 });
         }
