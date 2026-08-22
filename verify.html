@@ -3,35 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GSSS Shilla - Document Verification</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <title>QR Debug - GSSS Shilla</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --navy: #0a1628;
-            --navy-light: #1a2a4a;
-            --gold: #c9972b;
-            --gold-light: #e8b84b;
-            --gold-dark: #b8860b;
-            --gold-gradient: linear-gradient(135deg, #c9972b, #e8b84b, #c9972b);
-            --white: #ffffff;
-            --off-white: #f8f6f0;
-            --gray-light: #e8e4dc;
-            --gray: #9a9a9a;
-            --text: #1a1a2e;
-            --text-light: #5a5a7e;
-            --success: #0f9d58;
-            --success-light: #e6f4ea;
-            --danger: #d93025;
-            --danger-light: #fce8e6;
-            --warning: #f9ab00;
-            --warning-light: #fef7e0;
-            --shadow-lg: 0 20px 60px rgba(10, 22, 40, 0.15);
-            --radius: 20px;
-            --radius-sm: 12px;
-            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
         * {
             margin: 0;
             padding: 0;
@@ -39,892 +13,255 @@
         }
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f8f6f0 0%, #ffffff 50%, #f0ece4 100%);
+            background: #f0f2f5;
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
-
         .container {
-            background: var(--white);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
-            max-width: 650px;
+            background: #fff;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
             width: 100%;
-            overflow: hidden;
-            border: 1px solid rgba(201, 151, 43, 0.15);
-            animation: containerIn 0.6s ease forwards;
-            transform: translateY(20px);
-            opacity: 0;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
         }
-        @keyframes containerIn {
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, #0a1628, #1a2a4a);
-            padding: 25px 20px 20px;
-            text-align: center;
-            border-bottom: 3px solid var(--gold);
-        }
-        .logo {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: 3px solid var(--gold);
-            padding: 5px;
-            background: rgba(255, 255, 255, 0.95);
-            object-fit: contain;
-            margin-bottom: 8px;
-            transition: var(--transition);
-        }
-        .logo:hover {
-            transform: scale(1.05) rotate(-5deg);
-        }
-        .school-name {
-            font-family: 'Playfair Display', serif;
+        h1 {
             font-size: 20px;
-            font-weight: 800;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            color: #0a1628;
+            margin-bottom: 10px;
         }
-        .school-name span {
-            color: var(--gold);
+        .sub {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
         }
-        .school-tagline {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 9px;
-            letter-spacing: 3px;
+        .scan-area {
+            border: 2px dashed #c9972b;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fef8ed;
+        }
+        .scan-area:hover {
+            background: #fdf0d5;
+        }
+        .scan-area .icon {
+            font-size: 48px;
+            color: #c9972b;
+            margin-bottom: 10px;
+        }
+        .scan-area p {
+            color: #666;
+            font-size: 14px;
+        }
+        #fileInput {
+            display: none;
+        }
+        .result-box {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 10px;
+            background: #f8f6f0;
+            border: 1px solid #e8e4dc;
+            display: none;
+        }
+        .result-box .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
             text-transform: uppercase;
-            margin-top: 2px;
+            letter-spacing: 0.5px;
+        }
+        .result-box .value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0a1628;
+            word-break: break-all;
+            margin-top: 4px;
+            padding: 8px;
+            background: #fff;
+            border-radius: 6px;
+            border: 1px solid #e8e4dc;
+        }
+        .result-box .value.extracted {
+            color: #c9972b;
+            border-color: #c9972b;
         }
         .badge {
             display: inline-block;
-            background: var(--gold-gradient);
-            color: #0a1628;
-            padding: 4px 20px;
+            padding: 4px 12px;
             border-radius: 50px;
-            font-size: 9px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            font-size: 11px;
+            font-weight: 600;
             margin-top: 8px;
-            animation: badgePulse 2s ease-in-out infinite;
-            box-shadow: 0 0 30px rgba(201, 151, 43, 0.2);
         }
-        @keyframes badgePulse {
-            0%,
-            100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.02);
-            }
+        .badge.success {
+            background: #e6f4ea;
+            color: #0f9d58;
         }
-
-        /* Body */
-        .body {
-            padding: 25px 25px 20px;
-            background: var(--white);
+        .badge.error {
+            background: #fce8e6;
+            color: #d93025;
         }
-
-        /* Choose Buttons */
-        .choose-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
+        .badge.info {
+            background: #e6f0fa;
+            color: #1a5a8a;
         }
-        .choose-btn {
-            padding: 16px;
-            border: 2px solid var(--gray-light);
-            border-radius: var(--radius-sm);
-            background: var(--white);
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-            font-family: 'Inter', sans-serif;
-        }
-        .choose-btn:hover {
-            border-color: var(--gold);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(201, 151, 43, 0.1);
-        }
-        .choose-btn.active {
-            border-color: var(--gold);
-            background: #fef8ed;
-            box-shadow: 0 4px 20px rgba(201, 151, 43, 0.15);
-        }
-        .choose-btn .icon {
-            font-size: 28px;
-            color: var(--gold);
-            margin-bottom: 6px;
-        }
-        .choose-btn .label {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--navy);
-        }
-        .choose-btn .sub {
-            font-size: 11px;
-            color: var(--text-light);
-            margin-top: 2px;
-        }
-
-        /* Verification Box */
-        .verify-section {
-            display: none;
-            animation: fadeSlide 0.4s ease;
-        }
-        .verify-section.active {
-            display: block;
-        }
-        @keyframes fadeSlide {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .verify-box {
-            background: var(--off-white);
-            border-radius: var(--radius-sm);
-            padding: 20px 22px;
-            border: 2px solid var(--gray-light);
-            transition: var(--transition);
-        }
-        .verify-box:hover {
-            border-color: var(--gold);
-        }
-        .verify-box .box-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-        .verify-box .box-header .box-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--gold-gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-        .verify-box .box-header .box-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--navy);
-        }
-        .verify-box .box-header .box-title span {
-            color: var(--text-light);
-            font-weight: 400;
-            font-size: 12px;
-        }
-        .verify-box .box-subtitle {
-            font-size: 12px;
-            color: var(--text-light);
-            margin-bottom: 12px;
-            padding-left: 46px;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 8px;
-        }
-        .input-group input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid var(--gray-light);
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: 'Inter', sans-serif;
-            transition: var(--transition);
-            background: var(--white);
-            color: var(--navy);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .input-group input::placeholder {
-            color: var(--gray);
-            text-transform: none;
-            font-size: 12px;
-        }
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--gold);
-            box-shadow: 0 0 0 4px rgba(201, 151, 43, 0.1);
-        }
-        .input-group .btn-verify {
-            padding: 12px 28px;
-            background: var(--gold-gradient);
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: 'Inter', sans-serif;
-            white-space: nowrap;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        }
-        .input-group .btn-verify:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(201, 151, 43, 0.3);
-        }
-        .input-group .btn-verify:active {
-            transform: scale(0.95);
-        }
-        .input-group .btn-verify:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-            box-shadow: none !important;
-        }
-
-        /* Scan Options */
-        .scan-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
+        .debug-info {
             margin-top: 12px;
-            padding-left: 46px;
-        }
-        .scan-option {
-            background: var(--white);
-            border: 2px solid var(--gray-light);
-            border-radius: var(--radius-sm);
-            padding: 12px 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .scan-option:hover {
-            border-color: var(--gold);
-            background: #fef8ed;
-            transform: translateY(-2px);
-        }
-        .scan-option:active {
-            transform: scale(0.95);
-        }
-        .scan-option .icon {
-            font-size: 22px;
-            color: var(--gold);
-            margin-bottom: 4px;
-            transition: var(--transition);
-        }
-        .scan-option:hover .icon {
-            transform: scale(1.1);
-        }
-        .scan-option h4 {
-            font-size: 11px;
-            color: var(--navy);
-            margin-bottom: 2px;
-        }
-        .scan-option p {
-            font-size: 8px;
-            color: var(--gray);
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-
-        /* Result */
-        .result-container {
-            margin-top: 16px;
-            padding: 0 0 0 46px;
-        }
-        .result-icon {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            margin: 0 auto 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            animation: resultPop 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        @keyframes resultPop {
-            0% {
-                transform: scale(0);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1.15);
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-        .result-icon.success {
-            background: var(--success-light);
-            color: var(--success);
-            border: 2px solid rgba(15, 157, 88, 0.2);
-        }
-        .result-icon.error {
-            background: var(--danger-light);
-            color: var(--danger);
-            border: 2px solid rgba(217, 48, 37, 0.2);
-        }
-        .result-icon.loading {
-            background: var(--warning-light);
-            color: var(--warning);
-            border: 2px solid rgba(249, 171, 0, 0.2);
-        }
-        .result-title {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--navy);
-            text-align: center;
-            margin-bottom: 4px;
-        }
-        .result-title.error-title {
-            color: var(--danger);
-        }
-        .result-sub {
             font-size: 12px;
-            color: var(--text-light);
-            text-align: center;
-            margin-bottom: 14px;
-        }
-
-        .details-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 10px 0;
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-        }
-        .details-table td {
-            padding: 8px 12px;
-            border: 1px solid var(--gray-light);
-            font-size: 12px;
-            text-align: left;
-            color: var(--text);
-        }
-        .details-table td:first-child {
-            font-weight: 600;
-            background: var(--off-white);
-            color: var(--text-light);
-            width: 35%;
-            text-transform: uppercase;
-            font-size: 10px;
-            letter-spacing: 0.5px;
-        }
-        .details-table td:last-child {
-            font-weight: 500;
-            color: var(--navy);
-        }
-        .details-table .highlight {
-            color: var(--gold-dark);
-            font-weight: 700;
+            color: #999;
+            padding: 8px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            word-break: break-all;
             font-family: monospace;
-            letter-spacing: 0.5px;
         }
-
-        .success-box {
-            background: var(--success-light);
-            border: 1px solid rgba(15, 157, 88, 0.15);
-            border-left: 4px solid var(--success);
-            border-radius: var(--radius-sm);
-            padding: 12px 16px;
-            margin: 10px 0;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            font-size: 12px;
-            color: var(--success);
-        }
-        .success-box i {
-            font-size: 18px;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-        .success-box strong {
-            display: block;
-            font-size: 13px;
-            margin-bottom: 2px;
-            color: var(--navy);
-        }
-        .success-box p {
-            font-size: 11px;
-            color: var(--text-light);
-            line-height: 1.5;
-        }
-        .success-box .meta {
-            font-size: 10px;
-            color: var(--gray);
-            margin-top: 4px;
-        }
-
-        .error-box {
-            background: var(--danger-light);
-            border: 1px solid rgba(217, 48, 37, 0.15);
-            border-left: 4px solid var(--danger);
-            border-radius: var(--radius-sm);
-            padding: 12px 16px;
-            margin: 10px 0;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            font-size: 12px;
-            color: var(--danger);
-        }
-        .error-box i {
-            font-size: 18px;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-        .error-box div {
-            color: var(--text);
-        }
-
         .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 24px;
+            display: inline-block;
+            padding: 10px 24px;
             border: none;
-            border-radius: 50px;
-            font-size: 12px;
+            border-radius: 10px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s;
             font-family: 'Inter', sans-serif;
-            margin-top: 4px;
         }
         .btn-primary {
-            background: var(--gold-gradient);
+            background: #c9972b;
             color: #fff;
         }
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(201, 151, 43, 0.3);
+            background: #b8860b;
         }
         .btn-secondary {
-            background: var(--off-white);
-            color: var(--text-light);
-            border: 1px solid var(--gray-light);
+            background: #e8e4dc;
+            color: #333;
         }
         .btn-secondary:hover {
-            background: var(--gray-light);
-            color: var(--navy);
+            background: #d5d0c8;
         }
-
+        .mt-10 {
+            margin-top: 10px;
+        }
+        .flex {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
         .spinner {
             display: inline-block;
-            width: 22px;
-            height: 22px;
-            border: 3px solid var(--gray-light);
-            border-top-color: var(--gold);
+            width: 30px;
+            height: 30px;
+            border: 3px solid #e8e4dc;
+            border-top-color: #c9972b;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .security-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            justify-content: center;
-            font-size: 9px;
-            color: var(--gray);
-            margin-top: 16px;
-            padding: 6px 16px;
-            background: var(--off-white);
-            border-radius: 50px;
-            border: 1px solid var(--gray-light);
-        }
-        .security-badge i {
-            color: var(--success);
-        }
-        .security-badge .lock-icon {
-            color: var(--gold);
-        }
-
-        .footer {
-            padding: 12px 25px;
-            text-align: center;
-            border-top: 1px solid var(--gray-light);
-            background: var(--off-white);
-            font-size: 8px;
-            color: var(--gray);
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-        }
-        .footer i {
-            color: var(--gold);
-            margin-right: 6px;
-        }
-
-        .rate-limit {
-            background: var(--warning-light);
-            border: 1px solid rgba(249, 171, 0, 0.2);
-            border-radius: var(--radius-sm);
-            padding: 10px 16px;
-            margin-bottom: 16px;
-            font-size: 11px;
-            color: var(--warning);
-            display: none;
-            align-items: center;
-            gap: 10px;
-        }
-        .rate-limit.show {
-            display: flex;
-            animation: fadeSlide 0.3s ease;
-        }
-
-        /* Camera Modal */
-        .camera-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 99999;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-        }
-        .camera-modal.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-        .camera-modal video {
-            max-width: 100%;
-            max-height: 60vh;
-            border-radius: 16px;
-            border: 2px solid var(--gold);
-            background: #000;
-        }
-        .camera-controls {
-            display: flex;
-            gap: 12px;
-            margin-top: 18px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .camera-controls button {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: var(--transition);
-        }
-        .btn-scan {
-            background: var(--gold-gradient);
-            color: #fff;
-        }
-        .btn-scan:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(201, 151, 43, 0.3);
-        }
-        .btn-close-camera {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
-        .btn-close-camera:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                margin: 0 5px;
-            }
-            .body {
-                padding: 16px 14px;
-            }
-            .choose-section {
-                grid-template-columns: 1fr;
-            }
-            .input-group {
-                flex-direction: column;
-            }
-            .input-group .btn-verify {
-                width: 100%;
-                justify-content: center;
-            }
-            .scan-options {
-                grid-template-columns: 1fr 1fr;
-                padding-left: 0;
-            }
-            .verify-box .box-subtitle {
-                padding-left: 0;
-            }
-            .result-container {
-                padding: 0;
-            }
-            .details-table td {
-                padding: 6px 8px;
-                font-size: 11px;
-            }
-            .details-table td:first-child {
-                font-size: 9px;
-            }
-            .school-name {
-                font-size: 16px;
-            }
-            .logo {
-                width: 60px;
-                height: 60px;
-            }
-            .verify-box {
-                padding: 16px;
-            }
-        }
-
-        @media print {
-            body {
-                background: #fff !important;
-                padding: 0 !important;
-            }
-            .container {
-                box-shadow: none !important;
-                border: 1px solid #ddd !important;
-            }
-            .header {
-                background: #f8f6f0 !important;
-                border-bottom: 3px solid var(--gold) !important;
-            }
-            .school-name {
-                color: var(--navy) !important;
-            }
-            .school-name span {
-                color: var(--gold) !important;
-            }
-            .school-tagline {
-                color: #999 !important;
-            }
-            .badge {
-                background: var(--gold) !important;
-                color: #fff !important;
-            }
-            .scan-options,
-            .camera-modal,
-            .btn,
-            .footer,
-            .security-badge,
-            .choose-section,
-            .rate-limit,
-            .input-group .btn-verify {
-                display: none !important;
-            }
-            .body {
-                padding: 0 !important;
-            }
-            .verify-box {
-                border: 1px solid #ddd !important;
-                background: #fff !important;
-            }
-            .details-table td {
-                border-color: #ddd !important;
-            }
-            .details-table td:first-child {
-                background: #f8f6f0 !important;
-            }
-            .success-box {
-                background: #e6f4ea !important;
-                border-color: #0f9d58 !important;
-            }
-            .success-box strong {
-                color: var(--navy) !important;
-            }
-            .success-box p {
-                color: #333 !important;
-            }
-            .result-icon {
-                border-color: #0f9d58 !important;
-            }
-            .result-title {
-                color: var(--navy) !important;
-            }
-            .result-sub {
-                color: #666 !important;
-            }
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <img src="logo(1).png" alt="GSSS Shilla" class="logo" onerror="this.style.display='none'">
-            <div class="school-name">GSSS <span>Shilla</span></div>
-            <div class="school-tagline">Shilla • Nerwa • District Shimla • Himachal Pradesh - 171210</div>
-            <div class="badge"><i class="fas fa-shield-alt"></i> Secure Document Verification</div>
+        <h1>🔍 QR Code Debug Tool</h1>
+        <div class="sub">Scan a QR code to see what data is actually being read</div>
+
+        <div class="scan-area" onclick="document.getElementById('fileInput').click()">
+            <div class="icon"><i class="fas fa-qrcode"></i></div>
+            <p>Click to upload an image with QR code</p>
+            <p style="font-size:12px;color:#999;margin-top:4px;">JPG, PNG, etc.</p>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" onchange="scanQR(event)">
+
+        <div class="flex mt-10">
+            <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-upload"></i> Upload Image
+            </button>
+            <button class="btn btn-secondary" onclick="openCamera()">
+                <i class="fas fa-camera"></i> Open Camera
+            </button>
+            <button class="btn btn-secondary" onclick="clearResult()">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
         </div>
 
-        <div class="body">
-            <!-- Rate Limit -->
-            <div class="rate-limit" id="rateLimit">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span id="rateMsg">Too many attempts. Please wait 30 seconds.</span>
+        <div class="result-box" id="resultBox">
+            <div class="label">📋 Raw QR Data</div>
+            <div class="value" id="rawData">-</div>
+            
+            <div style="margin-top:12px;">
+                <div class="label">🎯 Extracted Code</div>
+                <div class="value extracted" id="extractedData">-</div>
             </div>
 
-            <!-- Choose Buttons -->
-            <div class="choose-section">
-                <button class="choose-btn active" id="btnBonafide" onclick="switchSection('bonafide')">
-                    <div class="icon"><i class="fas fa-certificate"></i></div>
-                    <div class="label">Bonafide Certificate</div>
-                    <div class="sub">Verify by 12-digit code</div>
-                </button>
-                <button class="choose-btn" id="btnMarksheet" onclick="switchSection('marksheet')">
-                    <div class="icon"><i class="fas fa-file-alt"></i></div>
-                    <div class="label">Marksheet</div>
-                    <div class="sub">Verify by Student ID</div>
-                </button>
+            <div id="statusBadge"></div>
+
+            <div class="debug-info" id="debugInfo">
+                <strong>Debug Info:</strong><br>
+                <span id="debugText">Waiting for scan...</span>
             </div>
-
-            <!-- ===== BONAFIDE SECTION ===== -->
-            <div class="verify-section active" id="section-bonafide">
-                <div class="verify-box">
-                    <div class="box-header">
-                        <div class="box-icon"><i class="fas fa-certificate"></i></div>
-                        <div class="box-title">Bonafide Verification <span>12-digit code</span></div>
-                    </div>
-                    <div class="box-subtitle">
-                        <i class="fas fa-key" style="color:var(--gold);margin-right:4px;"></i>
-                        Enter the 12-character alphanumeric verification code
-                    </div>
-
-                    <div class="input-group">
-                        <input type="text" id="bonafideInput" placeholder="e.g., AAAAAA163HBK" maxlength="12" autocomplete="off">
-                        <button class="btn-verify" onclick="verifyBonafide()"><i class="fas fa-check"></i> Verify</button>
-                    </div>
-
-                    <div class="scan-options">
-                        <div class="scan-option" onclick="openCamera('bonafide')">
-                            <div class="icon"><i class="fas fa-camera"></i></div>
-                            <h4>Scan QR</h4>
-                            <p>Use Camera</p>
-                        </div>
-                        <div class="scan-option" onclick="document.getElementById('bonafideImage').click()">
-                            <div class="icon"><i class="fas fa-image"></i></div>
-                            <h4>Upload Image</h4>
-                            <p>JPG, PNG, etc.</p>
-                        </div>
-                    </div>
-                    <input type="file" id="bonafideImage" accept="image/*" onchange="scanImage(event, 'bonafide')">
-
-                    <div class="result-container" id="bonafideResult">
-                        <div style="text-align:center;padding:20px 10px;">
-                            <i class="fas fa-certificate" style="font-size:30px;color:var(--gray);"></i>
-                            <p style="margin-top:8px;color:var(--text-light);font-size:13px;">Enter code or scan QR to verify</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ===== MARKSHEET SECTION ===== -->
-            <div class="verify-section" id="section-marksheet">
-                <div class="verify-box">
-                    <div class="box-header">
-                        <div class="box-icon"><i class="fas fa-file-alt"></i></div>
-                        <div class="box-title">Marksheet Verification <span>Student ID</span></div>
-                    </div>
-                    <div class="box-subtitle">
-                        <i class="fas fa-id-card" style="color:var(--gold);margin-right:4px;"></i>
-                        Enter your Student ID to verify marksheet details
-                    </div>
-
-                    <div class="input-group">
-                        <input type="text" id="studentInput" placeholder="e.g., HP10A001" maxlength="15" autocomplete="off">
-                        <button class="btn-verify" onclick="verifyMarksheet()"><i class="fas fa-check"></i> Verify</button>
-                    </div>
-
-                    <div class="scan-options">
-                        <div class="scan-option" onclick="openCamera('marksheet')">
-                            <div class="icon"><i class="fas fa-camera"></i></div>
-                            <h4>Scan QR</h4>
-                            <p>Use Camera</p>
-                        </div>
-                        
-                    </div>
-                    <input type="file" id="marksheetImage" accept="image/*" onchange="scanImage(event, 'marksheet')">
-
-                    <div class="result-container" id="marksheetResult">
-                        <div style="text-align:center;padding:20px 10px;">
-                            <i class="fas fa-file-alt" style="font-size:30px;color:var(--gray);"></i>
-                            <p style="margin-top:8px;color:var(--text-light);font-size:13px;">Enter Student ID or scan QR to verify</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="security-badge">
-                <i class="fas fa-shield-alt lock-icon"></i>
-                <span>Secure • Verified by GSSS Shilla</span>
-                <i class="fas fa-check-circle"></i>
-            </div>
-        </div>
-
-        <div class="footer">
-            <i class="fas fa-certificate"></i> GSSS Shilla • Official Document Verification System
         </div>
     </div>
 
     <!-- Camera Modal -->
-    <div class="camera-modal" id="cameraModal">
-        <video id="cameraVideo" autoplay playsinline></video>
-        <div class="camera-controls">
-            <button class="btn-scan" onclick="captureAndScan()"><i class="fas fa-camera"></i> Scan QR</button>
-            <button class="btn-close-camera" onclick="closeCamera()"><i class="fas fa-times"></i> Close</button>
+    <div class="camera-modal" id="cameraModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:99999;align-items:center;justify-content:center;flex-direction:column;padding:20px;">
+        <video id="cameraVideo" autoplay playsinline style="max-width:100%;max-height:60vh;border-radius:16px;border:2px solid #c9972b;background:#000;"></video>
+        <div style="display:flex;gap:12px;margin-top:18px;">
+            <button class="btn btn-primary" onclick="captureAndScan()"><i class="fas fa-camera"></i> Scan QR</button>
+            <button class="btn btn-secondary" onclick="closeCamera()"><i class="fas fa-times"></i> Close</button>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
     <script>
-        // ================================================================
-        // CONFIG
-        // ================================================================
-        const API_BASE = 'https://gsssshilla.onrender.com/api';
-        let scanMode = 'bonafide';
         let cameraStream = null;
-        let attemptCount = 0;
-        let isRateLimited = false;
-        let rateTimer = null;
 
-        // ================================================================
-        // UTILITY
-        // ================================================================
-        function sanitize(i) { return i ? String(i).replace(/[<>'"]/g, '').trim() : ''; }
+        function clearResult() {
+            document.getElementById('resultBox').style.display = 'none';
+            document.getElementById('rawData').textContent = '-';
+            document.getElementById('extractedData').textContent = '-';
+            document.getElementById('statusBadge').innerHTML = '';
+            document.getElementById('debugText').textContent = 'Waiting for scan...';
+        }
+
+        function showResult(raw, extracted, status) {
+            const box = document.getElementById('resultBox');
+            box.style.display = 'block';
+            
+            document.getElementById('rawData').textContent = raw || 'No data';
+            document.getElementById('extractedData').textContent = extracted || 'No data';
+            
+            let badgeHtml = '';
+            if (status === 'bonafide') {
+                badgeHtml = '<span class="badge success">✅ Bonafide Code Detected</span>';
+            } else if (status === 'marksheet') {
+                badgeHtml = '<span class="badge success">✅ Marksheet ID Detected</span>';
+            } else if (status === 'error') {
+                badgeHtml = '<span class="badge error">❌ Invalid Data</span>';
+            } else {
+                badgeHtml = '<span class="badge info">⚠️ Unknown Format</span>';
+            }
+            document.getElementById('statusBadge').innerHTML = badgeHtml;
+            
+            document.getElementById('debugText').textContent = 
+                `Raw length: ${raw ? raw.length : 0} characters | ` +
+                `Extracted: ${extracted || 'None'} | ` +
+                `Timestamp: ${new Date().toLocaleTimeString()}`;
+        }
 
         function isValidBonafideCode(code) {
             return /^[A-Za-z0-9]{12}$/.test(String(code).trim());
@@ -934,450 +271,108 @@
             return /^[A-Z]{2}[0-9]{2}[A-Z][0-9]{3}$/.test(String(id).toUpperCase().trim());
         }
 
-        function esc(t) { const d = document.createElement('div');
-            d.textContent = t || '';
-            return d.innerHTML; }
-
-        function fmtDate(d) {
-            if (!d) return '-';
-            const dt = new Date(d);
-            return isNaN(dt) ? d : dt.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        }
-
-        function getHeaders() {
-            const token = localStorage.getItem('adminToken');
-            return token ? { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
-        }
-
-        function checkRateLimit() {
-            if (isRateLimited) return false;
-            attemptCount++;
-            if (attemptCount >= 5) {
-                isRateLimited = true;
-                document.getElementById('rateLimit').classList.add('show');
-                document.querySelectorAll('.btn-verify').forEach(b => b.disabled = true);
-                rateTimer = setTimeout(() => {
-                    attemptCount = 0;
-                    isRateLimited = false;
-                    document.getElementById('rateLimit').classList.remove('show');
-                    document.querySelectorAll('.btn-verify').forEach(b => b.disabled = false);
-                }, 30000);
-                return false;
-            }
-            return true;
-        }
-
-        function showResult(section, type, data) {
-            const container = document.getElementById(section + 'Result');
-            if (type === 'loading') {
-                container.innerHTML = `
-                    <div style="text-align:center;padding:20px;">
-                        <div class="spinner"></div>
-                        <p style="margin-top:10px;color:var(--text-light);font-size:13px;">${data || 'Verifying...'}</p>
-                    </div>
-                `;
-                return;
-            }
-            if (type === 'error') {
-                container.innerHTML = `
-                    <div class="result-icon error"><i class="fas fa-times-circle"></i></div>
-                    <div class="result-title error-title">❌ Verification Failed</div>
-                    <div class="result-sub">${esc(data)}</div>
-                    <div class="error-box"><i class="fas fa-exclamation-triangle"></i><div>${esc(data)}</div></div>
-                    <div style="text-align:center;margin-top:8px;">
-                        <button class="btn btn-secondary" onclick="resetResult('${section}')"><i class="fas fa-redo"></i> Try Again</button>
-                    </div>
-                `;
-                return;
-            }
-            if (type === 'success') {
-                const d = data;
-                const vid = `${d.id || d.student_id || 'VER'}-${Date.now().toString().substring(6)}`;
-                let tableRows = '';
-                if (d.student_id) tableRows +=
-                    `<tr><td>Student ID</td><td><strong>${esc(d.student_id)}</strong></td></tr>`;
-                if (d.name) tableRows += `<tr><td>Student Name</td><td><strong>${esc(d.name)}</strong></td></tr>`;
-                if (d.father_name) tableRows += `<tr><td>Father's Name</td><td>${esc(d.father_name)}</td></tr>`;
-                if (d.mother_name) tableRows += `<tr><td>Mother's Name</td><td>${esc(d.mother_name)}</td></tr>`;
-                if (d.apaar_id) tableRows += `<tr><td>APAAR ID</td><td>${esc(d.apaar_id)}</td></tr>`;
-                if (d.dob) tableRows += `<tr><td>Date of Birth</td><td>${fmtDate(d.dob)}</td></tr>`;
-                if (d.class) tableRows +=
-                    `<tr><td>Class</td><td>${esc(d.class)}${d.section ? ' - ' + esc(d.section) : ''}</td></tr>`;
-                if (d.session) tableRows += `<tr><td>Session</td><td>${esc(d.session)}</td></tr>`;
-                if (d.admission_no || d.admissionNo) tableRows +=
-                    `<tr><td>Admission No</td><td>${esc(d.admission_no || d.admissionNo)}</td></tr>`;
-                if (d.exam_roll_no) tableRows += `<tr><td>Roll No</td><td>${esc(d.exam_roll_no)}</td></tr>`;
-                if (d.verification_code) tableRows +=
-                    `<tr><td>Verification Code</td><td class="highlight">${esc(d.verification_code)}</td></tr>`;
-                if (d.purpose) tableRows += `<tr><td>Purpose</td><td>${esc(d.purpose)}</td></tr>`;
-                if (d.issue_date) tableRows += `<tr><td>Issue Date</td><td>${fmtDate(d.issue_date)}</td></tr>`;
-
-                container.innerHTML = `
-                    <div class="result-icon success"><i class="fas fa-check-circle"></i></div>
-                    <div class="result-title">✅ Document Verified</div>
-                    <div class="result-sub">Authentic document issued by GSSS Shilla</div>
-                    <table class="details-table">${tableRows}</table>
-                    <div class="success-box">
-                        <i class="fas fa-shield-alt"></i>
-                        <div>
-                            <strong>✅ Verification Confirmed</strong>
-                            <p>All details verified from official school records.</p>
-                            <div class="meta">Verification ID: ${vid} • ${new Date().toLocaleString('en-IN')}</div>
-                        </div>
-                    </div>
-                    <div style="text-align:center;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
-                        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
-                        <button class="btn btn-secondary" onclick="resetResult('${section}')"><i class="fas fa-redo"></i> New</button>
-                    </div>
-                `;
-                attemptCount = 0;
-                return;
-            }
-        }
-
-        function resetResult(section) {
-            const container = document.getElementById(section + 'Result');
-            if (section === 'bonafide') {
-                container.innerHTML = `
-                    <div style="text-align:center;padding:20px 10px;">
-                        <i class="fas fa-certificate" style="font-size:30px;color:var(--gray);"></i>
-                        <p style="margin-top:8px;color:var(--text-light);font-size:13px;">Enter code or scan QR to verify</p>
-                    </div>
-                `;
-                document.getElementById('bonafideInput').value = '';
-            } else {
-                container.innerHTML = `
-                    <div style="text-align:center;padding:20px 10px;">
-                        <i class="fas fa-file-alt" style="font-size:30px;color:var(--gray);"></i>
-                        <p style="margin-top:8px;color:var(--text-light);font-size:13px;">Enter Student ID or scan QR to verify</p>
-                    </div>
-                `;
-                document.getElementById('studentInput').value = '';
-            }
-        }
-
-        // ================================================================
-        // SWITCH SECTION
-        // ================================================================
-        function switchSection(section) {
-            document.querySelectorAll('.verify-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.choose-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('section-' + section).classList.add('active');
-            document.getElementById('btn' + section.charAt(0).toUpperCase() + section.slice(1)).classList.add('active');
-            scanMode = section;
-        }
-
-        // ================================================================
-        // VERIFY BONAFIDE
-        // ================================================================
-        async function verifyBonafide() {
-            const input = document.getElementById('bonafideInput');
-            const code = sanitize(input.value).toUpperCase();
-
-            if (!code) { showResult('bonafide', 'error', 'Please enter verification code.'); return; }
-            if (!isValidBonafideCode(code)) {
-                showResult('bonafide', 'error', 'Invalid format. Code must be exactly 12 alphanumeric characters.');
-                return;
-            }
-            if (!checkRateLimit()) return;
-
-            showResult('bonafide', 'loading', 'Verifying bonafide certificate...');
-
-            try {
-                const response = await fetch(`${API_BASE}/bonafide/verify/${encodeURIComponent(code)}`);
-                if (!response.ok) {
-                    if (response.status === 404) throw new Error('Certificate not found.');
-                    throw new Error('Verification failed.');
-                }
-                const result = await response.json();
-                if (!result.success || !result.data) throw new Error('Invalid data.');
-                const d = result.data;
-                showResult('bonafide', 'success', {
-                    student_id: d.studentId || d.student_id || 'N/A',
-                    name: d.studentName || d.student_name || 'N/A',
-                    father_name: d.fatherName || d.father_name || '',
-                    mother_name: d.motherName || d.mother_name || '',
-                    class: d.className || d.class || '',
-                    section: d.section || '',
-                    session: d.session || '',
-                    admission_no: d.admissionNo || d.admission_no || '',
-                    verification_code: d.verificationCode || code,
-                    purpose: d.purpose || 'Bonafide Certificate',
-                    issue_date: d.issueDate || d.updatedAt || d.createdAt || new Date().toISOString()
-                });
-            } catch (e) {
-                showResult('bonafide', 'error', e.message);
-            }
-        }
-
-        // ================================================================
-        // VERIFY MARKSHEET
-        // ================================================================
-        async function verifyMarksheet() {
-            const input = document.getElementById('studentInput');
-            const studentId = sanitize(input.value).toUpperCase();
-
-            if (!studentId) { showResult('marksheet', 'error', 'Please enter Student ID.'); return; }
-            if (!isValidStudentId(studentId)) {
-                showResult('marksheet', 'error', 'Invalid format. Use: HP10A001');
-                return;
-            }
-            if (!checkRateLimit()) return;
-
-            showResult('marksheet', 'loading', 'Verifying marksheet...');
-
-            try {
-                const response = await fetch(`${API_BASE}/admin/results/students/${encodeURIComponent(studentId)}`, {
-                    headers: getHeaders()
-                });
-
-                if (!response.ok) {
-                    if (response.status === 404) throw new Error('Student not found.');
-                    if (response.status === 429) throw new Error('Too many requests. Please wait.');
-                    throw new Error('Unable to verify.');
-                }
-
-                const result = await response.json();
-                if (!result.success || !result.data || !result.data.student) throw new Error('Invalid data.');
-
-                const s = result.data.student;
-                if (s.student_id !== studentId) throw new Error('Student ID mismatch.');
-
-                const marksheetRes = await fetch(`${API_BASE}/admin/results/marksheets?student_id=${encodeURIComponent(studentId)}`, {
-                    headers: getHeaders()
-                });
-
-                let marksheets = [];
-                if (marksheetRes.ok) {
-                    const mData = await marksheetRes.json();
-                    if (mData.success && mData.data) marksheets = mData.data;
-                }
-
-                showResult('marksheet', 'success', {
-                    student_id: s.student_id,
-                    name: s.name,
-                    father_name: s.father_name || '',
-                    mother_name: s.mother_name || '',
-                    dob: s.dob || '',
-                    class: s.class || '',
-                    section: s.section || '',
-                    session: s.session || '',
-                    admission_no: s.admission_no || '',
-                    exam_roll_no: s.exam_roll_no || '',
-                    apaar_id: s.apaar_id || '',
-                    purpose: marksheets.length > 0 ? `${marksheets.length} marksheets found` : 'Student Record',
-                    issue_date: new Date().toISOString(),
-                    verification_code: `MR-${studentId}`
-                });
-
-            } catch (e) {
-                showResult('marksheet', 'error', e.message);
-            }
-        }
-
-        // ================================================================
-        // QR CODE EXTRACTION - IMPROVED
-        // ================================================================
-        function extractFromQR(qrData) {
-            if (!qrData) return null;
-
-            // Clean the data
-            let str = String(qrData).trim();
+        function extractCodeFromQR(qrData) {
+            if (!qrData) return { extracted: null, type: 'error' };
             
-            // Remove any special characters from start/end
-            str = str.replace(/^[^A-Za-z0-9?=&]+/, '');
-            str = str.replace(/[^A-Za-z0-9?=&]+$/, '');
-
-            console.log('QR Data:', str);
-
-            // ============================================================
-            // METHOD 1: Extract from URL with code parameter
-            // ============================================================
+            let str = String(qrData).trim();
+            console.log('Raw QR Data:', str);
+            
+            // Try URL parameters
             try {
                 const url = new URL(str);
-                
-                // Check for bonafide code (code parameter)
                 const codeParam = url.searchParams.get('code');
                 if (codeParam) {
                     const decoded = decodeURIComponent(codeParam).trim();
                     if (isValidBonafideCode(decoded)) {
-                        return { type: 'bonafide', value: decoded.toUpperCase() };
+                        return { extracted: decoded.toUpperCase(), type: 'bonafide' };
                     }
                 }
-                
-                // Check for student ID (data or id parameter)
                 const dataParam = url.searchParams.get('data') || url.searchParams.get('id');
                 if (dataParam) {
                     const decoded = decodeURIComponent(dataParam).trim();
                     if (isValidStudentId(decoded)) {
-                        return { type: 'marksheet', value: decoded.toUpperCase() };
+                        return { extracted: decoded.toUpperCase(), type: 'marksheet' };
                     }
                 }
-            } catch (e) {
-                console.log('Not a valid URL, trying other methods...');
+            } catch(e) {
+                console.log('Not a valid URL');
             }
 
-            // ============================================================
-            // METHOD 2: Look for 12-character alphanumeric code
-            // ============================================================
-            const bonafideMatches = str.match(/\b[A-Za-z0-9]{12}\b/g);
-            if (bonafideMatches) {
-                for (const match of bonafideMatches) {
+            // Try manual query string
+            const codeMatch = str.match(/[?&](code|data|id)=([^&]+)/);
+            if (codeMatch) {
+                const value = decodeURIComponent(codeMatch[2]).trim();
+                if (isValidBonafideCode(value)) {
+                    return { extracted: value.toUpperCase(), type: 'bonafide' };
+                }
+                if (isValidStudentId(value)) {
+                    return { extracted: value.toUpperCase(), type: 'marksheet' };
+                }
+            }
+
+            // Try 12-character code
+            const codeMatches = str.match(/\b[A-Za-z0-9]{12}\b/g);
+            if (codeMatches) {
+                for (const match of codeMatches) {
                     const code = match.toUpperCase();
                     if (isValidBonafideCode(code)) {
-                        return { type: 'bonafide', value: code };
+                        return { extracted: code, type: 'bonafide' };
                     }
                 }
             }
 
-            // ============================================================
-            // METHOD 3: Look for Student ID pattern
-            // ============================================================
+            // Try Student ID pattern
             const studentMatches = str.match(/\b[A-Z]{2}[0-9]{2}[A-Z][0-9]{3}\b/i);
             if (studentMatches) {
                 const id = studentMatches[0].toUpperCase();
                 if (isValidStudentId(id)) {
-                    return { type: 'marksheet', value: id };
+                    return { extracted: id, type: 'marksheet' };
                 }
             }
 
-            // ============================================================
-            // METHOD 4: Try to extract from query string manually
-            // ============================================================
-            if (str.includes('?code=') || str.includes('?data=') || str.includes('?id=')) {
-                const codeMatch = str.match(/[?&](code|data|id)=([^&]+)/);
-                if (codeMatch) {
-                    const value = decodeURIComponent(codeMatch[2]).trim();
-                    if (isValidBonafideCode(value)) {
-                        return { type: 'bonafide', value: value.toUpperCase() };
-                    }
-                    if (isValidStudentId(value)) {
-                        return { type: 'marksheet', value: value.toUpperCase() };
-                    }
-                }
-            }
-
-            // ============================================================
-            // METHOD 5: Try JSON
-            // ============================================================
-            try {
-                const data = JSON.parse(str);
-                if (data.verificationCode && isValidBonafideCode(data.verificationCode)) {
-                    return { type: 'bonafide', value: data.verificationCode };
-                }
-                if (data.student_id && isValidStudentId(data.student_id)) {
-                    return { type: 'marksheet', value: data.student_id };
-                }
-                if (data.studentId && isValidStudentId(data.studentId)) {
-                    return { type: 'marksheet', value: data.studentId };
-                }
-            } catch (e) {}
-
-            // ============================================================
-            // METHOD 6: Try to find any 12-character code (without word boundary)
-            // ============================================================
+            // Try any 12 characters
             const anyCode = str.match(/[A-Za-z0-9]{12}/);
             if (anyCode) {
                 const code = anyCode[0].toUpperCase();
                 if (isValidBonafideCode(code)) {
-                    return { type: 'bonafide', value: code };
+                    return { extracted: code, type: 'bonafide' };
                 }
             }
 
-            return null;
+            return { extracted: null, type: 'error' };
         }
 
-        function processQR(qrData) {
-            const result = extractFromQR(qrData);
-            if (!result) {
-                showResult(scanMode, 'error', 'QR code does not contain valid verification data.');
-                return;
-            }
-
-            if (result.type === 'bonafide') {
-                document.getElementById('bonafideInput').value = result.value;
-                switchSection('bonafide');
-                setTimeout(() => verifyBonafide(), 500);
-            } else if (result.type === 'marksheet') {
-                document.getElementById('studentInput').value = result.value;
-                switchSection('marksheet');
-                setTimeout(() => verifyMarksheet(), 500);
+        function processQRData(qrData) {
+            const result = extractCodeFromQR(qrData);
+            showResult(qrData, result.extracted || 'Not found', result.type);
+            
+            if (result.extracted) {
+                console.log('✅ Extracted:', result.extracted, 'Type:', result.type);
+            } else {
+                console.log('❌ Could not extract valid code');
             }
         }
 
         // ================================================================
-        // CAMERA
+        // IMAGE SCAN
         // ================================================================
-        async function openCamera(mode) {
-            scanMode = mode || 'bonafide';
-            try {
-                cameraStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
-                });
-                document.getElementById('cameraVideo').srcObject = cameraStream;
-                document.getElementById('cameraModal').classList.add('active');
-            } catch (e) {
-                alert('Camera access denied. Please use Image upload.');
-            }
-        }
-
-        function closeCamera() {
-            if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop());
-                cameraStream = null; }
-            document.getElementById('cameraModal').classList.remove('active');
-        }
-
-        function captureAndScan() {
-            const video = document.getElementById('cameraVideo');
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            try {
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const code = jsQR(imageData.data, imageData.width, imageData.height);
-                if (code && code.data) {
-                    closeCamera();
-                    processQR(code.data);
-                } else {
-                    alert('QR code not detected. Try better lighting or move closer.');
-                }
-            } catch (err) {
-                alert('Error scanning. Try again.');
-            }
-        }
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeCamera();
-        });
-
-        // ================================================================
-        // IMAGE SCAN - IMPROVED with multiple attempts
-        // ================================================================
-        function scanImage(event, mode) {
+        function scanQR(event) {
             const file = event.target.files[0];
             if (!file) return;
 
             if (!file.type.startsWith('image/')) {
-                showResult(mode, 'error', 'Please upload a valid image file.');
+                alert('Please upload a valid image file.');
                 return;
             }
 
-            if (file.size > 10 * 1024 * 1024) {
-                showResult(mode, 'error', 'Image too large (max 10MB).');
-                return;
-            }
-
-            showResult(mode, 'loading', 'Scanning image for QR code...');
-            scanMode = mode;
+            document.getElementById('resultBox').style.display = 'none';
+            document.getElementById('debugText').textContent = 'Scanning image...';
 
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
-                    // Try multiple resolutions for better QR detection
+                    // Try multiple resolutions
                     const resolutions = [
                         { scale: 1, label: 'Original' },
                         { scale: 0.5, label: 'Half' },
@@ -1392,7 +387,6 @@
                         let width = Math.round(img.width * res.scale);
                         let height = Math.round(img.height * res.scale);
                         
-                        // Limit max size
                         const maxDim = 2000;
                         if (width > maxDim || height > maxDim) {
                             const ratio = Math.min(maxDim / width, maxDim / height);
@@ -1400,7 +394,6 @@
                             height = Math.round(height * ratio);
                         }
                         
-                        // Minimum size for QR detection
                         if (width < 100 || height < 100) continue;
                         
                         const canvas = document.createElement('canvas');
@@ -1412,12 +405,10 @@
                         try {
                             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                             
-                            // Try with dontInvert first
                             let code = jsQR(imageData.data, imageData.width, imageData.height, {
                                 inversionAttempts: "dontInvert",
                             });
                             
-                            // If not found, try with attemptBoth
                             if (!code || !code.data) {
                                 code = jsQR(imageData.data, imageData.width, imageData.height, {
                                     inversionAttempts: "attemptBoth",
@@ -1425,70 +416,90 @@
                             }
                             
                             if (code && code.data) {
-                                console.log(`QR found at ${res.label} resolution:`, code.data);
+                                console.log(`✅ QR found at ${res.label} resolution:`, code.data);
                                 found = true;
-                                processQR(code.data);
+                                processQRData(code.data);
                                 break;
                             }
                         } catch (err) {
-                            console.log(`Error at ${res.label} resolution:`, err);
+                            console.log(`Error at ${res.label}:`, err);
                         }
                     }
                     
                     if (!found) {
-                        showResult(mode, 'error', 'No QR code found in image. Please ensure the QR code is clear, well-lit, and centered.');
+                        document.getElementById('resultBox').style.display = 'block';
+                        showResult('No QR found', 'Not detected', 'error');
+                        document.getElementById('debugText').textContent = 'No QR code found. Try a clearer image.';
                     }
                 };
                 img.onerror = function() {
-                    showResult(mode, 'error', 'Could not load image. Please try another file.');
+                    alert('Could not load image.');
                 };
                 img.src = e.target.result;
             };
             reader.onerror = function() {
-                showResult(mode, 'error', 'Could not read file. Please try again.');
+                alert('Could not read file.');
             };
             reader.readAsDataURL(file);
             event.target.value = '';
         }
 
         // ================================================================
-        // ENTER KEY SUPPORT
+        // CAMERA
         // ================================================================
-        document.getElementById('bonafideInput').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') verifyBonafide();
-        });
-        document.getElementById('studentInput').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') verifyMarksheet();
-        });
-
-        // ================================================================
-        // INIT
-        // ================================================================
-        document.addEventListener('DOMContentLoaded', function() {
-            const params = new URLSearchParams(window.location.search);
-            const code = params.get('code') || params.get('data');
-            if (code) {
-                try {
-                    const decoded = decodeURIComponent(code);
-                    const result = extractFromQR(decoded);
-                    if (result) {
-                        if (result.type === 'bonafide') {
-                            document.getElementById('bonafideInput').value = result.value;
-                            switchSection('bonafide');
-                            setTimeout(() => verifyBonafide(), 800);
-                        } else if (result.type === 'marksheet') {
-                            document.getElementById('studentInput').value = result.value;
-                            switchSection('marksheet');
-                            setTimeout(() => verifyMarksheet(), 800);
-                        }
-                    }
-                } catch (e) {}
+        async function openCamera() {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
+                });
+                document.getElementById('cameraVideo').srcObject = cameraStream;
+                document.getElementById('cameraModal').style.display = 'flex';
+            } catch(e) {
+                alert('Camera access denied. Please use image upload.');
             }
-        });
+        }
 
-        window.addEventListener('beforeunload', function() {
-            if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop());
-                cameraStream = null; }
+        function closeCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(t => t.stop());
+                cameraStream = null;
+            }
+            document.getElementById('cameraModal').style.display = 'none';
+        }
+
+        function captureAndScan() {
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            try {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                let code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: "dontInvert",
+                });
+                
+                if (!code || !code.data) {
+                    code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: "attemptBoth",
+                    });
+                }
+                
+                if (code && code.data) {
+                    closeCamera();
+                    processQRData(code.data);
+                } else {
+                    alert('QR code not detected. Try better lighting.');
+                }
+            } catch(err) {
+                alert('Error scanning. Try again.');
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeCamera();
         });
     </script>
 
