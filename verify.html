@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GSSS Shilla - Document Verification System</title>
+    <title>GSSS Shilla - Document Verification</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
@@ -82,7 +82,7 @@
         /* Tabs */
         .tabs {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 4px;
             margin-bottom: 18px;
             background: #f0f4f8;
@@ -94,7 +94,7 @@
             border: none;
             background: transparent;
             border-radius: 10px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
             color: #5a6a7e;
             cursor: pointer;
@@ -233,6 +233,59 @@
             color: #94a3b8;
         }
 
+        /* Camera Modal */
+        .camera-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+        .camera-modal.active {
+            display: flex;
+        }
+        .camera-modal video {
+            max-width: 100%;
+            max-height: 60vh;
+            border-radius: 10px;
+            border: 3px solid #e8b84b;
+            background: #000;
+        }
+        .camera-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .camera-controls button {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-scan {
+            background: #e8b84b;
+            color: #fff;
+        }
+        .btn-scan:hover {
+            background: #c9972b;
+        }
+        .btn-close-camera {
+            background: #dc2626;
+            color: #fff;
+        }
+        .btn-close-camera:hover {
+            background: #b91c1c;
+        }
+
         /* Result */
         .result-icon {
             width: 70px;
@@ -305,6 +358,15 @@
             font-weight: 700;
             font-family: monospace;
         }
+        .details-table .badge-success {
+            display: inline-block;
+            background: #16a34a;
+            color: #fff;
+            font-size: 9px;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-weight: 600;
+        }
 
         .success-box {
             background: #dcfce7;
@@ -334,6 +396,7 @@
             color: #166534;
             line-height: 1.5;
         }
+
         .error-box {
             background: #fee2e2;
             border: 1px solid #fecaca;
@@ -383,6 +446,14 @@
         .btn-secondary:hover {
             background: #e2e8f0;
         }
+        .btn-success {
+            background: #16a34a;
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #15803d;
+            transform: translateY(-2px);
+        }
 
         .spinner {
             display: inline-block;
@@ -426,57 +497,6 @@
             text-transform: uppercase;
         }
 
-        .camera-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.92);
-            z-index: 99999;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            padding: 20px;
-        }
-        .camera-modal.active {
-            display: flex;
-        }
-        .camera-modal video {
-            max-width: 100%;
-            max-height: 60vh;
-            border-radius: 10px;
-            border: 3px solid #e8b84b;
-        }
-        .camera-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .camera-controls button {
-            padding: 10px 25px;
-            border: none;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-        }
-        .btn-scan {
-            background: #e8b84b;
-            color: #fff;
-        }
-        .btn-scan:hover {
-            background: #c9972b;
-        }
-        .btn-close-camera {
-            background: #dc2626;
-            color: #fff;
-        }
-        .btn-close-camera:hover {
-            background: #b91c1c;
-        }
-
         .rate-limit {
             background: #fef3c7;
             border: 1px solid #fde68a;
@@ -495,6 +515,13 @@
 
         input[type="file"] {
             display: none;
+        }
+
+        .qr-status {
+            font-size: 11px;
+            color: #5a6a7e;
+            text-align: center;
+            margin-top: 8px;
         }
 
         @media (max-width: 480px) {
@@ -522,6 +549,46 @@
                 font-size: 9px;
             }
         }
+
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+                max-width: 100%;
+            }
+            .scan-options,
+            .camera-modal,
+            .btn,
+            .footer,
+            .form-section,
+            .security-badge,
+            .tabs {
+                display: none !important;
+            }
+            .header {
+                background: #fff;
+                border-bottom: 3px solid #e8b84b;
+            }
+            .school-name {
+                color: #0d1b2a;
+            }
+            .school-tagline {
+                color: #94a3b8;
+            }
+            .body {
+                padding: 0;
+            }
+            .details-table {
+                border: 2px solid #0d1b2a;
+            }
+            .success-box {
+                border: 1px solid #bbf7d0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -542,10 +609,7 @@
 
             <!-- Tabs -->
             <div class="tabs">
-                <button class="tab-btn active" data-tab="student" onclick="switchTab('student')">
-                    <i class="fas fa-user-graduate"></i> Student
-                </button>
-                <button class="tab-btn" data-tab="bonafide" onclick="switchTab('bonafide')">
+                <button class="tab-btn active" data-tab="bonafide" onclick="switchTab('bonafide')">
                     <i class="fas fa-certificate"></i> Bonafide
                 </button>
                 <button class="tab-btn" data-tab="marksheet" onclick="switchTab('marksheet')">
@@ -553,51 +617,16 @@
                 </button>
             </div>
 
-            <!-- Tab 1: Student -->
-            <div class="tab-content active" id="tab-student">
-                <div class="form-section">
-                    <label><i class="fas fa-id-card"></i> Enter Student ID</label>
-                    <div class="input-group">
-                        <input type="text" id="studentInput" placeholder="e.g., HP10A001" maxlength="15">
-                        <button class="btn-verify" onclick="verifyStudent()"><i class="fas fa-check"></i> Verify</button>
-                    </div>
-                </div>
-                <div class="scan-options">
-                    <div class="scan-option" onclick="openCamera('student')">
-                        <div class="icon"><i class="fas fa-camera"></i></div>
-                        <h4>Camera</h4>
-                        <p>Scan QR</p>
-                    </div>
-                    <div class="scan-option" onclick="document.getElementById('studentImage').click()">
-                        <div class="icon"><i class="fas fa-image"></i></div>
-                        <h4>Image</h4>
-                        <p>Upload QR</p>
-                    </div>
-                    <div class="scan-option" onclick="document.getElementById('studentPDF').click()">
-                        <div class="icon"><i class="fas fa-file-pdf"></i></div>
-                        <h4>PDF</h4>
-                        <p>Upload</p>
-                    </div>
-                </div>
-                <input type="file" id="studentImage" accept="image/*" onchange="scanImage(event, 'student')">
-                <input type="file" id="studentPDF" accept=".pdf" onchange="scanPDF(event, 'student')">
-                <div id="studentResult">
-                    <div style="text-align:center;padding:30px 10px;">
-                        <i class="fas fa-shield-alt" style="font-size:40px;color:#c9972b;"></i>
-                        <p style="margin-top:10px;color:#5a6a7e;font-size:14px;">Enter Student ID or scan QR</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tab 2: Bonafide -->
-            <div class="tab-content" id="tab-bonafide">
+            <!-- Tab 1: Bonafide -->
+            <div class="tab-content active" id="tab-bonafide">
                 <div class="form-section">
                     <label><i class="fas fa-certificate"></i> Enter Bonafide Code</label>
                     <div class="input-group">
-                        <input type="text" id="bonafideInput" placeholder="e.g., BC25-HP10A0-4F2E" maxlength="30">
+                        <input type="text" id="bonafideInput" placeholder="e.g., BC25-HP10A0-4F2E" maxlength="30" autocomplete="off">
                         <button class="btn-verify" onclick="verifyBonafide()"><i class="fas fa-check"></i> Verify</button>
                     </div>
                 </div>
+
                 <div class="scan-options">
                     <div class="scan-option" onclick="openCamera('bonafide')">
                         <div class="icon"><i class="fas fa-camera"></i></div>
@@ -609,29 +638,59 @@
                         <h4>Image</h4>
                         <p>Upload QR</p>
                     </div>
+                    <div class="scan-option" onclick="document.getElementById('bonafidePDF').click()">
+                        <div class="icon"><i class="fas fa-file-pdf"></i></div>
+                        <h4>PDF</h4>
+                        <p>Upload</p>
+                    </div>
                 </div>
                 <input type="file" id="bonafideImage" accept="image/*" onchange="scanImage(event, 'bonafide')">
+                <input type="file" id="bonafidePDF" accept=".pdf" onchange="scanPDF(event, 'bonafide')">
+
                 <div id="bonafideResult">
                     <div style="text-align:center;padding:30px 10px;">
                         <i class="fas fa-certificate" style="font-size:40px;color:#c9972b;"></i>
                         <p style="margin-top:10px;color:#5a6a7e;font-size:14px;">Enter Bonafide code or scan QR</p>
+                        <p style="font-size:11px;color:#94a3b8;">Format: BC25-HP10A0-4F2E</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 3: Marksheet -->
+            <!-- Tab 2: Marksheet -->
             <div class="tab-content" id="tab-marksheet">
                 <div class="form-section">
-                    <label><i class="fas fa-file-alt"></i> Enter Roll Number</label>
+                    <label><i class="fas fa-id-card"></i> Enter Student ID</label>
                     <div class="input-group">
-                        <input type="text" id="rollInput" placeholder="e.g., 2024-010" maxlength="20">
+                        <input type="text" id="studentInput" placeholder="e.g., HP10A001" maxlength="15" autocomplete="off">
                         <button class="btn-verify" onclick="verifyMarksheet()"><i class="fas fa-check"></i> Verify</button>
                     </div>
                 </div>
+
+                <div class="scan-options">
+                    <div class="scan-option" onclick="openCamera('marksheet')">
+                        <div class="icon"><i class="fas fa-camera"></i></div>
+                        <h4>Camera</h4>
+                        <p>Scan QR</p>
+                    </div>
+                    <div class="scan-option" onclick="document.getElementById('marksheetImage').click()">
+                        <div class="icon"><i class="fas fa-image"></i></div>
+                        <h4>Image</h4>
+                        <p>Upload QR</p>
+                    </div>
+                    <div class="scan-option" onclick="document.getElementById('marksheetPDF').click()">
+                        <div class="icon"><i class="fas fa-file-pdf"></i></div>
+                        <h4>PDF</h4>
+                        <p>Upload</p>
+                    </div>
+                </div>
+                <input type="file" id="marksheetImage" accept="image/*" onchange="scanImage(event, 'marksheet')">
+                <input type="file" id="marksheetPDF" accept=".pdf" onchange="scanPDF(event, 'marksheet')">
+
                 <div id="marksheetResult">
                     <div style="text-align:center;padding:30px 10px;">
                         <i class="fas fa-file-alt" style="font-size:40px;color:#c9972b;"></i>
-                        <p style="margin-top:10px;color:#5a6a7e;font-size:14px;">Enter Roll Number to verify marksheet</p>
+                        <p style="margin-top:10px;color:#5a6a7e;font-size:14px;">Enter Student ID or scan QR</p>
+                        <p style="font-size:11px;color:#94a3b8;">Format: HP10A001</p>
                     </div>
                 </div>
             </div>
@@ -652,7 +711,7 @@
     <div class="camera-modal" id="cameraModal">
         <video id="cameraVideo" autoplay playsinline></video>
         <div class="camera-controls">
-            <button class="btn-scan" onclick="captureAndScan()"><i class="fas fa-camera"></i> Scan</button>
+            <button class="btn-scan" onclick="captureAndScan()"><i class="fas fa-camera"></i> Scan QR</button>
             <button class="btn-close-camera" onclick="closeCamera()"><i class="fas fa-times"></i> Close</button>
         </div>
     </div>
@@ -662,8 +721,8 @@
         // CONFIG
         // ================================================================
         const API_BASE = 'https://gsssshilla.onrender.com/api';
+        let scanMode = 'bonafide';
         let cameraStream = null;
-        let scanMode = 'student';
         let attemptCount = 0;
         let isRateLimited = false;
         let rateTimer = null;
@@ -673,12 +732,12 @@
         // ================================================================
         function sanitize(i) { return i ? String(i).replace(/[<>'"]/g, '').trim() : ''; }
 
-        function isValidStudentId(id) {
-            return /^[A-Z]{2}[0-9]{2}[A-Z][0-9]{3}$/.test(String(id).toUpperCase().trim());
-        }
-
         function isValidBonafideCode(code) {
             return /^BC\d{2}-[A-Z0-9]{6}-[A-Z0-9]{4}$/.test(String(code).trim());
+        }
+
+        function isValidStudentId(id) {
+            return /^[A-Z]{2}[0-9]{2}[A-Z][0-9]{3}$/.test(String(id).toUpperCase().trim());
         }
 
         function esc(t) { const d = document.createElement('div');
@@ -731,32 +790,39 @@
                     <div class="result-title" style="color:#dc2626;">❌ Verification Failed</div>
                     <div class="result-sub">${esc(data)}</div>
                     <div class="error-box"><i class="fas fa-exclamation-triangle"></i><div>${esc(data)}</div></div>
-                    <div style="text-align:center;"><button class="btn btn-secondary" onclick="document.getElementById('${tab}Result').innerHTML=''">Try Again</button></div>
+                    <div style="text-align:center;margin-top:10px;">
+                        <button class="btn btn-secondary" onclick="resetResult('${tab}')"><i class="fas fa-redo"></i> Try Again</button>
+                    </div>
                 `;
                 return;
             }
             if (type === 'success') {
                 const d = data;
-                const vid = `${d.student_id || d.id || 'VER'}-${Date.now().toString().substring(6)}`;
+                const vid = `${d.id || d.student_id || 'VER'}-${Date.now().toString().substring(6)}`;
+                let tableRows = '';
+                if (d.student_id) tableRows +=
+                    `<tr><td>Student ID</td><td><strong>${esc(d.student_id)}</strong></td></tr>`;
+                if (d.name) tableRows += `<tr><td>Student Name</td><td><strong>${esc(d.name)}</strong></td></tr>`;
+                if (d.father_name) tableRows += `<tr><td>Father's Name</td><td>${esc(d.father_name)}</td></tr>`;
+                if (d.mother_name) tableRows += `<tr><td>Mother's Name</td><td>${esc(d.mother_name)}</td></tr>`;
+                if (d.apaar_id) tableRows += `<tr><td>APAAR ID</td><td>${esc(d.apaar_id)}</td></tr>`;
+                if (d.dob) tableRows += `<tr><td>Date of Birth</td><td>${fmtDate(d.dob)}</td></tr>`;
+                if (d.class) tableRows +=
+                    `<tr><td>Class</td><td>${esc(d.class)}${d.section ? ' - ' + esc(d.section) : ''}</td></tr>`;
+                if (d.session) tableRows += `<tr><td>Session</td><td>${esc(d.session)}</td></tr>`;
+                if (d.admission_no || d.admissionNo) tableRows +=
+                    `<tr><td>Admission No</td><td>${esc(d.admission_no || d.admissionNo)}</td></tr>`;
+                if (d.exam_roll_no) tableRows += `<tr><td>Roll No</td><td>${esc(d.exam_roll_no)}</td></tr>`;
+                if (d.verification_code) tableRows +=
+                    `<tr><td>Verification Code</td><td class="highlight">${esc(d.verification_code)}</td></tr>`;
+                if (d.purpose) tableRows += `<tr><td>Purpose</td><td>${esc(d.purpose)}</td></tr>`;
+                if (d.issue_date) tableRows += `<tr><td>Issue Date</td><td>${fmtDate(d.issue_date)}</td></tr>`;
+
                 container.innerHTML = `
                     <div class="result-icon success"><i class="fas fa-check-circle"></i></div>
                     <div class="result-title">✅ Document Verified</div>
                     <div class="result-sub">Authentic document issued by GSSS Shilla</div>
-                    <table class="details-table">
-                        ${d.student_id ? `<tr><td>Student ID</td><td><strong>${esc(d.student_id)}</strong></td></tr>` : ''}
-                        ${d.name ? `<tr><td>Student Name</td><td><strong>${esc(d.name)}</strong></td></tr>` : ''}
-                        ${d.father_name ? `<tr><td>Father's Name</td><td>${esc(d.father_name)}</td></tr>` : ''}
-                        ${d.mother_name ? `<tr><td>Mother's Name</td><td>${esc(d.mother_name)}</td></tr>` : ''}
-                        ${d.apaar_id ? `<tr><td>APAAR ID</td><td>${esc(d.apaar_id)}</td></tr>` : ''}
-                        ${d.dob ? `<tr><td>Date of Birth</td><td>${fmtDate(d.dob)}</td></tr>` : ''}
-                        ${d.class ? `<tr><td>Class</td><td>${esc(d.class)}${d.section ? ' - ' + esc(d.section) : ''}</td></tr>` : ''}
-                        ${d.session ? `<tr><td>Session</td><td>${esc(d.session)}</td></tr>` : ''}
-                        ${d.admission_no ? `<tr><td>Admission No</td><td>${esc(d.admission_no)}</td></tr>` : ''}
-                        ${d.exam_roll_no ? `<tr><td>Roll No</td><td>${esc(d.exam_roll_no)}</td></tr>` : ''}
-                        ${d.verification_code ? `<tr><td>Verification Code</td><td class="highlight">${esc(d.verification_code)}</td></tr>` : ''}
-                        ${d.purpose ? `<tr><td>Purpose</td><td>${esc(d.purpose)}</td></tr>` : ''}
-                        ${d.issue_date ? `<tr><td>Issue Date</td><td>${fmtDate(d.issue_date)}</td></tr>` : ''}
-                    </table>
+                    <table class="details-table">${tableRows}</table>
                     <div class="success-box">
                         <i class="fas fa-shield-alt"></i>
                         <div>
@@ -768,7 +834,7 @@
                     </div>
                     <div style="text-align:center;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
                         <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
-                        <button class="btn btn-secondary" onclick="document.getElementById('${tab}Result').innerHTML=''">New</button>
+                        <button class="btn btn-secondary" onclick="resetResult('${tab}')"><i class="fas fa-redo"></i> New</button>
                     </div>
                 `;
                 attemptCount = 0;
@@ -776,75 +842,26 @@
             }
         }
 
-        // ================================================================
-        // VERIFY STUDENT
-        // ================================================================
-        async function verifyStudent() {
-            const input = document.getElementById('studentInput');
-            const id = sanitize(input.value).toUpperCase();
-            if (!id) { showResult('student', 'error', 'Please enter Student ID.'); return; }
-            if (!isValidStudentId(id)) { showResult('student', 'error',
-                'Invalid format. Use: 2 letters + 2 digits + 1 letter + 3 digits (e.g., HP10A001)'); return; }
-            if (!checkRateLimit()) return;
-            showResult('student', 'loading', 'Verifying student...');
-
-            try {
-                // Try Bonafide API first
-                let res = await fetch(`${API_BASE}/bonafide/student/${id}`, { headers: getHeaders() });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.success && data.data) {
-                        const c = data.data;
-                        showResult('student', 'success', {
-                            student_id: c.studentId,
-                            name: c.studentName,
-                            father_name: c.fatherName,
-                            mother_name: c.motherName,
-                            dob: c.dob,
-                            class: c.className,
-                            section: c.section,
-                            session: c.session,
-                            admission_no: c.admissionNo,
-                            exam_roll_no: c.examRollNo,
-                            apaar_id: c.apaarId,
-                            verification_code: c.verificationCode,
-                            purpose: c.purpose || 'Bonafide Certificate',
-                            issue_date: c.updatedAt || c.createdAt
-                        });
-                        return;
-                    }
-                }
-
-                // Try Student API
-                res = await fetch(`${API_BASE}/admin/results/students/${id}`, { headers: getHeaders() });
-                if (!res.ok) {
-                    if (res.status === 404) throw new Error('Student ID not found.');
-                    if (res.status === 429) throw new Error('Too many requests. Please wait.');
-                    throw new Error('Unable to verify.');
-                }
-                const data = await res.json();
-                if (!data.success || !data.data || !data.data.student) throw new Error('Invalid data.');
-                const s = data.data.student;
-                if (s.student_id !== id) throw new Error('Student ID mismatch.');
-                showResult('student', 'success', {
-                    student_id: s.student_id,
-                    name: s.name,
-                    father_name: s.father_name,
-                    mother_name: s.mother_name,
-                    dob: s.dob,
-                    class: s.class,
-                    section: s.section,
-                    session: s.session,
-                    admission_no: s.admission_no,
-                    exam_roll_no: s.exam_roll_no,
-                    apaar_id: s.apaar_id,
-                    verification_code: `BC-${id}`,
-                    purpose: 'Student Record',
-                    issue_date: new Date().toISOString()
-                });
-            } catch (e) {
-                showResult('student', 'error', e.message);
+        function resetResult(tab) {
+            const container = document.getElementById(tab + 'Result');
+            if (tab === 'bonafide') {
+                container.innerHTML = `
+                    <div style="text-align:center;padding:30px 10px;">
+                        <i class="fas fa-certificate" style="font-size:40px;color:#c9972b;"></i>
+                        <p style="margin-top:10px;color:#5a6a7e;font-size:14px;">Enter Bonafide code or scan QR</p>
+                        <p style="font-size:11px;color:#94a3b8;">Format: BC25-HP10A0-4F2E</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div style="text-align:center;padding:30px 10px;">
+                        <i class="fas fa-file-alt" style="font-size:40px;color:#c9972b;"></i>
+                        <p style="margin-top:10px;color:#5a6a7e;font-size:14px;">Enter Student ID or scan QR</p>
+                        <p style="font-size:11px;color:#94a3b8;">Format: HP10A001</p>
+                    </div>
+                `;
             }
+            document.getElementById(tab + 'Input').value = '';
         }
 
         // ================================================================
@@ -853,19 +870,25 @@
         async function verifyBonafide() {
             const input = document.getElementById('bonafideInput');
             const code = sanitize(input.value);
-            if (!code) { showResult('bonafide', 'error', 'Please enter verification code.'); return; }
+
+            if (!code) { showResult('bonafide', 'error', 'Please enter Bonafide code.'); return; }
+            if (!isValidBonafideCode(code)) {
+                showResult('bonafide', 'error', 'Invalid format. Use: BC25-HP10A0-4F2E');
+                return;
+            }
             if (!checkRateLimit()) return;
+
             showResult('bonafide', 'loading', 'Verifying bonafide certificate...');
 
             try {
-                const res = await fetch(`${API_BASE}/bonafide/verify/${encodeURIComponent(code)}`);
-                if (!res.ok) {
-                    if (res.status === 404) throw new Error('Certificate not found.');
+                const response = await fetch(`${API_BASE}/bonafide/verify/${encodeURIComponent(code)}`);
+                if (!response.ok) {
+                    if (response.status === 404) throw new Error('Certificate not found.');
                     throw new Error('Verification failed.');
                 }
-                const data = await res.json();
-                if (!data.success || !data.data) throw new Error('Invalid data.');
-                const d = data.data;
+                const result = await response.json();
+                if (!result.success || !result.data) throw new Error('Invalid data.');
+                const d = result.data;
                 showResult('bonafide', 'success', {
                     student_id: d.studentId || d.student_id || 'N/A',
                     name: d.studentName || d.student_name || 'N/A',
@@ -888,104 +911,137 @@
         // VERIFY MARKSHEET
         // ================================================================
         async function verifyMarksheet() {
-            const input = document.getElementById('rollInput');
-            const roll = sanitize(input.value);
-            if (!roll) { showResult('marksheet', 'error', 'Please enter Roll Number.'); return; }
+            const input = document.getElementById('studentInput');
+            const studentId = sanitize(input.value).toUpperCase();
+
+            if (!studentId) { showResult('marksheet', 'error', 'Please enter Student ID.'); return; }
+            if (!isValidStudentId(studentId)) {
+                showResult('marksheet', 'error', 'Invalid format. Use: HP10A001');
+                return;
+            }
             if (!checkRateLimit()) return;
+
             showResult('marksheet', 'loading', 'Verifying marksheet...');
 
             try {
-                // Search by roll number - using student API with search
-                const res = await fetch(`${API_BASE}/admin/results/students?roll=${encodeURIComponent(roll)}`, {
+                // Get student details from result API
+                const response = await fetch(`${API_BASE}/admin/results/students/${encodeURIComponent(studentId)}`, {
                     headers: getHeaders()
                 });
-                if (!res.ok) throw new Error('Marksheet not found.');
-                const data = await res.json();
-                if (!data.success || !data.data) throw new Error('Invalid data.');
-                const students = data.data.students || data.data || [];
-                if (students.length === 0) throw new Error('Roll number not found.');
-                const s = students[0];
+
+                if (!response.ok) {
+                    if (response.status === 404) throw new Error('Student not found.');
+                    if (response.status === 429) throw new Error('Too many requests. Please wait.');
+                    throw new Error('Unable to verify.');
+                }
+
+                const result = await response.json();
+                if (!result.success || !result.data || !result.data.student) throw new Error('Invalid data.');
+
+                const s = result.data.student;
+                if (s.student_id !== studentId) throw new Error('Student ID mismatch.');
+
+                // Get marksheets
+                const marksheetRes = await fetch(`${API_BASE}/admin/results/marksheets?student_id=${encodeURIComponent(studentId)}`, {
+                    headers: getHeaders()
+                });
+
+                let marksheets = [];
+                if (marksheetRes.ok) {
+                    const mData = await marksheetRes.json();
+                    if (mData.success && mData.data) marksheets = mData.data;
+                }
+
                 showResult('marksheet', 'success', {
-                    student_id: s.student_id || s.studentId || 'N/A',
-                    name: s.name || s.studentName || 'N/A',
-                    father_name: s.father_name || s.fatherName || '',
-                    mother_name: s.mother_name || s.motherName || '',
+                    student_id: s.student_id,
+                    name: s.name,
+                    father_name: s.father_name || '',
+                    mother_name: s.mother_name || '',
                     dob: s.dob || '',
-                    class: s.class || s.className || '',
+                    class: s.class || '',
                     section: s.section || '',
                     session: s.session || '',
-                    admission_no: s.admission_no || s.admissionNo || '',
-                    exam_roll_no: roll,
-                    verification_code: `MR-${roll}`,
-                    purpose: 'Marksheet',
-                    issue_date: new Date().toISOString()
+                    admission_no: s.admission_no || '',
+                    exam_roll_no: s.exam_roll_no || '',
+                    apaar_id: s.apaar_id || '',
+                    purpose: marksheets.length > 0 ? `${marksheets.length} marksheets found` : 'Student Record',
+                    issue_date: new Date().toISOString(),
+                    verification_code: `MR-${studentId}`
                 });
+
             } catch (e) {
                 showResult('marksheet', 'error', e.message);
             }
         }
 
         // ================================================================
-        // QR SCAN
+        // QR CODE EXTRACTION
         // ================================================================
-        function extractId(qrData) {
+        function extractFromQR(qrData) {
             const str = String(qrData);
+
+            // Try bonafide code pattern
+            const bonafideMatch = str.match(/BC\d{2}-[A-Z0-9]{6}-[A-Z0-9]{4}/i);
+            if (bonafideMatch) {
+                const code = bonafideMatch[0].toUpperCase();
+                if (isValidBonafideCode(code)) return { type: 'bonafide', value: code };
+            }
+
+            // Try student ID pattern
+            const studentMatch = str.match(/[A-Z]{2}[0-9]{2}[A-Z][0-9]{3}/i);
+            if (studentMatch) {
+                const id = studentMatch[0].toUpperCase();
+                if (isValidStudentId(id)) return { type: 'marksheet', value: id };
+            }
+
             // Try URL params
             if (str.includes('code=') || str.includes('?code=')) {
                 try {
                     const url = new URL(str);
-                    const c = url.searchParams.get('code') || url.searchParams.get('data');
-                    if (c) {
-                        const cleaned = sanitize(decodeURIComponent(c));
-                        if (isValidStudentId(cleaned)) return { type: 'student', id: cleaned };
-                        if (isValidBonafideCode(cleaned)) return { type: 'bonafide', id: cleaned };
+                    const code = url.searchParams.get('code') || url.searchParams.get('data');
+                    if (code) {
+                        const decoded = decodeURIComponent(code);
+                        const clean = sanitize(decoded);
+                        if (isValidBonafideCode(clean)) return { type: 'bonafide', value: clean };
+                        if (isValidStudentId(clean)) return { type: 'marksheet', value: clean };
                     }
                 } catch (e) {}
             }
+
             // Try JSON
             if (str.startsWith('{')) {
                 try {
                     const data = JSON.parse(str);
-                    if (data.student_id && isValidStudentId(data.student_id)) return { type: 'student', id: data
-                            .student_id };
-                    if (data.studentId && isValidStudentId(data.studentId)) return { type: 'student', id: data
-                            .studentId };
-                    if (data.verificationCode && isValidBonafideCode(data.verificationCode)) return { type: 'bonafide',
-                        id: data.verificationCode };
+                    if (data.verificationCode && isValidBonafideCode(data.verificationCode)) {
+                        return { type: 'bonafide', value: data.verificationCode };
+                    }
+                    if (data.student_id && isValidStudentId(data.student_id)) {
+                        return { type: 'marksheet', value: data.student_id };
+                    }
+                    if (data.studentId && isValidStudentId(data.studentId)) {
+                        return { type: 'marksheet', value: data.studentId };
+                    }
                 } catch (e) {}
             }
-            // Try plain ID
-            const cleaned = sanitize(str);
-            if (isValidStudentId(cleaned)) return { type: 'student', id: cleaned };
-            if (isValidBonafideCode(cleaned)) return { type: 'bonafide', id: cleaned };
-            // Try to find pattern
-            const idMatch = str.match(/[A-Z]{2}[0-9]{2}[A-Z][0-9]{3}/i);
-            if (idMatch) {
-                const found = idMatch[0].toUpperCase();
-                if (isValidStudentId(found)) return { type: 'student', id: found };
-            }
-            const codeMatch = str.match(/BC\d{2}-[A-Z0-9]{6}-[A-Z0-9]{4}/i);
-            if (codeMatch) {
-                const found = codeMatch[0].toUpperCase();
-                if (isValidBonafideCode(found)) return { type: 'bonafide', id: found };
-            }
+
             return null;
         }
 
         function processQR(qrData) {
-            const result = extractId(qrData);
+            const result = extractFromQR(qrData);
             if (!result) {
                 showResult(scanMode, 'error', 'QR code does not contain valid verification data.');
                 return;
             }
-            if (result.type === 'student') {
-                document.getElementById('studentInput').value = result.id;
-                switchTab('student');
-                setTimeout(() => verifyStudent(), 300);
-            } else if (result.type === 'bonafide') {
-                document.getElementById('bonafideInput').value = result.id;
+
+            if (result.type === 'bonafide') {
+                document.getElementById('bonafideInput').value = result.value;
                 switchTab('bonafide');
                 setTimeout(() => verifyBonafide(), 300);
+            } else if (result.type === 'marksheet') {
+                document.getElementById('studentInput').value = result.value;
+                switchTab('marksheet');
+                setTimeout(() => verifyMarksheet(), 300);
             }
         }
 
@@ -993,7 +1049,7 @@
         // CAMERA
         // ================================================================
         async function openCamera(mode) {
-            scanMode = mode || 'student';
+            scanMode = mode || 'bonafide';
             try {
                 cameraStream = await navigator.mediaDevices.getUserMedia({
                     video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
@@ -1018,6 +1074,7 @@
             canvas.height = video.videoHeight || 480;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
             try {
                 const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 const code = jsQR(imageData.data, imageData.width, imageData.height);
@@ -1044,7 +1101,9 @@
             if (!file) return;
             if (!file.type.startsWith('image/')) { showResult(mode, 'error', 'Please upload an image file.'); return; }
             if (file.size > 5 * 1024 * 1024) { showResult(mode, 'error', 'Image too large (max 5MB).'); return; }
+
             showResult(mode, 'loading', 'Scanning image...');
+            scanMode = mode;
 
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -1059,7 +1118,6 @@
                         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                         const code = jsQR(imageData.data, imageData.width, imageData.height);
                         if (code && code.data) {
-                            scanMode = mode;
                             processQR(code.data);
                         } else {
                             showResult(mode, 'error', 'No QR code found in image.');
@@ -1084,7 +1142,9 @@
             if (!file) return;
             if (file.type !== 'application/pdf') { showResult(mode, 'error', 'Please upload a PDF file.'); return; }
             if (file.size > 10 * 1024 * 1024) { showResult(mode, 'error', 'PDF too large (max 10MB).'); return; }
+
             showResult(mode, 'loading', 'Scanning PDF...');
+            scanMode = mode;
 
             try {
                 const arrayBuffer = await file.arrayBuffer();
@@ -1103,7 +1163,6 @@
                         const code = jsQR(imageData.data, imageData.width, imageData.height);
                         if (code && code.data) {
                             found = true;
-                            scanMode = mode;
                             processQR(code.data);
                             break;
                         }
@@ -1127,20 +1186,25 @@
         }
 
         // ================================================================
-        // ENTER KEY
+        // ENTER KEY SUPPORT
         // ================================================================
-        document.getElementById('studentInput').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') verifyStudent();
-        });
         document.getElementById('bonafideInput').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') verifyBonafide();
         });
-        document.getElementById('rollInput').addEventListener('keydown', function(e) {
+        document.getElementById('studentInput').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') verifyMarksheet();
         });
 
         // ================================================================
-        // INIT
+        // PDF.js LIBRARY LOAD
+        // ================================================================
+        const pdfjsLib = window.pdfjsLib;
+        if (pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+
+        // ================================================================
+        // INIT - Check URL for QR data
         // ================================================================
         document.addEventListener('DOMContentLoaded', function() {
             const params = new URLSearchParams(window.location.search);
@@ -1148,16 +1212,16 @@
             if (code) {
                 try {
                     const decoded = decodeURIComponent(code);
-                    const result = extractId(decoded);
+                    const result = extractFromQR(decoded);
                     if (result) {
-                        if (result.type === 'student') {
-                            document.getElementById('studentInput').value = result.id;
-                            switchTab('student');
-                            setTimeout(() => verifyStudent(), 500);
-                        } else if (result.type === 'bonafide') {
-                            document.getElementById('bonafideInput').value = result.id;
+                        if (result.type === 'bonafide') {
+                            document.getElementById('bonafideInput').value = result.value;
                             switchTab('bonafide');
                             setTimeout(() => verifyBonafide(), 500);
+                        } else if (result.type === 'marksheet') {
+                            document.getElementById('studentInput').value = result.value;
+                            switchTab('marksheet');
+                            setTimeout(() => verifyMarksheet(), 500);
                         }
                     }
                 } catch (e) {}
