@@ -3,11 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GSSS Shilla - Document Verification</title>
+    <title>GSSS Shilla - Secure Document Verification</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
     <style>
+        :root {
+            --primary: #0a1628;
+            --primary-light: #162a4a;
+            --secondary: #1e3a6a;
+            --accent: #d4a84b;
+            --accent-light: #f0d88a;
+            --accent-dark: #b8922f;
+            --gold-gradient: linear-gradient(135deg, #d4a84b, #f0d88a, #d4a84b);
+            --white: #ffffff;
+            --off-white: #f8f6f0;
+            --gray-light: #e8e4dc;
+            --gray: #9a9a9a;
+            --text: #1a1a2e;
+            --text-light: #6a6a7e;
+            --success: #0f9d58;
+            --success-light: #e6f4ea;
+            --danger: #d93025;
+            --danger-light: #fce8e6;
+            --warning: #f9ab00;
+            --warning-light: #fef7e0;
+            --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 8px 40px rgba(0, 0, 0, 0.10);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.15);
+            --shadow-glow: 0 0 40px rgba(212, 168, 75, 0.15);
+            --radius: 20px;
+            --radius-sm: 12px;
+            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
         * {
             margin: 0;
             padding: 0;
@@ -15,68 +43,281 @@
         }
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f0f4f8 0%, #fef8ed 100%);
+            background: #0a1628;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(212, 168, 75, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(212, 168, 75, 0.05) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(26, 42, 74, 0.3) 0%, transparent 50%);
+            z-index: 0;
+            animation: bgPulse 8s ease-in-out infinite alternate;
+        }
+        @keyframes bgPulse {
+            0% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(212, 168, 75, 0.15);
+            border-radius: 50%;
+            animation: floatParticle linear infinite;
+        }
+        .particle:nth-child(1) {
+            left: 10%;
+            animation-duration: 20s;
+            animation-delay: 0s;
+            width: 6px;
+            height: 6px;
+        }
+        .particle:nth-child(2) {
+            left: 20%;
+            animation-duration: 25s;
+            animation-delay: 2s;
+            width: 3px;
+            height: 3px;
+        }
+        .particle:nth-child(3) {
+            left: 30%;
+            animation-duration: 18s;
+            animation-delay: 4s;
+        }
+        .particle:nth-child(4) {
+            left: 40%;
+            animation-duration: 22s;
+            animation-delay: 1s;
+            width: 5px;
+            height: 5px;
+        }
+        .particle:nth-child(5) {
+            left: 50%;
+            animation-duration: 28s;
+            animation-delay: 3s;
+            width: 3px;
+            height: 3px;
+        }
+        .particle:nth-child(6) {
+            left: 60%;
+            animation-duration: 19s;
+            animation-delay: 5s;
+        }
+        .particle:nth-child(7) {
+            left: 70%;
+            animation-duration: 24s;
+            animation-delay: 2s;
+            width: 5px;
+            height: 5px;
+        }
+        .particle:nth-child(8) {
+            left: 80%;
+            animation-duration: 21s;
+            animation-delay: 1s;
+            width: 3px;
+            height: 3px;
+        }
+        .particle:nth-child(9) {
+            left: 90%;
+            animation-duration: 26s;
+            animation-delay: 4s;
+        }
+        .particle:nth-child(10) {
+            left: 15%;
+            animation-duration: 23s;
+            animation-delay: 3s;
+            width: 4px;
+            height: 4px;
+        }
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
         .container {
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-            max-width: 600px;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(212, 168, 75, 0.1);
+            max-width: 620px;
             width: 100%;
             overflow: hidden;
-            border: 1px solid #e5e7eb;
+            border: 1px solid rgba(212, 168, 75, 0.15);
+            animation: containerIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            transform: translateY(30px);
+            opacity: 0;
         }
+        @keyframes containerIn {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
         .header {
-            background: linear-gradient(135deg, #0d1b2a, #1b3a5c);
-            padding: 25px 20px 20px;
+            background: linear-gradient(135deg, rgba(10, 22, 40, 0.95), rgba(22, 42, 74, 0.95));
+            padding: 28px 20px 22px;
             text-align: center;
-            border-bottom: 3px solid #e8b84b;
+            border-bottom: 2px solid rgba(212, 168, 75, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at center, rgba(212, 168, 75, 0.05) 0%, transparent 70%);
+            animation: shimmer 6s ease-in-out infinite alternate;
+        }
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-30%) rotate(0deg);
+            }
+            100% {
+                transform: translateX(30%) rotate(5deg);
+            }
+        }
+
+        .logo-wrapper {
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+        }
+        .logo-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            background: var(--gold-gradient);
+            opacity: 0.15;
+            animation: logoGlow 3s ease-in-out infinite alternate;
+        }
+        @keyframes logoGlow {
+            0% {
+                transform: scale(1);
+                opacity: 0.1;
+            }
+            100% {
+                transform: scale(1.3);
+                opacity: 0.25;
+            }
         }
         .logo {
-            width: 70px;
-            height: 70px;
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
-            border: 3px solid #e8b84b;
-            padding: 4px;
-            background: #fff;
+            border: 3px solid #d4a84b;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.95);
             object-fit: contain;
-            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            transition: var(--transition);
         }
+        .logo:hover {
+            transform: scale(1.05) rotate(-5deg);
+            box-shadow: 0 0 40px rgba(212, 168, 75, 0.3);
+        }
+
         .school-name {
             font-family: 'Playfair Display', serif;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 800;
             color: #fff;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+        .school-name span {
+            color: #d4a84b;
         }
         .school-tagline {
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.5);
             font-size: 9px;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             text-transform: uppercase;
             margin-top: 2px;
+            position: relative;
+            z-index: 1;
         }
         .badge {
             display: inline-block;
-            background: #e8b84b;
-            color: #fff;
-            padding: 3px 16px;
+            background: var(--gold-gradient);
+            color: #0a1628;
+            padding: 4px 20px;
             border-radius: 50px;
             font-size: 9px;
-            font-weight: 700;
+            font-weight: 800;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-top: 6px;
+            margin-top: 8px;
+            position: relative;
+            z-index: 1;
+            animation: badgePulse 2s ease-in-out infinite;
+            box-shadow: 0 0 30px rgba(212, 168, 75, 0.2);
         }
+        @keyframes badgePulse {
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(212, 168, 75, 0.2);
+            }
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 0 40px rgba(212, 168, 75, 0.4);
+            }
+        }
+
         .body {
-            padding: 20px 25px 25px;
+            padding: 22px 25px 25px;
         }
 
         /* Tabs */
@@ -85,44 +326,67 @@
             grid-template-columns: 1fr 1fr;
             gap: 4px;
             margin-bottom: 18px;
-            background: #f0f4f8;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
             padding: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
         .tab-btn {
-            padding: 10px;
+            padding: 12px;
             border: none;
             background: transparent;
-            border-radius: 10px;
+            border-radius: 11px;
             font-size: 12px;
             font-weight: 600;
-            color: #5a6a7e;
+            color: rgba(255, 255, 255, 0.5);
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             font-family: 'Inter', sans-serif;
+            position: relative;
         }
         .tab-btn i {
-            margin-right: 6px;
+            margin-right: 8px;
         }
         .tab-btn.active {
-            background: #fff;
-            color: #0d1b2a;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            background: rgba(212, 168, 75, 0.15);
+            color: #d4a84b;
+            box-shadow: 0 4px 20px rgba(212, 168, 75, 0.1);
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            left: 30%;
+            right: 30%;
+            height: 2px;
+            background: var(--gold-gradient);
+            border-radius: 2px;
+            animation: tabLine 0.5s ease forwards;
+        }
+        @keyframes tabLine {
+            from {
+                transform: scaleX(0);
+            }
+            to {
+                transform: scaleX(1);
+            }
         }
         .tab-btn:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.05);
         }
+
         .tab-content {
             display: none;
-            animation: fadeIn 0.3s ease;
+            animation: fadeSlide 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .tab-content.active {
             display: block;
         }
-        @keyframes fadeIn {
+        @keyframes fadeSlide {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(15px);
             }
             to {
                 opacity: 1;
@@ -132,21 +396,24 @@
 
         /* Form */
         .form-section {
-            background: #f0f4f8;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
             padding: 16px 18px;
             margin-bottom: 18px;
-            border: 2px solid #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(10px);
         }
         .form-section label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
-            color: #1a2332;
+            color: rgba(255, 255, 255, 0.6);
             display: block;
             margin-bottom: 6px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
         .form-section label i {
-            color: #c9972b;
+            color: #d4a84b;
             margin-right: 6px;
         }
         .input-group {
@@ -155,46 +422,65 @@
         }
         .input-group input {
             flex: 1;
-            padding: 10px 14px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 11px;
             font-size: 14px;
             font-family: 'Inter', sans-serif;
-            transition: all 0.3s;
-            background: #fff;
+            transition: all 0.4s ease;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+            text-transform: none;
+            font-size: 12px;
         }
         .input-group input:focus {
             outline: none;
-            border-color: #c9972b;
-            box-shadow: 0 0 0 3px rgba(201, 151, 43, 0.15);
-        }
-        .input-group input::placeholder {
-            color: #94a3b8;
-            font-size: 12px;
-            text-transform: none;
+            border-color: #d4a84b;
+            box-shadow: 0 0 0 4px rgba(212, 168, 75, 0.1);
+            background: rgba(255, 255, 255, 0.08);
         }
         .input-group .btn-verify {
-            padding: 10px 24px;
-            background: #c9972b;
-            color: #fff;
+            padding: 12px 28px;
+            background: var(--gold-gradient);
+            color: #0a1628;
             border: none;
-            border-radius: 10px;
+            border-radius: 11px;
             font-weight: 700;
             font-size: 13px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             font-family: 'Inter', sans-serif;
             white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+        .input-group .btn-verify::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        .input-group .btn-verify:hover::before {
+            transform: translateX(100%);
         }
         .input-group .btn-verify:hover {
-            background: #b8860b;
-            transform: translateY(-2px);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 30px rgba(212, 168, 75, 0.3);
+        }
+        .input-group .btn-verify:active {
+            transform: scale(0.95);
         }
         .input-group .btn-verify:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
+            transform: none !important;
         }
 
         /* Scan Options */
@@ -205,32 +491,58 @@
             margin-bottom: 18px;
         }
         .scan-option {
-            background: #f0f4f8;
-            border: 2px solid #e2e8f0;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 12px;
             padding: 14px 6px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+        }
+        .scan-option::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gold-gradient);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .scan-option:hover::before {
+            opacity: 0.05;
         }
         .scan-option:hover {
-            border-color: #c9972b;
-            background: #fef8ed;
+            border-color: rgba(212, 168, 75, 0.3);
             transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+        .scan-option:active {
+            transform: scale(0.95);
         }
         .scan-option .icon {
             font-size: 26px;
-            color: #c9972b;
+            color: #d4a84b;
             margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+            transition: var(--transition);
+        }
+        .scan-option:hover .icon {
+            transform: scale(1.1);
         }
         .scan-option h4 {
             font-size: 11px;
-            color: #1a2332;
+            color: rgba(255, 255, 255, 0.8);
             margin-bottom: 2px;
+            position: relative;
+            z-index: 1;
         }
         .scan-option p {
             font-size: 8px;
-            color: #94a3b8;
+            color: rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 1;
         }
 
         /* Camera Modal */
@@ -238,112 +550,150 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.92);
+            background: rgba(0, 0, 0, 0.95);
             z-index: 99999;
             align-items: center;
             justify-content: center;
             flex-direction: column;
             padding: 20px;
+            backdrop-filter: blur(20px);
         }
         .camera-modal.active {
             display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
         .camera-modal video {
             max-width: 100%;
             max-height: 60vh;
-            border-radius: 10px;
-            border: 3px solid #e8b84b;
+            border-radius: 16px;
+            border: 2px solid rgba(212, 168, 75, 0.3);
             background: #000;
+            box-shadow: 0 0 60px rgba(212, 168, 75, 0.1);
         }
         .camera-controls {
             display: flex;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 12px;
+            margin-top: 18px;
             flex-wrap: wrap;
             justify-content: center;
         }
         .camera-controls button {
-            padding: 10px 25px;
+            padding: 12px 30px;
             border: none;
             border-radius: 50px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
         }
         .btn-scan {
-            background: #e8b84b;
-            color: #fff;
+            background: var(--gold-gradient);
+            color: #0a1628;
         }
         .btn-scan:hover {
-            background: #c9972b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(212, 168, 75, 0.3);
         }
         .btn-close-camera {
-            background: #dc2626;
+            background: rgba(255, 255, 255, 0.1);
             color: #fff;
         }
         .btn-close-camera:hover {
-            background: #b91c1c;
+            background: rgba(255, 255, 255, 0.2);
         }
 
         /* Result */
         .result-icon {
-            width: 70px;
-            height: 70px;
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
-            margin: 0 auto 12px;
+            margin: 0 auto 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: 34px;
+            animation: resultPop 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        @keyframes resultPop {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.15);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
         .result-icon.success {
-            background: #dcfce7;
-            color: #16a34a;
-            border: 2px solid #bbf7d0;
+            background: rgba(15, 157, 88, 0.15);
+            color: #0f9d58;
+            border: 2px solid rgba(15, 157, 88, 0.2);
+            box-shadow: 0 0 40px rgba(15, 157, 88, 0.1);
         }
         .result-icon.error {
-            background: #fee2e2;
-            color: #dc2626;
-            border: 2px solid #fecaca;
+            background: rgba(217, 48, 37, 0.15);
+            color: #d93025;
+            border: 2px solid rgba(217, 48, 37, 0.2);
+            box-shadow: 0 0 40px rgba(217, 48, 37, 0.1);
         }
         .result-icon.loading {
-            background: #fef3c7;
-            color: #f59e0b;
-            border: 2px solid #fde68a;
+            background: rgba(249, 171, 0, 0.15);
+            color: #f9ab00;
+            border: 2px solid rgba(249, 171, 0, 0.2);
         }
         .result-title {
             font-size: 20px;
             font-weight: 800;
-            color: #0d1b2a;
+            color: #fff;
             text-align: center;
             margin-bottom: 4px;
+            animation: fadeSlide 0.5s ease 0.2s both;
+        }
+        .result-title.error-title {
+            color: #d93025;
         }
         .result-sub {
             font-size: 13px;
-            color: #5a6a7e;
+            color: rgba(255, 255, 255, 0.5);
             text-align: center;
             margin-bottom: 16px;
+            animation: fadeSlide 0.5s ease 0.3s both;
         }
 
+        /* Details Table */
         .details-table {
             width: 100%;
             border-collapse: collapse;
             margin: 12px 0;
-            border: 2px solid #0d1b2a;
-            border-radius: 10px;
+            border-radius: 12px;
             overflow: hidden;
+            animation: fadeSlide 0.5s ease 0.4s both;
         }
         .details-table td {
-            padding: 8px 12px;
-            border: 1px solid #e2e8f0;
+            padding: 10px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
             font-size: 12px;
             text-align: left;
+            color: rgba(255, 255, 255, 0.8);
         }
         .details-table td:first-child {
-            font-weight: 700;
-            background: #fef8ed;
-            color: #0d1b2a;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.5);
             width: 35%;
             text-transform: uppercase;
             font-size: 10px;
@@ -351,38 +701,41 @@
         }
         .details-table td:last-child {
             font-weight: 500;
-            color: #1a2332;
+            color: #fff;
         }
         .details-table .highlight {
-            color: #c9972b;
+            color: #d4a84b;
             font-weight: 700;
             font-family: monospace;
+            letter-spacing: 0.5px;
         }
         .details-table .badge-success {
             display: inline-block;
-            background: #16a34a;
-            color: #fff;
+            background: rgba(15, 157, 88, 0.2);
+            color: #0f9d58;
             font-size: 9px;
-            padding: 2px 10px;
+            padding: 2px 12px;
             border-radius: 50px;
             font-weight: 600;
+            border: 1px solid rgba(15, 157, 88, 0.2);
         }
 
         .success-box {
-            background: #dcfce7;
-            border: 1px solid #bbf7d0;
-            border-left: 4px solid #16a34a;
-            border-radius: 10px;
-            padding: 12px 16px;
+            background: rgba(15, 157, 88, 0.08);
+            border: 1px solid rgba(15, 157, 88, 0.15);
+            border-left: 4px solid #0f9d58;
+            border-radius: 12px;
+            padding: 14px 18px;
             margin: 12px 0;
             display: flex;
             align-items: flex-start;
-            gap: 10px;
+            gap: 12px;
             font-size: 12px;
-            color: #16a34a;
+            color: #0f9d58;
+            animation: fadeSlide 0.5s ease 0.5s both;
         }
         .success-box i {
-            font-size: 18px;
+            font-size: 20px;
             flex-shrink: 0;
             margin-top: 2px;
         }
@@ -390,30 +743,40 @@
             display: block;
             font-size: 13px;
             margin-bottom: 2px;
+            color: #fff;
         }
         .success-box p {
             font-size: 11px;
-            color: #166534;
+            color: rgba(255, 255, 255, 0.6);
             line-height: 1.5;
+        }
+        .success-box .meta {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 4px;
         }
 
         .error-box {
-            background: #fee2e2;
-            border: 1px solid #fecaca;
-            border-left: 4px solid #dc2626;
-            border-radius: 10px;
-            padding: 12px 16px;
+            background: rgba(217, 48, 37, 0.08);
+            border: 1px solid rgba(217, 48, 37, 0.15);
+            border-left: 4px solid #d93025;
+            border-radius: 12px;
+            padding: 14px 18px;
             margin: 12px 0;
             display: flex;
             align-items: flex-start;
-            gap: 10px;
+            gap: 12px;
             font-size: 12px;
-            color: #dc2626;
+            color: #d93025;
+            animation: fadeSlide 0.5s ease 0.5s both;
         }
         .error-box i {
-            font-size: 18px;
+            font-size: 20px;
             flex-shrink: 0;
             margin-top: 2px;
+        }
+        .error-box div {
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .btn {
@@ -426,41 +789,34 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             font-family: 'Inter', sans-serif;
             margin-top: 6px;
         }
         .btn-primary {
-            background: #e8b84b;
-            color: #fff;
+            background: var(--gold-gradient);
+            color: #0a1628;
         }
         .btn-primary:hover {
-            background: #c9972b;
             transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(212, 168, 75, 0.3);
         }
         .btn-secondary {
-            background: #f0f4f8;
-            color: #5a6a7e;
-            border: 1px solid #e2e8f0;
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
         .btn-secondary:hover {
-            background: #e2e8f0;
-        }
-        .btn-success {
-            background: #16a34a;
+            background: rgba(255, 255, 255, 0.1);
             color: #fff;
-        }
-        .btn-success:hover {
-            background: #15803d;
-            transform: translateY(-2px);
         }
 
         .spinner {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #e2e8f0;
-            border-top-color: #c9972b;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #d4a84b;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
@@ -473,44 +829,54 @@
         .security-badge {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             justify-content: center;
             font-size: 9px;
-            color: #94a3b8;
-            margin-top: 12px;
-            padding: 4px 12px;
-            background: #f0f4f8;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 14px;
+            padding: 6px 16px;
+            background: rgba(255, 255, 255, 0.03);
             border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            letter-spacing: 0.5px;
         }
         .security-badge i {
-            color: #16a34a;
+            color: #0f9d58;
+        }
+        .security-badge .lock-icon {
+            color: #d4a84b;
         }
 
         .footer {
-            padding: 12px 25px;
+            padding: 14px 25px;
             text-align: center;
-            border-top: 1px solid #e2e8f0;
-            background: #f0f4f8;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(0, 0, 0, 0.2);
             font-size: 8px;
-            color: #94a3b8;
-            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.15);
+            letter-spacing: 1.5px;
             text-transform: uppercase;
+        }
+        .footer i {
+            color: rgba(212, 168, 75, 0.3);
+            margin-right: 6px;
         }
 
         .rate-limit {
-            background: #fef3c7;
-            border: 1px solid #fde68a;
+            background: rgba(249, 171, 0, 0.08);
+            border: 1px solid rgba(249, 171, 0, 0.15);
             border-radius: 12px;
-            padding: 8px 14px;
+            padding: 10px 16px;
             margin-bottom: 14px;
             font-size: 11px;
-            color: #92400e;
+            color: #f9ab00;
             display: none;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         .rate-limit.show {
             display: flex;
+            animation: fadeSlide 0.3s ease;
         }
 
         input[type="file"] {
@@ -519,11 +885,12 @@
 
         .qr-status {
             font-size: 11px;
-            color: #5a6a7e;
+            color: rgba(255, 255, 255, 0.3);
             text-align: center;
             margin-top: 8px;
         }
 
+        /* Responsive */
         @media (max-width: 480px) {
             .container {
                 margin: 0 5px;
@@ -542,23 +909,53 @@
                 justify-content: center;
             }
             .details-table td {
-                padding: 6px 10px;
+                padding: 8px 10px;
                 font-size: 11px;
             }
             .details-table td:first-child {
                 font-size: 9px;
             }
+            .school-name {
+                font-size: 16px;
+            }
+            .logo {
+                width: 60px;
+                height: 60px;
+            }
         }
 
+        /* Print */
         @media print {
             body {
-                background: #fff;
-                padding: 0;
+                background: #fff !important;
+                padding: 0 !important;
+            }
+            body::before,
+            .particles {
+                display: none !important;
             }
             .container {
-                box-shadow: none;
-                border: none;
-                max-width: 100%;
+                background: #fff !important;
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+                backdrop-filter: none !important;
+            }
+            .header {
+                background: #f8f6f0 !important;
+                border-bottom: 2px solid #d4a84b !important;
+            }
+            .school-name {
+                color: #0a1628 !important;
+            }
+            .school-name span {
+                color: #d4a84b !important;
+            }
+            .school-tagline {
+                color: #999 !important;
+            }
+            .badge {
+                background: #d4a84b !important;
+                color: #fff !important;
             }
             .scan-options,
             .camera-modal,
@@ -566,42 +963,79 @@
             .footer,
             .form-section,
             .security-badge,
-            .tabs {
+            .tabs,
+            .rate-limit {
                 display: none !important;
             }
-            .header {
-                background: #fff;
-                border-bottom: 3px solid #e8b84b;
-            }
-            .school-name {
-                color: #0d1b2a;
-            }
-            .school-tagline {
-                color: #94a3b8;
-            }
             .body {
-                padding: 0;
+                padding: 0 !important;
             }
-            .details-table {
-                border: 2px solid #0d1b2a;
+            .details-table td {
+                color: #333 !important;
+                border-color: #ddd !important;
+            }
+            .details-table td:first-child {
+                background: #f8f6f0 !important;
+                color: #666 !important;
+            }
+            .details-table td:last-child {
+                color: #0a1628 !important;
             }
             .success-box {
-                border: 1px solid #bbf7d0;
+                background: #e6f4ea !important;
+                border-color: #0f9d58 !important;
+                color: #0f9d58 !important;
+            }
+            .success-box strong {
+                color: #0a1628 !important;
+            }
+            .success-box p {
+                color: #333 !important;
+            }
+            .result-icon {
+                border-color: #0f9d58 !important;
+            }
+            .result-title {
+                color: #0a1628 !important;
+            }
+            .result-sub {
+                color: #666 !important;
+            }
+            .details-table .highlight {
+                color: #d4a84b !important;
             }
         }
     </style>
 </head>
 <body>
 
+    <!-- Floating Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
     <div class="container">
+        <!-- Header -->
         <div class="header">
-            <img src="logo(1).png" alt="GSSS Shilla" class="logo" onerror="this.style.display='none'">
-            <div class="school-name">Govt. Sr. Sec. School Shilla</div>
+            <div class="logo-wrapper">
+                <img src="logo(1).png" alt="GSSS Shilla" class="logo" onerror="this.style.display='none'">
+            </div>
+            <div class="school-name">GSSS <span>Shilla</span></div>
             <div class="school-tagline">Shilla • Nerwa • District Shimla • Himachal Pradesh - 171210</div>
-            <div class="badge"><i class="fas fa-shield-alt"></i> Document Verification</div>
+            <div class="badge"><i class="fas fa-shield-alt"></i> Secure Verification</div>
         </div>
 
         <div class="body">
+            <!-- Rate Limit -->
             <div class="rate-limit" id="rateLimit">
                 <i class="fas fa-exclamation-triangle"></i>
                 <span id="rateMsg">Too many attempts. Please wait 30 seconds.</span>
@@ -620,9 +1054,9 @@
             <!-- Tab 1: Bonafide -->
             <div class="tab-content active" id="tab-bonafide">
                 <div class="form-section">
-                    <label><i class="fas fa-certificate"></i> Enter Bonafide Code</label>
+                    <label><i class="fas fa-key"></i> Enter Verification Code</label>
                     <div class="input-group">
-                        <input type="text" id="bonafideInput" placeholder="e.g., BC25-HP10A0-4F2E" maxlength="30" autocomplete="off">
+                        <input type="text" id="bonafideInput" placeholder="e.g., AAAAAA163HBK" maxlength="12" autocomplete="off">
                         <button class="btn-verify" onclick="verifyBonafide()"><i class="fas fa-check"></i> Verify</button>
                     </div>
                 </div>
@@ -631,7 +1065,7 @@
                     <div class="scan-option" onclick="openCamera('bonafide')">
                         <div class="icon"><i class="fas fa-camera"></i></div>
                         <h4>Camera</h4>
-                        <p>Scan QR</p>
+                        <p>Scan QR Code</p>
                     </div>
                     <div class="scan-option" onclick="document.getElementById('bonafideImage').click()">
                         <div class="icon"><i class="fas fa-image"></i></div>
@@ -641,7 +1075,7 @@
                     <div class="scan-option" onclick="document.getElementById('bonafidePDF').click()">
                         <div class="icon"><i class="fas fa-file-pdf"></i></div>
                         <h4>PDF</h4>
-                        <p>Upload</p>
+                        <p>Upload Document</p>
                     </div>
                 </div>
                 <input type="file" id="bonafideImage" accept="image/*" onchange="scanImage(event, 'bonafide')">
@@ -649,9 +1083,9 @@
 
                 <div id="bonafideResult">
                     <div style="text-align:center;padding:30px 10px;">
-                        <i class="fas fa-certificate" style="font-size:40px;color:#c9972b;"></i>
-                        <p style="margin-top:10px;color:#5a6a7e;font-size:14px;">Enter Bonafide code or scan QR</p>
-                        <p style="font-size:11px;color:#94a3b8;">Format: BC25-HP10A0-4F2E</p>
+                        <i class="fas fa-certificate" style="font-size:40px;color:rgba(212,168,75,0.3);"></i>
+                        <p style="margin-top:10px;color:rgba(255,255,255,0.4);font-size:14px;">Enter 12-character code or scan QR</p>
+                        <p style="font-size:11px;color:rgba(255,255,255,0.2);margin-top:4px;">Format: 12 alphanumeric characters (e.g., AAAAAA163HBK)</p>
                     </div>
                 </div>
             </div>
@@ -670,7 +1104,7 @@
                     <div class="scan-option" onclick="openCamera('marksheet')">
                         <div class="icon"><i class="fas fa-camera"></i></div>
                         <h4>Camera</h4>
-                        <p>Scan QR</p>
+                        <p>Scan QR Code</p>
                     </div>
                     <div class="scan-option" onclick="document.getElementById('marksheetImage').click()">
                         <div class="icon"><i class="fas fa-image"></i></div>
@@ -680,7 +1114,7 @@
                     <div class="scan-option" onclick="document.getElementById('marksheetPDF').click()">
                         <div class="icon"><i class="fas fa-file-pdf"></i></div>
                         <h4>PDF</h4>
-                        <p>Upload</p>
+                        <p>Upload Document</p>
                     </div>
                 </div>
                 <input type="file" id="marksheetImage" accept="image/*" onchange="scanImage(event, 'marksheet')">
@@ -688,22 +1122,22 @@
 
                 <div id="marksheetResult">
                     <div style="text-align:center;padding:30px 10px;">
-                        <i class="fas fa-file-alt" style="font-size:40px;color:#c9972b;"></i>
-                        <p style="margin-top:10px;color:#5a6a7e;font-size:14px;">Enter Student ID or scan QR</p>
-                        <p style="font-size:11px;color:#94a3b8;">Format: HP10A001</p>
+                        <i class="fas fa-file-alt" style="font-size:40px;color:rgba(212,168,75,0.3);"></i>
+                        <p style="margin-top:10px;color:rgba(255,255,255,0.4);font-size:14px;">Enter Student ID or scan QR</p>
+                        <p style="font-size:11px;color:rgba(255,255,255,0.2);margin-top:4px;">Format: HP10A001</p>
                     </div>
                 </div>
             </div>
 
             <div class="security-badge">
-                <i class="fas fa-lock"></i>
-                <span>Secure • Verified by GSSS Shilla</span>
-                <i class="fas fa-check-circle" style="color:#16a34a;"></i>
+                <i class="fas fa-shield-alt lock-icon"></i>
+                <span>256-bit Encrypted • Verified by GSSS Shilla</span>
+                <i class="fas fa-check-circle"></i>
             </div>
         </div>
 
         <div class="footer">
-            <i class="fas fa-certificate"></i> GSSS Shilla - Official Verification System
+            <i class="fas fa-certificate"></i> GSSS Shilla • Official Document Verification System
         </div>
     </div>
 
@@ -733,7 +1167,7 @@
         function sanitize(i) { return i ? String(i).replace(/[<>'"]/g, '').trim() : ''; }
 
         function isValidBonafideCode(code) {
-            return /^BC\d{2}-[A-Z0-9]{6}-[A-Z0-9]{4}$/.test(String(code).trim());
+            return /^[A-Za-z0-9]{12}$/.test(String(code).trim());
         }
 
         function isValidStudentId(id) {
@@ -779,7 +1213,7 @@
                 container.innerHTML = `
                     <div style="text-align:center;padding:30px;">
                         <div class="spinner"></div>
-                        <p style="margin-top:12px;color:#5a6a7e;">${data || 'Verifying...'}</p>
+                        <p style="margin-top:12px;color:rgba(255,255,255,0.4);">${data || 'Verifying...'}</p>
                     </div>
                 `;
                 return;
@@ -787,7 +1221,7 @@
             if (type === 'error') {
                 container.innerHTML = `
                     <div class="result-icon error"><i class="fas fa-times-circle"></i></div>
-                    <div class="result-title" style="color:#dc2626;">❌ Verification Failed</div>
+                    <div class="result-title error-title">❌ Verification Failed</div>
                     <div class="result-sub">${esc(data)}</div>
                     <div class="error-box"><i class="fas fa-exclamation-triangle"></i><div>${esc(data)}</div></div>
                     <div style="text-align:center;margin-top:10px;">
@@ -827,14 +1261,13 @@
                         <i class="fas fa-shield-alt"></i>
                         <div>
                             <strong>✅ Verification Confirmed</strong>
-                            <p>All details verified from official school records.</p>
-                            <p style="font-size:10px;color:#94a3b8;margin-top:4px;">Verification ID: ${vid}</p>
-                            <p style="font-size:9px;color:#94a3b8;">Verified on: ${new Date().toLocaleString('en-IN')}</p>
+                            <p>All details verified from official school records. This document is authentic and valid.</p>
+                            <div class="meta">Verification ID: ${vid} • Verified on: ${new Date().toLocaleString('en-IN')}</div>
                         </div>
                     </div>
-                    <div style="text-align:center;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+                    <div style="text-align:center;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
                         <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
-                        <button class="btn btn-secondary" onclick="resetResult('${tab}')"><i class="fas fa-redo"></i> New</button>
+                        <button class="btn btn-secondary" onclick="resetResult('${tab}')"><i class="fas fa-redo"></i> Verify New</button>
                     </div>
                 `;
                 attemptCount = 0;
@@ -847,21 +1280,22 @@
             if (tab === 'bonafide') {
                 container.innerHTML = `
                     <div style="text-align:center;padding:30px 10px;">
-                        <i class="fas fa-certificate" style="font-size:40px;color:#c9972b;"></i>
-                        <p style="margin-top:10px;color:#5a6a7e;font-size:14px;">Enter Bonafide code or scan QR</p>
-                        <p style="font-size:11px;color:#94a3b8;">Format: BC25-HP10A0-4F2E</p>
+                        <i class="fas fa-certificate" style="font-size:40px;color:rgba(212,168,75,0.3);"></i>
+                        <p style="margin-top:10px;color:rgba(255,255,255,0.4);font-size:14px;">Enter 12-character code or scan QR</p>
+                        <p style="font-size:11px;color:rgba(255,255,255,0.2);margin-top:4px;">Format: 12 alphanumeric characters (e.g., AAAAAA163HBK)</p>
                     </div>
                 `;
+                document.getElementById('bonafideInput').value = '';
             } else {
                 container.innerHTML = `
                     <div style="text-align:center;padding:30px 10px;">
-                        <i class="fas fa-file-alt" style="font-size:40px;color:#c9972b;"></i>
-                        <p style="margin-top:10px;color:#5a6a7e;font-size:14px;">Enter Student ID or scan QR</p>
-                        <p style="font-size:11px;color:#94a3b8;">Format: HP10A001</p>
+                        <i class="fas fa-file-alt" style="font-size:40px;color:rgba(212,168,75,0.3);"></i>
+                        <p style="margin-top:10px;color:rgba(255,255,255,0.4);font-size:14px;">Enter Student ID or scan QR</p>
+                        <p style="font-size:11px;color:rgba(255,255,255,0.2);margin-top:4px;">Format: HP10A001</p>
                     </div>
                 `;
+                document.getElementById('studentInput').value = '';
             }
-            document.getElementById(tab + 'Input').value = '';
         }
 
         // ================================================================
@@ -869,11 +1303,11 @@
         // ================================================================
         async function verifyBonafide() {
             const input = document.getElementById('bonafideInput');
-            const code = sanitize(input.value);
+            const code = sanitize(input.value).toUpperCase();
 
-            if (!code) { showResult('bonafide', 'error', 'Please enter Bonafide code.'); return; }
+            if (!code) { showResult('bonafide', 'error', 'Please enter verification code.'); return; }
             if (!isValidBonafideCode(code)) {
-                showResult('bonafide', 'error', 'Invalid format. Use: BC25-HP10A0-4F2E');
+                showResult('bonafide', 'error', 'Invalid format. Code must be exactly 12 alphanumeric characters.');
                 return;
             }
             if (!checkRateLimit()) return;
@@ -924,7 +1358,6 @@
             showResult('marksheet', 'loading', 'Verifying marksheet...');
 
             try {
-                // Get student details from result API
                 const response = await fetch(`${API_BASE}/admin/results/students/${encodeURIComponent(studentId)}`, {
                     headers: getHeaders()
                 });
@@ -941,7 +1374,6 @@
                 const s = result.data.student;
                 if (s.student_id !== studentId) throw new Error('Student ID mismatch.');
 
-                // Get marksheets
                 const marksheetRes = await fetch(`${API_BASE}/admin/results/marksheets?student_id=${encodeURIComponent(studentId)}`, {
                     headers: getHeaders()
                 });
@@ -980,8 +1412,8 @@
         function extractFromQR(qrData) {
             const str = String(qrData);
 
-            // Try bonafide code pattern
-            const bonafideMatch = str.match(/BC\d{2}-[A-Z0-9]{6}-[A-Z0-9]{4}/i);
+            // Try 12-character alphanumeric code (Bonafide)
+            const bonafideMatch = str.match(/[A-Za-z0-9]{12}/);
             if (bonafideMatch) {
                 const code = bonafideMatch[0].toUpperCase();
                 if (isValidBonafideCode(code)) return { type: 'bonafide', value: code };
@@ -1037,11 +1469,11 @@
             if (result.type === 'bonafide') {
                 document.getElementById('bonafideInput').value = result.value;
                 switchTab('bonafide');
-                setTimeout(() => verifyBonafide(), 300);
+                setTimeout(() => verifyBonafide(), 500);
             } else if (result.type === 'marksheet') {
                 document.getElementById('studentInput').value = result.value;
                 switchTab('marksheet');
-                setTimeout(() => verifyMarksheet(), 300);
+                setTimeout(() => verifyMarksheet(), 500);
             }
         }
 
