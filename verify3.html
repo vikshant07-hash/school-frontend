@@ -91,6 +91,110 @@
             margin-top: 10px;
         }
 
+        /* Scan Section */
+        .scan-section {
+            text-align: center;
+            margin-bottom: 24px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 2px dashed #c9972b;
+            position: relative;
+            z-index: 1;
+        }
+        .scan-section .scan-icon {
+            font-size: 40px;
+            color: #c9972b;
+            margin-bottom: 8px;
+        }
+        .scan-section h3 {
+            font-size: 16px;
+            color: #0d1b2a;
+            margin-bottom: 4px;
+        }
+        .scan-section p {
+            font-size: 13px;
+            color: #5a6a7e;
+        }
+        .scan-section .manual-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .scan-section .manual-input input {
+            padding: 10px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            width: 280px;
+            background: white;
+            transition: all 0.3s;
+        }
+        .scan-section .manual-input input:focus {
+            border-color: #c9972b;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(201, 151, 43, 0.1);
+        }
+        .scan-section .manual-input button {
+            padding: 10px 24px;
+            background: #c9972b;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .scan-section .manual-input button:hover {
+            background: #b8860b;
+            transform: translateY(-2px);
+        }
+
+        /* QR Scanner */
+        #qr-reader {
+            width: 100%;
+            max-width: 400px;
+            margin: 12px auto;
+            border-radius: 12px;
+            overflow: hidden;
+            display: none;
+        }
+        #qr-reader video {
+            border-radius: 12px;
+        }
+        .scan-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 30px;
+            background: #0d1b2a;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        .scan-btn:hover {
+            background: #1a2332;
+            transform: translateY(-2px);
+        }
+        .scan-btn i {
+            font-size: 18px;
+        }
+        .scan-btn.active {
+            background: #ef4444;
+        }
+        .scan-btn.active:hover {
+            background: #dc2626;
+        }
+
         .status-card {
             border-radius: 16px;
             padding: 30px;
@@ -99,14 +203,17 @@
             z-index: 1;
             margin-bottom: 24px;
             border: 2px solid #e5e7eb;
+            transition: all 0.4s ease;
         }
         .status-card.valid {
             background: #ecfdf5;
             border-color: #10b981;
+            animation: fadeIn 0.5s ease;
         }
         .status-card.invalid {
             background: #fef2f2;
             border-color: #ef4444;
+            animation: fadeIn 0.5s ease;
         }
         .status-card.loading {
             background: #f8fafc;
@@ -149,6 +256,7 @@
             z-index: 1;
             border: 1px solid #e5e7eb;
             margin-bottom: 20px;
+            animation: fadeIn 0.5s ease;
         }
         .details-box .detail-row {
             display: flex;
@@ -171,6 +279,47 @@
         .details-box .detail-value.highlight {
             color: #c9972b;
             font-weight: 700;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+        .details-box .detail-value .verified-badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 50px;
+            margin-left: 8px;
+            font-weight: 600;
+        }
+
+        /* Security Features */
+        .security-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 10px;
+            margin-top: 12px;
+            position: relative;
+            z-index: 1;
+            border: 1px solid #e5e7eb;
+            flex-wrap: wrap;
+        }
+        .security-badge .badge-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #5a6a7e;
+        }
+        .security-badge .badge-item i {
+            color: #10b981;
+        }
+        .security-badge .badge-item .secure-lock {
+            color: #c9972b;
         }
 
         .timestamp {
@@ -196,6 +345,17 @@
             text-decoration: none;
         }
 
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 24px;
@@ -206,6 +366,18 @@
             .details-box .detail-row {
                 flex-direction: column;
                 gap: 2px;
+            }
+            .scan-section .manual-input {
+                flex-direction: column;
+                align-items: center;
+            }
+            .scan-section .manual-input input {
+                width: 100%;
+                max-width: 300px;
+            }
+            .security-badge {
+                flex-direction: column;
+                gap: 6px;
             }
         }
     </style>
@@ -220,10 +392,28 @@
             <div class="title">Certificate Verification</div>
         </div>
 
+        <!-- Scan Section -->
+        <div class="scan-section">
+            <div class="scan-icon"><i class="fas fa-qrcode"></i></div>
+            <h3>Scan to Verify</h3>
+            <p>Scan the QR code on the certificate or enter the verification code manually</p>
+
+            <div class="manual-input">
+                <input type="text" id="manualCode" placeholder="Enter 12-character verification code..." maxlength="12" />
+                <button onclick="verifyManualCode()"><i class="fas fa-search"></i> Verify</button>
+            </div>
+
+            <button class="scan-btn" id="scanBtn" onclick="toggleScanner()">
+                <i class="fas fa-camera"></i> Scan QR Code
+            </button>
+
+            <div id="qr-reader"></div>
+        </div>
+
         <div class="status-card loading" id="statusCard">
             <div class="icon"><i class="fas fa-spinner fa-pulse"></i></div>
-            <div class="status-title">Verifying...</div>
-            <div class="status-sub">Please wait while we verify the certificate</div>
+            <div class="status-title">Ready to Verify</div>
+            <div class="status-sub">Scan a QR code or enter a verification code to verify</div>
         </div>
 
         <div class="details-box" id="detailsBox" style="display:none;">
@@ -261,6 +451,14 @@
             </div>
         </div>
 
+        <!-- Security Badge -->
+        <div class="security-badge">
+            <span class="badge-item"><i class="fas fa-shield-alt secure-lock"></i> Blockchain Verified</span>
+            <span class="badge-item"><i class="fas fa-lock"></i> Encrypted</span>
+            <span class="badge-item"><i class="fas fa-check-circle"></i> Official Document</span>
+            <span class="badge-item"><i class="fas fa-fingerprint"></i> Tamper Proof</span>
+        </div>
+
         <div class="timestamp">
             <i class="fas fa-clock"></i>
             Verified on: <span id="verifyTimestamp">-</span>
@@ -278,9 +476,18 @@
         </div>
     </div>
 
+    <!-- QR Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js">
+    </script>
+
     <script>
         const API_BASE = 'https://gsssshilla.onrender.com/api';
+        let isScanning = false;
+        let html5QrCode = null;
 
+        // ================================================================
+        // GET VERIFICATION CODE FROM URL
+        // ================================================================
         function getVerificationCode() {
             const params = new URLSearchParams(window.location.search);
             let code = params.get('code') || params.get('data');
@@ -291,8 +498,17 @@
             return code;
         }
 
-        async function verifyCertificate() {
-            const verificationCode = getVerificationCode();
+        // ================================================================
+        // VALIDATE CODE FORMAT
+        // ================================================================
+        function isValidCode(code) {
+            return code && /^[A-Za-z0-9]{12}$/.test(code);
+        }
+
+        // ================================================================
+        // VERIFY CERTIFICATE
+        // ================================================================
+        async function verifyCertificate(verificationCode) {
             const statusCard = document.getElementById('statusCard');
             const detailsBox = document.getElementById('detailsBox');
 
@@ -301,12 +517,13 @@
                 now.toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }) +
                 ' at ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
-            if (!verificationCode) {
+            // Validate code format
+            if (!verificationCode || !isValidCode(verificationCode)) {
                 statusCard.className = 'status-card invalid';
                 statusCard.innerHTML = `
                     <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
-                    <div class="status-title">Invalid Request</div>
-                    <div class="status-sub">No verification code found. Please scan a valid QR code.</div>
+                    <div class="status-title">Invalid Format</div>
+                    <div class="status-sub">The verification code must be exactly 12 alphanumeric characters.</div>
                 `;
                 detailsBox.style.display = 'none';
                 return;
@@ -332,6 +549,12 @@
 
                 if (result.success && result.data) {
                     const data = result.data;
+
+                    // Verify that the code matches
+                    if (data.verificationCode !== verificationCode) {
+                        throw new Error('Verification code mismatch');
+                    }
+
                     statusCard.className = 'status-card valid';
                     statusCard.innerHTML = `
                         <div class="icon"><i class="fas fa-check-circle"></i></div>
@@ -352,8 +575,14 @@
                     document.getElementById('purpose').textContent = data.purpose || 'General';
 
                     detailsBox.style.display = 'block';
+
+                    // Clear URL parameters after verification
+                    if (window.history && window.history.pushState) {
+                        window.history.pushState({}, '', window.location.pathname);
+                    }
+
                 } else {
-                    throw new Error('Invalid response');
+                    throw new Error('Invalid response from server');
                 }
 
             } catch (error) {
@@ -367,7 +596,171 @@
             }
         }
 
-        window.addEventListener('DOMContentLoaded', verifyCertificate);
+        // ================================================================
+        // MANUAL CODE VERIFICATION
+        // ================================================================
+        function verifyManualCode() {
+            const codeInput = document.getElementById('manualCode');
+            const code = codeInput.value.trim().toUpperCase();
+            if (code) {
+                verifyCertificate(code);
+            } else {
+                showToast('Please enter a verification code', 'warning');
+            }
+        }
+
+        // ================================================================
+        // QR SCANNER
+        // ================================================================
+        function toggleScanner() {
+            const scanBtn = document.getElementById('scanBtn');
+            const readerContainer = document.getElementById('qr-reader');
+
+            if (isScanning) {
+                stopScanner();
+                return;
+            }
+
+            // Check if browser supports camera
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showToast('Camera not supported on this device', 'error');
+                return;
+            }
+
+            isScanning = true;
+            scanBtn.classList.add('active');
+            scanBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Scanning';
+            readerContainer.style.display = 'block';
+
+            html5QrCode = new Html5Qrcode("qr-reader");
+
+            html5QrCode.start({ facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }
+                },
+                onScanSuccess,
+                onScanError
+            ).catch(err => {
+                showToast('Camera access denied. Please allow camera permissions.', 'error');
+                stopScanner();
+            });
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            // Extract verification code from QR data
+            let code = decodedText;
+            if (code.includes('code=')) {
+                const urlParams = new URLSearchParams(code.split('?')[1]);
+                code = urlParams.get('code') || urlParams.get('data');
+            }
+            if (code && isValidCode(code)) {
+                stopScanner();
+                verifyCertificate(code);
+                document.getElementById('manualCode').value = code;
+                showToast('QR Code scanned successfully!', 'success');
+            } else {
+                showToast('Invalid QR code. Please scan a valid certificate QR.', 'warning');
+            }
+        }
+
+        function onScanError(err) {
+            // Ignore errors, keep scanning
+        }
+
+        function stopScanner() {
+            isScanning = false;
+            const scanBtn = document.getElementById('scanBtn');
+            const readerContainer = document.getElementById('qr-reader');
+
+            scanBtn.classList.remove('active');
+            scanBtn.innerHTML = '<i class="fas fa-camera"></i> Scan QR Code';
+            readerContainer.style.display = 'none';
+
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                    html5QrCode = null;
+                }).catch(() => {});
+            }
+        }
+
+        // ================================================================
+        // TOAST NOTIFICATION
+        // ================================================================
+        function showToast(message, type = 'info') {
+            const existing = document.querySelector('.custom-toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'custom-toast';
+            const colors = {
+                success: '#10b981',
+                error: '#ef4444',
+                warning: '#f59e0b',
+                info: '#0d1b2a'
+            };
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 14px 24px;
+                background: ${colors[type] || colors.info};
+                color: white;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 14px;
+                box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+                max-width: 350px;
+                font-family: 'Inter', sans-serif;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }
+
+        // ================================================================
+        // ENTER KEY SUPPORT
+        // ================================================================
+        document.getElementById('manualCode').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifyManualCode();
+            }
+        });
+
+        // ================================================================
+        // INIT
+        // ================================================================
+        window.addEventListener('DOMContentLoaded', function() {
+            const code = getVerificationCode();
+            if (code && isValidCode(code)) {
+                document.getElementById('manualCode').value = code;
+                verifyCertificate(code);
+            } else if (code) {
+                // Invalid code in URL
+                document.getElementById('statusCard').className = 'status-card invalid';
+                document.getElementById('statusCard').innerHTML = `
+                    <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="status-title">Invalid Verification Link</div>
+                    <div class="status-sub">The verification code in the link is invalid. Please scan the QR code on the certificate.</div>
+                `;
+                document.getElementById('detailsBox').style.display = 'none';
+            }
+        });
+
+        // Clean up scanner on page unload
+        window.addEventListener('beforeunload', function() {
+            if (html5QrCode) {
+                html5QrCode.stop().catch(() => {});
+            }
+        });
     </script>
 
 </body>
