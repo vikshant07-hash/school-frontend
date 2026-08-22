@@ -1273,7 +1273,7 @@
         }
 
         // ================================================================
-        // QR CODE EXTRACTION - FIXED: Extract only verification code from URL
+        // QR CODE EXTRACTION - FIXED: Extract code from URL for both types
         // ================================================================
         function extractFromQR(qrData) {
             if (!qrData) return null;
@@ -1281,18 +1281,26 @@
             const str = String(qrData).trim();
 
             // ============================================================
-            // METHOD 1: Extract from URL with code parameter
-            // Example: https://gsssshilla07.pages.dev/verify3.html?code=AAAAAA163HBK
+            // METHOD 1: Extract from URL with parameter
+            // Bonafide: ?code=AAAAAA163HBK
+            // Marksheet: ?data=HP10A001  OR  ?id=HP10A001
             // ============================================================
             try {
                 const url = new URL(str);
-                const codeParam = url.searchParams.get('code') || url.searchParams.get('data') || url.searchParams.get('id');
+                
+                // Check for bonafide code
+                const codeParam = url.searchParams.get('code');
                 if (codeParam) {
                     const decoded = decodeURIComponent(codeParam).trim();
-                    // Check if it's a valid bonafide code
                     if (isValidBonafideCode(decoded)) {
                         return { type: 'bonafide', value: decoded.toUpperCase() };
                     }
+                }
+                
+                // Check for student ID (data or id parameter)
+                const dataParam = url.searchParams.get('data') || url.searchParams.get('id');
+                if (dataParam) {
+                    const decoded = decodeURIComponent(dataParam).trim();
                     if (isValidStudentId(decoded)) {
                         return { type: 'marksheet', value: decoded.toUpperCase() };
                     }
@@ -1342,10 +1350,13 @@
                 if (data.code && isValidBonafideCode(data.code)) {
                     return { type: 'bonafide', value: data.code };
                 }
+                if (data.data && isValidStudentId(data.data)) {
+                    return { type: 'marksheet', value: data.data };
+                }
             } catch (e) {}
 
             // ============================================================
-            // METHOD 5: Try to find any 12-character code (without word boundary)
+            // METHOD 5: Try to find any 12-character code
             // ============================================================
             const anyCode = str.match(/[A-Za-z0-9]{12}/);
             if (anyCode) {
@@ -1448,7 +1459,6 @@
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
-                    // Use high resolution for better QR detection
                     const maxDimension = 1500;
                     let width = img.width;
                     let height = img.height;
@@ -1474,7 +1484,6 @@
                         if (code && code.data) {
                             processQR(code.data);
                         } else {
-                            // Try with inversion
                             const code2 = jsQR(imageData.data, imageData.width, imageData.height, {
                                 inversionAttempts: "attemptBoth",
                             });
