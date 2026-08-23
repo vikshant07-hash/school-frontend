@@ -11,9 +11,7 @@
     <style>
         :root {
             --primary: #0a1628;
-            --primary-light: #1a2a4a;
             --gold: #c9972b;
-            --gold-light: #e8b84b;
             --gold-dark: #b8860b;
             --white: #ffffff;
             --gray-bg: #f0f2f5;
@@ -22,9 +20,7 @@
             --text-dark: #0d1b2a;
             --text-light: #5a6a7e;
             --success: #10b981;
-            --success-bg: #ecfdf5;
             --danger: #ef4444;
-            --danger-bg: #fef2f2;
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.12);
             --radius: 16px;
@@ -44,6 +40,7 @@
             min-height: 100vh;
         }
 
+        /* ===== NAVBAR ===== */
         .navbar {
             background: var(--white);
             border-bottom: 1px solid var(--gray-light);
@@ -132,7 +129,7 @@
             width: 28px;
             height: 28px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            background: linear-gradient(135deg, var(--gold), var(--gold));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -371,12 +368,12 @@
             font-size: 14px;
         }
         .alert-box.error {
-            background: var(--danger-bg);
+            background: #fee2e2;
             color: var(--danger);
             border: 1px solid #fecaca;
         }
         .alert-box.success {
-            background: var(--success-bg);
+            background: #ecfdf5;
             color: var(--success);
             border: 1px solid #bbf7d0;
         }
@@ -425,7 +422,7 @@
             font-weight: 600;
         }
         .status-badge.active {
-            background: var(--success-bg);
+            background: #ecfdf5;
             color: var(--success);
         }
 
@@ -485,7 +482,9 @@
             flex-wrap: wrap;
         }
 
-        /* ===== CERTIFICATE BOX ===== */
+        /* ================================================================
+           CERTIFICATE BOX - COMPLETE
+           ================================================================ */
         .certificate-box {
             background: white;
             padding: 25px 30px 18px;
@@ -501,28 +500,28 @@
         }
 
         /* ===== SECURITY WATERMARK PATTERN ===== */
-        .certificate-box .security-pattern {
+        .certificate-box .security-bg {
             position: absolute;
             inset: 0;
             pointer-events: none;
             z-index: 0;
             overflow: hidden;
         }
-        .certificate-box .security-pattern .bg-pattern {
+        .certificate-box .security-bg .pattern {
             position: absolute;
             inset: -50%;
             background-image: 
                 repeating-linear-gradient(45deg, 
                     rgba(201, 151, 43, 0.02) 0px, 
-                    rgba(201, 151, 43, 0.02) 10px,
-                    rgba(201, 151, 43, 0.04) 10px, 
-                    rgba(201, 151, 43, 0.04) 11px
+                    rgba(201, 151, 43, 0.02) 15px,
+                    rgba(201, 151, 43, 0.04) 15px, 
+                    rgba(201, 151, 43, 0.04) 16px
                 ),
                 repeating-linear-gradient(-45deg, 
                     rgba(201, 151, 43, 0.02) 0px, 
-                    rgba(201, 151, 43, 0.02) 10px,
-                    rgba(201, 151, 43, 0.04) 10px, 
-                    rgba(201, 151, 43, 0.04) 11px
+                    rgba(201, 151, 43, 0.02) 15px,
+                    rgba(201, 151, 43, 0.04) 15px, 
+                    rgba(201, 151, 43, 0.04) 16px
                 ),
                 radial-gradient(circle at 20% 30%, rgba(201, 151, 43, 0.04) 0%, transparent 50%),
                 radial-gradient(circle at 80% 70%, rgba(201, 151, 43, 0.04) 0%, transparent 50%);
@@ -553,7 +552,7 @@
             bottom: 80px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 60px;
+            font-size: 50px;
             font-weight: 900;
             color: rgba(13, 27, 42, 0.03);
             letter-spacing: 20px;
@@ -562,21 +561,6 @@
             z-index: 0;
             white-space: nowrap;
             font-family: 'Georgia', serif;
-        }
-
-        .certificate-box .security-border {
-            position: absolute;
-            bottom: 30px;
-            left: 30px;
-            right: 30px;
-            font-size: 7px;
-            letter-spacing: 3px;
-            color: rgba(201, 151, 43, 0.08);
-            text-align: center;
-            pointer-events: none;
-            z-index: 0;
-            font-family: 'Georgia', serif;
-            overflow: hidden;
         }
 
         .certificate-box .school-header {
@@ -944,9 +928,6 @@
                 font-size: 40px !important;
                 opacity: 0.04 !important;
             }
-            .certificate-box .security-pattern .bg-pattern {
-                opacity: 0.5 !important;
-            }
             .certificate-box .verify-section {
                 padding: 6px 10px !important;
             }
@@ -965,8 +946,8 @@
             .certificate-box .signature-box .line {
                 width: 100px !important;
             }
-            .certificate-box .security-border {
-                display: block !important;
+            .certificate-box .security-bg .pattern {
+                opacity: 0.5 !important;
             }
         }
 
@@ -1421,7 +1402,8 @@
                 const response = await fetch(`${API_BASE}/bonafide/student/${encodeURIComponent(studentId)}`, { headers: getAuthHeaders() });
                 if (response.status === 404) {
                     status.className = 'alert-box info';
-                    status.innerHTML = `<i class="fas fa-info-circle"></i> No existing certificate found for Student ID: ${studentId}. Fill details and generate.`;
+                    status.innerHTML =
+                        `<i class="fas fa-info-circle"></i> No existing certificate found for Student ID: ${studentId}. Fill details and generate.`;
                     showToast('No existing certificate found', 'info');
                     document.getElementById('studentId').value = studentId;
                     return;
@@ -1581,10 +1563,9 @@
 
             const html = `
                 <div class="certificate-box" id="certToPrint">
-                    <div class="security-pattern"><div class="bg-pattern"></div></div>
+                    <div class="security-bg"><div class="pattern"></div></div>
                     <div class="watermark-logo"></div>
                     <div class="watermark-text">GSSS SHILLA</div>
-                    <div class="security-border">✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦</div>
                     
                     <div class="school-header">
                         <img src="logo(1).png" class="school-logo" onerror="this.style.display='none'">
@@ -1666,83 +1647,82 @@
         }
 
         // ================================================================
-        // ✅ FIXED: DOWNLOAD PDF - Single Page
+        // ✅ FIXED: DOWNLOAD PDF
         // ================================================================
         function downloadPDF() {
             const element = document.getElementById('certToPrint');
-            if (!element) { showToast('Please generate certificate first', 'warning'); return; }
+            if (!element) {
+                showToast('Please generate certificate first', 'warning');
+                return;
+            }
 
+            // Hide header and actions for clean PDF
             const header = document.querySelector('.cert-header');
             const actions = document.querySelector('.cert-actions');
             if (header) header.style.display = 'none';
             if (actions) actions.style.display = 'none';
 
-            // Ensure element is visible and properly sized
-            element.style.transform = 'scale(1)';
-            element.style.position = 'relative';
-            element.style.top = '0';
-            element.style.left = '0';
+            // Get the actual HTML content with all styles
+            const htmlContent = element.outerHTML;
 
-            const opt = {
-                margin: [0.3, 0.3, 0.3, 0.3],
-                filename: `Bonafide_Certificate_${currentCertificateData?.verificationCode || 'cert'}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    letterRendering: true,
-                    width: 850,
-                    height: element.scrollHeight || 1100,
-                    logging: false,
-                    allowTaint: true,
-                    useCORS: true,
-                    windowWidth: 850
-                },
-                jsPDF: {
-                    unit: 'in',
-                    format: 'a4',
-                    orientation: 'portrait'
-                },
-                pagebreak: { mode: 'avoid-all' }
-            };
+            // Create a clean document for PDF
+            const style = document.querySelector('style').innerHTML;
+            const logoImg = document.querySelector('.school-logo')?.src || 'logo(1).png';
+            const signatureImg = document.querySelector('.signature-img')?.src || 'principal.png';
 
-            showToast('Generating PDF...', 'info');
+            // Replace image sources with absolute URLs if needed
+            let finalHtml = htmlContent
+                .replace(/src="logo\(1\)\.png"/g, `src="${logoImg}"`)
+                .replace(/src="principal\.png"/g, `src="${signatureImg}"`);
 
-            // ✅ Use the actual element with a wrapper to ensure single page
-            const wrapper = document.createElement('div');
-            wrapper.style.width = '850px';
-            wrapper.style.margin = '0 auto';
-            wrapper.style.padding = '0';
-            wrapper.style.background = 'white';
-            wrapper.style.position = 'absolute';
-            wrapper.style.left = '-9999px';
-            wrapper.style.top = '0';
-            wrapper.appendChild(element.cloneNode(true));
-            document.body.appendChild(wrapper);
+            const printWindow = window.open('', '_blank', 'width=850,height=1100');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Bonafide Certificate</title>
+                    <style>
+                        ${style}
+                        body { margin: 0; padding: 0; background: white; }
+                        .certificate-box { 
+                            width: 850px; 
+                            margin: 10px auto; 
+                            padding: 20px 25px 15px;
+                            border: 2px solid #000;
+                            box-sizing: border-box;
+                        }
+                        .navbar, .page-header, .form-card, .tabs, .filter-bar, 
+                        .cert-header, .cert-actions, .btn, .toast-container, 
+                        .table-wrapper, #certificatePreview .cert-header, 
+                        #certificatePreview .cert-actions { display: none !important; }
+                        .watermark-logo { opacity: 0.06 !important; }
+                        .security-bg .pattern { opacity: 0.5 !important; }
+                        .watermark-text { opacity: 0.03 !important; }
+                        @page { margin: 0; size: A4; }
+                        .certificate-box { page-break-after: avoid; page-break-inside: avoid; }
+                    </style>
+                </head>
+                <body>
+                    ${finalHtml}
+                    <script>
+                        // Auto print after load
+                        setTimeout(function() {
+                            window.print();
+                        }, 500);
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
 
-            // Force element to be properly sized
-            const clonedElement = wrapper.querySelector('.certificate-box');
-            if (clonedElement) {
-                clonedElement.style.width = '850px';
-                clonedElement.style.margin = '0 auto';
-                clonedElement.style.padding = '20px 25px 15px';
-                clonedElement.style.boxSizing = 'border-box';
-            }
+            // Show toast
+            showToast('PDF generated successfully!', 'success');
 
-            html2pdf().set(opt).from(wrapper).save()
-                .then(() => {
-                    document.body.removeChild(wrapper);
-                    if (header) header.style.display = 'flex';
-                    if (actions) actions.style.display = 'flex';
-                    showToast('PDF downloaded successfully!', 'success');
-                })
-                .catch((error) => {
-                    document.body.removeChild(wrapper);
-                    if (header) header.style.display = 'flex';
-                    if (actions) actions.style.display = 'flex';
-                    console.error('PDF Error:', error);
-                    showToast('Error generating PDF: ' + error.message, 'error');
-                });
+            // Restore header and actions
+            setTimeout(() => {
+                if (header) header.style.display = 'flex';
+                if (actions) actions.style.display = 'flex';
+            }, 1000);
         }
 
         function printCertificate(studentId) {
@@ -1757,7 +1737,8 @@
                 const result = await response.json();
                 if (result.success && result.data) {
                     const cert = result.data;
-                    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`https://gsssshilla07.pages.dev/verify3.html?code=${cert.verification_code}`)}`;
+                    const qrUrl =
+                        `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`https://gsssshilla07.pages.dev/verify3.html?code=${cert.verification_code}`)}`;
                     renderCertificate({ ...cert, qrCode: qrUrl });
                     document.getElementById('certificatePreview').style.display = 'block';
                     switchTab('generate');
@@ -1831,7 +1812,8 @@
                     document.getElementById('todayCount').textContent = statsData.data?.today || 0;
                 }
                 if (certificates.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light);">No certificates found</td></tr>';
+                    tbody.innerHTML =
+                        '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light);">No certificates found</td></tr>';
                     return;
                 }
                 tbody.innerHTML = certificates.map((c, i) => `
@@ -1851,7 +1833,8 @@
                 `).join('');
                 renderPagination(result.pagination);
             } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--danger);">${error.message}</td></tr>`;
+                tbody.innerHTML =
+                    `<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--danger);">${error.message}</td></tr>`;
                 showToast(error.message, 'error');
             }
         }
@@ -1861,11 +1844,14 @@
             if (!pagination || pagination.totalPages <= 1) { container.innerHTML = ''; return; }
             const { page, totalPages } = pagination;
             let html = '';
-            html += `<button class="btn btn-sm btn-outline" ${page <= 1 ? 'disabled' : ''} onclick="goToPage(${page - 1})"><i class="fas fa-chevron-left"></i></button>`;
+            html +=
+                `<button class="btn btn-sm btn-outline" ${page <= 1 ? 'disabled' : ''} onclick="goToPage(${page - 1})"><i class="fas fa-chevron-left"></i></button>`;
             for (let i = Math.max(1, page - 2); i <= Math.min(totalPages, page + 2); i++) {
-                html += `<button class="btn btn-sm ${i === page ? 'btn-primary' : 'btn-outline'}" onclick="goToPage(${i})">${i}</button>`;
+                html +=
+                    `<button class="btn btn-sm ${i === page ? 'btn-primary' : 'btn-outline'}" onclick="goToPage(${i})">${i}</button>`;
             }
-            html += `<button class="btn btn-sm btn-outline" ${page >= totalPages ? 'disabled' : ''} onclick="goToPage(${page + 1})"><i class="fas fa-chevron-right"></i></button>`;
+            html +=
+                `<button class="btn btn-sm btn-outline" ${page >= totalPages ? 'disabled' : ''} onclick="goToPage(${page + 1})"><i class="fas fa-chevron-right"></i></button>`;
             container.innerHTML = html;
         }
 
@@ -1892,7 +1878,8 @@
             document.getElementById('photoPreview').innerHTML = '';
             document.getElementById('verificationCodeDisplay').style.display = 'none';
             document.getElementById('fetchStatus').className = 'alert-box info';
-            document.getElementById('fetchStatus').innerHTML = '<i class="fas fa-info-circle"></i> Enter Student ID and click Fetch';
+            document.getElementById('fetchStatus').innerHTML =
+                '<i class="fas fa-info-circle"></i> Enter Student ID and click Fetch';
             document.getElementById('certificatePreview').style.display = 'none';
             currentCertificateData = null;
         }
