@@ -1036,6 +1036,7 @@
                     <span style="font-size:12px;color:var(--text-muted);">Fields with <span style="color:#ef4444;">*</span> required</span>
                 </div>
 
+                <!-- Search Row -->
                 <div class="search-row" style="margin-bottom:16px;">
                     <input type="text" id="searchStudentId" class="form-control" placeholder="Enter Student ID to fetch (e.g., HP10A001)" />
                     <button class="btn btn-primary" onclick="fetchStudent()"><i class="fas fa-user-check"></i> Fetch</button>
@@ -1043,6 +1044,7 @@
                 </div>
                 <div id="fetchStatus" class="alert-box info"><i class="fas fa-info-circle"></i> Enter Student ID and click Fetch</div>
 
+                <!-- Form Grid -->
                 <div class="form-grid" style="margin-top:16px;">
                     <div class="form-group">
                         <label>Student ID <span class="required">*</span></label>
@@ -1231,7 +1233,6 @@
         // CONFIG - PRODUCTION
         // ================================================================
         
-        // ✅ PRODUCTION URL
         const API_BASE = 'https://gsssshilla.onrender.com/api';
 
         console.log('🔗 API_BASE:', API_BASE);
@@ -1324,24 +1325,7 @@
         }
 
         // ================================================================
-        // VALIDATE UNIQUE IDS
-        // ================================================================
-        async function validateUniqueIds(studentId, apaarId) {
-            try {
-                const response = await fetch(`${API_BASE}/bonafide/validate-unique`, {
-                    method: 'POST',
-                    headers: getAuthHeaders(),
-                    body: JSON.stringify({ studentId, apaarId })
-                });
-                const result = await response.json();
-                return result;
-            } catch (error) {
-                return { valid: true };
-            }
-        }
-
-        // ================================================================
-        // ✅ FIXED: FETCH STUDENT
+        // ✅ FIXED: FETCH STUDENT - Only Bonafide API
         // ================================================================
         async function fetchStudent() {
             const studentId = document.getElementById('searchStudentId').value.trim().toUpperCase();
@@ -1359,67 +1343,65 @@
 
             const status = document.getElementById('fetchStatus');
             status.className = 'alert-box info';
-            status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching student...';
+            status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching student from bonafide records...';
 
             try {
-                console.log('📤 Fetching student:', `${API_BASE}/admin/results/students/${encodeURIComponent(studentId)}`);
+                console.log('📤 Fetching student:', `${API_BASE}/bonafide/student/${encodeURIComponent(studentId)}`);
                 
-                const response = await fetch(`${API_BASE}/admin/results/students/${encodeURIComponent(studentId)}`, {
+                // ✅ Only call bonafide API - NO result system
+                const response = await fetch(`${API_BASE}/bonafide/student/${encodeURIComponent(studentId)}`, {
                     headers: getAuthHeaders()
                 });
 
                 console.log('📥 Response Status:', response.status);
 
+                if (response.status === 404) {
+                    // Student not found in bonafide system
+                    status.className = 'alert-box info';
+                    status.innerHTML = `<i class="fas fa-info-circle"></i> No existing certificate found for Student ID: ${studentId}. You can create a new one.`;
+                    showToast('No existing certificate. Fill details and generate.', 'info');
+                    
+                    // ✅ Auto-fill Student ID in the main field
+                    document.getElementById('studentId').value = studentId;
+                    return;
+                }
+
                 if (!response.ok) {
-                    if (response.status === 404) {
-                        throw new Error('Student not found. Please check the Student ID.');
-                    } else if (response.status === 401) {
-                        throw new Error('Session expired. Please login again.');
-                    } else {
-                        throw new Error(`Server error: ${response.status}`);
-                    }
+                    throw new Error(`Server error: ${response.status}`);
                 }
 
-                const data = await response.json();
-                console.log('📥 Response Data:', data);
+                const result = await response.json();
+                console.log('📥 Response Data:', result);
 
-                // ✅ Check if student data exists
-                const student = data.data?.student || data.data;
-
-                if (!student) {
-                    throw new Error('No student data found');
+                if (!result.success || !result.data) {
+                    throw new Error('Invalid data received');
                 }
 
-                // ✅ Check if student has required fields
-                if (!student.student_id && !studentId) {
-                    throw new Error('Student ID not found in response');
-                }
+                const cert = result.data;
 
-                // ✅ Fill form with student data
-                document.getElementById('studentId').value = student.student_id || studentId;
-                document.getElementById('apaarId').value = student.apaar_id || '';
-                document.getElementById('studentName').value = student.name || '';
-                document.getElementById('fatherName').value = student.father_name || '';
-                document.getElementById('motherName').value = student.mother_name || '';
-                document.getElementById('dob').value = student.dob || '';
-                document.getElementById('className').value = student.class || '10';
-                document.getElementById('section').value = student.section || '';
-                document.getElementById('admissionNo').value = student.admission_no || student.admission || student.student_id || '';
-                document.getElementById('session').value = student.session || '2025-26';
-                document.getElementById('examRollNo').value = student.exam_roll_no || '';
+                // ✅ Fill form with certificate data
+                document.getElementById('studentId').value = cert.student_id || studentId;
+                document.getElementById('apaarId').value = cert.apaar_id || '';
+                document.getElementById('studentName').value = cert.student_name || '';
+                document.getElementById('fatherName').value = cert.father_name || '';
+                document.getElementById('motherName').value = cert.mother_name || '';
+                document.getElementById('dob').value = cert.dob || '';
+                document.getElementById('className').value = cert.class_name || '10';
+                document.getElementById('section').value = cert.section || '';
+                document.getElementById('admissionNo').value = cert.admission_no || '';
+                document.getElementById('session').value = cert.session || '2025-26';
+                document.getElementById('examRollNo').value = cert.exam_roll_no || '';
+                document.getElementById('purpose').value = cert.purpose || 'Passport Application';
+                document.getElementById('address').value = cert.address || '';
+                document.getElementById('phone').value = cert.phone || '';
 
-                // ✅ Generate verification code
-                const apaarId = student.apaar_id || '';
-                const code = generateVerificationCode(studentId, apaarId);
-                document.getElementById('permanentCode').textContent = code;
+                // ✅ Show verification code
+                document.getElementById('permanentCode').textContent = cert.verification_code;
                 document.getElementById('verificationCodeDisplay').style.display = 'block';
 
                 status.className = 'alert-box success';
-                status.innerHTML = `<i class="fas fa-check-circle"></i> Student found: ${student.name || 'N/A'}`;
-                showToast('Student loaded successfully', 'success');
-
-                // ✅ Check if certificate already exists
-                await loadExistingCertificate(studentId);
+                status.innerHTML = `<i class="fas fa-check-circle"></i> Certificate loaded for: ${cert.student_name || 'N/A'}`;
+                showToast('Certificate loaded successfully', 'success');
 
             } catch (error) {
                 console.error('❌ Fetch error:', error);
@@ -1430,51 +1412,10 @@
         }
 
         // ================================================================
-        // LOAD EXISTING CERTIFICATE
+        // LOAD EXISTING CERTIFICATE (Alias for fetchStudent)
         // ================================================================
-        async function loadExistingCertificate(studentId) {
-            const id = studentId || document.getElementById('studentId').value.trim();
-            if (!id) return;
-
-            try {
-                const response = await fetch(`${API_BASE}/bonafide/student/${encodeURIComponent(id)}`, {
-                    headers: getAuthHeaders()
-                });
-
-                if (response.status === 404) {
-                    return;
-                }
-
-                if (!response.ok) {
-                    throw new Error('Failed to load certificate');
-                }
-
-                const result = await response.json();
-                if (result.success && result.data) {
-                    const cert = result.data;
-                    document.getElementById('permanentCode').textContent = cert.verification_code;
-                    document.getElementById('verificationCodeDisplay').style.display = 'block';
-
-                    document.getElementById('studentName').value = cert.student_name || '';
-                    document.getElementById('fatherName').value = cert.father_name || '';
-                    document.getElementById('motherName').value = cert.mother_name || '';
-                    document.getElementById('dob').value = cert.dob || '';
-                    document.getElementById('className').value = cert.class_name || '10';
-                    document.getElementById('section').value = cert.section || '';
-                    document.getElementById('admissionNo').value = cert.admission_no || '';
-                    document.getElementById('session').value = cert.session || '2025-26';
-                    document.getElementById('examRollNo').value = cert.exam_roll_no || '';
-                    document.getElementById('purpose').value = cert.purpose || 'Passport Application';
-                    document.getElementById('address').value = cert.address || '';
-                    document.getElementById('phone').value = cert.phone || '';
-                    document.getElementById('apaarId').value = cert.apaar_id || '';
-
-                    showToast('Existing certificate loaded. Update to modify.', 'info');
-                }
-            } catch (error) {
-                // Silent fail
-                console.log('No existing certificate found');
-            }
+        async function loadExistingCertificate() {
+            await fetchStudent();
         }
 
         // ================================================================
@@ -2060,7 +2001,9 @@
             loadHistory();
             const studentId = document.getElementById('studentId').value.trim();
             if (studentId) {
-                loadExistingCertificate(studentId);
+                // Auto-load if student ID is present
+                document.getElementById('searchStudentId').value = studentId;
+                fetchStudent();
             }
         });
     </script>
