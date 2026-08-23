@@ -1113,7 +1113,7 @@
                     </div>
                     <div class="form-group">
                         <label>APAAR ID <span class="required">*</span></label>
-                        <input type="text" id="apaarId" class="form-control" placeholder="12-character alphanumeric (e.g., AP12AB345678)" maxlength="12" />
+                        <input type="text" id="apaarId" class="form-control" placeholder="12-character alphanumeric" maxlength="12" />
                     </div>
                 </div>
 
@@ -1134,10 +1134,9 @@
                         <input type="text" id="motherName" class="form-control" placeholder="Mother's Name" />
                     </div>
                     <div class="form-group">
-    <label>Date of Birth <span class="required">*</span></label>
-    <input type="date" id="dob" class="form-control" required />
+                        <label>Date of Birth <span class="required">*</span></label>
+                        <input type="date" id="dob" class="form-control" required />
                     </div>
-                    
                 </div>
 
                 <div class="form-grid">
@@ -1302,7 +1301,8 @@
         // ================================================================
         // CONFIG
         // ================================================================
-        const API_BASE = 'https://gsssshilla.onrender.com/api';
+        const API_BASE = 'http://localhost:5000/api';
+        // const API_BASE = 'https://gsssshilla.onrender.com/api';
         let currentCertificateData = null;
         let currentPage = 1;
         const PAGE_SIZE = 20;
@@ -1375,7 +1375,6 @@
         // GENERATE 12-CHARACTER UNIQUE VERIFICATION CODE
         // ================================================================
         function generateVerificationCode(studentId, apaarId) {
-            // Combine studentId and apaarId to create unique hash
             const combined = `${studentId}-${apaarId}-${Date.now()}`;
             let hash = 0;
             for (let i = 0; i < combined.length; i++) {
@@ -1383,7 +1382,6 @@
                 hash = ((hash << 5) - hash) + char;
                 hash = hash & hash;
             }
-            // Convert to base36 and ensure 12 characters
             let code = Math.abs(hash).toString(36).toUpperCase();
             while (code.length < 12) {
                 code = 'A' + code;
@@ -1448,7 +1446,6 @@
                     document.getElementById('session').value = student.session || '2025-26';
                     document.getElementById('examRollNo').value = student.exam_roll_no || '';
 
-                    // Generate 12-character unique verification code
                     const apaarId = student.apaar_id || '';
                     const code = generateVerificationCode(studentId, apaarId);
                     document.getElementById('permanentCode').textContent = code;
@@ -1458,7 +1455,6 @@
                     status.innerHTML = `<i class="fas fa-check-circle"></i> Student found: ${student.name}`;
                     showToast('Student loaded successfully', 'success');
 
-                    // Check if certificate already exists
                     await loadExistingCertificate(studentId);
                 } else {
                     throw new Error('No data found');
@@ -1493,22 +1489,22 @@
                 const result = await response.json();
                 if (result.success && result.data) {
                     const cert = result.data;
-                    document.getElementById('permanentCode').textContent = cert.verificationCode;
+                    document.getElementById('permanentCode').textContent = cert.verification_code;
                     document.getElementById('verificationCodeDisplay').style.display = 'block';
 
-                    document.getElementById('studentName').value = cert.studentName || '';
-                    document.getElementById('fatherName').value = cert.fatherName || '';
-                    document.getElementById('motherName').value = cert.motherName || '';
+                    document.getElementById('studentName').value = cert.student_name || '';
+                    document.getElementById('fatherName').value = cert.father_name || '';
+                    document.getElementById('motherName').value = cert.mother_name || '';
                     document.getElementById('dob').value = cert.dob || '';
-                    document.getElementById('className').value = cert.className || '10';
+                    document.getElementById('className').value = cert.class_name || '10';
                     document.getElementById('section').value = cert.section || '';
-                    document.getElementById('admissionNo').value = cert.admissionNo || '';
+                    document.getElementById('admissionNo').value = cert.admission_no || '';
                     document.getElementById('session').value = cert.session || '2025-26';
-                    document.getElementById('examRollNo').value = cert.examRollNo || '';
+                    document.getElementById('examRollNo').value = cert.exam_roll_no || '';
                     document.getElementById('purpose').value = cert.purpose || 'Passport Application';
                     document.getElementById('address').value = cert.address || '';
                     document.getElementById('phone').value = cert.phone || '';
-                    document.getElementById('apaarId').value = cert.apaarId || '';
+                    document.getElementById('apaarId').value = cert.apaar_id || '';
 
                     showToast('Existing certificate loaded. Update to modify.', 'info');
                 }
@@ -1555,55 +1551,76 @@
         }
 
         // ================================================================
-        // GENERATE CERTIFICATE
+        // GENERATE CERTIFICATE - UPDATED
         // ================================================================
         async function generateCertificate() {
+            console.log('🔍 generateCertificate() called');
+
+            // Get form values
             const studentId = document.getElementById('studentId').value.trim();
             const apaarId = document.getElementById('apaarId').value.trim();
+            const studentName = document.getElementById('studentName').value.trim();
+            const fatherName = document.getElementById('fatherName').value.trim();
+            const motherName = document.getElementById('motherName').value.trim();
+            const dob = document.getElementById('dob').value;
+            const className = document.getElementById('className').value;
+            const section = document.getElementById('section').value.trim();
+            const admissionNo = document.getElementById('admissionNo').value.trim();
+            const session = document.getElementById('session').value;
+            const examRollNo = document.getElementById('examRollNo').value.trim();
+            const purpose = document.getElementById('purpose').value;
+            const address = document.getElementById('address').value.trim();
+            const phone = document.getElementById('phone').value.trim();
 
-            // Validate Student ID
+            // DEBUG: Log all values
+            console.log('📝 Form Values:', {
+                studentId,
+                apaarId,
+                studentName,
+                fatherName,
+                motherName,
+                dob,
+                className,
+                section,
+                admissionNo,
+                session,
+                examRollNo,
+                purpose,
+                address,
+                phone
+            });
+
+            // Validate
             if (!studentId) { showToast('Student ID is required', 'error'); return; }
-
-            // Validate APAAR ID - must be exactly 12 characters alphanumeric
             if (!apaarId) { showToast('APAAR ID is required', 'error'); return; }
             if (!/^[A-Za-z0-9]{12}$/.test(apaarId)) {
                 showToast('APAAR ID must be exactly 12 alphanumeric characters', 'error');
                 return;
             }
+            if (!studentName) { showToast('Student Name is required', 'error'); return; }
+            if (!fatherName) { showToast('Father\'s Name is required', 'error'); return; }
+            if (!admissionNo) { showToast('Admission Number is required', 'error'); return; }
+            if (!dob) { showToast('Date of Birth is required', 'error'); return; }
 
-            // Validate uniqueness - check with server
-            try {
-                const validateResult = await validateUniqueIds(studentId, apaarId);
-                if (!validateResult.valid) {
-                    showToast(validateResult.message || 'Student ID or APAAR ID already exists', 'error');
-                    return;
-                }
-            } catch (error) {
-                // If validation API fails, continue but show warning
-                console.warn('Uniqueness validation failed, continuing...');
-            }
-
+            // Build data object
             const data = {
                 studentId: studentId,
                 apaarId: apaarId,
-                studentName: document.getElementById('studentName').value.trim(),
-                fatherName: document.getElementById('fatherName').value.trim(),
-                motherName: document.getElementById('motherName').value.trim(),
-                dob: document.getElementById('dob').value,
-                className: document.getElementById('className').value,
-                section: document.getElementById('section').value.trim(),
-                admissionNo: document.getElementById('admissionNo').value.trim(),
-                session: document.getElementById('session').value,
-                examRollNo: document.getElementById('examRollNo').value.trim(),
-                purpose: document.getElementById('purpose').value,
-                address: document.getElementById('address').value.trim(),
-                phone: document.getElementById('phone').value.trim()
+                studentName: studentName,
+                fatherName: fatherName,
+                motherName: motherName || '',
+                dob: dob,
+                className: className,
+                section: section || '',
+                admissionNo: admissionNo,
+                session: session || '2025-26',
+                examRollNo: examRollNo || '',
+                purpose: purpose || 'General',
+                address: address || '',
+                phone: phone || ''
             };
 
-            // Validate required fields
-            if (!data.studentName) { showToast('Student Name is required', 'error'); return; }
-            if (!data.fatherName) { showToast('Father\'s Name is required', 'error'); return; }
-            if (!data.admissionNo) { showToast('Admission Number is required', 'error'); return; }
+            console.log('📤 Sending Data:', JSON.stringify(data, null, 2));
 
             // Handle photo
             const photoInput = document.getElementById('photo');
@@ -1614,23 +1631,48 @@
                     return;
                 }
                 data.photo = await compressImage(file);
+                console.log('📸 Photo included, length:', data.photo.length);
+            }
+
+            // Get token
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                showToast('Please login first', 'error');
+                window.location.href = 'login.html';
+                return;
             }
 
             try {
                 showToast('Generating certificate...', 'info');
 
+                console.log('🌐 Sending request to:', `${API_BASE}/bonafide/generate`);
+
                 const response = await fetch(`${API_BASE}/bonafide/generate`, {
                     method: 'POST',
-                    headers: getAuthHeaders(),
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify(data)
                 });
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Failed to generate');
+                console.log('📥 Response Status:', response.status);
+
+                const responseText = await response.text();
+                console.log('📥 Response Text:', responseText);
+
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('❌ Failed to parse JSON:', e);
+                    throw new Error('Invalid response from server');
                 }
 
-                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.message || 'Failed to generate');
+                }
+
                 if (!result.success) {
                     throw new Error(result.message || 'Generation failed');
                 }
@@ -1647,7 +1689,8 @@
                 loadHistory();
 
             } catch (error) {
-                showToast(error.message, 'error');
+                console.error('❌ Generate error:', error);
+                showToast(error.message || 'Failed to generate certificate', 'error');
             }
         }
 
@@ -1857,17 +1900,17 @@
                 tbody.innerHTML = certificates.map((c, i) => `
                     <tr>
                         <td>${((result.pagination?.page - 1) * PAGE_SIZE) + i + 1}</td>
-                        <td><strong>${c.studentId}</strong></td>
-                        <td>${c.studentName}</td>
-                        <td>${c.className || '-'}</td>
-                        <td style="font-size:11px;color:var(--gold);font-weight:600;font-family:monospace;">${c.verificationCode}</td>
-                        <td>${c.updatedAt ? new Date(c.updatedAt).toLocaleDateString('en-IN') : '-'}</td>
+                        <td><strong>${c.student_id}</strong></td>
+                        <td>${c.student_name}</td>
+                        <td>${c.class_name || '-'}</td>
+                        <td style="font-size:11px;color:var(--gold);font-weight:600;font-family:monospace;">${c.verification_code}</td>
+                        <td>${c.updated_at ? new Date(c.updated_at).toLocaleDateString('en-IN') : '-'}</td>
                         <td><span class="status-badge active">Active</span></td>
                         <td>
-                            <button class="btn btn-xs btn-primary" onclick="viewCertificate('${c.studentId}')"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-xs btn-success" onclick="editCertificate('${c.studentId}')"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-xs btn-danger" onclick="deleteCertificate('${c.studentId}','${c.studentName}')"><i class="fas fa-trash"></i></button>
-                            <button class="btn btn-xs btn-outline" onclick="printCertificate('${c.studentId}')"><i class="fas fa-print"></i></button>
+                            <button class="btn btn-xs btn-primary" onclick="viewCertificate('${c.student_id}')"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-xs btn-success" onclick="editCertificate('${c.student_id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-xs btn-danger" onclick="deleteCertificate('${c.student_id}','${c.student_name}')"><i class="fas fa-trash"></i></button>
+                            <button class="btn btn-xs btn-outline" onclick="printCertificate('${c.student_id}')"><i class="fas fa-print"></i></button>
                         </td>
                     </tr>
                 `).join('');
@@ -1926,7 +1969,7 @@
                 if (result.success && result.data) {
                     const cert = result.data;
                     const qrUrl =
-                        `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`https://gsssshilla07.pages.dev/verify.html?code=${cert.verificationCode}`)}`;
+                        `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`https://gsssshilla07.pages.dev/verify3.html?code=${cert.verification_code}`)}`;
 
                     renderCertificate({
                         ...cert,
@@ -1956,23 +1999,23 @@
                 const result = await response.json();
                 if (result.success && result.data) {
                     const cert = result.data;
-                    document.getElementById('studentId').value = cert.studentId;
-                    document.getElementById('searchStudentId').value = cert.studentId;
-                    document.getElementById('apaarId').value = cert.apaarId || '';
-                    document.getElementById('studentName').value = cert.studentName || '';
-                    document.getElementById('fatherName').value = cert.fatherName || '';
-                    document.getElementById('motherName').value = cert.motherName || '';
+                    document.getElementById('studentId').value = cert.student_id;
+                    document.getElementById('searchStudentId').value = cert.student_id;
+                    document.getElementById('apaarId').value = cert.apaar_id || '';
+                    document.getElementById('studentName').value = cert.student_name || '';
+                    document.getElementById('fatherName').value = cert.father_name || '';
+                    document.getElementById('motherName').value = cert.mother_name || '';
                     document.getElementById('dob').value = cert.dob || '';
-                    document.getElementById('className').value = cert.className || '10';
+                    document.getElementById('className').value = cert.class_name || '10';
                     document.getElementById('section').value = cert.section || '';
-                    document.getElementById('admissionNo').value = cert.admissionNo || '';
+                    document.getElementById('admissionNo').value = cert.admission_no || '';
                     document.getElementById('session').value = cert.session || '2025-26';
-                    document.getElementById('examRollNo').value = cert.examRollNo || '';
+                    document.getElementById('examRollNo').value = cert.exam_roll_no || '';
                     document.getElementById('purpose').value = cert.purpose || 'Passport Application';
                     document.getElementById('address').value = cert.address || '';
                     document.getElementById('phone').value = cert.phone || '';
 
-                    document.getElementById('permanentCode').textContent = cert.verificationCode;
+                    document.getElementById('permanentCode').textContent = cert.verification_code;
                     document.getElementById('verificationCodeDisplay').style.display = 'block';
 
                     switchTab('generate');
