@@ -508,6 +508,49 @@
             margin: 0 auto;
             overflow: hidden;
         }
+        
+        /* ===== SECURITY PATTERN - Background ===== */
+        .certificate-box::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(201, 151, 43, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(201, 151, 43, 0.03) 0%, transparent 50%),
+                repeating-linear-gradient(45deg, 
+                    transparent, 
+                    transparent 20px, 
+                    rgba(201, 151, 43, 0.02) 20px, 
+                    rgba(201, 151, 43, 0.02) 21px
+                ),
+                repeating-linear-gradient(-45deg, 
+                    transparent, 
+                    transparent 20px, 
+                    rgba(201, 151, 43, 0.02) 20px, 
+                    rgba(201, 151, 43, 0.02) 21px
+                );
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* ===== SECURITY BORDER PATTERN ===== */
+        .certificate-box::after {
+            content: '✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦';
+            position: absolute;
+            bottom: 32px;
+            left: 30px;
+            right: 30px;
+            font-size: 8px;
+            letter-spacing: 4px;
+            color: rgba(201, 151, 43, 0.08);
+            text-align: center;
+            pointer-events: none;
+            z-index: 0;
+            font-family: 'Georgia', serif;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        
         .certificate-box .watermark {
             position: absolute;
             top: 50%;
@@ -520,6 +563,7 @@
             filter: grayscale(100%);
             pointer-events: none;
             border-radius: 50%;
+            z-index: 0;
         }
         .certificate-box .school-header {
             text-align: center;
@@ -734,20 +778,20 @@
             font-family: 'Inter', sans-serif;
         }
         .certificate-box .signature-box .signature-img {
-    width: 190px;
-    height: 100px;
-    object-fit: contain;
-    display: block;
-    margin: 0 auto;
-}
+            width: 190px;
+            height: 100px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
 
-/* Mobile ke liye chhota */
-@media (max-width: 480px) {
-    .certificate-box .signature-box .signature-img {
-        width: 120px;
-        height: 70px;
-    }
-}
+        /* Mobile ke liye chhota */
+        @media (max-width: 480px) {
+            .certificate-box .signature-box .signature-img {
+                width: 120px;
+                height: 70px;
+            }
+        }
         
         .certificate-box .footer-line {
             text-align: center;
@@ -880,6 +924,7 @@
             .certificate-box .watermark {
                 width: 200px !important;
                 height: 200px !important;
+                opacity: 0.08 !important;
             }
             .certificate-box .verify-section {
                 padding: 6px 10px !important;
@@ -898,6 +943,13 @@
             }
             .certificate-box .signature-box .line {
                 width: 100px !important;
+            }
+            /* Security pattern in print */
+            .certificate-box::before {
+                display: block !important;
+            }
+            .certificate-box::after {
+                display: block !important;
             }
         }
 
@@ -1718,7 +1770,7 @@
         }
 
         // ================================================================
-        // DOWNLOAD PDF
+        // ✅ FIXED: DOWNLOAD PDF
         // ================================================================
         function downloadPDF() {
             const element = document.getElementById('certToPrint');
@@ -1727,58 +1779,50 @@
                 return;
             }
 
+            // Hide header and actions for clean PDF
             const header = document.querySelector('.cert-header');
             const actions = document.querySelector('.cert-actions');
             if (header) header.style.display = 'none';
             if (actions) actions.style.display = 'none';
 
-            const opt = {
-                margin: [0.3, 0.3, 0.3, 0.3],
-                filename: `Bonafide_Certificate_${currentCertificateData?.verificationCode || 'cert'}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    letterRendering: true,
-                    width: 850
-                },
-                jsPDF: {
-                    unit: 'in',
-                    format: 'a4',
-                    orientation: 'portrait'
-                }
-            };
+            // Wait for DOM to update
+            setTimeout(() => {
+                const opt = {
+                    margin: 0.3,
+                    filename: `Bonafide_Certificate_${currentCertificateData?.verificationCode || 'cert'}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        letterRendering: true,
+                        width: element.scrollWidth || 850,
+                        height: element.scrollHeight || 1100,
+                        logging: false
+                    },
+                    jsPDF: {
+                        unit: 'in',
+                        format: 'a4',
+                        orientation: 'portrait'
+                    },
+                    pagebreak: { mode: 'avoid-all' }
+                };
 
-            showToast('Generating PDF...', 'info');
+                showToast('Generating PDF...', 'info');
 
-            const clone = element.cloneNode(true);
-            clone.style.width = '850px';
-            clone.style.margin = '0 auto';
-            clone.style.padding = '20px 25px 15px';
-            clone.style.background = 'white';
-
-            const tempContainer = document.createElement('div');
-            tempContainer.style.position = 'absolute';
-            tempContainer.style.left = '-9999px';
-            tempContainer.style.top = '0';
-            tempContainer.style.width = '850px';
-            tempContainer.style.background = 'white';
-            tempContainer.appendChild(clone);
-            document.body.appendChild(tempContainer);
-
-            html2pdf().set(opt).from(clone).save()
-                .then(() => {
-                    if (header) header.style.display = 'flex';
-                    if (actions) actions.style.display = 'flex';
-                    document.body.removeChild(tempContainer);
-                    showToast('PDF downloaded successfully!', 'success');
-                })
-                .catch((error) => {
-                    if (header) header.style.display = 'flex';
-                    if (actions) actions.style.display = 'flex';
-                    document.body.removeChild(tempContainer);
-                    showToast('Error generating PDF: ' + error.message, 'error');
-                });
+                // ✅ Use the actual element, not clone
+                html2pdf().set(opt).from(element).save()
+                    .then(() => {
+                        if (header) header.style.display = 'flex';
+                        if (actions) actions.style.display = 'flex';
+                        showToast('PDF downloaded successfully!', 'success');
+                    })
+                    .catch((error) => {
+                        if (header) header.style.display = 'flex';
+                        if (actions) actions.style.display = 'flex';
+                        console.error('PDF Error:', error);
+                        showToast('Error generating PDF: ' + error.message, 'error');
+                    });
+            }, 300);
         }
 
         // ================================================================
