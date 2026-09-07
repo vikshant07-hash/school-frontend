@@ -528,6 +528,16 @@
             transform: none !important;
         }
 
+        .btn-warning {
+            background: #E67E22;
+            color: var(--white);
+        }
+
+        .btn-warning:hover {
+            background: #D35400;
+            transform: translateY(-3px);
+        }
+
         .hero-image {
             flex: 1;
             min-width: 240px;
@@ -894,8 +904,8 @@
 
         .file-item .info {
             display: flex;
-            align-items: center;
-            gap: 10px;
+            flex-direction: column;
+            gap: 2px;
             flex: 1;
             min-width: 100px;
         }
@@ -911,9 +921,21 @@
             word-break: break-all;
         }
 
+        .file-item .info .title {
+            font-size: 12px;
+            color: var(--gray);
+            font-style: italic;
+        }
+
         .file-item .info .size {
             font-size: 12px;
             color: var(--gray);
+        }
+
+        .file-item .info .sender {
+            font-size: 11px;
+            color: var(--saffron-dark);
+            font-weight: 500;
         }
 
         .file-item .actions a {
@@ -1095,6 +1117,13 @@
             border: 1px solid #B0C4DE;
         }
 
+        .connection-item .badge.permission-badge {
+            background: #FEF9E7;
+            color: #7D6608;
+            border: 1px solid #F9E79F;
+            font-size: 9px;
+        }
+
         /* ============================================================
            HOST CONTROLS
            ============================================================ */
@@ -1129,7 +1158,7 @@
 
         .host-controls .body .control-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 12px;
         }
 
@@ -1150,6 +1179,8 @@
             background: var(--white-smoke);
             border-radius: var(--radius-sm);
             margin-bottom: 4px;
+            flex-wrap: wrap;
+            gap: 6px;
         }
 
         .host-controls .body .guest-list .guest-item .name {
@@ -1157,9 +1188,15 @@
             font-weight: 500;
         }
 
+        .host-controls .body .guest-list .guest-item .permission {
+            font-size: 11px;
+            color: var(--gray);
+        }
+
         .host-controls .body .guest-list .guest-item .actions {
             display: flex;
             gap: 6px;
+            flex-wrap: wrap;
         }
 
         .host-controls .body .guest-list .guest-item .actions .btn-sm {
@@ -1194,6 +1231,38 @@
         }
 
         .host-controls .body .share-options select:focus {
+            outline: none;
+            border-color: var(--saffron);
+            box-shadow: 0 0 0 4px var(--saffron-glow);
+        }
+
+        .host-controls .body .file-title-input {
+            margin-top: 12px;
+            padding: 12px;
+            background: var(--white-smoke);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        .host-controls .body .file-title-input label {
+            font-size: 13px;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .host-controls .body .file-title-input input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-family: var(--font);
+            background: var(--white);
+            color: var(--black);
+        }
+
+        .host-controls .body .file-title-input input:focus {
             outline: none;
             border-color: var(--saffron);
             box-shadow: 0 0 0 4px var(--saffron-glow);
@@ -1432,7 +1501,7 @@
             }
 
             .host-controls .body .control-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr 1fr;
             }
         }
 
@@ -1472,6 +1541,10 @@
             .username-modal .modal-box .input-group .btn {
                 width: 100%;
                 justify-content: center;
+            }
+
+            .host-controls .body .control-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -1658,6 +1731,7 @@
                     <div class="control-grid">
                         <button class="btn btn-success" id="shareAllBtn"><i class="fas fa-broadcast"></i> Share to All</button>
                         <button class="btn btn-secondary" id="shareSpecificBtn"><i class="fas fa-user-plus"></i> Share to Specific</button>
+                        <button class="btn btn-warning" id="managePermBtn"><i class="fas fa-key"></i> Manage Permissions</button>
                     </div>
                     <div class="share-options hidden" id="shareOptions">
                         <label><i class="fas fa-users"></i> Select Device to Share:</label>
@@ -1665,6 +1739,10 @@
                             <option value="all">All Devices</option>
                         </select>
                         <button class="btn btn-primary" id="shareSelectedBtn" style="margin-top:8px;"><i class="fas fa-paper-plane"></i> Share Now</button>
+                    </div>
+                    <div class="file-title-input hidden" id="fileTitleInput">
+                        <label><i class="fas fa-tag"></i> File Title (Optional):</label>
+                        <input type="text" id="fileTitle" placeholder="Enter file title..." maxlength="50" />
                     </div>
                     <div class="guest-list" id="guestList">
                         <p style="font-size:13px;color:var(--gray);margin-bottom:6px;"><i class="fas fa-user-friends"></i> Guest Devices:</p>
@@ -1685,6 +1763,9 @@
                     <h3 data-i18n="send-title">Send File</h3>
                     <p style="font-size:12px;color:var(--gray);margin-bottom:8px;" id="sendTargetInfo">Sending to: All Devices</p>
                     <input type="file" id="fileInput" />
+                    <div style="margin-top:8px;">
+                        <input type="text" id="sendFileTitle" placeholder="Enter file title..." style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:var(--font);background:var(--white-smoke);color:var(--black);" maxlength="50" />
+                    </div>
                     <button class="btn btn-primary" id="sendFileBtn" style="margin-top:10px;" data-i18n="send-btn"><i class="fas fa-paper-plane"></i> Send</button>
                     <div class="progress-wrap" id="progressWrap">
                         <div class="progress-track">
@@ -1882,6 +1963,7 @@
             const disconnectBtn = document.getElementById('disconnectBtn');
             const closeOfferBtn = document.getElementById('closeOfferBtn');
             const fileInput = document.getElementById('fileInput');
+            const sendFileTitle = document.getElementById('sendFileTitle');
             const offerDisplay = document.getElementById('offerDisplay');
             const offerCode = document.getElementById('offerCode');
             const remoteCode = document.getElementById('remoteCode');
@@ -1914,8 +1996,10 @@
             const shareAllBtn = document.getElementById('shareAllBtn');
             const shareSpecificBtn = document.getElementById('shareSpecificBtn');
             const shareSelectedBtn = document.getElementById('shareSelectedBtn');
+            const managePermBtn = document.getElementById('managePermBtn');
+            const fileTitleInput = document.getElementById('fileTitleInput');
+            const fileTitle = document.getElementById('fileTitle');
             const sendTargetInfo = document.getElementById('sendTargetInfo');
-            const hostItem = document.getElementById('hostItem');
 
             // ===== STATE =====
             let peer = null;
@@ -1928,9 +2012,11 @@
             let fileMetadata = null;
             let keepAliveInterval = null;
             let isHost = false;
-            let shareTarget = 'all'; // 'all' or specific peer ID
-            let deviceUsernameMap = {}; // peerId -> username
+            let shareTarget = 'all';
+            let deviceUsernameMap = {};
+            let guestPermissions = {}; // peerId -> {canShare: boolean}
             let pendingFileForShare = null;
+            let pendingFileTitleForShare = '';
             const CHUNK_SIZE = 16384;
 
             // ===== CODE GENERATOR =====
@@ -2036,11 +2122,9 @@
                 usernameError.textContent = 'Please enter a valid username';
                 myUsername = username;
                 hideUsernameModal();
-                // Update UI with username
                 hostDeviceName.textContent = myUsername;
                 document.querySelector('#hostItem .label').textContent = myUsername;
                 setStatus('Welcome ' + myUsername + '! Create an offer or connect.', 'success');
-                // Enable buttons
                 createOfferBtn.disabled = false;
                 connectBtn.disabled = false;
             });
@@ -2082,12 +2166,10 @@
             }
 
             function updateConnectionUI() {
-                // Update host
                 const hostName = myUsername || 'You';
                 hostDeviceName.textContent = hostName;
                 document.querySelector('#hostItem .label').textContent = hostName;
 
-                // Update other devices
                 let html = '';
                 const activeConnections = connections.filter(c => c.open);
 
@@ -2108,11 +2190,13 @@
                     activeConnections.forEach((conn) => {
                         const peerId = conn.peer || 'Device';
                         const username = deviceUsernameMap[peerId] || peerId;
+                        const canShare = guestPermissions[peerId] !== false;
                         html += `
                             <div class="connection-item guest">
                                 <span class="dot connected"></span>
                                 <span class="label">${username}</span>
                                 <span class="sub"><i class="fas fa-link" style="color:#2980B9;"></i> Guest</span>
+                                ${canShare ? '<span class="badge permission-badge"><i class="fas fa-check"></i> Can Share</span>' : '<span class="badge" style="background:#FDF0EE;color:#C0392B;border:1px solid #F5B7B1;font-size:9px;padding:2px 8px;border-radius:50px;"><i class="fas fa-ban"></i> No Share</span>'}
                                 <span class="badge guest-badge"><i class="fas fa-check"></i> Connected</span>
                             </div>
                         `;
@@ -2131,16 +2215,13 @@
 
                 otherDevices.innerHTML = html;
 
-                // Update device count
                 const count = activeConnections.length;
                 deviceCount.textContent = count + ' devices';
 
-                // Update guest list for host
                 if (isHost) {
                     updateGuestList();
                 }
 
-                // Show/hide transfer section and host controls
                 if (count > 0 || isHost) {
                     transferSection.classList.remove('hidden');
                     document.getElementById('setupSection').style.opacity = '0.4';
@@ -2163,7 +2244,6 @@
                     hostControls.classList.add('hidden');
                 }
 
-                // Update share target select
                 updateShareTargets();
             }
 
@@ -2178,12 +2258,17 @@
                 activeConnections.forEach((conn) => {
                     const peerId = conn.peer || 'Device';
                     const username = deviceUsernameMap[peerId] || peerId;
+                    const canShare = guestPermissions[peerId] !== false;
                     html += `
                         <div class="guest-item">
                             <span class="name"><i class="fas fa-user-circle" style="color:#2980B9;"></i> ${username}</span>
+                            <span class="permission">${canShare ? '✅ Can Share' : '❌ Cannot Share'}</span>
                             <div class="actions">
                                 <button class="btn btn-primary btn-sm" onclick="window.shareToSpecific('${peerId}')">
                                     <i class="fas fa-paper-plane"></i> Share
+                                </button>
+                                <button class="btn btn-warning btn-sm" onclick="window.togglePermission('${peerId}')">
+                                    <i class="fas fa-key"></i>
                                 </button>
                                 <button class="btn btn-danger btn-sm" onclick="window.disconnectGuest('${peerId}')">
                                     <i class="fas fa-times"></i>
@@ -2207,6 +2292,15 @@
                     option.textContent = username;
                     select.appendChild(option);
                 });
+            }
+
+            function updateSendTargetInfo() {
+                if (shareTarget === 'all') {
+                    sendTargetInfo.textContent = 'Sending to: All Devices';
+                } else {
+                    const name = deviceUsernameMap[shareTarget] || shareTarget;
+                    sendTargetInfo.textContent = 'Sending to: ' + name;
+                }
             }
 
             // ===== KEEP ALIVE =====
@@ -2281,6 +2375,8 @@
                             return;
                         }
                         connections.push(conn);
+                        // Default permission: can share = true
+                        guestPermissions[conn.peer] = true;
                         setupConnection(conn);
                         setStatus('New device connected!', 'success');
                         updateConnectionUI();
@@ -2305,9 +2401,12 @@
 
             function setupConnection(conn) {
                 conn.on('open', function() {
-                    // Send username to peer
                     try {
                         conn.send({ type: 'username', username: myUsername });
+                        // Send permission info if host
+                        if (isHost) {
+                            conn.send({ type: 'permission', canShare: guestPermissions[conn.peer] !== false });
+                        }
                     } catch (e) { /* ignore */ }
                     setStatus('Connected! Ready to share files.', 'success');
                     updateConnectionUI();
@@ -2328,9 +2427,25 @@
                         updateConnectionUI();
                         return;
                     }
+                    if (data.type === 'permission') {
+                        // Guest receiving permission from host
+                        if (!isHost) {
+                            if (data.canShare) {
+                                setStatus('Host has granted you sharing permission!', 'success');
+                            } else {
+                                setStatus('Host has revoked your sharing permission.', 'warning');
+                            }
+                        }
+                        return;
+                    }
                     if (data.type === 'share-target') {
                         shareTarget = data.target;
                         updateSendTargetInfo();
+                        return;
+                    }
+                    if (data.type === 'permission-update') {
+                        guestPermissions[data.peerId] = data.canShare;
+                        updateConnectionUI();
                         return;
                     }
                     handleReceivedData(data, conn);
@@ -2341,6 +2456,7 @@
                     if (index > -1) {
                         const peerId = conn.peer;
                         delete deviceUsernameMap[peerId];
+                        delete guestPermissions[peerId];
                         connections.splice(index, 1);
                     }
                     if (connections.length === 0 && !isHost) {
@@ -2363,14 +2479,23 @@
             // ===== DATA HANDLING =====
             function handleReceivedData(data, conn) {
                 try {
+                    // Check if this device has permission to share (for guests)
+                    if (!isHost && data.type === 'file-metadata') {
+                        // Check if we have permission
+                        if (guestPermissions[myPeerId] === false) {
+                            setStatus('You do not have permission to receive files from this host.', 'warning');
+                            return;
+                        }
+                    }
+
                     if (data.type === 'file-metadata') {
-                        // Check if this file is for this device
                         if (data.target && data.target !== myPeerId && data.target !== 'all') {
                             return;
                         }
                         fileMetadata = data;
                         currentFile = null;
-                        setStatus('Receiving: ' + data.fileName, 'info');
+                        const titleInfo = data.fileTitle ? ' - "' + data.fileTitle + '"' : '';
+                        setStatus('Receiving: ' + data.fileName + titleInfo + ' from ' + (data.sender || 'unknown'), 'info');
                         progressWrap.classList.add('active');
                         progressFill.style.width = '0%';
                         progressPercent.textContent = '0%';
@@ -2383,7 +2508,6 @@
                             console.warn('Chunk without metadata');
                             return;
                         }
-                        // Check if this file is for this device
                         if (fileMetadata.target && fileMetadata.target !== myPeerId && fileMetadata.target !== 'all') {
                             return;
                         }
@@ -2411,6 +2535,8 @@
                             const fileName = fileMetadata.fileName;
                             const fileSize = formatSize(fileMetadata.fileSize);
                             const icon = getFileIcon(fileName);
+                            const title = fileMetadata.fileTitle || '';
+                            const sender = fileMetadata.sender || 'Unknown';
 
                             const item = document.createElement('div');
                             item.className = 'file-item fade-in';
@@ -2418,7 +2544,9 @@
                                 <div class="info">
                                     <span class="file-icon"><i class="fas ${icon}"></i></span>
                                     <span class="name">${fileName}</span>
+                                    ${title ? `<span class="title">📌 ${title}</span>` : ''}
                                     <span class="size">(${fileSize})</span>
+                                    <span class="sender"><i class="fas fa-user"></i> From: ${sender}</span>
                                 </div>
                                 <div class="actions">
                                     <a href="${url}" download="${fileName}"><i class="fas fa-download"></i> Download</a>
@@ -2433,7 +2561,8 @@
                             fileCount.textContent = receivedFileCount;
 
                             progressWrap.classList.remove('active');
-                            setStatus('File received: ' + fileName, 'success');
+                            const titleMsg = title ? ' ("' + title + '")' : '';
+                            setStatus('File received: ' + fileName + titleMsg + ' from ' + sender, 'success');
                             updateSteps(3);
 
                             currentFile = null;
@@ -2448,12 +2577,17 @@
             }
 
             // ===== SEND FILE =====
-            function sendFile(file, target) {
+            function sendFile(file, target, fileTitle) {
                 const activeConnections = connections.filter(c => c.open);
                 let targetConnections = activeConnections;
 
                 if (target && target !== 'all') {
                     targetConnections = activeConnections.filter(c => c.peer === target);
+                    // Check if target has permission
+                    if (target !== 'all' && guestPermissions[target] === false) {
+                        setStatus('Target device does not have permission to receive files.', 'error');
+                        return;
+                    }
                 }
 
                 if (targetConnections.length === 0) {
@@ -2467,7 +2601,8 @@
                     fileSize: file.size,
                     fileType: file.type || 'application/octet-stream',
                     target: target || 'all',
-                    sender: myUsername
+                    sender: myUsername,
+                    fileTitle: fileTitle || ''
                 };
 
                 let sentCount = 0;
@@ -2488,7 +2623,8 @@
                 progressWrap.classList.add('active');
                 progressFill.style.width = '0%';
                 progressPercent.textContent = '0%';
-                progressFileName.textContent = file.name + ' (' + formatSize(file.size) + ')';
+                const titleDisplay = fileTitle ? ' "' + fileTitle + '"' : '';
+                progressFileName.textContent = file.name + titleDisplay + ' (' + formatSize(file.size) + ')';
                 const targetName = (target && target !== 'all') ? 
                     (deviceUsernameMap[target] || target) : 'All Devices';
                 setStatus('Sending to ' + targetName + ' (' + sentCount + ' device(s)): ' + file.name, 'info');
@@ -2544,22 +2680,16 @@
                 readNextChunk();
             }
 
-            function updateSendTargetInfo() {
-                if (shareTarget === 'all') {
-                    sendTargetInfo.textContent = 'Sending to: All Devices';
-                } else {
-                    const name = deviceUsernameMap[shareTarget] || shareTarget;
-                    sendTargetInfo.textContent = 'Sending to: ' + name;
-                }
-            }
-
-            // ===== SHARE TO SPECIFIC (Global function for guest list) =====
+            // ===== SHARE TO SPECIFIC (Global function) =====
             window.shareToSpecific = function(peerId) {
+                if (!isHost) {
+                    setStatus('Only the host can share files.', 'error');
+                    return;
+                }
                 shareTarget = peerId;
                 updateSendTargetInfo();
                 const username = deviceUsernameMap[peerId] || peerId;
                 setStatus('Share target set to: ' + username, 'info');
-                // Notify other devices about share target
                 connections.forEach(conn => {
                     try {
                         if (conn.open) {
@@ -2567,21 +2697,52 @@
                         }
                     } catch (e) { /* ignore */ }
                 });
-                // If there's a pending file, send it
                 if (pendingFileForShare) {
                     const file = pendingFileForShare;
+                    const title = pendingFileTitleForShare || '';
                     pendingFileForShare = null;
-                    sendFile(file, shareTarget);
+                    pendingFileTitleForShare = '';
+                    sendFile(file, shareTarget, title);
                 }
             };
 
+            window.togglePermission = function(peerId) {
+                if (!isHost) {
+                    setStatus('Only the host can manage permissions.', 'error');
+                    return;
+                }
+                const current = guestPermissions[peerId] !== false;
+                guestPermissions[peerId] = !current;
+                const username = deviceUsernameMap[peerId] || peerId;
+                setStatus('Permission for ' + username + ' set to: ' + (guestPermissions[peerId] ? 'Can Share' : 'Cannot Share'),
+                    'info');
+                // Send permission update to all guests
+                connections.forEach(conn => {
+                    try {
+                        if (conn.open) {
+                            conn.send({ type: 'permission-update', peerId: peerId, canShare: guestPermissions[
+                                    peerId] });
+                            if (conn.peer === peerId) {
+                                conn.send({ type: 'permission', canShare: guestPermissions[peerId] });
+                            }
+                        }
+                    } catch (e) { /* ignore */ }
+                });
+                updateConnectionUI();
+            };
+
             window.disconnectGuest = function(peerId) {
+                if (!isHost) {
+                    setStatus('Only the host can disconnect guests.', 'error');
+                    return;
+                }
                 const conn = connections.find(c => c.peer === peerId);
                 if (conn) {
                     try { conn.close(); } catch (e) {}
                     const index = connections.indexOf(conn);
                     if (index > -1) {
                         delete deviceUsernameMap[peerId];
+                        delete guestPermissions[peerId];
                         connections.splice(index, 1);
                     }
                     setStatus('Disconnected guest', 'warning');
@@ -2643,6 +2804,8 @@
                         return;
                     }
                     connections.push(conn);
+                    // Default permission for this connection
+                    guestPermissions[conn.peer] = true;
                     setupConnection(conn);
                     setStatus('Connecting to ' + remoteId + '...', 'info');
                     updateConnectionUI();
@@ -2662,24 +2825,42 @@
                     setStatus('No devices connected', 'error');
                     return;
                 }
+
+                // Check if guest has permission to share
+                if (!isHost) {
+                    if (guestPermissions[myPeerId] === false) {
+                        setStatus('You do not have permission to share files. Contact the host.', 'error');
+                        return;
+                    }
+                }
+
                 const file = files[0];
+                const title = sendFileTitle.value.trim() || '';
                 
                 if (shareTarget === 'all') {
-                    sendFile(file, 'all');
+                    sendFile(file, 'all', title);
                 } else {
-                    // Check if target still connected
                     const targetConn = connections.find(c => c.peer === shareTarget && c.open);
                     if (!targetConn) {
                         setStatus('Target device disconnected. Sending to all.', 'warning');
-                        sendFile(file, 'all');
+                        sendFile(file, 'all', title);
                     } else {
-                        sendFile(file, shareTarget);
+                        // Check target permission if host
+                        if (isHost && guestPermissions[shareTarget] === false) {
+                            setStatus('Target device does not have permission to receive files.', 'error');
+                            return;
+                        }
+                        sendFile(file, shareTarget, title);
                     }
                 }
             });
 
             // Host Controls
             shareAllBtn.addEventListener('click', function() {
+                if (!isHost) {
+                    setStatus('Only the host can control sharing.', 'error');
+                    return;
+                }
                 shareTarget = 'all';
                 updateSendTargetInfo();
                 setStatus('Share mode: All Devices', 'info');
@@ -2691,19 +2872,29 @@
                     } catch (e) { /* ignore */ }
                 });
                 shareOptions.classList.add('hidden');
+                fileTitleInput.classList.add('hidden');
             });
 
             shareSpecificBtn.addEventListener('click', function() {
+                if (!isHost) {
+                    setStatus('Only the host can control sharing.', 'error');
+                    return;
+                }
                 const activeConnections = connections.filter(c => c.open);
                 if (activeConnections.length === 0) {
                     setStatus('No guests connected to share with', 'error');
                     return;
                 }
                 shareOptions.classList.toggle('hidden');
+                fileTitleInput.classList.add('hidden');
                 updateShareTargets();
             });
 
             shareSelectedBtn.addEventListener('click', function() {
+                if (!isHost) {
+                    setStatus('Only the host can control sharing.', 'error');
+                    return;
+                }
                 const target = shareTargetSelect.value;
                 if (!target) {
                     setStatus('Please select a target device', 'error');
@@ -2721,6 +2912,21 @@
                     } catch (e) { /* ignore */ }
                 });
                 shareOptions.classList.add('hidden');
+                fileTitleInput.classList.add('hidden');
+            });
+
+            managePermBtn.addEventListener('click', function() {
+                if (!isHost) {
+                    setStatus('Only the host can manage permissions.', 'error');
+                    return;
+                }
+                const activeConnections = connections.filter(c => c.open);
+                if (activeConnections.length === 0) {
+                    setStatus('No guests connected to manage.', 'error');
+                    return;
+                }
+                updateGuestList();
+                setStatus('Manage permissions from the Guest Devices list below.', 'info');
             });
 
             disconnectBtn.addEventListener('click', function() {
@@ -2729,6 +2935,7 @@
                 });
                 connections = [];
                 deviceUsernameMap = {};
+                guestPermissions = {};
                 if (peer) {
                     try { peer.destroy(); } catch (e) {}
                     peer = null;
@@ -2740,6 +2947,7 @@
                 offerDisplay.classList.add('hidden');
                 peerIdText.textContent = '—';
                 fileInput.value = '';
+                sendFileTitle.value = '';
                 progressWrap.classList.remove('active');
                 currentFile = null;
                 fileMetadata = null;
@@ -2748,6 +2956,8 @@
                 updateSteps(1);
                 updateConnectionUI();
                 hostControls.classList.add('hidden');
+                shareOptions.classList.add('hidden');
+                fileTitleInput.classList.add('hidden');
                 if (keepAliveInterval) {
                     clearInterval(keepAliveInterval);
                     keepAliveInterval = null;
@@ -2769,12 +2979,15 @@
                 });
                 connections = [];
                 deviceUsernameMap = {};
+                guestPermissions = {};
                 isConnected = false;
                 updateSteps(1);
                 updateConnectionUI();
                 document.getElementById('setupSection').style.opacity = '1';
                 document.getElementById('setupSection').style.pointerEvents = 'auto';
                 hostControls.classList.add('hidden');
+                shareOptions.classList.add('hidden');
+                fileTitleInput.classList.add('hidden');
             });
 
             copyOfferBtn.addEventListener('click', function() {
@@ -2803,6 +3016,7 @@
                 });
                 connections = [];
                 deviceUsernameMap = {};
+                guestPermissions = {};
                 isConnected = false;
                 setStatus('Click "Create Offer" to generate a new code', 'info');
                 peerIdText.textContent = '—';
@@ -2811,6 +3025,8 @@
                 document.getElementById('setupSection').style.opacity = '1';
                 document.getElementById('setupSection').style.pointerEvents = 'auto';
                 hostControls.classList.add('hidden');
+                shareOptions.classList.add('hidden');
+                fileTitleInput.classList.add('hidden');
             });
 
             // Hamburger
@@ -2848,11 +3064,9 @@
             });
 
             // ===== INIT =====
-            // Disable buttons until username is set
             createOfferBtn.disabled = true;
             connectBtn.disabled = true;
 
-            // Show username modal
             showUsernameModal();
 
             setStatus('Please enter your username to continue', '');
@@ -2864,7 +3078,9 @@
             console.log('📖 Open this page on multiple devices.');
             console.log('📡 One device clicks "Create Offer" (Host), others paste the code and click "Connect" (Guest).');
             console.log('👤 Each device needs a unique username for identification.');
-            console.log('👑 Host has full control - can share to all or specific devices.');
+            console.log('👑 Host has full control - can manage permissions and sharing.');
+            console.log('🔑 Guests can only share if host grants permission.');
+            console.log('📝 Files can have titles for better identification.');
 
         })();
     </script>
