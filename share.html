@@ -108,6 +108,18 @@
             }
         }
 
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.6;
+                transform: scale(0.9);
+            }
+        }
+
         .fade-in {
             animation: fadeInUp 0.5s ease;
         }
@@ -272,6 +284,109 @@
         }
 
         /* ============================================================
+           USERNAME MODAL
+           ============================================================ */
+        .username-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        .username-modal.hidden {
+            display: none;
+        }
+
+        .username-modal .modal-box {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 40px 36px 32px;
+            max-width: 420px;
+            width: 92%;
+            text-align: center;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border);
+        }
+
+        .username-modal .modal-box .icon-box {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--saffron-bg);
+            color: var(--saffron);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 16px;
+            border: 2px solid var(--saffron-glow);
+        }
+
+        .username-modal .modal-box h2 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--black);
+            margin-bottom: 4px;
+        }
+
+        .username-modal .modal-box h2 span {
+            color: var(--saffron);
+        }
+
+        .username-modal .modal-box p {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .username-modal .modal-box .input-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .username-modal .modal-box .input-group input {
+            flex: 1;
+            min-width: 160px;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-family: var(--font);
+            transition: var(--transition);
+            background: var(--white-smoke);
+            color: var(--black);
+        }
+
+        .username-modal .modal-box .input-group input:focus {
+            outline: none;
+            border-color: var(--saffron);
+            box-shadow: 0 0 0 4px var(--saffron-glow);
+            background: var(--white);
+        }
+
+        .username-modal .modal-box .input-group .btn {
+            padding: 12px 28px;
+        }
+
+        .username-modal .modal-box .error-msg {
+            color: #C0392B;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .username-modal .modal-box .error-msg.show {
+            display: block;
+        }
+
+        /* ============================================================
            HERO
            ============================================================ */
         .hero {
@@ -395,6 +510,22 @@
         .btn-danger:hover {
             background: #A93226;
             transform: translateY(-3px);
+        }
+
+        .btn-success {
+            background: #27AE60;
+            color: var(--white);
+        }
+
+        .btn-success:hover {
+            background: #1E8449;
+            transform: translateY(-3px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
         }
 
         .hero-image {
@@ -840,19 +971,8 @@
             flex-shrink: 0;
         }
 
-        .code-highlight {
-            background: var(--dark-blue);
-            color: var(--saffron-light);
-            padding: 2px 12px;
-            border-radius: 6px;
-            font-family: 'SF Mono', monospace;
-            font-size: 14px;
-            letter-spacing: 0.5px;
-            display: inline-block;
-        }
-
         /* ============================================================
-           CONNECTED DEVICES - CLEAN LAYOUT
+           CONNECTION STATUS
            ============================================================ */
         .connection-status {
             margin-top: 16px;
@@ -877,6 +997,17 @@
 
         .connection-status .header i {
             color: var(--saffron);
+        }
+
+        .connection-status .header .host-badge-header {
+            margin-left: auto;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 12px;
+            border-radius: 50px;
+            background: var(--saffron-bg);
+            color: var(--saffron-dark);
+            border: 1px solid var(--saffron-glow);
         }
 
         .connection-status .body {
@@ -904,8 +1035,8 @@
             background: var(--saffron-bg);
         }
 
-        .connection-item.connected {
-            border-left-color: #27AE60;
+        .connection-item.guest {
+            border-left-color: #2980B9;
         }
 
         .connection-item .dot {
@@ -922,18 +1053,6 @@
         .connection-item .dot.connected {
             background: #2980B9;
             animation: pulse-dot 2s infinite;
-        }
-
-        @keyframes pulse-dot {
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.6;
-                transform: scale(0.9);
-            }
         }
 
         .connection-item .label {
@@ -964,16 +1083,120 @@
             border: 1px solid var(--saffron-glow);
         }
 
-        .connection-item .badge.connected-badge {
-            background: #E8F8F5;
-            color: #1A7A5A;
-            border: 1px solid #A3E4D7;
+        .connection-item .badge.guest-badge {
+            background: #E8F4FD;
+            color: #1A5276;
+            border: 1px solid #AED6F1;
         }
 
         .connection-item .badge.you-badge {
             background: var(--dark-blue-bg);
             color: var(--dark-blue);
             border: 1px solid #B0C4DE;
+        }
+
+        /* ============================================================
+           HOST CONTROLS
+           ============================================================ */
+        .host-controls {
+            margin-top: 16px;
+            background: var(--white);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .host-controls .header {
+            padding: 14px 20px;
+            background: var(--white-smoke);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--black-fade);
+        }
+
+        .host-controls .header i {
+            color: var(--saffron);
+        }
+
+        .host-controls .body {
+            padding: 16px 20px;
+        }
+
+        .host-controls .body .control-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .host-controls .body .control-grid .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .host-controls .body .guest-list {
+            margin-top: 12px;
+        }
+
+        .host-controls .body .guest-list .guest-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: var(--white-smoke);
+            border-radius: var(--radius-sm);
+            margin-bottom: 4px;
+        }
+
+        .host-controls .body .guest-list .guest-item .name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .host-controls .body .guest-list .guest-item .actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .host-controls .body .guest-list .guest-item .actions .btn-sm {
+            padding: 4px 10px;
+            font-size: 11px;
+        }
+
+        .host-controls .body .share-options {
+            margin-top: 12px;
+            padding: 12px;
+            background: var(--white-smoke);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        .host-controls .body .share-options label {
+            font-size: 13px;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .host-controls .body .share-options select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-family: var(--font);
+            background: var(--white);
+            color: var(--black);
+        }
+
+        .host-controls .body .share-options select:focus {
+            outline: none;
+            border-color: var(--saffron);
+            box-shadow: 0 0 0 4px var(--saffron-glow);
         }
 
         /* ============================================================
@@ -1207,6 +1430,10 @@
             .connection-item .badge {
                 margin-left: 0;
             }
+
+            .host-controls .body .control-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1235,10 +1462,43 @@
                 height: 18px;
                 font-size: 9px;
             }
+
+            .username-modal .modal-box {
+                padding: 28px 20px 24px;
+            }
+            .username-modal .modal-box .input-group {
+                flex-direction: column;
+            }
+            .username-modal .modal-box .input-group .btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
+
+    <!-- ============================================================
+    USERNAME MODAL
+    ============================================================ -->
+    <div class="username-modal" id="usernameModal">
+        <div class="modal-box">
+            <div class="icon-box">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h2>Welcome to <span>SHAREx</span></h2>
+            <p>Enter your username to identify yourself on the network.</p>
+            <div class="input-group">
+                <input type="text" id="usernameInput" placeholder="Enter username..." maxlength="20" />
+                <button class="btn btn-primary" id="usernameSubmitBtn">
+                    <i class="fas fa-check"></i> Join
+                </button>
+            </div>
+            <div class="error-msg" id="usernameError">
+                <i class="fas fa-exclamation-circle"></i> Please enter a valid username
+            </div>
+        </div>
+    </div>
 
     <!-- ============================================================
     NAVBAR
@@ -1307,7 +1567,7 @@
     <section class="app-section" id="app">
         <div class="section-title">
             <h2><span class="highlight"><i class="fas fa-wifi"></i></span> <span data-i18n="app-title2">File Sharing</span></h2>
-            <p data-i18n="app-desc">Connect two devices and transfer files directly</p>
+            <p data-i18n="app-desc">Connect devices and transfer files directly</p>
         </div>
 
         <!-- STEPS -->
@@ -1368,21 +1628,50 @@
                 <span style="margin-left:12px;font-weight:500;color:var(--gray);font-size:11px;"><i class="fas fa-info-circle"></i> Keep tab open to stay connected</span>
             </div>
 
-            <!-- CONNECTION STATUS - CLEAN LAYOUT -->
+            <!-- CONNECTION STATUS -->
             <div class="connection-status" id="connectionStatus">
                 <div class="header">
                     <i class="fas fa-users"></i>
                     <span>Connected Devices</span>
                     <span style="margin-left:auto;font-weight:400;font-size:12px;color:var(--gray);" id="deviceCount">0 devices</span>
+                    <span class="host-badge-header" id="hostBadgeHeader"><i class="fas fa-crown"></i> Host</span>
                 </div>
                 <div class="body" id="connectionBody">
-                    <div class="connection-item host">
+                    <div class="connection-item host" id="hostItem">
                         <span class="dot online"></span>
-                        <span class="label" id="hostDeviceId">—</span>
+                        <span class="label" id="hostDeviceName">—</span>
                         <span class="sub"><i class="fas fa-crown" style="color:var(--saffron);"></i> Host</span>
                         <span class="badge host-badge"><i class="fas fa-check-circle"></i> Online</span>
                     </div>
                     <div id="otherDevices"></div>
+                </div>
+            </div>
+
+            <!-- HOST CONTROLS - Only visible to host -->
+            <div class="host-controls hidden" id="hostControls">
+                <div class="header">
+                    <i class="fas fa-sliders-h"></i>
+                    <span>Host Controls</span>
+                    <span style="margin-left:auto;font-weight:400;font-size:12px;color:var(--gray);"><i class="fas fa-crown" style="color:var(--saffron);"></i> You are the Host</span>
+                </div>
+                <div class="body">
+                    <div class="control-grid">
+                        <button class="btn btn-success" id="shareAllBtn"><i class="fas fa-broadcast"></i> Share to All</button>
+                        <button class="btn btn-secondary" id="shareSpecificBtn"><i class="fas fa-user-plus"></i> Share to Specific</button>
+                    </div>
+                    <div class="share-options hidden" id="shareOptions">
+                        <label><i class="fas fa-users"></i> Select Device to Share:</label>
+                        <select id="shareTargetSelect">
+                            <option value="all">All Devices</option>
+                        </select>
+                        <button class="btn btn-primary" id="shareSelectedBtn" style="margin-top:8px;"><i class="fas fa-paper-plane"></i> Share Now</button>
+                    </div>
+                    <div class="guest-list" id="guestList">
+                        <p style="font-size:13px;color:var(--gray);margin-bottom:6px;"><i class="fas fa-user-friends"></i> Guest Devices:</p>
+                        <div id="guestListItems">
+                            <p style="font-size:12px;color:var(--gray);text-align:center;padding:8px;">No guests connected</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1394,6 +1683,7 @@
                 <div class="card fade-in">
                     <span class="card-icon"><i class="fas fa-upload"></i></span>
                     <h3 data-i18n="send-title">Send File</h3>
+                    <p style="font-size:12px;color:var(--gray);margin-bottom:8px;" id="sendTargetInfo">Sending to: All Devices</p>
                     <input type="file" id="fileInput" />
                     <button class="btn btn-primary" id="sendFileBtn" style="margin-top:10px;" data-i18n="send-btn"><i class="fas fa-paper-plane"></i> Send</button>
                     <div class="progress-wrap" id="progressWrap">
@@ -1502,7 +1792,7 @@
                     'hero-image-title': 'SHAREx Tool',
                     'hero-image-desc': 'P2P File Transfer',
                     'app-title2': 'File Sharing',
-                    'app-desc': 'Connect two devices and transfer files directly',
+                    'app-desc': 'Connect devices and transfer files directly',
                     'step1': 'Connect',
                     'step2': 'Choose File',
                     'step3': 'Share',
@@ -1546,7 +1836,7 @@
                     'hero-image-title': 'SHAREx Tool',
                     'hero-image-desc': 'P2P फ़ाइल ट्रांसफर',
                     'app-title2': 'फ़ाइल शेयरिंग',
-                    'app-desc': 'दो डिवाइसों को कनेक्ट करें और सीधे फ़ाइलें ट्रांसफर करें',
+                    'app-desc': 'डिवाइसों को कनेक्ट करें और सीधे फ़ाइलें ट्रांसफर करें',
                     'step1': 'कनेक्ट करें',
                     'step2': 'फ़ाइल चुनें',
                     'step3': 'शेयर करें',
@@ -1581,6 +1871,11 @@
             let currentLang = 'en';
 
             // ===== DOM REFS =====
+            const usernameModal = document.getElementById('usernameModal');
+            const usernameInput = document.getElementById('usernameInput');
+            const usernameSubmitBtn = document.getElementById('usernameSubmitBtn');
+            const usernameError = document.getElementById('usernameError');
+
             const createOfferBtn = document.getElementById('createOfferBtn');
             const connectBtn = document.getElementById('connectBtn');
             const sendFileBtn = document.getElementById('sendFileBtn');
@@ -1608,20 +1903,34 @@
             const hamburger = document.getElementById('hamburger');
             const navLinks = document.getElementById('navLinks');
             const langButtons = document.querySelectorAll('.lang-toggle button');
-            const hostDeviceId = document.getElementById('hostDeviceId');
+            const hostDeviceName = document.getElementById('hostDeviceName');
             const otherDevices = document.getElementById('otherDevices');
             const deviceCount = document.getElementById('deviceCount');
+            const hostBadgeHeader = document.getElementById('hostBadgeHeader');
+            const hostControls = document.getElementById('hostControls');
+            const guestListItems = document.getElementById('guestListItems');
+            const shareOptions = document.getElementById('shareOptions');
+            const shareTargetSelect = document.getElementById('shareTargetSelect');
+            const shareAllBtn = document.getElementById('shareAllBtn');
+            const shareSpecificBtn = document.getElementById('shareSpecificBtn');
+            const shareSelectedBtn = document.getElementById('shareSelectedBtn');
+            const sendTargetInfo = document.getElementById('sendTargetInfo');
+            const hostItem = document.getElementById('hostItem');
 
             // ===== STATE =====
             let peer = null;
             let connections = [];
             let isConnected = false;
             let myPeerId = null;
+            let myUsername = '';
             let receivedFileCount = 0;
             let currentFile = null;
             let fileMetadata = null;
             let keepAliveInterval = null;
             let isHost = false;
+            let shareTarget = 'all'; // 'all' or specific peer ID
+            let deviceUsernameMap = {}; // peerId -> username
+            let pendingFileForShare = null;
             const CHUNK_SIZE = 16384;
 
             // ===== CODE GENERATOR =====
@@ -1702,6 +2011,46 @@
                 });
             });
 
+            // ===== USERNAME =====
+            function showUsernameModal() {
+                usernameModal.classList.remove('hidden');
+                usernameInput.focus();
+            }
+
+            function hideUsernameModal() {
+                usernameModal.classList.add('hidden');
+            }
+
+            usernameSubmitBtn.addEventListener('click', function() {
+                const username = usernameInput.value.trim();
+                if (!username) {
+                    usernameError.classList.add('show');
+                    return;
+                }
+                if (username.length < 2) {
+                    usernameError.textContent = 'Username must be at least 2 characters';
+                    usernameError.classList.add('show');
+                    return;
+                }
+                usernameError.classList.remove('show');
+                usernameError.textContent = 'Please enter a valid username';
+                myUsername = username;
+                hideUsernameModal();
+                // Update UI with username
+                hostDeviceName.textContent = myUsername;
+                document.querySelector('#hostItem .label').textContent = myUsername;
+                setStatus('Welcome ' + myUsername + '! Create an offer or connect.', 'success');
+                // Enable buttons
+                createOfferBtn.disabled = false;
+                connectBtn.disabled = false;
+            });
+
+            usernameInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    usernameSubmitBtn.click();
+                }
+            });
+
             // ===== STATUS =====
             function setStatus(message, type) {
                 statusMessage.textContent = message;
@@ -1734,51 +2083,76 @@
 
             function updateConnectionUI() {
                 // Update host
-                if (myPeerId) {
-                    hostDeviceId.textContent = myPeerId;
-                } else {
-                    hostDeviceId.textContent = '—';
-                }
+                const hostName = myUsername || 'You';
+                hostDeviceName.textContent = hostName;
+                document.querySelector('#hostItem .label').textContent = hostName;
 
                 // Update other devices
                 let html = '';
-                const connectedPeers = connections.filter(c => c.open);
-                const count = connectedPeers.length;
+                const activeConnections = connections.filter(c => c.open);
 
-                connectedPeers.forEach((conn) => {
-                    const peerId = conn.peer || 'Device';
-                    html += `
-                        <div class="connection-item connected">
-                            <span class="dot connected"></span>
-                            <span class="label">${peerId}</span>
-                            <span class="sub"><i class="fas fa-link" style="color:#2980B9;"></i> Connected</span>
-                            <span class="badge connected-badge"><i class="fas fa-check"></i> Active</span>
-                        </div>
-                    `;
-                });
-
-                if (count === 0) {
+                if (activeConnections.length === 0) {
                     html = `
                         <div style="text-align:center;padding:16px 0;color:var(--gray);font-size:13px;">
                             <i class="fas fa-users" style="font-size:20px;display:block;margin-bottom:6px;"></i>
                             No other devices connected
                         </div>
                     `;
+                    if (isHost) {
+                        hostBadgeHeader.textContent = '<i class="fas fa-crown"></i> Host';
+                        hostBadgeHeader.style.display = 'inline-block';
+                    } else {
+                        hostBadgeHeader.style.display = 'none';
+                    }
+                } else {
+                    activeConnections.forEach((conn) => {
+                        const peerId = conn.peer || 'Device';
+                        const username = deviceUsernameMap[peerId] || peerId;
+                        html += `
+                            <div class="connection-item guest">
+                                <span class="dot connected"></span>
+                                <span class="label">${username}</span>
+                                <span class="sub"><i class="fas fa-link" style="color:#2980B9;"></i> Guest</span>
+                                <span class="badge guest-badge"><i class="fas fa-check"></i> Connected</span>
+                            </div>
+                        `;
+                    });
+                    if (isHost) {
+                        hostBadgeHeader.textContent = '<i class="fas fa-crown"></i> Host';
+                        hostBadgeHeader.style.display = 'inline-block';
+                    } else {
+                        hostBadgeHeader.textContent = '<i class="fas fa-user"></i> Guest';
+                        hostBadgeHeader.style.display = 'inline-block';
+                        hostBadgeHeader.style.background = '#E8F4FD';
+                        hostBadgeHeader.style.color = '#1A5276';
+                        hostBadgeHeader.style.border = '1px solid #AED6F1';
+                    }
                 }
 
                 otherDevices.innerHTML = html;
 
                 // Update device count
-                const totalCount = count > 0 ? count : 0;
-                deviceCount.textContent = totalCount + ' devices';
+                const count = activeConnections.length;
+                deviceCount.textContent = count + ' devices';
 
-                // Show/hide transfer section
+                // Update guest list for host
+                if (isHost) {
+                    updateGuestList();
+                }
+
+                // Show/hide transfer section and host controls
                 if (count > 0 || isHost) {
                     transferSection.classList.remove('hidden');
                     document.getElementById('setupSection').style.opacity = '0.4';
                     document.getElementById('setupSection').style.pointerEvents = 'none';
                     isConnected = true;
                     updateSteps(2);
+                    
+                    if (isHost) {
+                        hostControls.classList.remove('hidden');
+                    } else {
+                        hostControls.classList.add('hidden');
+                    }
                 } else {
                     transferSection.classList.add('hidden');
                     document.getElementById('setupSection').style.opacity = '1';
@@ -1786,7 +2160,53 @@
                     isConnected = false;
                     updateSteps(1);
                     progressWrap.classList.remove('active');
+                    hostControls.classList.add('hidden');
                 }
+
+                // Update share target select
+                updateShareTargets();
+            }
+
+            function updateGuestList() {
+                const activeConnections = connections.filter(c => c.open);
+                if (activeConnections.length === 0) {
+                    guestListItems.innerHTML = '<p style="font-size:12px;color:var(--gray);text-align:center;padding:8px;">No guests connected</p>';
+                    return;
+                }
+
+                let html = '';
+                activeConnections.forEach((conn) => {
+                    const peerId = conn.peer || 'Device';
+                    const username = deviceUsernameMap[peerId] || peerId;
+                    html += `
+                        <div class="guest-item">
+                            <span class="name"><i class="fas fa-user-circle" style="color:#2980B9;"></i> ${username}</span>
+                            <div class="actions">
+                                <button class="btn btn-primary btn-sm" onclick="window.shareToSpecific('${peerId}')">
+                                    <i class="fas fa-paper-plane"></i> Share
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="window.disconnectGuest('${peerId}')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                guestListItems.innerHTML = html;
+            }
+
+            function updateShareTargets() {
+                const select = shareTargetSelect;
+                select.innerHTML = '<option value="all">All Devices</option>';
+                const activeConnections = connections.filter(c => c.open);
+                activeConnections.forEach((conn) => {
+                    const peerId = conn.peer || 'Device';
+                    const username = deviceUsernameMap[peerId] || peerId;
+                    const option = document.createElement('option');
+                    option.value = peerId;
+                    option.textContent = username;
+                    select.appendChild(option);
+                });
             }
 
             // ===== KEEP ALIVE =====
@@ -1855,7 +2275,6 @@
                     });
 
                     peer.on('connection', function(conn) {
-                        // Check if already connected to this peer
                         const existing = connections.find(c => c.peer === conn.peer);
                         if (existing) {
                             conn.close();
@@ -1869,7 +2288,7 @@
 
                     peer.on('disconnected', function() {
                         connections = connections.filter(c => c.open);
-                        if (connections.length === 0) {
+                        if (connections.length === 0 && !isHost) {
                             isConnected = false;
                             updateSteps(1);
                             progressWrap.classList.remove('active');
@@ -1886,6 +2305,10 @@
 
             function setupConnection(conn) {
                 conn.on('open', function() {
+                    // Send username to peer
+                    try {
+                        conn.send({ type: 'username', username: myUsername });
+                    } catch (e) { /* ignore */ }
                     setStatus('Connected! Ready to share files.', 'success');
                     updateConnectionUI();
                 });
@@ -1900,12 +2323,24 @@
                     if (data.type === 'pong') {
                         return;
                     }
+                    if (data.type === 'username') {
+                        deviceUsernameMap[conn.peer] = data.username;
+                        updateConnectionUI();
+                        return;
+                    }
+                    if (data.type === 'share-target') {
+                        shareTarget = data.target;
+                        updateSendTargetInfo();
+                        return;
+                    }
                     handleReceivedData(data, conn);
                 });
 
                 conn.on('close', function() {
                     const index = connections.indexOf(conn);
                     if (index > -1) {
+                        const peerId = conn.peer;
+                        delete deviceUsernameMap[peerId];
                         connections.splice(index, 1);
                     }
                     if (connections.length === 0 && !isHost) {
@@ -1929,6 +2364,10 @@
             function handleReceivedData(data, conn) {
                 try {
                     if (data.type === 'file-metadata') {
+                        // Check if this file is for this device
+                        if (data.target && data.target !== myPeerId && data.target !== 'all') {
+                            return;
+                        }
                         fileMetadata = data;
                         currentFile = null;
                         setStatus('Receiving: ' + data.fileName, 'info');
@@ -1942,6 +2381,10 @@
                     if (data.type === 'file-chunk') {
                         if (!fileMetadata) {
                             console.warn('Chunk without metadata');
+                            return;
+                        }
+                        // Check if this file is for this device
+                        if (fileMetadata.target && fileMetadata.target !== myPeerId && fileMetadata.target !== 'all') {
                             return;
                         }
 
@@ -2005,10 +2448,16 @@
             }
 
             // ===== SEND FILE =====
-            function sendFile(file) {
+            function sendFile(file, target) {
                 const activeConnections = connections.filter(c => c.open);
-                if (activeConnections.length === 0) {
-                    setStatus('No devices connected', 'error');
+                let targetConnections = activeConnections;
+
+                if (target && target !== 'all') {
+                    targetConnections = activeConnections.filter(c => c.peer === target);
+                }
+
+                if (targetConnections.length === 0) {
+                    setStatus('No target devices connected', 'error');
                     return;
                 }
 
@@ -2016,11 +2465,13 @@
                     type: 'file-metadata',
                     fileName: file.name,
                     fileSize: file.size,
-                    fileType: file.type || 'application/octet-stream'
+                    fileType: file.type || 'application/octet-stream',
+                    target: target || 'all',
+                    sender: myUsername
                 };
 
                 let sentCount = 0;
-                activeConnections.forEach(conn => {
+                targetConnections.forEach(conn => {
                     try {
                         conn.send(metadata);
                         sentCount++;
@@ -2038,7 +2489,9 @@
                 progressFill.style.width = '0%';
                 progressPercent.textContent = '0%';
                 progressFileName.textContent = file.name + ' (' + formatSize(file.size) + ')';
-                setStatus('Sending to ' + sentCount + ' device(s): ' + file.name, 'info');
+                const targetName = (target && target !== 'all') ? 
+                    (deviceUsernameMap[target] || target) : 'All Devices';
+                setStatus('Sending to ' + targetName + ' (' + sentCount + ' device(s)): ' + file.name, 'info');
                 updateSteps(3);
 
                 const reader = new FileReader();
@@ -2051,7 +2504,7 @@
                         const chunkData = new Uint8Array(arrayBuffer);
                         const chunkMessage = { type: 'file-chunk', chunk: chunkData };
 
-                        activeConnections.forEach(conn => {
+                        targetConnections.forEach(conn => {
                             try {
                                 conn.send(chunkMessage);
                             } catch (err) { /* ignore */ }
@@ -2067,8 +2520,9 @@
                         } else {
                             setTimeout(() => {
                                 progressWrap.classList.remove('active');
-                                setStatus('File sent to ' + sentCount + ' device(s): ' + file.name,
-                                'success');
+                                const targetNameDisplay = (target && target !== 'all') ? 
+                                    (deviceUsernameMap[target] || target) : 'All Devices';
+                                setStatus('File sent to ' + targetNameDisplay + ': ' + file.name, 'success');
                                 updateSteps(3);
                             }, 500);
                         }
@@ -2090,8 +2544,57 @@
                 readNextChunk();
             }
 
+            function updateSendTargetInfo() {
+                if (shareTarget === 'all') {
+                    sendTargetInfo.textContent = 'Sending to: All Devices';
+                } else {
+                    const name = deviceUsernameMap[shareTarget] || shareTarget;
+                    sendTargetInfo.textContent = 'Sending to: ' + name;
+                }
+            }
+
+            // ===== SHARE TO SPECIFIC (Global function for guest list) =====
+            window.shareToSpecific = function(peerId) {
+                shareTarget = peerId;
+                updateSendTargetInfo();
+                const username = deviceUsernameMap[peerId] || peerId;
+                setStatus('Share target set to: ' + username, 'info');
+                // Notify other devices about share target
+                connections.forEach(conn => {
+                    try {
+                        if (conn.open) {
+                            conn.send({ type: 'share-target', target: shareTarget });
+                        }
+                    } catch (e) { /* ignore */ }
+                });
+                // If there's a pending file, send it
+                if (pendingFileForShare) {
+                    const file = pendingFileForShare;
+                    pendingFileForShare = null;
+                    sendFile(file, shareTarget);
+                }
+            };
+
+            window.disconnectGuest = function(peerId) {
+                const conn = connections.find(c => c.peer === peerId);
+                if (conn) {
+                    try { conn.close(); } catch (e) {}
+                    const index = connections.indexOf(conn);
+                    if (index > -1) {
+                        delete deviceUsernameMap[peerId];
+                        connections.splice(index, 1);
+                    }
+                    setStatus('Disconnected guest', 'warning');
+                    updateConnectionUI();
+                }
+            };
+
             // ===== EVENTS =====
             createOfferBtn.addEventListener('click', async function() {
+                if (!myUsername) {
+                    showUsernameModal();
+                    return;
+                }
                 try {
                     const code = generateSHARExCode();
                     isHost = true;
@@ -2106,20 +2609,22 @@
             });
 
             connectBtn.addEventListener('click', async function() {
+                if (!myUsername) {
+                    showUsernameModal();
+                    return;
+                }
                 const remoteId = remoteCode.value.trim();
                 if (!remoteId) {
                     setStatus('Please paste a code', 'error');
                     return;
                 }
 
-                // Prevent connecting to self
                 if (remoteId === myPeerId) {
                     setStatus('You cannot connect to yourself!', 'error');
                     return;
                 }
 
                 try {
-                    // Check if already connected to this peer
                     const existing = connections.find(c => c.peer === remoteId);
                     if (existing) {
                         setStatus('Already connected to ' + remoteId, 'warning');
@@ -2157,7 +2662,65 @@
                     setStatus('No devices connected', 'error');
                     return;
                 }
-                sendFile(files[0]);
+                const file = files[0];
+                
+                if (shareTarget === 'all') {
+                    sendFile(file, 'all');
+                } else {
+                    // Check if target still connected
+                    const targetConn = connections.find(c => c.peer === shareTarget && c.open);
+                    if (!targetConn) {
+                        setStatus('Target device disconnected. Sending to all.', 'warning');
+                        sendFile(file, 'all');
+                    } else {
+                        sendFile(file, shareTarget);
+                    }
+                }
+            });
+
+            // Host Controls
+            shareAllBtn.addEventListener('click', function() {
+                shareTarget = 'all';
+                updateSendTargetInfo();
+                setStatus('Share mode: All Devices', 'info');
+                connections.forEach(conn => {
+                    try {
+                        if (conn.open) {
+                            conn.send({ type: 'share-target', target: 'all' });
+                        }
+                    } catch (e) { /* ignore */ }
+                });
+                shareOptions.classList.add('hidden');
+            });
+
+            shareSpecificBtn.addEventListener('click', function() {
+                const activeConnections = connections.filter(c => c.open);
+                if (activeConnections.length === 0) {
+                    setStatus('No guests connected to share with', 'error');
+                    return;
+                }
+                shareOptions.classList.toggle('hidden');
+                updateShareTargets();
+            });
+
+            shareSelectedBtn.addEventListener('click', function() {
+                const target = shareTargetSelect.value;
+                if (!target) {
+                    setStatus('Please select a target device', 'error');
+                    return;
+                }
+                shareTarget = target;
+                updateSendTargetInfo();
+                const username = deviceUsernameMap[target] || target;
+                setStatus('Share target set to: ' + username, 'info');
+                connections.forEach(conn => {
+                    try {
+                        if (conn.open) {
+                            conn.send({ type: 'share-target', target: shareTarget });
+                        }
+                    } catch (e) { /* ignore */ }
+                });
+                shareOptions.classList.add('hidden');
             });
 
             disconnectBtn.addEventListener('click', function() {
@@ -2165,6 +2728,7 @@
                     try { conn.close(); } catch (e) {}
                 });
                 connections = [];
+                deviceUsernameMap = {};
                 if (peer) {
                     try { peer.destroy(); } catch (e) {}
                     peer = null;
@@ -2183,6 +2747,7 @@
                 document.getElementById('setupSection').style.pointerEvents = 'auto';
                 updateSteps(1);
                 updateConnectionUI();
+                hostControls.classList.add('hidden');
                 if (keepAliveInterval) {
                     clearInterval(keepAliveInterval);
                     keepAliveInterval = null;
@@ -2203,11 +2768,13 @@
                     try { conn.close(); } catch (e) {}
                 });
                 connections = [];
+                deviceUsernameMap = {};
                 isConnected = false;
                 updateSteps(1);
                 updateConnectionUI();
                 document.getElementById('setupSection').style.opacity = '1';
                 document.getElementById('setupSection').style.pointerEvents = 'auto';
+                hostControls.classList.add('hidden');
             });
 
             copyOfferBtn.addEventListener('click', function() {
@@ -2235,6 +2802,7 @@
                     try { conn.close(); } catch (e) {}
                 });
                 connections = [];
+                deviceUsernameMap = {};
                 isConnected = false;
                 setStatus('Click "Create Offer" to generate a new code', 'info');
                 peerIdText.textContent = '—';
@@ -2242,6 +2810,7 @@
                 updateConnectionUI();
                 document.getElementById('setupSection').style.opacity = '1';
                 document.getElementById('setupSection').style.pointerEvents = 'auto';
+                hostControls.classList.add('hidden');
             });
 
             // Hamburger
@@ -2279,17 +2848,23 @@
             });
 
             // ===== INIT =====
-            setStatus('Create an offer or connect to a device', '');
+            // Disable buttons until username is set
+            createOfferBtn.disabled = true;
+            connectBtn.disabled = true;
+
+            // Show username modal
+            showUsernameModal();
+
+            setStatus('Please enter your username to continue', '');
             updateSteps(1);
             setLanguage('en');
             updateConnectionUI();
 
             console.log('✅ SHAREx Tool - P2P File Sharing');
             console.log('📖 Open this page on multiple devices.');
-            console.log('📡 One device clicks "Create Offer", others paste the code and click "Connect".');
-            console.log('🔑 Code format: SHAREx + 5 numbers + 3 letters (e.g. SHAREx63739UUK)');
-            console.log('💡 Background tab support enabled - connection stays alive!');
-            console.log('🔄 Multiple devices can connect to the same offer!');
+            console.log('📡 One device clicks "Create Offer" (Host), others paste the code and click "Connect" (Guest).');
+            console.log('👤 Each device needs a unique username for identification.');
+            console.log('👑 Host has full control - can share to all or specific devices.');
 
         })();
     </script>
