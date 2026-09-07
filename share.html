@@ -1,38 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SHAREx Tool - P2P File Sharing</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js">
     </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         /* ============================================================
-                   CSS - Safron (#FF9933), White (#FFFFFF), Black (#000000)
-                   ============================================================ */
-
-        /* ----- रूट वेरिएबल्स ----- */
+           ROOT VARIABLES - SAFFRON, WHITE, BLACK
+           ============================================================ */
         :root {
-            --safron: #FF9933;
-            --safron-light: #FFB366;
-            --safron-dark: #CC7A00;
-            --safron-glow: rgba(255, 153, 51, 0.3);
+            --saffron: #FF9933;
+            --saffron-light: #FFB006;
+            --saffron-dark: #CC7A00;
+            --saffron-glow: rgba(255, 153, 51, 0.25);
+            --saffron-bg: #FFF8F0;
             --white: #FFFFFF;
-            --white-smoke: #F5F5F5;
+            --white-smoke: #F5F6FA;
             --black: #000000;
             --black-light: #1A1A1A;
-            --black-fade: #333333;
+            --black-fade: #2D2D2D;
             --gray: #888888;
-            --light-gray: #E8E8E8;
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-            --shadow-hover: 0 12px 48px rgba(255, 153, 51, 0.20);
+            --light-gray: #E8EAF0;
+            --border: #E8EDF8;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 8px 30px rgba(255, 153, 51, 0.12);
             --radius: 16px;
             --radius-sm: 10px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --font: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
-        /* ----- रीसेट & बेस ----- */
+        /* ============================================================
+           RESET & BASE
+           ============================================================ */
         * {
             margin: 0;
             padding: 0;
@@ -45,7 +50,7 @@
 
         body {
             font-family: var(--font);
-            background: var(--white);
+            background: var(--white-smoke);
             color: var(--black);
             min-height: 100vh;
             display: flex;
@@ -53,58 +58,45 @@
             transition: var(--transition);
         }
 
-        /* ----- स्क्रोलबार ----- */
+        /* ============================================================
+           SCROLLBAR
+           ============================================================ */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
         ::-webkit-scrollbar-track {
             background: var(--white-smoke);
         }
         ::-webkit-scrollbar-thumb {
-            background: var(--safron);
+            background: var(--saffron);
             border-radius: 50px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--safron-dark);
+            background: var(--saffron-dark);
         }
 
         /* ============================================================
-                   NAVBAR
-                   ============================================================ */
-        .navbar {
-            background: var(--white);
-            padding: 14px 32px;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 3px solid var(--safron);
-            flex-wrap: wrap;
-            gap: 12px;
+           ANIMATIONS
+           ============================================================ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-        }
-
-        .navbar-brand .logo-icon {
-            width: 42px;
-            height: 42px;
-            background: var(--safron);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: var(--white);
-            font-weight: 700;
-            animation: pulse-logo 2s infinite;
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-12px);
+            }
         }
 
         @keyframes pulse-logo {
@@ -113,25 +105,106 @@
                 transform: scale(1);
             }
             50% {
-                transform: scale(1.05);
+                transform: scale(1.06);
             }
         }
 
+        @keyframes pulse-icon {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.08);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.5s ease;
+        }
+        .fade-in-d1 {
+            animation-delay: 0.1s;
+        }
+        .fade-in-d2 {
+            animation-delay: 0.2s;
+        }
+        .fade-in-d3 {
+            animation-delay: 0.3s;
+        }
+        .fade-in-d4 {
+            animation-delay: 0.4s;
+        }
+
+        /* ============================================================
+           NAVBAR - Like Admin Dashboard Style
+           ============================================================ */
+        .navbar {
+            background: var(--white);
+            padding: 12px 32px;
+            box-shadow: var(--shadow);
+            border-bottom: 3px solid var(--saffron);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .navbar-brand .logo-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--saffron);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--white);
+            animation: pulse-logo 2s infinite;
+        }
+
         .navbar-brand .brand-text {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             color: var(--black);
             letter-spacing: -0.5px;
         }
 
         .navbar-brand .brand-text .highlight {
-            color: var(--safron);
+            color: var(--saffron);
         }
 
         .navbar-links {
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: 20px;
             flex-wrap: wrap;
         }
 
@@ -141,8 +214,8 @@
             font-weight: 500;
             font-size: 14px;
             transition: var(--transition);
+            padding: 6px 0;
             position: relative;
-            padding: 4px 0;
         }
 
         .navbar-links a::after {
@@ -152,7 +225,7 @@
             left: 0;
             width: 0;
             height: 2px;
-            background: var(--safron);
+            background: var(--saffron);
             transition: var(--transition);
         }
 
@@ -162,7 +235,7 @@
         }
 
         .navbar-links a:hover {
-            color: var(--safron-dark);
+            color: var(--saffron-dark);
         }
 
         .lang-toggle {
@@ -184,19 +257,19 @@
             transition: var(--transition);
             background: transparent;
             color: var(--black-fade);
+            font-family: var(--font);
         }
 
         .lang-toggle button.active {
-            background: var(--safron);
+            background: var(--saffron);
             color: var(--white);
-            box-shadow: 0 2px 12px var(--safron-glow);
+            box-shadow: 0 2px 12px var(--saffron-glow);
         }
 
         .lang-toggle button:hover:not(.active) {
             background: var(--light-gray);
         }
 
-        /* हम्बर्गर मेनू (मोबाइल) */
         .hamburger {
             display: none;
             flex-direction: column;
@@ -226,10 +299,10 @@
         }
 
         /* ============================================================
-                   HERO SECTION
-                   ============================================================ */
+           HERO - Simplified
+           ============================================================ */
         .hero {
-            padding: 60px 32px 40px;
+            padding: 40px 32px 32px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -242,40 +315,41 @@
 
         .hero-content {
             flex: 1;
-            min-width: 280px;
+            min-width: 260px;
         }
 
         .hero-content .badge {
             display: inline-block;
-            background: var(--safron);
-            color: var(--white);
+            background: var(--saffron-bg);
+            color: var(--saffron-dark);
             padding: 4px 16px;
             border-radius: 50px;
             font-size: 12px;
             font-weight: 600;
             letter-spacing: 0.5px;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
+            border: 1px solid var(--saffron-glow);
             animation: fadeInUp 0.6s ease;
         }
 
         .hero-content h1 {
-            font-size: 42px;
+            font-size: 38px;
             font-weight: 800;
             line-height: 1.15;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             animation: fadeInUp 0.8s ease;
         }
 
         .hero-content h1 .highlight {
-            color: var(--safron);
+            color: var(--saffron);
         }
 
         .hero-content p {
-            font-size: 18px;
+            font-size: 17px;
             color: var(--gray);
             line-height: 1.7;
-            margin-bottom: 24px;
-            max-width: 480px;
+            margin-bottom: 22px;
+            max-width: 460px;
             animation: fadeInUp 1.0s ease;
         }
 
@@ -291,7 +365,7 @@
             border: none;
             border-radius: var(--radius-sm);
             font-weight: 600;
-            font-size: 15px;
+            font-size: 14px;
             cursor: pointer;
             transition: var(--transition);
             display: inline-flex;
@@ -302,14 +376,14 @@
         }
 
         .btn-primary {
-            background: var(--safron);
+            background: var(--saffron);
             color: var(--white);
-            box-shadow: 0 4px 20px var(--safron-glow);
+            box-shadow: 0 4px 20px var(--saffron-glow);
         }
 
         .btn-primary:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 32px var(--safron-glow);
+            box-shadow: 0 8px 32px var(--saffron-glow);
         }
 
         .btn-secondary {
@@ -335,71 +409,55 @@
             transform: translateY(-3px);
         }
 
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
         .hero-image {
             flex: 1;
-            min-width: 280px;
+            min-width: 240px;
             display: flex;
             justify-content: center;
             align-items: center;
             animation: float 3s ease-in-out infinite;
         }
 
-        @keyframes float {
-            0%,
-            100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-16px);
-            }
-        }
-
         .hero-image .image-wrapper {
             width: 100%;
-            max-width: 420px;
+            max-width: 380px;
             aspect-ratio: 1/0.9;
-            background: linear-gradient(135deg, var(--safron-light), var(--safron));
+            background: linear-gradient(135deg, var(--saffron-light), var(--saffron));
             border-radius: var(--radius);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
             color: var(--white);
-            padding: 32px;
+            padding: 28px;
             text-align: center;
-            box-shadow: 0 20px 60px var(--safron-glow);
+            box-shadow: 0 20px 60px var(--saffron-glow);
             position: relative;
             overflow: hidden;
         }
 
         .image-wrapper .big-icon {
-            font-size: 72px;
-            margin-bottom: 12px;
+            font-size: 64px;
+            margin-bottom: 10px;
             animation: pulse-icon 2s infinite;
         }
 
-        @keyframes pulse-icon {
-            0%,
-            100% {
-                transform: scale(1) rotate(0deg);
-            }
-            50% {
-                transform: scale(1.05) rotate(3deg);
-            }
-        }
-
         .image-wrapper h3 {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
         }
 
         .image-wrapper p {
-            font-size: 14px;
+            font-size: 13px;
             opacity: 0.9;
             margin-top: 4px;
         }
 
-        /* फ़्लोटिंग एलिमेंट्स (एनिमेशन) */
         .floating-elements {
             position: absolute;
             width: 100%;
@@ -412,9 +470,9 @@
 
         .floating-elements span {
             position: absolute;
-            font-size: 28px;
-            opacity: 0.25;
-            animation: float-around 8s infinite;
+            font-size: 24px;
+            opacity: 0.2;
+            animation: float 6s infinite;
         }
 
         .floating-elements span:nth-child(1) {
@@ -438,27 +496,11 @@
             animation-delay: 1s;
         }
 
-        @keyframes float-around {
-            0%,
-            100% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-            25% {
-                transform: translate(20px, -20px) rotate(10deg);
-            }
-            50% {
-                transform: translate(-10px, 30px) rotate(-5deg);
-            }
-            75% {
-                transform: translate(30px, 10px) rotate(8deg);
-            }
-        }
-
         /* ============================================================
-                   MAIN APP SECTION
-                   ============================================================ */
+           MAIN APP - Card Style Like Admin Dashboard
+           ============================================================ */
         .app-section {
-            padding: 40px 32px 60px;
+            padding: 24px 32px 50px;
             max-width: 1100px;
             margin: 0 auto;
             width: 100%;
@@ -466,25 +508,77 @@
 
         .app-section .section-title {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
         }
 
         .app-section .section-title h2 {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 8px;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 6px;
         }
 
         .app-section .section-title h2 .highlight {
-            color: var(--safron);
+            color: var(--saffron);
         }
 
         .app-section .section-title p {
             color: var(--gray);
-            font-size: 16px;
+            font-size: 15px;
         }
 
-        /* ----- कार्ड्स ----- */
+        /* Steps */
+        .steps {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--gray);
+            padding: 6px 16px;
+            border-radius: 50px;
+            background: var(--white);
+            border: 1px solid var(--light-gray);
+            transition: var(--transition);
+        }
+
+        .step.active {
+            color: var(--black);
+            border-color: var(--saffron);
+            background: var(--saffron-bg);
+        }
+
+        .step .num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .step.active .num {
+            background: var(--saffron);
+            color: var(--white);
+        }
+
+        .step.done .num {
+            background: var(--saffron);
+            color: var(--white);
+        }
+
+        /* Grid */
         .app-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -496,31 +590,31 @@
             background: var(--white);
             border-radius: var(--radius);
             padding: 24px 28px;
-            border: 1px solid var(--light-gray);
+            border: 1px solid var(--border);
             box-shadow: var(--shadow);
             transition: var(--transition);
         }
 
         .card:hover {
-            border-color: var(--safron);
+            border-color: var(--saffron);
             box-shadow: var(--shadow-hover);
             transform: translateY(-4px);
         }
 
         .card .card-icon {
-            font-size: 32px;
-            margin-bottom: 10px;
+            font-size: 28px;
+            margin-bottom: 8px;
             display: block;
         }
 
         .card h3 {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .card p {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--gray);
             margin-bottom: 14px;
         }
@@ -529,7 +623,7 @@
         .card textarea {
             width: 100%;
             padding: 10px 14px;
-            border: 1.5px solid var(--light-gray);
+            border: 1.5px solid var(--border);
             border-radius: var(--radius-sm);
             font-size: 14px;
             font-family: var(--font);
@@ -537,14 +631,14 @@
             background: var(--white-smoke);
             color: var(--black);
             resize: vertical;
-            min-height: 44px;
+            min-height: 42px;
         }
 
         .card input[type="text"]:focus,
         .card textarea:focus {
             outline: none;
-            border-color: var(--safron);
-            box-shadow: 0 0 0 4px var(--safron-glow);
+            border-color: var(--saffron);
+            box-shadow: 0 0 0 4px var(--saffron-glow);
             background: var(--white);
         }
 
@@ -558,7 +652,7 @@
         .card input[type="file"]::-webkit-file-upload-button {
             padding: 8px 16px;
             background: var(--white-smoke);
-            border: 1.5px solid var(--light-gray);
+            border: 1.5px solid var(--border);
             border-radius: var(--radius-sm);
             color: var(--black);
             font-weight: 500;
@@ -568,8 +662,8 @@
         }
 
         .card input[type="file"]::-webkit-file-upload-button:hover {
-            border-color: var(--safron);
-            background: var(--safron-glow);
+            border-color: var(--saffron);
+            background: var(--saffron-bg);
         }
 
         .card .btn {
@@ -584,11 +678,12 @@
             width: auto;
         }
 
+        /* Status */
         .status-box {
             padding: 14px 18px;
             border-radius: var(--radius-sm);
-            background: var(--white-smoke);
-            border: 1px solid var(--light-gray);
+            background: var(--white);
+            border: 1px solid var(--border);
             display: flex;
             align-items: center;
             gap: 12px;
@@ -596,17 +691,17 @@
             color: var(--black-fade);
             margin-top: 12px;
             transition: var(--transition);
-            min-height: 52px;
+            min-height: 50px;
         }
 
         .status-box .icon {
-            font-size: 20px;
+            font-size: 18px;
             flex-shrink: 0;
         }
 
         .status-box.success {
-            border-color: var(--safron);
-            background: #FFF8F0;
+            border-color: var(--saffron);
+            background: var(--saffron-bg);
         }
 
         .status-box.error {
@@ -616,11 +711,11 @@
         }
 
         .status-box.info {
-            border-color: var(--safron);
-            background: #FFF8F0;
+            border-color: var(--saffron);
+            background: var(--saffron-bg);
         }
 
-        /* प्रोग्रेस */
+        /* Progress */
         .progress-wrap {
             margin-top: 14px;
             display: none;
@@ -632,7 +727,7 @@
 
         .progress-track {
             width: 100%;
-            height: 8px;
+            height: 6px;
             background: var(--light-gray);
             border-radius: 50px;
             overflow: hidden;
@@ -640,7 +735,7 @@
 
         .progress-fill {
             height: 100%;
-            background: var(--safron);
+            background: var(--saffron);
             border-radius: 50px;
             width: 0%;
             transition: width 0.3s ease;
@@ -659,7 +754,7 @@
             color: var(--black);
         }
 
-        /* फ़ाइल लिस्ट */
+        /* File List */
         .file-list {
             margin-top: 10px;
         }
@@ -671,7 +766,7 @@
             padding: 10px 14px;
             background: var(--white-smoke);
             border-radius: var(--radius-sm);
-            border: 1px solid var(--light-gray);
+            border: 1px solid var(--border);
             margin-bottom: 6px;
             transition: var(--transition);
             gap: 10px;
@@ -679,7 +774,7 @@
         }
 
         .file-item:hover {
-            border-color: var(--safron);
+            border-color: var(--saffron);
         }
 
         .file-item .info {
@@ -691,7 +786,7 @@
         }
 
         .file-item .info .file-icon {
-            font-size: 22px;
+            font-size: 20px;
             flex-shrink: 0;
         }
 
@@ -709,7 +804,7 @@
         .file-item .actions a {
             padding: 4px 14px;
             border-radius: var(--radius-sm);
-            background: var(--safron);
+            background: var(--saffron);
             color: var(--white);
             text-decoration: none;
             font-size: 13px;
@@ -718,7 +813,7 @@
         }
 
         .file-item .actions a:hover {
-            background: var(--safron-dark);
+            background: var(--saffron-dark);
             transform: translateY(-1px);
         }
 
@@ -730,87 +825,44 @@
         }
 
         .empty-state .big-icon {
-            font-size: 36px;
+            font-size: 32px;
             display: block;
             margin-bottom: 6px;
         }
 
-        /* हिडन */
         .hidden {
             display: none !important;
         }
 
-        /* पीयर आईडी */
         .peer-id-display {
             font-size: 12px;
             color: var(--gray);
             text-align: center;
             margin-top: 10px;
             padding: 8px;
-            background: var(--white-smoke);
+            background: var(--white);
             border-radius: var(--radius-sm);
-            border: 1px dashed var(--light-gray);
+            border: 1px dashed var(--border);
             font-family: 'SF Mono', monospace;
         }
 
-        /* स्टेप्स */
-        .steps {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .step {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: var(--gray);
-            padding: 6px 14px;
-            border-radius: 50px;
-            background: var(--white-smoke);
-            border: 1px solid var(--light-gray);
-            transition: var(--transition);
-        }
-
-        .step.active {
-            color: var(--black);
-            border-color: var(--safron);
-            background: #FFF8F0;
-        }
-
-        .step .num {
-            width: 22px;
-            height: 22px;
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2.5px solid var(--light-gray);
+            border-top-color: var(--saffron);
             border-radius: 50%;
-            background: var(--light-gray);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--gray);
-            transition: var(--transition);
-        }
-
-        .step.active .num {
-            background: var(--safron);
-            color: var(--white);
-        }
-
-        .step.done .num {
-            background: var(--safron);
-            color: var(--white);
+            animation: spin 0.8s linear infinite;
+            flex-shrink: 0;
         }
 
         /* ============================================================
-                   FEATURES SECTION
-                   ============================================================ */
+           FEATURES - Card Style
+           ============================================================ */
         .features-section {
-            padding: 40px 32px 60px;
-            background: var(--white-smoke);
+            padding: 40px 32px 50px;
+            background: var(--white);
+            border-top: 1px solid var(--border);
         }
 
         .features-section .container {
@@ -820,159 +872,127 @@
 
         .features-section .section-title {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
         }
 
         .features-section .section-title h2 {
-            font-size: 32px;
-            font-weight: 700;
+            font-size: 28px;
+            font-weight: 800;
         }
 
         .features-section .section-title h2 .highlight {
-            color: var(--safron);
+            color: var(--saffron);
         }
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
         }
 
         .feature-card {
-            background: var(--white);
-            padding: 28px 24px;
+            background: var(--white-smoke);
+            padding: 24px 20px;
             border-radius: var(--radius);
             text-align: center;
-            border: 1px solid var(--light-gray);
+            border: 1px solid var(--border);
             transition: var(--transition);
-            box-shadow: var(--shadow);
         }
 
         .feature-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--safron);
+            transform: translateY(-6px);
+            border-color: var(--saffron);
             box-shadow: var(--shadow-hover);
         }
 
         .feature-card .icon {
-            font-size: 40px;
-            margin-bottom: 12px;
+            font-size: 36px;
+            margin-bottom: 10px;
             display: block;
-            animation: pulse-icon 3s infinite;
         }
 
         .feature-card h4 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .feature-card p {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--gray);
             line-height: 1.6;
         }
 
         /* ============================================================
-                   FOOTER
-                   ============================================================ */
+           FOOTER - Like Admin Dashboard
+           ============================================================ */
         .footer {
-            background: var(--black);
-            color: var(--white-smoke);
-            padding: 40px 32px 20px;
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            padding: 20px 32px;
             margin-top: auto;
         }
 
-        .footer .container {
+        .footer-content {
             max-width: 1100px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 32px;
-        }
-
-        .footer .brand h3 {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--white);
-            margin-bottom: 6px;
-        }
-
-        .footer .brand h3 .highlight {
-            color: var(--safron);
-        }
-
-        .footer .brand p {
-            font-size: 14px;
-            color: #AAAAAA;
-            line-height: 1.7;
-            max-width: 300px;
-        }
-
-        .footer .col h4 {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--white);
-            margin-bottom: 12px;
-        }
-
-        .footer .col a {
-            display: block;
-            color: #AAAAAA;
-            text-decoration: none;
-            font-size: 14px;
-            margin-bottom: 6px;
-            transition: var(--transition);
-        }
-
-        .footer .col a:hover {
-            color: var(--safron);
-            transform: translateX(4px);
-        }
-
-        .footer .social {
-            display: flex;
-            gap: 12px;
-            margin-top: 10px;
-        }
-
-        .footer .social a {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.06);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: var(--white-smoke);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .footer .social a:hover {
-            background: var(--safron);
-            color: var(--white);
-            transform: translateY(-3px);
-        }
-
-        .footer .bottom {
-            max-width: 1100px;
-            margin: 24px auto 0;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 12px;
+        }
+
+        .footer-content span,
+        .footer-content a {
             font-size: 13px;
-            color: #888888;
+            color: var(--gray);
+            text-decoration: none;
+        }
+
+        .footer-content a {
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .footer-content a:hover {
+            color: var(--saffron);
+            text-decoration: underline;
+        }
+
+        .footer-content .gold-link {
+            color: var(--saffron-dark);
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 12px;
+        }
+
+        .footer-social a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--white-smoke);
+            color: var(--gray);
+            font-size: 15px;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .footer-social a:hover {
+            background: var(--saffron-bg);
+            color: var(--saffron);
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px var(--saffron-glow);
         }
 
         /* ============================================================
-                   RESPONSIVE
-                   ============================================================ */
+           RESPONSIVE
+           ============================================================ */
         @media (max-width: 768px) {
             .navbar {
                 padding: 12px 16px;
@@ -997,7 +1017,7 @@
             }
 
             .hero {
-                padding: 32px 16px;
+                padding: 24px 16px;
                 flex-direction: column;
                 text-align: center;
             }
@@ -1011,43 +1031,28 @@
             }
 
             .hero-content h1 {
-                font-size: 30px;
+                font-size: 28px;
             }
 
             .app-grid {
                 grid-template-columns: 1fr;
             }
 
-            .footer .container {
-                grid-template-columns: 1fr;
-                gap: 20px;
+            .app-section {
+                padding: 16px 12px 32px;
             }
 
-            .footer .bottom {
-                flex-direction: column;
-                text-align: center;
+            .card {
+                padding: 16px;
             }
 
             .features-grid {
                 grid-template-columns: 1fr 1fr;
             }
-        }
 
-        @media (max-width: 480px) {
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .hero-content h1 {
-                font-size: 26px;
-            }
-
-            .app-section {
-                padding: 20px 12px 40px;
-            }
-
-            .card {
-                padding: 16px;
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
             }
 
             .image-wrapper .big-icon {
@@ -1061,54 +1066,59 @@
             .navbar-brand .brand-text {
                 font-size: 18px;
             }
-        }
 
-        /* ============================================================
-                   ANIMATIONS
-                   ============================================================ */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
+            .steps {
+                gap: 6px;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .step {
+                font-size: 11px;
+                padding: 4px 12px;
+            }
+            .step .num {
+                width: 20px;
+                height: 20px;
+                font-size: 10px;
             }
         }
 
-        .fade-in {
-            animation: fadeInUp 0.6s ease;
-        }
-
-        .fade-in-d1 {
-            animation-delay: 0.1s;
-        }
-        .fade-in-d2 {
-            animation-delay: 0.2s;
-        }
-        .fade-in-d3 {
-            animation-delay: 0.3s;
-        }
-        .fade-in-d4 {
-            animation-delay: 0.4s;
-        }
-
-        /* स्पिनर */
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 2.5px solid var(--light-gray);
-            border-top-color: var(--safron);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            flex-shrink: 0;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
+        @media (max-width: 480px) {
+            .features-grid {
+                grid-template-columns: 1fr;
             }
+
+            .hero-content h1 {
+                font-size: 24px;
+            }
+
+            .app-section .section-title h2 {
+                font-size: 22px;
+            }
+
+            .hero {
+                padding: 16px 12px;
+            }
+
+            .step {
+                font-size: 10px;
+                padding: 3px 10px;
+            }
+            .step .num {
+                width: 18px;
+                height: 18px;
+                font-size: 9px;
+            }
+        }
+
+        /* Code Highlight */
+        .code-highlight {
+            background: var(--black);
+            color: var(--saffron);
+            padding: 2px 12px;
+            border-radius: 6px;
+            font-family: 'SF Mono', monospace;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            display: inline-block;
         }
     </style>
 </head>
@@ -1146,7 +1156,7 @@
     ============================================================ -->
     <section class="hero" id="home">
         <div class="hero-content">
-            <span class="badge" data-i18n="hero-badge">🚀 P2P FILE SHARING</span>
+            <span class="badge" data-i18n="hero-badge">FAST • P2P FILE SHARING</span>
             <h1>
                 <span data-i18n="hero-title1">Share Files</span><br />
                 <span class="highlight" data-i18n="hero-title2">Instantly & Securely</span>
@@ -1184,7 +1194,7 @@
             <p data-i18n="app-desc">Connect two devices and transfer files directly</p>
         </div>
 
-        <!-- स्टेप्स -->
+        <!-- STEPS -->
         <div class="steps" id="steps">
             <div class="step active" id="step1">
                 <span class="num">1</span>
@@ -1200,10 +1210,10 @@
             </div>
         </div>
 
-        <!-- मुख्य ऐप -->
+        <!-- SETUP -->
         <div id="setupSection">
             <div class="app-grid">
-                <!-- ऑफ़र -->
+                <!-- OFFER -->
                 <div class="card fade-in fade-in-d1">
                     <span class="card-icon">🎯</span>
                     <h3 data-i18n="offer-title">Create Offer</h3>
@@ -1212,26 +1222,26 @@
                     <div id="offerDisplay" class="hidden" style="margin-top:12px;">
                         <label style="font-size:13px;font-weight:600;color:var(--gray);" data-i18n="offer-code-label">Your Connection Code</label>
                         <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;">
-                            <textarea id="offerCode" readonly style="flex:1;min-height:40px;font-size:14px;letter-spacing:1px;"></textarea>
+                            <textarea id="offerCode" readonly style="flex:1;min-height:40px;font-size:16px;letter-spacing:1px;background:var(--black);color:var(--saffron);font-weight:700;border-color:var(--saffron);"></textarea>
                             <button class="btn btn-secondary btn-sm" id="copyOfferBtn" data-i18n="offer-copy">📄 Copy</button>
                             <button class="btn btn-outline btn-sm" id="resetOfferBtn" data-i18n="offer-reset">🔄 New</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- कनेक्ट -->
+                <!-- CONNECT -->
                 <div class="card fade-in fade-in-d2">
                     <span class="card-icon">🔗</span>
                     <h3 data-i18n="connect-title">Connect to Device</h3>
                     <p data-i18n="connect-desc">Paste the code from the other device</p>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                        <input type="text" id="remoteCode" placeholder="Paste code here..." style="flex:1;min-width:120px;" />
+                        <input type="text" id="remoteCode" placeholder="Paste code here..." style="flex:1;min-width:120px;font-family:'SF Mono',monospace;letter-spacing:0.5px;" />
                         <button class="btn btn-primary" id="connectBtn" data-i18n="connect-btn">✅ Connect</button>
                     </div>
                 </div>
             </div>
 
-            <!-- स्टेटस -->
+            <!-- STATUS -->
             <div class="status-box" id="statusBox">
                 <span class="icon">💡</span>
                 <span id="statusMessage" data-i18n="status-default">Create an offer or connect to a device</span>
@@ -1242,10 +1252,10 @@
             </div>
         </div>
 
-        <!-- ट्रांसफर सेक्शन -->
-        <div id="transferSection" class="hidden" style="margin-top:24px;padding-top:24px;border-top:2px solid var(--light-gray);">
+        <!-- TRANSFER SECTION -->
+        <div id="transferSection" class="hidden" style="margin-top:24px;padding-top:24px;border-top:2px solid var(--border);">
             <div class="app-grid">
-                <!-- भेजें -->
+                <!-- SEND -->
                 <div class="card fade-in">
                     <span class="card-icon">📤</span>
                     <h3 data-i18n="send-title">Send File</h3>
@@ -1262,7 +1272,7 @@
                     </div>
                 </div>
 
-                <!-- प्राप्त -->
+                <!-- RECEIVE -->
                 <div class="card fade-in fade-in-d2">
                     <span class="card-icon">📥</span>
                     <h3 data-i18n="receive-title">Received Files</h3>
@@ -1318,45 +1328,18 @@
     </section>
 
     <!-- ============================================================
-    FOOTER
+    FOOTER - Like Admin Dashboard
     ============================================================ -->
     <footer class="footer" id="footer">
-        <div class="container">
-            <div class="brand">
-                <h3>SHARE<span class="highlight">x</span></h3>
-                <p data-i18n="footer-brand-desc">
-                    P2P file sharing tool that keeps your data private.
-                    No servers, no uploads, no tracking.
-                </p>
-                <div class="social">
-                    <a href="#" aria-label="Twitter">🐦</a>
-                    <a href="#" aria-label="GitHub">🐙</a>
-                    <a href="#" aria-label="LinkedIn">🔗</a>
-                    <a href="#" aria-label="YouTube">▶️</a>
-                </div>
+        <div class="footer-content">
+            <span>&copy; 2026 <a href="#" class="gold-link">SHAREx Tool</a>. All rights reserved.</span>
+            <span>Developed & Designed by <a href="#" class="gold-link">Vikshant Kralta</a></span>
+            <div class="footer-social">
+                <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
+                <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
             </div>
-            <div class="col">
-                <h4 data-i18n="footer-nav">Navigation</h4>
-                <a href="#home" data-i18n="nav-home">Home</a>
-                <a href="#app" data-i18n="nav-app">Share</a>
-                <a href="#features" data-i18n="nav-features">Features</a>
-            </div>
-            <div class="col">
-                <h4 data-i18n="footer-support">Support</h4>
-                <a href="#" data-i18n="footer-faq">FAQ</a>
-                <a href="#" data-i18n="footer-privacy">Privacy Policy</a>
-                <a href="#" data-i18n="footer-terms">Terms</a>
-            </div>
-            <div class="col">
-                <h4 data-i18n="footer-contact">Contact</h4>
-                <a href="mailto:support@sharex.com">support@sharex.com</a>
-                <a href="#" data-i18n="footer-feedback">Feedback</a>
-                <span style="font-size:13px;color:#888;margin-top:6px;display:block;" data-i18n="footer-made">Made with ❤️</span>
-            </div>
-        </div>
-        <div class="bottom">
-            <span>&copy; 2026 SHAREx Tool. <span data-i18n="footer-rights">All rights reserved.</span></span>
-            <span data-i18n="footer-version">Version 2.0</span>
         </div>
     </footer>
 
@@ -1367,54 +1350,43 @@
         (function() {
             'use strict';
 
-            // ===== भाषा डेटा =====
+            // ===== TRANSLATIONS =====
             const translations = {
                 en: {
                     'nav-home': 'Home',
                     'nav-app': 'Share',
                     'nav-features': 'Features',
                     'nav-contact': 'Contact',
-
                     'hero-badge': '🚀 P2P FILE SHARING',
                     'hero-title1': 'Share Files',
                     'hero-title2': 'Instantly & Securely',
                     'hero-desc': 'No servers, no uploads, no limits. Just pure peer-to-peer file sharing directly between your devices. Fast, private, and free.',
                     'hero-btn-start': '🚀 Start Sharing',
                     'hero-btn-learn': 'Learn More',
-
                     'hero-image-title': 'SHAREx Tool',
                     'hero-image-desc': 'P2P File Transfer',
-
                     'app-title': '📡',
                     'app-title2': 'File Sharing',
                     'app-desc': 'Connect two devices and transfer files directly',
-
                     'step1': 'Connect',
                     'step2': 'Choose File',
                     'step3': 'Share',
-
                     'offer-title': 'Create Offer',
                     'offer-desc': 'Generate a code for the other device to connect',
                     'offer-btn': '🔗 Create Offer',
                     'offer-code-label': 'Your Connection Code',
                     'offer-copy': '📄 Copy',
                     'offer-reset': '🔄 New',
-
                     'connect-title': 'Connect to Device',
                     'connect-desc': 'Paste the code from the other device',
                     'connect-btn': '✅ Connect',
-
                     'status-default': 'Create an offer or connect to a device',
-
                     'send-title': 'Send File',
                     'send-btn': '🚀 Send',
-
                     'receive-title': 'Received Files',
                     'receive-empty': 'No files received yet',
                     'file-count-label': 'Files:',
-
                     'disconnect-btn': '🔌 Disconnect',
-
                     'features-title': '✨',
                     'features-title2': 'Why SHAREx Tool?',
                     'feature1-title': 'Blazing Fast',
@@ -1425,65 +1397,42 @@
                     'feature3-desc': 'Works on phone, tablet, laptop, desktop - any modern browser.',
                     'feature4-title': 'No Limits',
                     'feature4-desc': 'No file size limits. Share photos, videos, documents, anything.',
-
-                    'footer-brand-desc': 'P2P file sharing tool that keeps your data private. No servers, no uploads, no tracking.',
-                    'footer-nav': 'Navigation',
-                    'footer-support': 'Support',
-                    'footer-contact': 'Contact',
-                    'footer-faq': 'FAQ',
-                    'footer-privacy': 'Privacy Policy',
-                    'footer-terms': 'Terms',
-                    'footer-feedback': 'Feedback',
-                    'footer-made': 'Made with ❤️',
-                    'footer-rights': 'All rights reserved.',
-                    'footer-version': 'Version 2.0',
                 },
                 hi: {
                     'nav-home': 'होम',
                     'nav-app': 'शेयर करें',
                     'nav-features': 'फीचर्स',
                     'nav-contact': 'संपर्क',
-
                     'hero-badge': '🚀 पी2पी फ़ाइल शेयरिंग',
                     'hero-title1': 'फ़ाइलें शेयर करें',
                     'hero-title2': 'तुरंत और सुरक्षित',
                     'hero-desc': 'कोई सर्वर नहीं, कोई अपलोड नहीं, कोई सीमा नहीं। सीधे आपके डिवाइसों के बीच पीयर-टू-पीयर फ़ाइल शेयरिंग। तेज़, निजी और मुफ्त।',
                     'hero-btn-start': '🚀 शेयर करना शुरू करें',
                     'hero-btn-learn': 'और जानें',
-
                     'hero-image-title': 'SHAREx Tool',
                     'hero-image-desc': 'P2P फ़ाइल ट्रांसफर',
-
                     'app-title': '📡',
                     'app-title2': 'फ़ाइल शेयरिंग',
                     'app-desc': 'दो डिवाइसों को कनेक्ट करें और सीधे फ़ाइलें ट्रांसफर करें',
-
                     'step1': 'कनेक्ट करें',
                     'step2': 'फ़ाइल चुनें',
                     'step3': 'शेयर करें',
-
                     'offer-title': 'ऑफ़र बनाएँ',
                     'offer-desc': 'दूसरे डिवाइस के लिए कनेक्शन कोड जनरेट करें',
                     'offer-btn': '🔗 ऑफ़र बनाएँ',
                     'offer-code-label': 'आपका कनेक्शन कोड',
                     'offer-copy': '📄 कॉपी करें',
                     'offer-reset': '🔄 नया',
-
                     'connect-title': 'डिवाइस से कनेक्ट करें',
                     'connect-desc': 'दूसरे डिवाइस का कोड यहाँ पेस्ट करें',
                     'connect-btn': '✅ कनेक्ट करें',
-
                     'status-default': 'ऑफ़र बनाएँ या किसी डिवाइस से कनेक्ट करें',
-
                     'send-title': 'फ़ाइल भेजें',
                     'send-btn': '🚀 भेजें',
-
                     'receive-title': 'प्राप्त फ़ाइलें',
                     'receive-empty': 'अभी कोई फ़ाइल नहीं मिली',
                     'file-count-label': 'फ़ाइलें:',
-
                     'disconnect-btn': '🔌 कनेक्शन तोड़ें',
-
                     'features-title': '✨',
                     'features-title2': 'SHAREx Tool क्यों?',
                     'feature1-title': 'बहुत तेज़',
@@ -1494,24 +1443,12 @@
                     'feature3-desc': 'फोन, टैबलेट, लैपटॉप, डेस्कटॉप - किसी भी आधुनिक ब्राउज़र पर काम करता है।',
                     'feature4-title': 'कोई सीमा नहीं',
                     'feature4-desc': 'फ़ाइल साइज़ की कोई सीमा नहीं। फ़ोटो, वीडियो, दस्तावेज़, कुछ भी शेयर करें।',
-
-                    'footer-brand-desc': 'P2P फ़ाइल शेयरिंग टूल जो आपके डेटा को निजी रखता है। कोई सर्वर नहीं, कोई अपलोड नहीं, कोई ट्रैकिंग नहीं।',
-                    'footer-nav': 'नेविगेशन',
-                    'footer-support': 'सहायता',
-                    'footer-contact': 'संपर्क',
-                    'footer-faq': 'सामान्य प्रश्न',
-                    'footer-privacy': 'गोपनीयता नीति',
-                    'footer-terms': 'नियम',
-                    'footer-feedback': 'सुझाव दें',
-                    'footer-made': '❤️ के साथ बनाया गया',
-                    'footer-rights': 'सभी अधिकार सुरक्षित।',
-                    'footer-version': 'संस्करण 2.0',
                 }
             };
 
             let currentLang = 'en';
 
-            // ===== डीओएम रेफरेंस =====
+            // ===== DOM REFS =====
             const createOfferBtn = document.getElementById('createOfferBtn');
             const connectBtn = document.getElementById('connectBtn');
             const sendFileBtn = document.getElementById('sendFileBtn');
@@ -1539,7 +1476,7 @@
             const navLinks = document.getElementById('navLinks');
             const langButtons = document.querySelectorAll('.lang-toggle button');
 
-            // ===== स्टेट =====
+            // ===== STATE =====
             let peer = null;
             let connection = null;
             let isConnected = false;
@@ -1549,12 +1486,20 @@
             let fileMetadata = null;
             const CHUNK_SIZE = 16384;
 
-            // ===== यूटिलिटी =====
-            function generateId() {
-                return Math.random().toString(36).substring(2, 8) +
-                    Math.random().toString(36).substring(2, 8);
+            // ===== CODE GENERATOR =====
+            function generateSHARExCode() {
+                // Format: SHAREx(5numbers)(3alphabets).vk
+                // Example: SHAREx12345ABC.vk
+                const nums = String(Math.floor(10000 + Math.random() * 90000));
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                let letters = '';
+                for (let i = 0; i < 3; i++) {
+                    letters += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return 'SHAREx' + nums + letters + '.vk';
             }
 
+            // ===== UTILITY =====
             function formatSize(bytes) {
                 if (bytes < 1024) return bytes + ' B';
                 if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
@@ -1596,7 +1541,7 @@
                 return map[ext] || '📎';
             }
 
-            // ===== भाषा =====
+            // ===== LANGUAGE =====
             function setLanguage(lang) {
                 currentLang = lang;
                 document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -1621,7 +1566,7 @@
                 });
             });
 
-            // ===== स्टेटस =====
+            // ===== STATUS =====
             function setStatus(message, type) {
                 statusMessage.textContent = message;
                 statusBox.className = 'status-box';
@@ -1652,7 +1597,7 @@
                 isConnected = connected;
                 if (connected) {
                     transferSection.classList.remove('hidden');
-                    document.getElementById('setupSection').style.opacity = '0.5';
+                    document.getElementById('setupSection').style.opacity = '0.4';
                     document.getElementById('setupSection').style.pointerEvents = 'none';
                     setStatus('✅ Connected! You can now send and receive files.', 'success');
                     updateSteps(2);
@@ -1665,7 +1610,7 @@
                 }
             }
 
-            // ===== पीयर =====
+            // ===== PEER =====
             function initPeer(id) {
                 return new Promise((resolve, reject) => {
                     if (peer) { peer.destroy();
@@ -1738,7 +1683,7 @@
                 });
             }
 
-            // ===== डेटा हैंडलिंग =====
+            // ===== DATA HANDLING =====
             function handleReceivedData(data) {
                 try {
                     if (data.type === 'file-metadata') {
@@ -1784,7 +1729,7 @@
                                     <span class="size">(${fileSize})</span>
                                 </div>
                                 <div class="actions">
-                                    <a href="${url}" download="${fileName}">⬇️ Download</a>
+                                    <a href="${url}" download="${fileName}">Download</a>
                                 </div>
                             `;
 
@@ -1810,7 +1755,7 @@
                 }
             }
 
-            // ===== फ़ाइल भेजें =====
+            // ===== SEND FILE =====
             function sendFile(file) {
                 if (!connection) { setStatus('❌ No connection', 'error'); return; }
 
@@ -1871,12 +1816,14 @@
                 readNextChunk();
             }
 
-            // ===== ईवेंट =====
+            // ===== EVENTS =====
             createOfferBtn.addEventListener('click', async function() {
                 try {
-                    const id = generateId();
-                    await initPeer(id);
-                    offerCode.value = id;
+                    // Generate SHAREx code in format: SHAREx(5numbers)(3alphabets).vk
+                    const code = generateSHARExCode();
+                    // Use the generated code as Peer ID
+                    await initPeer(code);
+                    offerCode.value = code;
                     offerDisplay.classList.remove('hidden');
                     setStatus('🔄 Offer created. Waiting for other device to connect...', 'info');
                 } catch (err) {
@@ -1889,10 +1836,14 @@
                 if (!remoteId) { setStatus('❌ Please paste a code', 'error'); return; }
 
                 try {
-                    if (!peer) {
-                        const myId = generateId();
-                        await initPeer(myId);
-                    }
+                    // Generate a temporary ID for this device
+                    const myId = 'SHAREx' + String(Math.floor(10000 + Math.random() * 90000)) + 
+                                String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
+                                String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
+                                String.fromCharCode(65 + Math.floor(Math.random() * 26)) + '.vk';
+                    
+                    await initPeer(myId);
+                    
                     const conn = peer.connect(remoteId, { reliable: true });
                     if (!conn) {
                         setStatus('❌ Could not connect. Is the other device online?', 'error');
@@ -1956,13 +1907,12 @@
                 peerIdText.textContent = '—';
             });
 
-            // हम्बर्गर
+            // Hamburger
             hamburger.addEventListener('click', function() {
                 this.classList.toggle('active');
                 navLinks.classList.toggle('open');
             });
 
-            // नेविगेशन लिंक्स - मोबाइल पर बंद
             document.querySelectorAll('.navbar-links a').forEach(link => {
                 link.addEventListener('click', () => {
                     hamburger.classList.remove('active');
@@ -1970,17 +1920,15 @@
                 });
             });
 
-            // एंटर
             remoteCode.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') connectBtn.click();
             });
 
-            // फ़ाइल चुनने पर
             fileInput.addEventListener('change', function() {
                 if (this.files.length > 0) updateSteps(3);
             });
 
-            // ===== इनिशियल =====
+            // ===== INIT =====
             setStatus('💡 Create an offer or connect to a device', '');
             updateSteps(1);
             setLanguage('en');
@@ -1988,6 +1936,7 @@
             console.log('⚡ SHAREx Tool - P2P File Sharing');
             console.log('📖 Open this page on two devices.');
             console.log('📡 One device clicks "Create Offer", the other pastes the code and clicks "Connect".');
+            console.log('🔑 Code format: SHAREx(5numbers)(3alphabets).vk');
 
         })();
     </script>
