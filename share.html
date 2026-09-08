@@ -1663,7 +1663,7 @@
         <div id="setupSection">
             <div class="app-grid">
                 <!-- OFFER -->
-                <div class="card fade-in fade-in-d1">
+                <div class="card fade-in fade-in-d1" id="offerCard">
                     <span class="card-icon"><i class="fas fa-qrcode"></i></span>
                     <h3 data-i18n="offer-title">Create Offer</h3>
                     <p data-i18n="offer-desc">Generate a code for others to connect</p>
@@ -1679,7 +1679,7 @@
                 </div>
 
                 <!-- CONNECT -->
-                <div class="card fade-in fade-in-d2">
+                <div class="card fade-in fade-in-d2" id="connectCard">
                     <span class="card-icon"><i class="fas fa-plug"></i></span>
                     <h3 data-i18n="connect-title">Connect to Device</h3>
                     <p data-i18n="connect-desc">Paste the code to connect</p>
@@ -1713,7 +1713,7 @@
                     <div class="connection-item host" id="hostItem">
                         <span class="dot online"></span>
                         <span class="label" id="hostDeviceName">—</span>
-                        <span class="sub">👑 HOST</span>
+                        <span class="sub" id="hostItemSub">👑 HOST</span>
                         <span class="badge host-badge"><i class="fas fa-check-circle"></i> Online</span>
                     </div>
                     <div id="otherDevices"></div>
@@ -1986,6 +1986,7 @@
             const navLinks = document.getElementById('navLinks');
             const langButtons = document.querySelectorAll('.lang-toggle button');
             const hostDeviceName = document.getElementById('hostDeviceName');
+            const hostItemSub = document.getElementById('hostItemSub');
             const otherDevices = document.getElementById('otherDevices');
             const deviceCount = document.getElementById('deviceCount');
             const hostBadgeHeader = document.getElementById('hostBadgeHeader');
@@ -2000,6 +2001,8 @@
             const fileTitleInput = document.getElementById('fileTitleInput');
             const fileTitle = document.getElementById('fileTitle');
             const sendTargetInfo = document.getElementById('sendTargetInfo');
+            const offerCard = document.getElementById('offerCard');
+            const connectCard = document.getElementById('connectCard');
 
             // ===== STATE =====
             let peer = null;
@@ -2008,16 +2011,20 @@
             let myPeerId = null;
             let myUsername = '';
             let receivedFileCount = 0;
-            let currentFile = null;
-            let fileMetadata = null;
             let keepAliveInterval = null;
             let isHost = false;
             let shareTarget = 'all';
             let deviceUsernameMap = {};
-            let guestPermissions = {}; // peerId -> {canShare: boolean}
+            let guestPermissions = {}; // (host only) peerId -> canShare boolean
+            let myShareAllowed = true; // (guest only) whether host currently allows me to send/receive
             let pendingFileForShare = null;
             let pendingFileTitleForShare = '';
+            let sendInProgress = false;
+            // Per-connection receive buffers, keyed by remote peer id.
+            // Prevents two simultaneous incoming transfers from corrupting each other.
+            let receiveBuffers = {};
             const CHUNK_SIZE = 16384;
+            const MAX_BUFFERED_AMOUNT = 2 * 1024 * 1024; // 2MB backpressure ceiling
 
             // ===== CODE GENERATOR =====
             function generateSHARExCode() {
@@ -2110,6 +2117,7 @@
             usernameSubmitBtn.addEventListener('click', function() {
                 const username = usernameInput.value.trim();
                 if (!username) {
+                    usernameError.textContent = 'Please enter a valid username';
                     usernameError.classList.add('show');
                     return;
                 }
@@ -2119,14 +2127,12 @@
                     return;
                 }
                 usernameError.classList.remove('show');
-                usernameError.textContent = 'Please enter a valid username';
                 myUsername = username;
                 hideUsernameModal();
-                hostDeviceName.textContent = myUsername;
-                document.querySelector('#hostItem .label').textContent = myUsername;
                 setStatus('Welcome ' + myUsername + '! Create an offer or connect.', 'success');
                 createOfferBtn.disabled = false;
                 connectBtn.disabled = false;
+                updateConnectionUI();
             });
 
             usernameInput.addEventListener('keydown', function(e) {
@@ -2165,47 +2171,107 @@
                 });
             }
 
+            // Lock the role once a device becomes a host or a guest so a
+            // single device can't accidentally act as both at once.
+            function applyRoleLock() {
+                if (isHost) {
+                    // Hosting: creating another offer or connecting out as a guest is blocked.
+                    createOfferBtn.disabled = true;
+                    connectBtn.disabled = true;
+                    remoteCode.disabled = true;
+                    connectCard.style.opacity = '0.5';
+                    connectCard.style.pointerEvents = 'none';
+                } else if (isConnected) {
+                    // Connected as a guest: only one host connection is allowed,
+                    // and this device can't also become a host at the same time.
+                    createOfferBtn.disabled = true;
+                    connectBtn.disabled = true;
+                    remoteCode.disabled = true;
+                    offerCard.style.opacity = '0.5';
+                    offerCard.style.pointerEvents = 'none';
+                    connectCard.style.opacity = '0.5';
+                    connectCard.style.pointerEvents = 'none';
+                } else if (myUsername) {
+                    // Idle: both roles available again.
+                    createOfferBtn.disabled = false;
+                    connectBtn.disabled = false;
+                    remoteCode.disabled = false;
+                    offerCard.style.opacity = '1';
+                    offerCard.style.pointerEvents = 'auto';
+                    connectCard.style.opacity = '1';
+                    connectCard.style.pointerEvents = 'auto';
+                }
+            }
+
             function updateConnectionUI() {
-                const hostName = myUsername || 'You';
-                hostDeviceName.textContent = hostName;
-                document.querySelector('#hostItem .label').textContent = hostName;
+                const myLabel = myUsername || 'You';
+                hostDeviceName.textContent = myLabel;
 
                 let html = '';
                 const activeConnections = connections.filter(c => c.open);
 
-                if (activeConnections.length === 0) {
-                    html = `
-                        <div style="text-align:center;padding:16px 0;color:var(--gray);font-size:13px;">
-                            <i class="fas fa-users" style="font-size:20px;display:block;margin-bottom:6px;"></i>
-                            No other devices connected
-                        </div>
-                    `;
-                    if (isHost) {
-                        hostBadgeHeader.textContent = '<i class="fas fa-crown"></i> Host';
-                        hostBadgeHeader.style.display = 'inline-block';
-                    } else {
-                        hostBadgeHeader.style.display = 'none';
-                    }
-                } else {
-                    activeConnections.forEach((conn) => {
-                        const peerId = conn.peer || 'Device';
-                        const username = deviceUsernameMap[peerId] || peerId;
-                        const canShare = guestPermissions[peerId] !== false;
-                        html += `
-                            <div class="connection-item guest">
-                                <span class="dot connected"></span>
-                                <span class="label">${username}</span>
-                                <span class="sub"><i class="fas fa-link" style="color:#2980B9;"></i> Guest</span>
-                                ${canShare ? '<span class="badge permission-badge"><i class="fas fa-check"></i> Can Share</span>' : '<span class="badge" style="background:#FDF0EE;color:#C0392B;border:1px solid #F5B7B1;font-size:9px;padding:2px 8px;border-radius:50px;"><i class="fas fa-ban"></i> No Share</span>'}
-                                <span class="badge guest-badge"><i class="fas fa-check"></i> Connected</span>
+                if (isHost) {
+                    // I am the host: my own row is HOST, every connection is a guest.
+                    hostItemSub.innerHTML = '<i class="fas fa-crown"></i> HOST (You)';
+                    document.getElementById('hostItem').className = 'connection-item host';
+
+                    if (activeConnections.length === 0) {
+                        html = `
+                            <div style="text-align:center;padding:16px 0;color:var(--gray);font-size:13px;">
+                                <i class="fas fa-users" style="font-size:20px;display:block;margin-bottom:6px;"></i>
+                                No guests connected yet
                             </div>
                         `;
-                    });
-                    if (isHost) {
-                        hostBadgeHeader.textContent = '<i class="fas fa-crown"></i> Host';
-                        hostBadgeHeader.style.display = 'inline-block';
                     } else {
-                        hostBadgeHeader.textContent = '<i class="fas fa-user"></i> Guest';
+                        activeConnections.forEach((conn) => {
+                            const peerId = conn.peer || 'Device';
+                            const username = deviceUsernameMap[peerId] || peerId;
+                            const canShare = guestPermissions[peerId] !== false;
+                            html += `
+                                <div class="connection-item guest">
+                                    <span class="dot connected"></span>
+                                    <span class="label">${username}</span>
+                                    <span class="sub"><i class="fas fa-user" style="color:#2980B9;"></i> Guest</span>
+                                    ${canShare ? '<span class="badge permission-badge"><i class="fas fa-check"></i> Can Share</span>' : '<span class="badge" style="background:#FDF0EE;color:#C0392B;border:1px solid #F5B7B1;font-size:9px;padding:2px 8px;border-radius:50px;"><i class="fas fa-ban"></i> No Share</span>'}
+                                    <span class="badge guest-badge"><i class="fas fa-check"></i> Connected</span>
+                                </div>
+                            `;
+                        });
+                    }
+                    hostBadgeHeader.innerHTML = '<i class="fas fa-crown"></i> Host';
+                    hostBadgeHeader.style.display = 'inline-block';
+                    hostBadgeHeader.style.background = '';
+                    hostBadgeHeader.style.color = '';
+                    hostBadgeHeader.style.border = '';
+                } else {
+                    // I am a guest (or not yet connected): my own row is GUEST,
+                    // and the single connection (if any) is the HOST, not another guest.
+                    hostItemSub.innerHTML = '<i class="fas fa-user"></i> GUEST (You)';
+                    document.getElementById('hostItem').className = 'connection-item guest';
+
+                    if (activeConnections.length === 0) {
+                        html = `
+                            <div style="text-align:center;padding:16px 0;color:var(--gray);font-size:13px;">
+                                <i class="fas fa-plug" style="font-size:20px;display:block;margin-bottom:6px;"></i>
+                                Not connected to a host yet
+                            </div>
+                        `;
+                        hostBadgeHeader.style.display = 'none';
+                    } else {
+                        const conn = activeConnections[0];
+                        const peerId = conn.peer || 'Device';
+                        const username = deviceUsernameMap[peerId] || peerId;
+                        const canShare = myShareAllowed !== false;
+                        html = `
+                            <div class="connection-item host">
+                                <span class="dot connected"></span>
+                                <span class="label">${username}</span>
+                                <span class="sub"><i class="fas fa-crown" style="color:var(--saffron-dark);"></i> Host</span>
+                                ${canShare ? '<span class="badge permission-badge"><i class="fas fa-check"></i> Can Share</span>' : '<span class="badge" style="background:#FDF0EE;color:#C0392B;border:1px solid #F5B7B1;font-size:9px;padding:2px 8px;border-radius:50px;"><i class="fas fa-ban"></i> No Share</span>'}
+                                <span class="badge host-badge"><i class="fas fa-check"></i> Connected</span>
+                            </div>
+                        `;
+                        hostBadgeHeader.innerHTML = '<i class="fas fa-user"></i> Guest';
                         hostBadgeHeader.style.display = 'inline-block';
                         hostBadgeHeader.style.background = '#E8F4FD';
                         hostBadgeHeader.style.color = '#1A5276';
@@ -2222,18 +2288,27 @@
                     updateGuestList();
                 }
 
-                if (count > 0 || isHost) {
+                if (count > 0) {
                     transferSection.classList.remove('hidden');
                     document.getElementById('setupSection').style.opacity = '0.4';
                     document.getElementById('setupSection').style.pointerEvents = 'none';
                     isConnected = true;
                     updateSteps(2);
-                    
+
                     if (isHost) {
                         hostControls.classList.remove('hidden');
                     } else {
                         hostControls.classList.add('hidden');
                     }
+                } else if (isHost) {
+                    // Hosting but no guests yet - keep the offer/status visible.
+                    transferSection.classList.add('hidden');
+                    document.getElementById('setupSection').style.opacity = '1';
+                    document.getElementById('setupSection').style.pointerEvents = 'auto';
+                    isConnected = false;
+                    updateSteps(1);
+                    progressWrap.classList.remove('active');
+                    hostControls.classList.add('hidden');
                 } else {
                     transferSection.classList.add('hidden');
                     document.getElementById('setupSection').style.opacity = '1';
@@ -2245,6 +2320,8 @@
                 }
 
                 updateShareTargets();
+                updateSendTargetInfo();
+                applyRoleLock();
             }
 
             function updateGuestList() {
@@ -2295,6 +2372,12 @@
             }
 
             function updateSendTargetInfo() {
+                if (!isHost) {
+                    // A guest only ever has one connection: the host. There is
+                    // no meaningful "target" to pick, so always be explicit about it.
+                    sendTargetInfo.textContent = 'Sending to: Host';
+                    return;
+                }
                 if (shareTarget === 'all') {
                     sendTargetInfo.textContent = 'Sending to: All Devices';
                 } else {
@@ -2369,13 +2452,21 @@
                     });
 
                     peer.on('connection', function(conn) {
+                        // Only a host accepts incoming connections. A guest device
+                        // only ever dials out to its host, so any inbound
+                        // connection attempt on a guest peer is refused - this is
+                        // what keeps host and guest roles cleanly separated.
+                        if (!isHost) {
+                            try { conn.close(); } catch (e) { /* ignore */ }
+                            return;
+                        }
                         const existing = connections.find(c => c.peer === conn.peer);
                         if (existing) {
                             conn.close();
                             return;
                         }
                         connections.push(conn);
-                        // Default permission: can share = true
+                        // Default permission for a newly-joined guest: allowed to share.
                         guestPermissions[conn.peer] = true;
                         setupConnection(conn);
                         setStatus('New device connected!', 'success');
@@ -2383,12 +2474,13 @@
                     });
 
                     peer.on('disconnected', function() {
+                        setStatus('Lost connection to signaling server, reconnecting...', 'warning');
+                        try { peer.reconnect(); } catch (e) { /* ignore */ }
                         connections = connections.filter(c => c.open);
                         if (connections.length === 0 && !isHost) {
                             isConnected = false;
                             updateSteps(1);
                             progressWrap.classList.remove('active');
-                            setStatus('Disconnected from server', 'error');
                         }
                         updateConnectionUI();
                     });
@@ -2428,19 +2520,21 @@
                         return;
                     }
                     if (data.type === 'permission') {
-                        // Guest receiving permission from host
+                        // Guest receiving its own permission status from the host.
                         if (!isHost) {
-                            if (data.canShare) {
+                            myShareAllowed = !!data.canShare;
+                            if (myShareAllowed) {
                                 setStatus('Host has granted you sharing permission!', 'success');
                             } else {
                                 setStatus('Host has revoked your sharing permission.', 'warning');
                             }
+                            updateConnectionUI();
                         }
                         return;
                     }
                     if (data.type === 'share-target') {
+                        // Informational only for guests; guests always send to the host.
                         shareTarget = data.target;
-                        updateSendTargetInfo();
                         return;
                     }
                     if (data.type === 'permission-update') {
@@ -2457,13 +2551,14 @@
                         const peerId = conn.peer;
                         delete deviceUsernameMap[peerId];
                         delete guestPermissions[peerId];
+                        delete receiveBuffers[peerId];
                         connections.splice(index, 1);
                     }
                     if (connections.length === 0 && !isHost) {
                         isConnected = false;
                         updateSteps(1);
                         progressWrap.classList.remove('active');
-                        setStatus('All devices disconnected', 'error');
+                        setStatus('Disconnected from host', 'error');
                     } else {
                         setStatus('A device disconnected', 'warning');
                     }
@@ -2479,21 +2574,28 @@
             // ===== DATA HANDLING =====
             function handleReceivedData(data, conn) {
                 try {
-                    // Check if this device has permission to share (for guests)
-                    if (!isHost && data.type === 'file-metadata') {
-                        // Check if we have permission
-                        if (guestPermissions[myPeerId] === false) {
-                            setStatus('You do not have permission to receive files from this host.', 'warning');
-                            return;
-                        }
+                    const peerId = conn.peer;
+
+                    // Guests can be blocked from receiving/sending by the host.
+                    if (!isHost && data.type === 'file-metadata' && myShareAllowed === false) {
+                        setStatus('You do not have permission to receive files from this host.', 'warning');
+                        return;
+                    }
+                    // Host can block a specific guest from sending it files.
+                    if (isHost && data.type === 'file-metadata' && guestPermissions[peerId] === false) {
+                        setStatus('Blocked a file from a guest without sharing permission.', 'warning');
+                        return;
                     }
 
                     if (data.type === 'file-metadata') {
                         if (data.target && data.target !== myPeerId && data.target !== 'all') {
                             return;
                         }
-                        fileMetadata = data;
-                        currentFile = null;
+                        receiveBuffers[peerId] = {
+                            metadata: data,
+                            chunks: [],
+                            receivedSize: 0
+                        };
                         const titleInfo = data.fileTitle ? ' - "' + data.fileTitle + '"' : '';
                         setStatus('Receiving: ' + data.fileName + titleInfo + ' from ' + (data.sender || 'unknown'), 'info');
                         progressWrap.classList.add('active');
@@ -2504,33 +2606,26 @@
                     }
 
                     if (data.type === 'file-chunk') {
-                        if (!fileMetadata) {
-                            console.warn('Chunk without metadata');
+                        const buffer = receiveBuffers[peerId];
+                        if (!buffer) {
+                            console.warn('Chunk without metadata from', peerId);
                             return;
                         }
+                        const fileMetadata = buffer.metadata;
                         if (fileMetadata.target && fileMetadata.target !== myPeerId && fileMetadata.target !== 'all') {
                             return;
                         }
 
-                        if (!currentFile) {
-                            currentFile = {
-                                chunks: [],
-                                receivedSize: 0,
-                                metadata: fileMetadata
-                            };
-                        }
-
                         const blob = new Blob([data.chunk]);
-                        currentFile.chunks.push(blob);
-                        currentFile.receivedSize += data.chunk.byteLength;
+                        buffer.chunks.push(blob);
+                        buffer.receivedSize += data.chunk.byteLength;
 
-                        const percent = Math.min(Math.round((currentFile.receivedSize / fileMetadata.fileSize) * 100),
-                            100);
+                        const percent = Math.min(Math.round((buffer.receivedSize / fileMetadata.fileSize) * 100), 100);
                         progressFill.style.width = percent + '%';
                         progressPercent.textContent = percent + '%';
 
-                        if (currentFile.receivedSize >= fileMetadata.fileSize) {
-                            const finalBlob = new Blob(currentFile.chunks);
+                        if (buffer.receivedSize >= fileMetadata.fileSize) {
+                            const finalBlob = new Blob(buffer.chunks);
                             const url = URL.createObjectURL(finalBlob);
                             const fileName = fileMetadata.fileName;
                             const fileSize = formatSize(fileMetadata.fileSize);
@@ -2565,8 +2660,7 @@
                             setStatus('File received: ' + fileName + titleMsg + ' from ' + sender, 'success');
                             updateSteps(3);
 
-                            currentFile = null;
-                            fileMetadata = null;
+                            delete receiveBuffers[peerId];
                         }
                         return;
                     }
@@ -2576,24 +2670,59 @@
                 }
             }
 
+            // ===== BACKPRESSURE HELPER =====
+            // Waits until every target connection's underlying data channel has
+            // drained below the buffered-amount ceiling before continuing to send
+            // more chunks. Without this, large files can overload the channel and
+            // silently drop or corrupt data.
+            function waitForDrain(conns, cb) {
+                const check = () => {
+                    const stillHigh = conns.some(c => {
+                        try {
+                            return c.open && c.dataChannel && c.dataChannel.bufferedAmount > MAX_BUFFERED_AMOUNT;
+                        } catch (e) {
+                            return false;
+                        }
+                    });
+                    if (stillHigh) {
+                        setTimeout(check, 30);
+                    } else {
+                        cb();
+                    }
+                };
+                check();
+            }
+
             // ===== SEND FILE =====
-            function sendFile(file, target, fileTitle) {
+            function sendFile(file, target, fileTitleText) {
                 const activeConnections = connections.filter(c => c.open);
                 let targetConnections = activeConnections;
 
                 if (target && target !== 'all') {
                     targetConnections = activeConnections.filter(c => c.peer === target);
-                    // Check if target has permission
-                    if (target !== 'all' && guestPermissions[target] === false) {
-                        setStatus('Target device does not have permission to receive files.', 'error');
-                        return;
-                    }
+                }
+
+                // The host is the only one that enforces per-guest permissions.
+                let skippedForPermission = 0;
+                if (isHost) {
+                    const before = targetConnections.length;
+                    targetConnections = targetConnections.filter(c => guestPermissions[c.peer] !== false);
+                    skippedForPermission = before - targetConnections.length;
                 }
 
                 if (targetConnections.length === 0) {
-                    setStatus('No target devices connected', 'error');
+                    setStatus(skippedForPermission > 0 ?
+                        'No permitted devices to send to.' :
+                        'No target devices connected', 'error');
                     return;
                 }
+
+                if (sendInProgress) {
+                    setStatus('Please wait for the current transfer to finish.', 'warning');
+                    return;
+                }
+                sendInProgress = true;
+                sendFileBtn.disabled = true;
 
                 const metadata = {
                     type: 'file-metadata',
@@ -2602,7 +2731,7 @@
                     fileType: file.type || 'application/octet-stream',
                     target: target || 'all',
                     sender: myUsername,
-                    fileTitle: fileTitle || ''
+                    fileTitle: fileTitleText || ''
                 };
 
                 let sentCount = 0;
@@ -2617,17 +2746,23 @@
 
                 if (sentCount === 0) {
                     setStatus('Failed to send to any device', 'error');
+                    sendInProgress = false;
+                    sendFileBtn.disabled = false;
                     return;
                 }
 
                 progressWrap.classList.add('active');
                 progressFill.style.width = '0%';
                 progressPercent.textContent = '0%';
-                const titleDisplay = fileTitle ? ' "' + fileTitle + '"' : '';
+                const titleDisplay = fileTitleText ? ' "' + fileTitleText + '"' : '';
                 progressFileName.textContent = file.name + titleDisplay + ' (' + formatSize(file.size) + ')';
-                const targetName = (target && target !== 'all') ? 
+                const targetName = (target && target !== 'all') ?
                     (deviceUsernameMap[target] || target) : 'All Devices';
-                setStatus('Sending to ' + targetName + ' (' + sentCount + ' device(s)): ' + file.name, 'info');
+                let statusMsg = 'Sending to ' + targetName + ' (' + sentCount + ' device(s)): ' + file.name;
+                if (skippedForPermission > 0) {
+                    statusMsg += ' (' + skippedForPermission + ' device(s) skipped - no permission)';
+                }
+                setStatus(statusMsg, 'info');
                 updateSteps(3);
 
                 const reader = new FileReader();
@@ -2642,7 +2777,7 @@
 
                         targetConnections.forEach(conn => {
                             try {
-                                conn.send(chunkMessage);
+                                if (conn.open) conn.send(chunkMessage);
                             } catch (err) { /* ignore */ }
                         });
 
@@ -2652,24 +2787,30 @@
                         progressPercent.textContent = percent + '%';
 
                         if (offset < fileSize) {
-                            readNextChunk();
+                            waitForDrain(targetConnections, readNextChunk);
                         } else {
                             setTimeout(() => {
                                 progressWrap.classList.remove('active');
-                                const targetNameDisplay = (target && target !== 'all') ? 
+                                const targetNameDisplay = (target && target !== 'all') ?
                                     (deviceUsernameMap[target] || target) : 'All Devices';
                                 setStatus('File sent to ' + targetNameDisplay + ': ' + file.name, 'success');
                                 updateSteps(3);
+                                sendInProgress = false;
+                                sendFileBtn.disabled = false;
                             }, 500);
                         }
                     } catch (err) {
                         console.error('Chunk error:', err);
                         setStatus('Error sending chunk', 'error');
+                        sendInProgress = false;
+                        sendFileBtn.disabled = false;
                     }
                 };
 
                 reader.onerror = function() {
                     setStatus('Error reading file', 'error');
+                    sendInProgress = false;
+                    sendFileBtn.disabled = false;
                 };
 
                 function readNextChunk() {
@@ -2716,7 +2857,8 @@
                 const username = deviceUsernameMap[peerId] || peerId;
                 setStatus('Permission for ' + username + ' set to: ' + (guestPermissions[peerId] ? 'Can Share' : 'Cannot Share'),
                     'info');
-                // Send permission update to all guests
+                // Tell the affected guest their new status, and let every guest
+                // know this peer's status (used for host-side UI only in practice).
                 connections.forEach(conn => {
                     try {
                         if (conn.open) {
@@ -2743,6 +2885,7 @@
                     if (index > -1) {
                         delete deviceUsernameMap[peerId];
                         delete guestPermissions[peerId];
+                        delete receiveBuffers[peerId];
                         connections.splice(index, 1);
                     }
                     setStatus('Disconnected guest', 'warning');
@@ -2756,6 +2899,10 @@
                     showUsernameModal();
                     return;
                 }
+                if (isConnected && !isHost) {
+                    setStatus('You are already connected as a guest. Disconnect first to host.', 'error');
+                    return;
+                }
                 try {
                     const code = generateSHARExCode();
                     isHost = true;
@@ -2765,6 +2912,7 @@
                     setStatus('Offer created. Share the code for others to connect.', 'info');
                     updateConnectionUI();
                 } catch (err) {
+                    isHost = false;
                     setStatus('Failed to create offer: ' + err.message, 'error');
                 }
             });
@@ -2772,6 +2920,14 @@
             connectBtn.addEventListener('click', async function() {
                 if (!myUsername) {
                     showUsernameModal();
+                    return;
+                }
+                if (isHost) {
+                    setStatus('You are already hosting. Close your offer first to connect elsewhere.', 'error');
+                    return;
+                }
+                if (connections.some(c => c.open)) {
+                    setStatus('Already connected to a host. Disconnect first to join another.', 'warning');
                     return;
                 }
                 const remoteId = remoteCode.value.trim();
@@ -2786,12 +2942,6 @@
                 }
 
                 try {
-                    const existing = connections.find(c => c.peer === remoteId);
-                    if (existing) {
-                        setStatus('Already connected to ' + remoteId, 'warning');
-                        return;
-                    }
-
                     if (!peer) {
                         const myId = generateSHARExCode();
                         isHost = false;
@@ -2803,9 +2953,9 @@
                         setStatus('Could not connect. Is the other device online?', 'error');
                         return;
                     }
+                    isHost = false;
+                    myShareAllowed = true;
                     connections.push(conn);
-                    // Default permission for this connection
-                    guestPermissions[conn.peer] = true;
                     setupConnection(conn);
                     setStatus('Connecting to ' + remoteId + '...', 'info');
                     updateConnectionUI();
@@ -2827,16 +2977,20 @@
                 }
 
                 // Check if guest has permission to share
-                if (!isHost) {
-                    if (guestPermissions[myPeerId] === false) {
-                        setStatus('You do not have permission to share files. Contact the host.', 'error');
-                        return;
-                    }
+                if (!isHost && myShareAllowed === false) {
+                    setStatus('You do not have permission to share files. Contact the host.', 'error');
+                    return;
                 }
 
                 const file = files[0];
                 const title = sendFileTitle.value.trim() || '';
-                
+
+                if (!isHost) {
+                    // A guest always sends to its single host connection.
+                    sendFile(file, 'all', title);
+                    return;
+                }
+
                 if (shareTarget === 'all') {
                     sendFile(file, 'all', title);
                 } else {
@@ -2845,11 +2999,6 @@
                         setStatus('Target device disconnected. Sending to all.', 'warning');
                         sendFile(file, 'all', title);
                     } else {
-                        // Check target permission if host
-                        if (isHost && guestPermissions[shareTarget] === false) {
-                            setStatus('Target device does not have permission to receive files.', 'error');
-                            return;
-                        }
                         sendFile(file, shareTarget, title);
                     }
                 }
@@ -2929,13 +3078,15 @@
                 setStatus('Manage permissions from the Guest Devices list below.', 'info');
             });
 
-            disconnectBtn.addEventListener('click', function() {
+            function resetAllState() {
                 connections.forEach(conn => {
                     try { conn.close(); } catch (e) {}
                 });
                 connections = [];
                 deviceUsernameMap = {};
                 guestPermissions = {};
+                receiveBuffers = {};
+                myShareAllowed = true;
                 if (peer) {
                     try { peer.destroy(); } catch (e) {}
                     peer = null;
@@ -2943,14 +3094,13 @@
                 myPeerId = null;
                 isHost = false;
                 isConnected = false;
-                setStatus('Disconnected all devices', 'error');
                 offerDisplay.classList.add('hidden');
                 peerIdText.textContent = '—';
                 fileInput.value = '';
                 sendFileTitle.value = '';
                 progressWrap.classList.remove('active');
-                currentFile = null;
-                fileMetadata = null;
+                sendInProgress = false;
+                sendFileBtn.disabled = false;
                 document.getElementById('setupSection').style.opacity = '1';
                 document.getElementById('setupSection').style.pointerEvents = 'auto';
                 updateSteps(1);
@@ -2962,71 +3112,46 @@
                     clearInterval(keepAliveInterval);
                     keepAliveInterval = null;
                 }
+            }
+
+            disconnectBtn.addEventListener('click', function() {
+                resetAllState();
+                setStatus('Disconnected all devices', 'error');
             });
 
             closeOfferBtn.addEventListener('click', function() {
-                if (peer) {
-                    try { peer.destroy(); } catch (e) {}
-                    peer = null;
-                }
-                myPeerId = null;
-                isHost = false;
-                offerDisplay.classList.add('hidden');
-                peerIdText.textContent = '—';
+                resetAllState();
                 setStatus('Offer closed', 'info');
-                connections.forEach(conn => {
-                    try { conn.close(); } catch (e) {}
-                });
-                connections = [];
-                deviceUsernameMap = {};
-                guestPermissions = {};
-                isConnected = false;
-                updateSteps(1);
-                updateConnectionUI();
-                document.getElementById('setupSection').style.opacity = '1';
-                document.getElementById('setupSection').style.pointerEvents = 'auto';
-                hostControls.classList.add('hidden');
-                shareOptions.classList.add('hidden');
-                fileTitleInput.classList.add('hidden');
             });
 
             copyOfferBtn.addEventListener('click', function() {
-                offerCode.select();
-                document.execCommand('copy');
-                setStatus('Code copied!', 'success');
-                setTimeout(() => {
-                    if (isConnected) {
-                        setStatus('Connected! Ready to share files.', 'success');
-                    } else {
-                        setStatus('Offer created. Share the code.', 'info');
-                    }
-                }, 1200);
+                const text = offerCode.value;
+                const showCopied = () => {
+                    setStatus('Code copied!', 'success');
+                    setTimeout(() => {
+                        if (isConnected) {
+                            setStatus('Connected! Ready to share files.', 'success');
+                        } else {
+                            setStatus('Offer created. Share the code.', 'info');
+                        }
+                    }, 1200);
+                };
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(showCopied).catch(() => {
+                        offerCode.select();
+                        document.execCommand('copy');
+                        showCopied();
+                    });
+                } else {
+                    offerCode.select();
+                    document.execCommand('copy');
+                    showCopied();
+                }
             });
 
             resetOfferBtn.addEventListener('click', function() {
-                if (peer) {
-                    try { peer.destroy(); } catch (e) {}
-                    peer = null;
-                }
-                myPeerId = null;
-                isHost = false;
-                offerDisplay.classList.add('hidden');
-                connections.forEach(conn => {
-                    try { conn.close(); } catch (e) {}
-                });
-                connections = [];
-                deviceUsernameMap = {};
-                guestPermissions = {};
-                isConnected = false;
+                resetAllState();
                 setStatus('Click "Create Offer" to generate a new code', 'info');
-                peerIdText.textContent = '—';
-                updateSteps(1);
-                updateConnectionUI();
-                document.getElementById('setupSection').style.opacity = '1';
-                document.getElementById('setupSection').style.pointerEvents = 'auto';
-                hostControls.classList.add('hidden');
-                shareOptions.classList.add('hidden');
-                fileTitleInput.classList.add('hidden');
             });
 
             // Hamburger
@@ -3081,6 +3206,7 @@
             console.log('👑 Host has full control - can manage permissions and sharing.');
             console.log('🔑 Guests can only share if host grants permission.');
             console.log('📝 Files can have titles for better identification.');
+            console.log('🔒 A device is either Host or Guest, never both, until it disconnects/resets.');
 
         })();
     </script>
