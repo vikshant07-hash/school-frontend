@@ -25,7 +25,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .session-popup .school-logo { width: 80px; height: 80px; border-radius: 20px; background: var(--gold-bg); margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--gold); }
 .session-popup .school-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 12px; }
 .icon-box { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 36px; background: #fef2f2; color: var(--red); }
-.session-popup h2 { font-size: 26px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
+.session-popup h2 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
 .session-popup h2 span { color: var(--gold); }
 .sub-text { font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; }
 .session-timer { font-size: 13px; color: var(--text-muted); background: var(--bg); padding: 8px 16px; border-radius: 50px; display: inline-block; margin: 8px 0 20px; }
@@ -81,7 +81,6 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .promote-bar b { color: var(--gold); }
 .hidden { display: none !important; }
 
-/* SESSION SETTINGS CARD */
 .session-card { background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%); color: #fff; padding: 20px 24px; border-radius: var(--radius); margin-bottom: 20px; box-shadow: var(--shadow); display: flex; flex-wrap: wrap; align-items: center; gap: 16px; justify-content: space-between; }
 .session-card .info { display: flex; flex-direction: column; gap: 4px; }
 .session-card .info .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6); font-weight: 600; }
@@ -89,7 +88,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .session-card .actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .session-card .actions select { padding: 9px 14px; border: 1px solid rgba(255,255,255,0.2); border-radius: var(--radius-sm); background: rgba(255,255,255,0.1); color: #fff; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
 .session-card .actions select option { background: #1a2332; color: #fff; }
-.session-card .actions button { padding: 9px 18px; border-radius: var(--radius-sm); border: none; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); }
+.session-card .actions button { padding: 9px 18px; border-radius: var(--radius-sm); border: none; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
 
 .student-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; margin-top: 16px; }
 .student-card { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; transition: var(--transition); box-shadow: var(--shadow); position: relative; display: flex; flex-direction: column; }
@@ -231,7 +230,6 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
         </div>
     </div>
 
-    <!-- SESSION SETTINGS CARD -->
     <div class="session-card">
         <div class="info">
             <span class="label"><i class="fas fa-calendar-alt"></i> Current Active Session</span>
@@ -421,14 +419,10 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 /* CONFIG                                                        */
 /* ============================================================ */
 const STUDENT_API = "https://gsssshilla.onrender.com/api/students";
-
-    const SETTINGS_API = "https://gsssshilla.onrender.com/api/students";
+const SETTINGS_API = "https://gsssshilla.onrender.com/api/students";
 const VERIFY_BASE = "https://gsssshilla07.pages.dev/verify-student.html";
 const CURRENT_SESSION_KEY = "currentSession";
 
-/* ============================================================ */
-/* STATE                                                         */
-/* ============================================================ */
 const state = {
     page: 1,
     limit: 12,
@@ -467,7 +461,7 @@ function showToast(msg, type = "info") {
     t.className = `toast toast-${type}`;
     t.textContent = msg;
     c.appendChild(t);
-    setTimeout(() => { t.style.opacity = "0"; setTimeout(() => t.remove(), 400); }, 4000);
+    setTimeout(() => { t.style.opacity = "0"; setTimeout(() => t.remove(), 400); }, 4500);
 }
 
 function openModal(id) { $("#" + id).classList.add("active"); }
@@ -513,36 +507,61 @@ async function checkAuth() {
             }
             return true;
         } else { showPopup("expired"); return false; }
-    } catch (err) { showPopup("expired"); return false; }
+    } catch (err) {
+        console.warn("Auth check failed (maybe cold start):", err.message);
+        // Don't logout on network error
+        return true;
+    }
 }
 
-async function apiCall(url, options = {}) {
+/* ============================================================ */
+/* API CALL WITH RETRY                                           */
+/* ============================================================ */
+async function apiCall(url, options = {}, retries = 2) {
     const isFormData = options.body instanceof FormData;
     const headers = getAuthHeaders(isFormData);
     if (!headers) throw new Error("Not authenticated");
 
-    let res;
-    try {
-        res = await fetch(url, { ...options, headers: { ...headers, ...(options.headers || {}) } });
-    } catch (e) { throw new Error("Network error. Check internet."); }
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 30000);
 
-    if (res.status === 401) { showPopup("expired"); throw new Error("Session expired"); }
+        try {
+            const res = await fetch(url, {
+                ...options,
+                headers: { ...headers, ...(options.headers || {}) },
+                signal: controller.signal
+            });
+            clearTimeout(timeout);
 
-    const text = await res.text();
-    let data;
-    try { data = text ? JSON.parse(text) : {}; }
-    catch (e) {
-        console.error("Non-JSON:", text.substring(0, 300));
-        throw new Error(`Server returned non-JSON (status ${res.status}).`);
-    }
+            if (res.status === 401) { showPopup("expired"); throw new Error("Session expired"); }
 
-    if (!res.ok) {
-        if (data.errors && Array.isArray(data.errors)) {
-            throw new Error(data.errors.map(e => `${e.field}: ${e.message}`).join(" • "));
+            const text = await res.text();
+            let data;
+            try { data = text ? JSON.parse(text) : {}; }
+            catch (e) {
+                console.error("Non-JSON response:", text.substring(0, 300));
+                throw new Error(`Server error (status ${res.status}).`);
+            }
+
+            if (!res.ok) {
+                if (data.errors && Array.isArray(data.errors)) {
+                    throw new Error(data.errors.map(e => `${e.field}: ${e.message}`).join(" • "));
+                }
+                throw new Error(data.message || `Request failed (${res.status})`);
+            }
+            return data;
+        } catch (err) {
+            clearTimeout(timeout);
+            const isRetryable = err.name === "AbortError" || err.message === "Failed to fetch";
+            if (attempt < retries && isRetryable) {
+                console.log(`Retry ${attempt + 1}/${retries} for ${url}`);
+                await new Promise(r => setTimeout(r, 2500));
+                continue;
+            }
+            throw err;
         }
-        throw new Error(data.message || `Request failed (${res.status})`);
     }
-    return data;
 }
 
 /* ============================================================ */
@@ -563,9 +582,6 @@ function buildQuery() {
     return p.toString();
 }
 
-/* ============================================================ */
-/* LOAD STUDENTS                                                 */
-/* ============================================================ */
 async function loadStudents() {
     $("#loadingState").classList.remove("hidden");
     $("#emptyState").classList.add("hidden");
@@ -651,9 +667,6 @@ function renderPagination() {
     wrap.appendChild(mk("»", page + 1, page === pages));
 }
 
-/* ============================================================ */
-/* STATS + SESSION                                               */
-/* ============================================================ */
 async function loadStats() {
     try {
         const res = await apiCall(`${STUDENT_API}?limit=1`);
@@ -673,25 +686,17 @@ async function loadStats() {
 
 async function loadCurrentSession() {
     try {
-        // Try to read from backend
-        const res = await fetch(`${SETTINGS_API}/current-session`, {
-            headers: getAuthHeaders()
-        });
-        if (res.ok) {
-            const data = await res.json();
-            if (data.success && data.session) {
-                state.currentSession = data.session;
-                try { localStorage.setItem(CURRENT_SESSION_KEY, data.session); } catch (e) {}
-            }
+        const res = await apiCall(`${SETTINGS_API}/current-session`);
+        if (res.session) {
+            state.currentSession = res.session;
+            try { localStorage.setItem(CURRENT_SESSION_KEY, res.session); } catch (e) {}
         }
     } catch (e) {}
 
-    // Fallback to localStorage
     if (!state.currentSession) {
         try { state.currentSession = localStorage.getItem(CURRENT_SESSION_KEY) || ""; } catch (e) {}
     }
 
-    // Auto compute next session if not set
     if (!state.currentSession) {
         const y = new Date().getFullYear();
         state.currentSession = `${y}-${(y + 1).toString().substring(2)}`;
@@ -706,32 +711,29 @@ async function loadCurrentSession() {
 async function saveCurrentSession() {
     const newSession = $("#sessionSetter").value.trim();
     if (!newSession) return showToast("Select a session", "warning");
-    if (!/^\d{4}-\d{2,4}$/.test(newSession)) return showToast("Invalid session format (YYYY-YY or YYYY-YYYY)", "error");
+    if (!/^\d{4}-\d{2,4}$/.test(newSession)) return showToast("Invalid session format", "error");
 
     state.currentSession = newSession;
     try { localStorage.setItem(CURRENT_SESSION_KEY, newSession); } catch (e) {}
 
-    // Try saving to backend
     try {
-        await fetch(`${SETTINGS_API}/current-session`, {
+        await apiCall(`${SETTINGS_API}/current-session`, {
             method: "POST",
-            headers: getAuthHeaders(),
             body: JSON.stringify({ session: newSession })
         });
-    } catch (e) {}
+        showToast(`Current session set to ${newSession} ✅`, "success");
+    } catch (e) {
+        showToast(`Saved locally: ${newSession}`, "info");
+    }
 
     $("#currentSessionDisplay").textContent = newSession;
     $("#statSession").textContent = newSession;
-    showToast(`Current session set to ${newSession} ✅`, "success");
 }
 
-/* ============================================================ */
-/* SESSION DROPDOWN FILL                                         */
-/* ============================================================ */
 function computeSessionOptions() {
     const y = new Date().getFullYear();
     const options = [];
-    for (let i = -2; i <= 3; i++) {
+    for (let i = -3; i <= 4; i++) {
         const start = y + i;
         const end = (start + 1).toString().substring(2);
         options.push(`${start}-${end}`);
@@ -741,15 +743,12 @@ function computeSessionOptions() {
 
 async function fillSessionDropdowns() {
     const options = computeSessionOptions();
-
     const sessionSetter = $("#sessionSetter");
     const fSessionTop = $("#fSessionTop");
 
-    // Preserve first option and reset
     sessionSetter.innerHTML = '<option value="">-- Select Session --</option>';
     fSessionTop.innerHTML = '<option value="">All Sessions</option>';
 
-    // Get sessions from students data too
     let extraSessions = [];
     try {
         const data = await apiCall(`${STUDENT_API}?limit=200`);
@@ -768,9 +767,6 @@ async function fillSessionDropdowns() {
     sessionSetter.value = state.currentSession || "";
 }
 
-/* ============================================================ */
-/* FILTER EVENTS                                                 */
-/* ============================================================ */
 function readFilters() {
     state.filters.search = $("#fSearch").value.trim();
     state.filters.class = $("#fClass").value;
@@ -837,7 +833,6 @@ function resetForm() {
 function openAddModal() {
     resetForm();
     setRequiredDocs(false);
-    // Auto-fill current session
     const sessionInput = form.querySelector('[name="session"]');
     if (sessionInput && state.currentSession) sessionInput.value = state.currentSession;
     openModal("formModal");
@@ -847,8 +842,13 @@ async function openEditModal(id) {
     resetForm();
     $("#formModalTitle").innerHTML = '<i class="fas fa-edit"></i> Edit Student';
     try {
-        const { data } = await apiCall(`${STUDENT_API}/${id}`);
-        const s = data.data;
+        const res = await apiCall(`${STUDENT_API}/${id}`);
+        // SAFE EXTRACTION
+        const s = res?.data || res;
+        if (!s || !s.id) {
+            throw new Error("Student data not found. Please refresh and try again.");
+        }
+
         $("#studentPkId").value = s.id;
         state.editingId = s.id;
 
@@ -875,7 +875,6 @@ async function openEditModal(id) {
         setVal("emailId", s.email_id);
         setVal("address", s.address);
 
-        // Show existing document links
         const existingDocs = {
             studentPhoto: s.student_photo_url,
             signature: s.signature_url,
@@ -895,7 +894,7 @@ async function openEditModal(id) {
             if (!input) continue;
             const hint = document.createElement("div");
             hint.className = "file-existing";
-            hint.innerHTML = `<i class="fas fa-check-circle" style="color:var(--green);"></i> Uploaded: <a href="${esc(url)}" target="_blank" rel="noopener">View Current File</a> <span style="color:var(--text-muted);font-size:10px;">(Upload new to replace)</span>`;
+            hint.innerHTML = `<i class="fas fa-check-circle" style="color:var(--green);"></i> Uploaded: <a href="${esc(url)}" target="_blank" rel="noopener">View Current File</a>`;
             input.parentElement.appendChild(hint);
         }
 
@@ -934,9 +933,6 @@ document.querySelectorAll('#studentForm input[type="file"]').forEach((input) => 
     });
 });
 
-/* ============================================================ */
-/* SAVE STUDENT                                                  */
-/* ============================================================ */
 $("#btnSaveForm").addEventListener("click", async () => {
     const btn = $("#btnSaveForm");
     $("#formErrors").classList.add("hidden");
@@ -944,7 +940,6 @@ $("#btnSaveForm").addEventListener("click", async () => {
 
     if (!form.checkValidity()) { form.reportValidity(); return; }
 
-    const studentId = form.querySelector('[name="studentId"]').value.trim();
     const aadhar = form.querySelector('[name="aadharNumber"]').value.trim();
     const mobile = form.querySelector('[name="mobileNumber"]').value.trim();
     const email = form.querySelector('[name="emailId"]').value.trim();
@@ -1031,13 +1026,17 @@ $("#btnSaveForm").addEventListener("click", async () => {
 async function openViewModal(id) {
     state.viewingId = id;
     try {
-        const { data } = await apiCall(`${STUDENT_API}/${id}`);
-        const s = data.data;
+        const res = await apiCall(`${STUDENT_API}/${id}`);
+        // SAFE EXTRACTION
+        const s = res?.data || res;
+        if (!s || !s.id) {
+            throw new Error("Student data not found. Please refresh and try again.");
+        }
 
         const row = (l, v) => `<div class="view-row"><span class="lbl">${esc(l)}</span><span class="val">${esc(v ?? "—")}</span></div>`;
         const docLink = (l, url) => url
             ? `<a href="${esc(url)}" target="_blank" rel="noopener"><i class="fas fa-file"></i> ${esc(l)}</a>`
-            : `<span class="empty"><i class="fas fa-times-circle"></i> ${esc(l)} (Not Uploaded)</span>`;
+            : `<span class="empty"><i class="fas fa-times-circle"></i> ${esc(l)}</span>`;
 
         $("#viewTitle").innerHTML = `<i class="fas fa-user-graduate"></i> ${esc(s.name)}`;
         $("#viewBody").innerHTML = `
@@ -1076,7 +1075,7 @@ async function openViewModal(id) {
                 <div class="view-row"><span class="val">${esc(s.address || "—")}</span></div>
             </div>
             <div class="view-section">
-                <h4>Documents (${[s.student_photo_url, s.signature_url, s.aadhar_card_url, s.himachali_bonafide_url, s.caste_certificate_url, s.apaar_card_url, s.previous_marksheet_url, s.income_certificate_url, s.bpl_certificate_url, s.other_document_url].filter(Boolean).length}/10)</h4>
+                <h4>Documents</h4>
                 <div class="doc-links">
                     ${docLink("Student Photo", s.student_photo_url)}
                     ${docLink("Signature", s.signature_url)}
@@ -1105,9 +1104,6 @@ $("#viewPrintBtn").addEventListener("click", () => {
     }
 });
 
-/* ============================================================ */
-/* DELETE                                                        */
-/* ============================================================ */
 async function deleteStudent(id, name) {
     if (!confirm(`Delete "${name}"? All uploaded documents will also be deleted.`)) return;
     try {
@@ -1120,9 +1116,6 @@ async function deleteStudent(id, name) {
     }
 }
 
-/* ============================================================ */
-/* CARD ACTIONS                                                  */
-/* ============================================================ */
 $("#studentGrid").addEventListener("click", (e) => {
     const btn = e.target.closest("[data-act]");
     if (btn) {
@@ -1162,9 +1155,6 @@ $("#studentGrid").addEventListener("click", (e) => {
     }
 });
 
-/* ============================================================ */
-/* PROMOTE MODE                                                  */
-/* ============================================================ */
 $("#btnPromoteMode").addEventListener("click", () => {
     state.promoteMode = true;
     state.selectedIds.clear();
@@ -1184,7 +1174,7 @@ $("#btnPromoteConfirm").addEventListener("click", async () => {
     const toClass = $("#promoteClass").value;
     if (!toClass) return showToast("Select target class", "warning");
     if (!state.selectedIds.size) return showToast("Select at least one student", "warning");
-    if (!confirm(`Promote ${state.selectedIds.size} students to Class ${toClass}? Session will be updated to next.`)) return;
+    if (!confirm(`Promote ${state.selectedIds.size} students to Class ${toClass}?`)) return;
 
     try {
         const res = await apiCall(`${STUDENT_API}/promote`, {
@@ -1203,15 +1193,12 @@ $("#btnPromoteConfirm").addEventListener("click", async () => {
     }
 });
 
-/* ============================================================ */
-/* PROMOTE WHOLE SESSION                                         */
-/* ============================================================ */
 async function promoteWholeSession() {
     const session = state.currentSession;
     if (!session) return showToast("Set current session first", "warning");
 
     const nextSession = incrementSessionClient(session);
-    if (!confirm(`Promote ALL students from session "${session}" to their NEXT class and update session to "${nextSession}"?\n\nThis will NOT affect students of other sessions.`)) return;
+    if (!confirm(`Promote ALL active students from "${session}" to their NEXT class and update session to "${nextSession}"?\n\nStudents in Class 12 will be skipped.`)) return;
 
     try {
         const res = await apiCall(`${STUDENT_API}/promote-session`, {
@@ -1219,7 +1206,10 @@ async function promoteWholeSession() {
             body: JSON.stringify({ fromSession: session, toSession: nextSession })
         });
         showToast(res.message || "Whole session promoted ✅", "success");
-        await saveCurrentSessionFromPromotion(nextSession);
+        state.currentSession = nextSession;
+        try { localStorage.setItem(CURRENT_SESSION_KEY, nextSession); } catch (e) {}
+        $("#currentSessionDisplay").textContent = nextSession;
+        $("#statSession").textContent = nextSession;
         loadStudents();
         loadStats();
         fillSessionDropdowns();
@@ -1233,21 +1223,8 @@ function incrementSessionClient(s) {
     if (!m) return s;
     const startYear = parseInt(m[1]) + 1;
     const endYear = startYear + 1;
-    return `${startYear}-${endYear.toString().substring(2)}`;
-}
-
-async function saveCurrentSessionFromPromotion(newSession) {
-    state.currentSession = newSession;
-    try { localStorage.setItem(CURRENT_SESSION_KEY, newSession); } catch (e) {}
-    try {
-        await fetch(`${SETTINGS_API}/current-session`, {
-            method: "POST",
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ session: newSession })
-        });
-    } catch (e) {}
-    $("#currentSessionDisplay").textContent = newSession;
-    $("#statSession").textContent = newSession;
+    const endPart = m[2].length === 2 ? endYear.toString().substring(2) : String(endYear);
+    return `${startYear}-${endPart}`;
 }
 
 function refreshAll() { loadStudents(); loadStats(); fillSessionDropdowns(); }
@@ -1271,7 +1248,7 @@ function generateQRCodeBase64(url, size = 140) {
 }
 
 /* ============================================================ */
-/* PROFESSIONAL PDF WITH DOCUMENT URLs + QR CODES                */
+/* PROFESSIONAL PDF — bigger fonts, readable, printable          */
 /* ============================================================ */
 async function printStudentProfile(studentId) {
     try {
@@ -1282,12 +1259,12 @@ async function printStudentProfile(studentId) {
         });
         if (!res.ok) throw new Error("Failed to fetch student");
         const result = await res.json();
-        const s = result.data;
+        const s = result?.data || result;
+        if (!s || !s.id) throw new Error("Student data not found");
 
         const adminData = JSON.parse(localStorage.getItem("adminData") || "{}");
         const downloadedBy = adminData.name || adminData.username || localStorage.getItem("adminName") || "Admin";
 
-        // Main verification QR
         const verificationData = {
             student_id: s.student_id,
             name: s.name,
@@ -1298,9 +1275,8 @@ async function printStudentProfile(studentId) {
             apaar_id: s.apaar_id || ""
         };
         const verificationUrl = `${VERIFY_BASE}?data=${encodeURIComponent(JSON.stringify(verificationData))}`;
-        const verificationQR = await generateQRCodeBase64(verificationUrl, 160);
+        const verificationQR = await generateQRCodeBase64(verificationUrl, 180);
 
-        // Documents with URLs and individual QR codes
         const docs = [
             { label: "Aadhar Card",         url: s.aadhar_card_url,        has: !!s.aadhar_card_url },
             { label: "Himachali Bonafide",  url: s.himachali_bonafide_url, has: !!s.himachali_bonafide_url },
@@ -1312,9 +1288,8 @@ async function printStudentProfile(studentId) {
             { label: "Any Other Document",  url: s.other_document_url,     has: !!s.other_document_url }
         ];
 
-        // Generate QR for each doc
         const docsWithQR = await Promise.all(docs.map(async (d) => {
-            const qr = d.has ? await generateQRCodeBase64(d.url, 90) : null;
+            const qr = d.has ? await generateQRCodeBase64(d.url, 100) : null;
             return { ...d, qr };
         }));
 
@@ -1325,22 +1300,22 @@ async function printStudentProfile(studentId) {
                 : "—";
             docRows += `
                 <tr>
-                    <td style="text-align:center;padding:6px 6px;border:1px solid #d1d5db;font-size:10px;">${i + 1}</td>
-                    <td style="padding:6px 8px;border:1px solid #d1d5db;font-weight:600;font-size:10px;">${esc(d.label)}</td>
-                    <td style="text-align:center;padding:6px 6px;border:1px solid #d1d5db;font-size:9px;">
+                    <td style="text-align:center;padding:10px 8px;border:1px solid #94a3b8;font-size:12px;">${i + 1}</td>
+                    <td style="padding:10px 12px;border:1px solid #94a3b8;font-weight:600;font-size:13px;">${esc(d.label)}</td>
+                    <td style="text-align:center;padding:10px 8px;border:1px solid #94a3b8;font-size:12px;">
                         ${d.has
                             ? '<span style="color:#10b981;font-weight:700;">✅ Yes</span>'
                             : '<span style="color:#94a3b8;">❌ No</span>'}
                     </td>
-                    <td style="padding:6px 8px;border:1px solid #d1d5db;font-size:8px;word-break:break-all;color:#2563eb;">
+                    <td style="padding:10px 12px;border:1px solid #94a3b8;font-size:10px;word-break:break-all;color:#2563eb;">
                         ${d.has
                             ? `<a href="${esc(d.url)}" style="color:#2563eb;text-decoration:none;">${esc(shortUrl)}</a>`
                             : "—"}
                     </td>
-                    <td style="text-align:center;padding:4px;border:1px solid #d1d5db;width:60px;">
+                    <td style="text-align:center;padding:6px;border:1px solid #94a3b8;width:80px;">
                         ${d.qr
-                            ? `<img src="${d.qr}" width="50" height="50" style="border:1px solid #c9972b;border-radius:3px;background:white;">`
-                            : '<div style="font-size:8px;color:#cbd5e1;">—</div>'}
+                            ? `<img src="${d.qr}" width="70" height="70" style="border:2px solid #c9972b;border-radius:5px;background:white;">`
+                            : '<div style="font-size:10px;color:#cbd5e1;">—</div>'}
                     </td>
                 </tr>`;
         });
@@ -1363,79 +1338,72 @@ async function printStudentProfile(studentId) {
 <meta charset="UTF-8">
 <title>Student Profile: ${esc(s.name)} - ${esc(s.student_id)}</title>
 <style>
-@page { size: A4; margin: 8mm 10mm 8mm 10mm; }
+@page { size: A4; margin: 10mm 10mm 12mm 10mm; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { height: auto; }
-body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; background: #ffffff; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; height: auto; }
-.page-container { width: 100%; max-width: 190mm; margin: 0 auto; padding: 6px 8px 60px; position: relative; }
+body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; background: #ffffff; font-size: 13px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+.page-container { width: 100%; max-width: 190mm; margin: 0 auto; padding: 4px 6px 90px; position: relative; }
 
-/* Watermark */
 .watermark-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 9999; overflow: hidden; }
-.watermark-pattern { position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(201,151,43,0.08) 40px, rgba(201,151,43,0.08) 42px), repeating-linear-gradient(135deg, transparent, transparent 40px, rgba(201,151,43,0.06) 40px, rgba(201,151,43,0.06) 42px); background-size: 56px 56px; }
-.watermark-pattern2 { position: absolute; inset: 0; background-image: repeating-linear-gradient(-45deg, transparent, transparent 50px, rgba(74,138,244,0.07) 50px, rgba(74,138,244,0.07) 52px), repeating-linear-gradient(45deg, transparent, transparent 50px, rgba(74,138,244,0.05) 50px, rgba(74,138,244,0.05) 52px); background-size: 70px 70px; }
-.watermark-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; height: 500px; opacity: 0.10; background: url('logo(1).png') center/contain no-repeat; filter: grayscale(100%) blur(0.5px); border-radius: 50%; }
+.watermark-pattern { position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(201,151,43,0.07) 40px, rgba(201,151,43,0.07) 42px); background-size: 56px 56px; }
+.watermark-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 550px; height: 550px; opacity: 0.09; background: url('logo(1).png') center/contain no-repeat; filter: grayscale(100%); border-radius: 50%; }
 
 /* Header */
-.page-header { text-align: center; padding-bottom: 10px; border-bottom: 3px solid #c9972b; position: relative; z-index: 1; background: rgba(255,255,255,0.95); }
-.page-header .logo { width: 64px; height: 64px; border-radius: 50%; border: 2px solid #c9972b; padding: 3px; background: white; margin: 0 auto 3px; display: block; }
-.page-header .school-name { font-family: 'Georgia', serif; font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: #0d1b2a; }
-.page-header .school-tagline { font-size: 8px; color: #5a6a7e; letter-spacing: 2.5px; text-transform: uppercase; }
-.page-header .heading-box { display: inline-block; background: #0d1b2a; color: #fff; padding: 4px 22px; border-radius: 25px; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: 2px solid #c9972b; margin-top: 4px; }
+.page-header { text-align: center; padding-bottom: 14px; border-bottom: 4px solid #c9972b; position: relative; z-index: 1; background: rgba(255,255,255,0.96); }
+.page-header .logo { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #c9972b; padding: 5px; background: white; margin: 0 auto 8px; display: block; }
+.page-header .school-name { font-family: 'Georgia', serif; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 2.5px; color: #0d1b2a; }
+.page-header .school-tagline { font-size: 12px; color: #5a6a7e; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; font-weight: 600; }
+.page-header .heading-box { display: inline-block; background: #0d1b2a; color: #fff; padding: 8px 32px; border-radius: 30px; font-size: 16px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; border: 3px solid #c9972b; margin-top: 10px; }
 
 .content-area { position: relative; z-index: 1; }
 
-.section-heading { font-size: 12px; font-weight: 700; margin: 16px 0 6px; padding: 6px 14px; background: #fef8ed; border-left: 4px solid #c9972b; letter-spacing: 1px; color: #0d1b2a; text-transform: uppercase; }
+.section-heading { font-size: 15px; font-weight: 800; margin: 18px 0 10px; padding: 10px 18px; background: #fef8ed; border-left: 5px solid #c9972b; letter-spacing: 1.5px; color: #0d1b2a; text-transform: uppercase; border-radius: 0 6px 6px 0; }
 
-/* Info table */
 .info-table { width: 100%; border-collapse: collapse; margin: 0 0 10px; border: 2px solid #0d1b2a; }
-.info-table td { padding: 7px 10px; border: 1px solid #d1d5db; font-size: 11px; vertical-align: middle; }
-.info-table .label-cell { font-weight: 700; background: #fef8ed; color: #0d1b2a; width: 16%; letter-spacing: 0.5px; text-transform: uppercase; font-size: 9px; }
-.info-table .value-cell { font-weight: 500; color: #1a2332; width: 34%; font-size: 11px; }
-.photo-cell { width: 110px; text-align: center; vertical-align: middle; background: #f8fafc; padding: 6px; }
-.photo-box { width: 80px; height: 95px; border: 3px solid #c9972b; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; margin: 0 auto 5px; }
+.info-table td { padding: 10px 14px; border: 1px solid #94a3b8; font-size: 13px; vertical-align: middle; }
+.info-table .label-cell { font-weight: 800; background: #fef8ed; color: #0d1b2a; width: 16%; letter-spacing: 0.8px; text-transform: uppercase; font-size: 11px; }
+.info-table .value-cell { font-weight: 500; color: #1a2332; width: 34%; font-size: 13.5px; }
+
+.photo-cell { width: 150px; text-align: center; vertical-align: middle; background: #f8fafc; padding: 10px; }
+.photo-box { width: 115px; height: 135px; border: 4px solid #c9972b; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; margin: 0 auto 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 .photo-box img { width: 100%; height: 100%; object-fit: cover; }
-.photo-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 30px; color: #cbd5e1; }
-.photo-label { font-size: 8px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
-.signature-box-small { width: 80px; height: 35px; border: 2px dashed #c9972b; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; margin: 0 auto 3px; }
+.photo-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 42px; color: #cbd5e1; }
+.photo-label { font-size: 10px; color: #475569; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.signature-box-small { width: 115px; height: 50px; border: 2px dashed #c9972b; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; margin: 0 auto 5px; }
 .signature-box-small img { width: 100%; height: 100%; object-fit: contain; }
-.signature-placeholder { font-size: 8px; color: #94a3b8; }
-.signature-label { font-size: 8px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.signature-placeholder { font-size: 10px; color: #94a3b8; }
+.signature-label { font-size: 10px; color: #475569; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
 
-/* Address */
-.address-box { border: 2px solid #0d1b2a; border-radius: 6px; padding: 10px 14px; background: #f8fafc; font-size: 11px; color: #1a2332; margin-bottom: 10px; line-height: 1.6; }
+.address-box { border: 2px solid #0d1b2a; border-radius: 8px; padding: 14px 18px; background: #f8fafc; font-size: 13.5px; color: #1a2332; margin-bottom: 10px; line-height: 1.7; }
 
-/* Documents table */
-.doc-table { width: 100%; border-collapse: collapse; margin: 4px 0; border: 2px solid #0d1b2a; }
-.doc-table th { background: #0d1b2a; color: #fff; padding: 7px 8px; border: 1px solid #0d1b2a; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
-.doc-table td { padding: 6px 8px; border: 1px solid #d1d5db; font-size: 10px; text-align: left; vertical-align: middle; }
+.doc-table { width: 100%; border-collapse: collapse; margin: 6px 0; border: 2px solid #0d1b2a; }
+.doc-table th { background: #0d1b2a; color: #fff; padding: 11px 10px; border: 1px solid #0d1b2a; font-size: 11.5px; text-transform: uppercase; letter-spacing: 1.2px; text-align: center; font-weight: 700; }
+.doc-table td { padding: 10px 12px; border: 1px solid #94a3b8; font-size: 12.5px; text-align: left; vertical-align: middle; }
 
-/* Signature area */
-.signature-area { display: flex; justify-content: space-between; margin-top: 16px; padding-top: 8px; align-items: flex-end; }
-.signature-box { text-align: center; font-size: 9px; width: 180px; }
-.signature-box .signature-img { height: 55px; max-width: 160px; object-fit: contain; display: block; margin: 0 auto 3px; }
-.signature-box .line { width: 130px; height: 1px; border-top: 1px dashed #94a3b8; margin: 12px auto 3px; }
-.signature-box strong { font-size: 10px; color: #0d1b2a; }
-.signature-box small { font-size: 8px; color: #64748b; display: block; }
+.signature-area { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 14px; align-items: flex-end; }
+.signature-box { text-align: center; font-size: 12px; width: 220px; }
+.signature-box .signature-img { height: 70px; max-width: 180px; object-fit: contain; display: block; margin: 0 auto 5px; }
+.signature-box .line { width: 160px; height: 1px; border-top: 1.5px dashed #64748b; margin: 16px auto 5px; }
+.signature-box strong { font-size: 14px; color: #0d1b2a; font-weight: 800; }
+.signature-box small { font-size: 11px; color: #475569; display: block; margin-top: 2px; }
 
-.date-box { border: 2px solid #c9972b; background: #fef8ed; padding: 8px 14px; border-radius: 6px; font-size: 10px; text-align: center; min-width: 150px; }
-.date-box strong { display: block; color: #0d1b2a; font-size: 11px; }
-.date-box span { color: #5a6a7e; font-size: 9px; }
+.date-box { border: 3px solid #c9972b; background: #fef8ed; padding: 12px 18px; border-radius: 8px; font-size: 13px; text-align: center; min-width: 180px; }
+.date-box strong { display: block; color: #0d1b2a; font-size: 14px; font-weight: 800; }
+.date-box span { color: #475569; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-top: 4px; display: block; }
 
-/* Verification */
-.verification-section { display: flex; align-items: center; gap: 16px; margin: 14px 0 10px; padding: 10px 16px; border: 2px solid #c9972b; background: #fef8ed; border-radius: 8px; }
-.verification-qr { width: 90px; height: 90px; border: 2px solid #0d1b2a; border-radius: 6px; overflow: hidden; flex-shrink: 0; background: white; display: flex; align-items: center; justify-content: center; }
-.verification-qr img { width: 84px; height: 84px; }
-.verification-text { flex: 1; font-size: 9px; color: #0d1b2a; }
-.verification-text strong { display: block; font-size: 13px; margin-bottom: 3px; color: #c9972b; }
-.verification-text p { font-size: 9px; color: #5a6a7e; margin: 2px 0; line-height: 1.5; }
+.verification-section { display: flex; align-items: center; gap: 22px; margin: 20px 0 10px; padding: 16px 22px; border: 3px solid #c9972b; background: #fef8ed; border-radius: 12px; }
+.verification-qr { width: 120px; height: 120px; border: 3px solid #0d1b2a; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: white; display: flex; align-items: center; justify-content: center; }
+.verification-qr img { width: 112px; height: 112px; }
+.verification-text { flex: 1; color: #0d1b2a; }
+.verification-text strong { display: block; font-size: 17px; margin-bottom: 6px; color: #c9972b; font-weight: 800; letter-spacing: 0.5px; }
+.verification-text p { font-size: 12px; color: #475569; margin: 4px 0; line-height: 1.6; }
 
-/* Footer */
 .footer-wrapper { position: fixed; left: 50%; transform: translateX(-50%); width: 190mm; bottom: 0; z-index: 1; }
-.security-text-line { text-align: center; font-size: 6px; color: rgba(13, 27, 42, 0.20); letter-spacing: 3px; padding: 4px 0; border-top: 1px dashed #cbd5e1; border-bottom: 1px dashed #cbd5e1; text-transform: uppercase; white-space: nowrap; background: rgba(255,255,255,0.9); }
-.page-footer { padding-top: 6px; border-top: 2px solid #c9972b; font-size: 8px; color: #64748b; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.95); }
-.footer-left { text-align: left; }
-.footer-center { text-align: center; font-weight: 600; color: #0d1b2a; }
-.footer-right { text-align: right; }
+.security-text-line { text-align: center; font-size: 8px; color: rgba(13, 27, 42, 0.28); letter-spacing: 4px; padding: 6px 0; border-top: 1px dashed #cbd5e1; border-bottom: 1px dashed #cbd5e1; text-transform: uppercase; white-space: nowrap; background: rgba(255,255,255,0.95); font-weight: 600; }
+.page-footer { padding-top: 10px; border-top: 3px solid #c9972b; font-size: 11px; color: #475569; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.98); }
+.footer-left { text-align: left; font-weight: 600; }
+.footer-center { text-align: center; font-weight: 700; color: #0d1b2a; font-size: 12px; }
+.footer-right { text-align: right; font-weight: 600; }
 
 @media print {
     html, body { margin: 0; padding: 0; height: auto; }
@@ -1449,7 +1417,6 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
 
 <div class="watermark-container">
     <div class="watermark-pattern"></div>
-    <div class="watermark-pattern2"></div>
     <div class="watermark-logo"></div>
 </div>
 
@@ -1488,7 +1455,7 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
             </tr>
             <tr>
                 <td class="label-cell">Full Name</td>
-                <td class="value-cell" style="font-weight:700;font-size:12.5px;">${esc(s.name)}</td>
+                <td class="value-cell" style="font-weight:800;font-size:15px;">${esc(s.name)}</td>
                 <td class="label-cell">Gender</td>
                 <td class="value-cell">${esc(s.gender || "-")}</td>
             </tr>
@@ -1514,7 +1481,7 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
                 <td class="label-cell">Mobile</td>
                 <td class="value-cell">${esc(s.mobile_number || "-")}</td>
                 <td class="label-cell">Email</td>
-                <td class="value-cell" style="font-size:10px;">${esc(s.email_id || "-")}</td>
+                <td class="value-cell" style="font-size:12px;">${esc(s.email_id || "-")}</td>
             </tr>
         </table>
 
@@ -1531,7 +1498,7 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
                 <td class="value-cell"><b>${esc(s.session || "-")}</b></td>
                 <td class="label-cell">Status</td>
                 <td class="value-cell">
-                    <span style="display:inline-block;background:${s.status === "Active" ? "#dcfce7" : s.status === "Promoted" ? "#dbeafe" : "#fef3c7"};color:${s.status === "Active" ? "#166534" : s.status === "Promoted" ? "#1e40af" : "#92400e"};padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;text-transform:uppercase;">${esc(s.status || "Active")}</span>
+                    <span style="display:inline-block;background:${s.status === "Active" ? "#dcfce7" : s.status === "Promoted" ? "#dbeafe" : "#fef3c7"};color:${s.status === "Active" ? "#166534" : s.status === "Promoted" ? "#1e40af" : "#92400e"};padding:4px 14px;border-radius:14px;font-size:12px;font-weight:800;text-transform:uppercase;">${esc(s.status || "Active")}</span>
                 </td>
             </tr>
             <tr>
@@ -1551,11 +1518,11 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
         <table class="doc-table">
             <thead>
                 <tr>
-                    <th style="width:28px;">#</th>
-                    <th style="width:130px;">Document</th>
-                    <th style="width:60px;">Status</th>
-                    <th>Cloudinary URL (clickable in digital copy)</th>
-                    <th style="width:64px;">QR</th>
+                    <th style="width:36px;">#</th>
+                    <th style="width:150px;">Document</th>
+                    <th style="width:70px;">Status</th>
+                    <th>Cloudinary URL (clickable)</th>
+                    <th style="width:90px;">QR Code</th>
                 </tr>
             </thead>
             <tbody>
@@ -1578,24 +1545,24 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
 
         <div class="verification-section">
             <div class="verification-qr">
-                ${verificationQR ? `<img src="${verificationQR}" alt="Verification QR">` : '<div style="font-size:8px;color:#94a3b8;text-align:center;">QR N/A</div>'}
+                ${verificationQR ? `<img src="${verificationQR}" alt="Verification QR">` : '<div style="font-size:10px;color:#94a3b8;text-align:center;">QR N/A</div>'}
             </div>
             <div class="verification-text">
                 <strong>Scan to Verify Student Profile</strong>
                 <p>Scan this QR code to verify the authenticity of this student profile document.</p>
                 <p>Each document above also has its own QR code for direct access to the uploaded file.</p>
-                <p style="font-size:8px;color:#94a3b8;margin-top:2px;">Verification ID: ${esc(s.student_id)}-${Date.now().toString().substring(8)}</p>
+                <p style="font-size:11px;color:#94a3b8;margin-top:4px;">Verification ID: ${esc(s.student_id)}-${Date.now().toString().substring(8)}</p>
             </div>
         </div>
 
     </div>
 
     <div class="footer-wrapper">
-        <div class="security-text-line">GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT</div>
+        <div class="security-text-line">GSSS SHILLA OFFICIAL DOCUMENT | GSSS SHILLA OFFICIAL DOCUMENT | GSSS SHILLA OFFICIAL DOCUMENT</div>
         <div class="page-footer">
             <div class="footer-left"><strong>Print Date:</strong> ${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</div>
-            <div class="footer-center"><strong>Issued by:</strong> ${esc(downloadedBy)}<br><span style="font-size:7px;color:#94a3b8;">Authorized Signatory</span></div>
-            <div class="footer-right"><strong>Session:</strong> ${esc(s.session || "-")}<br><span style="font-size:7px;">GSSS Shilla - Official Document</span></div>
+            <div class="footer-center"><strong>Issued by:</strong> ${esc(downloadedBy)}<br><span style="font-size:9px;color:#94a3b8;">Authorized Signatory</span></div>
+            <div class="footer-right"><strong>Session:</strong> ${esc(s.session || "-")}<br><span style="font-size:9px;">GSSS Shilla - Official Document</span></div>
         </div>
     </div>
 
@@ -1612,7 +1579,7 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
 }
 
 /* ============================================================ */
-/* MODAL CLOSE HANDLERS                                          */
+/* MODAL CLOSE + INIT                                            */
 /* ============================================================ */
 document.addEventListener("click", (e) => {
     if (e.target.classList.contains("modal-overlay")) e.target.classList.remove("active");
@@ -1625,9 +1592,6 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-/* ============================================================ */
-/* INIT                                                          */
-/* ============================================================ */
 window.addEventListener("DOMContentLoaded", async () => {
     if (await checkAuth()) {
         await loadCurrentSession();
