@@ -242,15 +242,27 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
                     </div>
                 </div>
 
-                <div class="download-card disabled">
-                    <div class="coming-soon">Coming Soon</div>
-                    <div class="dc-icon green"><i class="fas fa-certificate"></i></div>
-                    <div class="dc-body">
-                        <div class="dc-title">Bonafide Certificate</div>
-                        <div class="dc-desc">Get bonafide certificate for various purposes</div>
-                        <button class="dc-btn" disabled><i class="fas fa-lock"></i> Locked</button>
-                    </div>
-                </div>
+                <!-- Bonafide Certificate Card - replace the disabled one -->
+<div class="download-card" id="bonafideCard" style="display:none;" onclick="downloadBonafide()">
+    <div class="dc-icon green"><i class="fas fa-certificate"></i></div>
+    <div class="dc-body">
+        <div class="dc-title">Bonafide Certificate</div>
+        <div class="dc-desc">Download your official bonafide certificate</div>
+        <button class="dc-btn" id="bonafideBtn"><i class="fas fa-download"></i> Download</button>
+    </div>
+</div>
+
+<!-- Locked state (shown if not enabled) -->
+<div class="download-card disabled" id="bonafideLocked">
+    <div class="dc-icon green" style="opacity:0.6;"><i class="fas fa-lock"></i></div>
+    <div class="dc-body">
+        <div class="dc-title">Bonafide Certificate</div>
+        <div class="dc-desc">Contact school office to enable this certificate</div>
+        <button class="dc-btn" disabled><i class="fas fa-lock"></i> Not Available</button>
+    </div>
+</div>
+
+                
 
                 <div class="download-card disabled">
                     <div class="coming-soon">Coming Soon</div>
@@ -462,6 +474,42 @@ function generateQRCodeBase64(url, size = 140) {
             .catch(() => resolve(null));
     });
 }
+
+    /* ============ CHECK BONAFIDE STATUS ============ */
+async function checkBonafideStatus() {
+    if (!student || !student.student_id) return;
+    try {
+        const res = await fetch(`${STUDENT_API}/../bonafide/my-status/${encodeURIComponent(student.student_id)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const isEnabled = data.success && data.enabled;
+
+        const card = document.getElementById("bonafideCard");
+        const locked = document.getElementById("bonafideLocked");
+
+        if (isEnabled) {
+            if (card) card.style.display = "flex";
+            if (locked) locked.style.display = "none";
+        } else {
+            if (card) card.style.display = "none";
+            if (locked) locked.style.display = "flex";
+        }
+    } catch (e) {
+        console.warn("Bonafide status check failed:", e.message);
+    }
+}
+
+/* ============ DOWNLOAD BONAFIDE ============ */
+function downloadBonafide() {
+    if (!student || !student.student_id) return;
+    const url = `https://gsssshilla.onrender.com/api/bonafide/certificate/${encodeURIComponent(student.student_id)}/pdf`;
+    window.open(url, "_blank");
+    showToast("Opening bonafide certificate…", "info");
+}
+
+/* ============ CALL on dashboard load ============ */
+// Apne existing renderDashboard() ke baad ye line add karo:
+// await checkBonafideStatus();
 
 /* ============ DOWNLOAD PROFILE PDF ============ */
 async function downloadProfilePDF() {
@@ -758,13 +806,16 @@ setInterval(() => {
 }, 60000);
 
 /* ============ INIT ============ */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     student = loadStudentFromSession();
     if (student) {
         renderDashboard(student);
         showToast(`Welcome, ${student.name}!`, "success");
+        await checkBonafideStatus();   // ⬅️ ye line add karo
     }
 });
+    
+
 </script>
 </body>
 </html>
