@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Students Manager - Admin | GSSS Shilla</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root {
+    --bg: #f5f7fb; --bg-white: #ffffff; --text-primary: #1a2332; --text-secondary: #5a6a7e;
+    --text-muted: #94a3b8; --gold: #c9972b; --gold-light: #e8b84b; --gold-bg: #fef8ed;
+    --blue: #4a8af4; --blue-bg: #eef4ff; --green: #10b981; --green-bg: #ecfdf5;
+    --purple: #8b5cf6; --purple-bg: #f5f0ff; --pink: #ec4899; --pink-bg: #fdf2f8;
+    --orange: #f59e0b; --orange-bg: #fffbeb; --red: #ef4444; --border: #e8edf8;
+    --shadow: 0 2px 12px rgba(0,0,0,0.04); --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --radius: 16px; --radius-sm: 10px; --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ============== SESSION OVERLAY ============== */
+.session-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 9999; justify-content: center; align-items: center; }
+.session-overlay.active { display: flex; }
+.session-popup { background: var(--bg-white); border-radius: 24px; padding: 40px 32px; max-width: 440px; width: 92%; text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.3); border: 1px solid rgba(201,151,43,0.15); }
+.session-popup .school-logo { width: 80px; height: 80px; border-radius: 20px; background: var(--gold-bg); margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--gold); }
+.session-popup .school-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 12px; }
+.icon-box { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+.icon-box.expired { background: #fef2f2; color: var(--red); }
+.session-popup h2 { font-size: 26px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
+.session-popup h2 span { color: var(--gold); }
+.sub-text { font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; }
+.session-timer { font-size: 13px; color: var(--text-muted); background: var(--bg); padding: 8px 16px; border-radius: 50px; display: inline-block; margin: 8px 0 20px; }
+.school-name-popup { font-size: 13px; font-weight: 600; color: var(--gold); margin-bottom: 20px; }
+.login-again-btn { display: inline-flex; align-items: center; gap: 12px; padding: 14px 40px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #fff; border: none; border-radius: 50px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
+.login-again-btn:hover { transform: translateY(-4px); }
+
+/* ============== NAVBAR ============== */
+.navbar { background: var(--bg-white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 68px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
+.navbar .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.navbar .brand .logo-placeholder { width: 42px; height: 42px; border-radius: var(--radius-sm); background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.navbar .brand .logo-placeholder img { width: 46px; height: 46px; border-radius: 10px; object-fit: contain; background: #fff; padding: 4px; }
+.navbar .brand .name { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.navbar .brand .name span { color: var(--gold); }
+.nav-links { display: flex; gap: 8px; list-style: none; }
+.nav-links a { text-decoration: none; color: var(--text-secondary); padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; transition: var(--transition); }
+.nav-links a:hover { background: var(--bg); color: var(--text-primary); }
+.nav-links a.active { background: var(--gold-bg); color: var(--gold); }
+.nav-links a i { margin-right: 6px; }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.admin-badge { display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 10px; background: var(--bg); border-radius: 50px; font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+.online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.hamburger { display: none; background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-primary); }
+
+/* ============== MAIN ============== */
+.main-container { flex: 1; max-width: 1400px; margin: 0 auto; padding: 24px 32px 40px; width: 100%; }
+.page-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; padding: 20px 28px; background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.page-header h1 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.page-header h1 i { color: var(--gold); }
+.header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); text-decoration: none; font-family: 'Inter', sans-serif; }
+.btn-primary { background: var(--gold); color: #fff; } .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+.btn-success { background: var(--green); color: #fff; } .btn-success:hover { background: #059669; transform: translateY(-2px); }
+.btn-danger { background: var(--red); color: #fff; } .btn-danger:hover { background: #dc2626; transform: translateY(-2px); }
+.btn-outline { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); } .btn-outline:hover { background: var(--border); }
+.btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 8px; }
+.btn-xs { padding: 4px 10px; font-size: 11px; border-radius: 6px; }
+
+/* ============== STATS ============== */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: var(--bg-white); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); text-align: center; box-shadow: var(--shadow); transition: var(--transition); }
+.stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+.stat-card h3 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.stat-card .number { font-size: 28px; font-weight: 800; }
+.number.gold { color: var(--gold); } .number.green { color: var(--green); } .number.red { color: var(--red); } .number.blue { color: var(--blue); }
+
+/* ============== FILTER BAR ============== */
+.class-nav { background: var(--bg-white); padding: 20px 24px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 20px; box-shadow: var(--shadow); }
+.class-nav h3 { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 12px; }
+.class-nav h3 i { color: var(--gold); margin-right: 6px; }
+.filter-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.filter-row input, .filter-row select {
+    padding: 9px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    font-size: 13px; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); outline: none;
+    transition: var(--transition);
+}
+.filter-row input:focus, .filter-row select:focus { border-color: var(--gold); background: #fff; }
+.filter-row input[type="text"] { flex: 1 1 240px; min-width: 200px; }
+
+.promote-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border); font-size: 13px; }
+.promote-bar b { color: var(--gold); }
+.promote-bar select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Inter', sans-serif; background: var(--bg); }
+.hidden { display: none !important; }
+
+/* ============== CLASS BUTTONS ============== */
+.class-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.class-btn { padding: 8px 20px; border: 2px solid var(--border); background: var(--bg-white); border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--text-secondary); transition: var(--transition); font-family: 'Inter', sans-serif; }
+.class-btn:hover { border-color: var(--gold); color: var(--gold); }
+.class-btn.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+
+/* ============== STUDENT GRID ============== */
+.student-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; margin-top: 16px; }
+.student-card { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; transition: var(--transition); box-shadow: var(--shadow); position: relative; display: flex; flex-direction: column; }
+.student-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: var(--gold); }
+.student-card.selected { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,151,43,0.15); }
+
+.card-photo-wrap { position: relative; height: 170px; background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%); display: flex; align-items: center; justify-content: center; }
+.card-photo { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; box-shadow: var(--shadow-md); }
+.card-photo-placeholder { width: 110px; height: 110px; border-radius: 50%; background: rgba(255,255,255,0.15); border: 4px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 44px; color: #fff; }
+.card-class-badge { position: absolute; top: 12px; right: 12px; background: var(--gold); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
+.card-status { position: absolute; bottom: 12px; left: 12px; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+.status-Active { background: #dcfce7; color: #166534; }
+.status-Promoted { background: #dbeafe; color: #1e40af; }
+.status-Passed { background: #fef3c7; color: #92400e; }
+.status-Left { background: #fee2e2; color: #991b1b; }
+.card-select { position: absolute; top: 12px; left: 12px; z-index: 2; width: 20px; height: 20px; cursor: pointer; accent-color: var(--gold); }
+
+.card-body { padding: 14px 18px 12px; flex: 1; display: flex; flex-direction: column; }
+.card-name { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+.card-roll { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+.card-info { font-size: 12.5px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 12px; }
+.card-info b { color: var(--text-primary); font-weight: 600; }
+.card-actions { display: flex; gap: 6px; padding-top: 10px; margin-top: auto; border-top: 1px solid var(--border); justify-content: flex-end; flex-wrap: wrap; }
+.action-btn { padding: 5px 12px; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; gap: 4px; }
+.action-btn:hover { transform: scale(1.05); }
+.action-btn.edit { background: var(--orange-bg); color: var(--orange); }
+.action-btn.delete { background: #fee2e2; color: var(--red); }
+.action-btn.print { background: var(--pink-bg); color: var(--pink); }
+.action-btn.view { background: var(--purple-bg); color: var(--purple); }
+
+/* ============== STATE BOX ============== */
+.state-box { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 14px; background: var(--bg-white); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px; border: 1px solid var(--border); }
+
+/* ============== PAGINATION ============== */
+.pagination { display: flex; justify-content: center; gap: 6px; margin-top: 24px; flex-wrap: wrap; }
+.pagination button { padding: 7px 14px; border: 1px solid var(--border); background: var(--bg-white); border-radius: var(--radius-sm); cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px; color: var(--text-secondary); transition: var(--transition); }
+.pagination button:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+.pagination button.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+.pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ============== MODAL ============== */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+.modal-overlay.active { display: flex; }
+.modal-content { background: var(--bg-white); padding: 30px; border-radius: var(--radius); max-width: 780px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 14px; margin-bottom: 18px; }
+.modal-header h2 { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+.modal-header h2 i { color: var(--gold); margin-right: 8px; }
+.close-btn { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; transition: var(--transition); }
+.close-btn:hover { color: var(--red); transform: rotate(90deg); }
+
+/* ============== FORM ============== */
+.form-section { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--gold); margin: 20px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--gold-bg); }
+.form-section:first-of-type { margin-top: 0; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid label, .modal-content > label.full { display: flex; flex-direction: column; font-size: 12px; font-weight: 600; color: var(--text-secondary); gap: 6px; }
+.form-grid input, .form-grid select, .form-grid textarea, .modal-content textarea {
+    padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text-primary); background: var(--bg); outline: none;
+    transition: var(--transition);
+}
+.form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus { border-color: var(--gold); background: #fff; }
+.form-grid input[type="file"] { padding: 8px 10px; font-size: 12px; cursor: pointer; }
+.modal-content > label.full { margin-top: 14px; }
+.file-grid { grid-template-columns: 1fr 1fr; }
+.hint { font-size: 12px; color: var(--text-muted); margin: -4px 0 14px; }
+.form-errors { background: #fee2e2; color: #991b1b; padding: 12px 16px; border-radius: var(--radius-sm); margin-top: 16px; font-size: 13px; border-left: 4px solid var(--red); }
+
+/* ============== VIEW MODAL ============== */
+.view-section { margin-bottom: 22px; }
+.view-section h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--gold); margin: 0 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.view-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; font-size: 13px; }
+.view-row { display: flex; flex-direction: column; gap: 2px; }
+.view-row .lbl { font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+.view-row .val { color: var(--text-primary); font-weight: 500; word-break: break-word; }
+.view-photo { width: 120px; height: 140px; border-radius: 10px; object-fit: cover; border: 3px solid var(--gold); margin-bottom: 16px; display: block; }
+.doc-links { display: flex; flex-direction: column; gap: 6px; }
+.doc-links a { color: var(--gold); text-decoration: none; font-size: 13px; padding: 8px 12px; background: var(--gold-bg); border-radius: 8px; transition: var(--transition); display: flex; align-items: center; gap: 8px; }
+.doc-links a:hover { background: #fdebc8; }
+
+/* ============== TOAST ============== */
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { padding: 14px 24px; border-radius: var(--radius-sm); color: #fff; font-weight: 600; font-size: 13px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); min-width: 250px; animation: slideIn 0.3s ease; }
+.toast-success { background: var(--green); }
+.toast-error { background: var(--red); }
+.toast-warning { background: var(--orange); }
+.toast-info { background: var(--text-primary); }
+@keyframes slideIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+
+.alert-box { padding: 14px 18px; border-radius: var(--radius-sm); margin: 12px 0; }
+.alert-box.error { background: #fee2e2; color: var(--red); border: 1px solid #fecaca; }
+.alert-box.success { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; }
+.alert-box.info { background: var(--blue-bg); color: var(--blue); border: 1px solid #bfdbfe; }
+
+/* ============== FOOTER ============== */
+.footer { background: var(--bg-white); border-top: 1px solid var(--border); padding: 20px 32px; text-align: center; font-size: 13px; color: var(--text-muted); }
+
+/* ============== RESPONSIVE ============== */
+@media (max-width: 768px) {
+    .navbar { padding: 0 20px; }
+    .nav-links { display: none; flex-direction: column; position: absolute; top: 68px; left: 0; right: 0; background: var(--bg-white); padding: 16px; border-bottom: 1px solid var(--border); }
+    .nav-links.open { display: flex; }
+    .hamburger { display: block; }
+    .main-container { padding: 16px; }
+    .page-header { padding: 16px; flex-direction: column; align-items: stretch; }
+    .student-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .form-grid, .file-grid, .view-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============== SESSION OVERLAY ============== -->
+<div class="session-overlay" id="sessionOverlay">
+    <div class="session-popup">
+        <div class="school-logo"><img src="logo(1).png" alt="GSSS SHILLA Logo"></div>
+        <div class="school-name-popup"><i class="fas fa-school"></i> Govt. Sr. Sec. School Shilla</div>
+        <div class="icon-box expired" id="popupIconBox"><i class="fas fa-clock" id="popupIcon"></i></div>
+        <h2 id="popupTitle">Session <span>Expired</span></h2>
+        <p class="sub-text" id="popupSubText">Your session has been expired due to inactivity.<br>Please login again to continue.</p>
+        <div class="session-timer"><i class="fas fa-shield-alt"></i> <span id="popupStatusText">Secure session ended</span></div>
+        <button class="login-again-btn" onclick="redirectToLogin()"><i class="fas fa-sign-in-alt"></i> <span id="popupBtnText">Login Again</span></button>
+    </div>
+</div>
+
+<!-- ============== NAVBAR ============== -->
+<nav class="navbar">
+    <a href="#" class="brand">
+        <div class="logo-placeholder"><img src="logo(1).png" alt="Logo"></div>
+        <div class="name">GSSS<span> SHILLA</span></div>
+    </a>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="admin-result.html"><i class="fas fa-graduation-cap"></i> Results</a></li>
+        <li><a href="admin-students.html" class="active"><i class="fas fa-users"></i> Students</a></li>
+    </ul>
+    <div class="nav-right">
+        <div class="admin-badge">
+            <span class="avatar" id="adminAvatar">🛡️</span>
+            <span id="adminName">Admin</span>
+            <span class="online-dot"></span>
+        </div>
+        <button class="hamburger" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
+    </div>
+</nav>
+
+<!-- ============== MAIN ============== -->
+<div class="main-container">
+    <div class="page-header">
+        <h1><i class="fas fa-users"></i> Student Management</h1>
+        <div class="header-actions">
+            <select id="fSession" class="btn btn-outline" style="padding:8px 14px; font-family:'Inter',sans-serif;">
+                <option value="">All Sessions</option>
+            </select>
+            <button class="btn btn-outline" onclick="refreshAll()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <button class="btn btn-success" onclick="openAddModal()"><i class="fas fa-user-plus"></i> Add Student</button>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+        <div class="stat-card"><h3>Total Students</h3><div class="number gold" id="statTotal">0</div></div>
+        <div class="stat-card"><h3>Classes</h3><div class="number blue" id="statClasses">0</div></div>
+        <div class="stat-card"><h3>Promoted</h3><div class="number green" id="statPromoted">0</div></div>
+        <div class="stat-card"><h3>Current Session</h3><div class="number gold" id="statSession" style="font-size:18px;margin-top:6px;">—</div></div>
+    </div>
+
+    <!-- FILTER -->
+    <div class="class-nav">
+        <h3><i class="fas fa-filter"></i> Filter & Sort</h3>
+        <div class="filter-row">
+            <input type="text" id="fSearch" placeholder="🔍 Search name, admission no, mobile...">
+            <select id="fClass">
+                <option value="">All Classes</option>
+                <option>Nursery</option><option>LKG</option><option>UKG</option>
+                <option>1</option><option>2</option><option>3</option><option>4</option>
+                <option>5</option><option>6</option><option>7</option><option>8</option>
+                <option>9</option><option>10</option><option>11</option><option>12</option>
+            </select>
+            <select id="fGender">
+                <option value="">All Genders</option>
+                <option>Male</option><option>Female</option><option>Other</option>
+            </select>
+            <select id="fCategory">
+                <option value="">All Categories</option>
+                <option>General</option><option>SC</option><option>ST</option>
+                <option>OBC</option><option>EWS</option><option>Other</option>
+            </select>
+            <select id="fStatus">
+                <option value="">All Status</option>
+                <option>Active</option><option>Promoted</option>
+                <option>Passed</option><option>Left</option>
+            </select>
+            <select id="fSortBy">
+                <option value="created_at">Sort: Newest</option>
+                <option value="name">Sort: Name</option>
+                <option value="class">Sort: Class</option>
+                <option value="roll_number">Sort: Roll No</option>
+                <option value="admission_date">Sort: Admission Date</option>
+            </select>
+            <select id="fOrder">
+                <option value="desc">↓ Desc</option>
+                <option value="asc">↑ Asc</option>
+            </select>
+            <button class="btn btn-outline btn-sm" id="btnReset">Reset</button>
+            <button class="btn btn-primary btn-sm" id="btnPromoteMode"><i class="fas fa-graduation-cap"></i> Promote Mode</button>
+        </div>
+
+        <div class="promote-bar hidden" id="promoteBar">
+            <span><b id="selectedCount">0</b> students selected</span>
+            <select id="promoteClass">
+                <option value="">Promote To Class…</option>
+                <option>Nursery</option><option>LKG</option><option>UKG</option>
+                <option>1</option><option>2</option><option>3</option><option>4</option>
+                <option>5</option><option>6</option><option>7</option><option>8</option>
+                <option>9</option><option>10</option><option>11</option><option>12</option>
+            </select>
+            <button class="btn btn-success btn-sm" id="btnPromoteConfirm"><i class="fas fa-check"></i> Promote Selected</button>
+            <button class="btn btn-outline btn-sm" id="btnCancelPromote">Cancel</button>
+        </div>
+    </div>
+
+    <!-- STUDENT GRID -->
+    <div id="loadingState" class="state-box"><i class="fas fa-spinner fa-spin"></i> Loading students…</div>
+    <div id="emptyState" class="state-box hidden">No students found. Click "Add Student" to begin.</div>
+    <section class="student-grid" id="studentGrid"></section>
+    <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- ============== ADD/EDIT MODAL ============== -->
+<div class="modal-overlay" id="formModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="formModalTitle"><i class="fas fa-user-plus"></i> Add Student</h2>
+            <button class="close-btn" onclick="closeModal('formModal')">&times;</button>
+        </div>
+
+        <form id="studentForm" enctype="multipart/form-data">
+            <input type="hidden" id="studentPkId">
+
+            <h3 class="form-section">Basic Information</h3>
+            <div class="form-grid">
+                <label>Student ID * <input type="text" name="studentId" required></label>
+                <label>Admission Number * <input type="text" name="admissionNumber" required></label>
+                <label>Admission Date * <input type="date" name="admissionDate" required></label>
+                <label>Session * <input type="text" name="session" placeholder="2024-2025" pattern="\d{4}-\d{4}" required></label>
+                <label>Class *
+                    <select name="class" required>
+                        <option value="">Select Class</option>
+                        <option>Nursery</option><option>LKG</option><option>UKG</option>
+                        <option>1</option><option>2</option><option>3</option><option>4</option>
+                        <option>5</option><option>6</option><option>7</option><option>8</option>
+                        <option>9</option><option>10</option><option>11</option><option>12</option>
+                    </select>
+                </label>
+                <label>Roll Number * <input type="text" name="rollNumber" required></label>
+            </div>
+
+            <h3 class="form-section">Personal Details</h3>
+            <div class="form-grid">
+                <label>Full Name * <input type="text" name="name" required></label>
+                <label>Father's Name * <input type="text" name="fatherName" required></label>
+                <label>Mother's Name * <input type="text" name="motherName" required></label>
+                <label>Date of Birth * <input type="date" name="dob" required></label>
+                <label>Gender *
+                    <select name="gender" required>
+                        <option value="">Select Gender</option>
+                        <option>Male</option><option>Female</option><option>Other</option>
+                    </select>
+                </label>
+                <label>Category *
+                    <select name="category" required>
+                        <option value="">Select Category</option>
+                        <option>General</option><option>SC</option><option>ST</option>
+                        <option>OBC</option><option>EWS</option><option>Other</option>
+                    </select>
+                </label>
+            </div>
+
+            <h3 class="form-section">ID & Contact</h3>
+            <div class="form-grid">
+                <label>Aadhar Number * <input type="text" name="aadharNumber" pattern="\d{12}" maxlength="12" required></label>
+                <label>APAAR ID <input type="text" name="apaarId"></label>
+                <label>Mobile Number * <input type="tel" name="mobileNumber" pattern="[6-9]\d{9}" maxlength="10" required></label>
+                <label>Email ID * <input type="email" name="emailId" required></label>
+            </div>
+
+            <label class="full">Address * <textarea name="address" rows="2" required></textarea></label>
+
+            <h3 class="form-section">Documents Upload</h3>
+            <p class="hint">Allowed: JPG, PNG, WEBP, PDF (max 5MB each)</p>
+            <div class="form-grid file-grid">
+                <label>Student Photo <input type="file" name="studentPhoto" accept="image/*,application/pdf"></label>
+                <label>Signature <input type="file" name="signature" accept="image/*,application/pdf"></label>
+                <label>Aadhar Card <input type="file" name="aadharCard" accept="image/*,application/pdf"></label>
+                <label>Himachali Bonafide <input type="file" name="himachaliBonafide" accept="image/*,application/pdf"></label>
+                <label>Caste Certificate <input type="file" name="casteCertificate" accept="image/*,application/pdf"></label>
+                <label>APAAR Card <input type="file" name="apaarCard" accept="image/*,application/pdf"></label>
+                <label>Previous Marksheet <input type="file" name="previousMarksheet" accept="image/*,application/pdf"></label>
+                <label>Income Certificate <input type="file" name="incomeCertificate" accept="image/*,application/pdf"></label>
+                <label>BPL Certificate <input type="file" name="bplCertificate" accept="image/*,application/pdf"></label>
+                <label>Any Other Document <input type="file" name="otherDocument" accept="image/*,application/pdf"></label>
+            </div>
+
+            <div class="form-errors hidden" id="formErrors"></div>
+        </form>
+
+        <div style="display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border);padding-top:16px;margin-top:20px;">
+            <button type="button" class="btn btn-outline" onclick="closeModal('formModal')">Cancel</button>
+            <button type="button" class="btn btn-success" id="btnSaveForm"><i class="fas fa-save"></i> Save Student</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============== VIEW MODAL ============== -->
+<div class="modal-overlay" id="viewModal">
+    <div class="modal-content" style="max-width:900px;">
+        <div class="modal-header">
+            <h2 id="viewTitle"><i class="fas fa-user-graduate"></i> Student Details</h2>
+            <button class="close-btn" onclick="closeModal('viewModal')">&times;</button>
+        </div>
+        <div id="viewBody"></div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border);padding-top:16px;margin-top:20px;">
+            <button class="btn btn-outline" onclick="closeModal('viewModal')">Close</button>
+            <button class="btn btn-primary" id="viewPrintBtn"><i class="fas fa-print"></i> Print PDF</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<footer class="footer"><span>&copy; 2026 Govt. Sr. Sec. School Shilla. All rights reserved.</span></footer>
+
+<script>
+/* ============================================================ */
+/* CONFIG                                                        */
+/* ============================================================ */
+const STUDENT_API = "https://gsssshilla.onrender.com/api/students";
+
+/* ============================================================ */
+/* STATE                                                         */
+/* ============================================================ */
+const state = {
+    page: 1,
+    limit: 12,
+    filters: { search: "", class: "", session: "", gender: "", category: "", status: "" },
+    sortBy: "created_at",
+    order: "desc",
+    students: [],
+    pagination: {},
+    promoteMode: false,
+    selectedIds: new Set(),
+    editingId: null,
+    viewingId: null
+};
+
+/* ============================================================ */
+/* HELPERS                                                       */
+/* ============================================================ */
+const $ = (s) => document.querySelector(s);
+
+function esc(v) {
+    return v === null || v === undefined ? "" : String(v)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function fmtDate(d) {
+    if (!d) return "-";
+    const dt = new Date(d);
+    return isNaN(dt) ? "-" : dt.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+function showToast(msg, type = "info") {
+    const c = $("#toastContainer");
+    const t = document.createElement("div");
+    t.className = `toast toast-${type}`;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => { t.style.opacity = "0"; setTimeout(() => t.remove(), 400); }, 4000);
+}
+
+function openModal(id) { $("#" + id).classList.add("active"); }
+function closeModal(id) { $("#" + id).classList.remove("active"); }
+
+function toggleNav() { $("#navLinks").classList.toggle("open"); }
+
+function showPopup(type = "expired") {
+    const overlay = $("#sessionOverlay");
+    $("#popupIconBox").className = "icon-box " + (type === "invalid" ? "expired" : "expired");
+    $("#popupIcon").className = type === "invalid" ? "fas fa-lock" : "fas fa-clock";
+    $("#popupTitle").innerHTML = type === "invalid" ? 'Invalid <span>Access</span>' : 'Session <span>Expired</span>';
+    $("#popupBtnText").textContent = type === "invalid" ? "Go to Login" : "Login Again";
+    overlay.classList.add("active");
+    try { localStorage.removeItem("adminToken"); } catch (e) {}
+}
+function redirectToLogin() { window.location.replace("login.html"); }
+
+/* ============================================================ */
+/* AUTH                                                          */
+/* ============================================================ */
+function getAuthHeaders() {
+    try {
+        const token = localStorage.getItem("adminToken");
+        if (!token) { showPopup("invalid"); return null; }
+        return { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" };
+    } catch (e) { showPopup("invalid"); return null; }
+}
+
+async function checkAuth() {
+    let token = null;
+    try { token = localStorage.getItem("adminToken"); } catch (e) {}
+    if (!token) { showPopup("invalid"); return false; }
+    try {
+        const res = await fetch("https://gsssshilla.onrender.com/api/admin/verify", {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+            if (data.admin?.username) {
+                $("#adminAvatar").textContent = data.admin.username.charAt(0).toUpperCase();
+                $("#adminName").textContent = data.admin.username;
+            }
+            return true;
+        } else { showPopup("expired"); return false; }
+    } catch (err) { showPopup("expired"); return false; }
+}
+
+/* ============================================================ */
+/* API CALL                                                      */
+/* ============================================================ */
+async function apiCall(url, options = {}) {
+    const headers = getAuthHeaders();
+    if (!headers) throw new Error("Not authenticated");
+    let res;
+    try {
+        res = await fetch(url, { ...options, headers: { ...headers, ...(options.headers || {}) } });
+    } catch (e) { throw new Error("Network error"); }
+    if (res.status === 401) { showPopup("expired"); throw new Error("Session expired"); }
+    let data;
+    try { data = await res.json(); } catch (e) { throw new Error(`Server error ${res.status}`); }
+    if (!res.ok) throw new Error(data.message || `Request failed ${res.status}`);
+    return data;
+}
+
+/* ============================================================ */
+/* QUERY BUILDER                                                 */
+/* ============================================================ */
+function buildQuery() {
+    const p = new URLSearchParams();
+    if (state.filters.search) p.set("search", state.filters.search);
+    if (state.filters.class) p.set("class", state.filters.class);
+    if (state.filters.session) p.set("session", state.filters.session);
+    if (state.filters.gender) p.set("gender", state.filters.gender);
+    if (state.filters.category) p.set("category", state.filters.category);
+    if (state.filters.status) p.set("status", state.filters.status);
+    p.set("sortBy", state.sortBy);
+    p.set("order", state.order);
+    p.set("page", state.page);
+    p.set("limit", state.limit);
+    return p.toString();
+}
+
+/* ============================================================ */
+/* LOAD STUDENTS                                                 */
+/* ============================================================ */
+async function loadStudents() {
+    $("#loadingState").classList.remove("hidden");
+    $("#emptyState").classList.add("hidden");
+    $("#studentGrid").innerHTML = "";
+    $("#pagination").innerHTML = "";
+
+    try {
+        const data = await apiCall(`${STUDENT_API}?${buildQuery()}`);
+        state.students = data.data || [];
+        state.pagination = data.pagination || {};
+        $("#loadingState").classList.add("hidden");
+
+        if (!state.students.length) {
+            $("#emptyState").classList.remove("hidden");
+            return;
+        }
+        renderStudents();
+        renderPagination();
+    } catch (err) {
+        $("#loadingState").classList.add("hidden");
+        if (err.message !== "Session expired") {
+            showToast(err.message, "error");
+            $("#emptyState").classList.remove("hidden");
+        }
+    }
+}
+
+/* ============================================================ */
+/* RENDER STUDENTS                                               */
+/* ============================================================ */
+function renderStudents() {
+    const grid = $("#studentGrid");
+    grid.innerHTML = state.students.map((s) => {
+        const photo = s.student_photo_url || "";
+        const statusClass = `status-${s.status || "Active"}`;
+        const selected = state.selectedIds.has(s.id) ? "selected" : "";
+
+        return `
+        <div class="student-card ${selected}" data-id="${s.id}">
+            ${state.promoteMode ? `<input type="checkbox" class="card-select" data-id="${s.id}" ${selected ? "checked" : ""}>` : ""}
+            <div class="card-photo-wrap">
+                ${photo
+                    ? `<img class="card-photo" src="${esc(photo)}" alt="photo" onerror="this.outerHTML='<div class=&quot;card-photo-placeholder&quot;>👤</div>'">`
+                    : `<div class="card-photo-placeholder">👤</div>`}
+                <span class="card-class-badge">Class ${esc(s.class)}</span>
+                <span class="card-status ${statusClass}">${esc(s.status || "Active")}</span>
+            </div>
+            <div class="card-body">
+                <div class="card-name">${esc(s.name)}</div>
+                <div class="card-roll">Roll: <b>${esc(s.roll_number)}</b> · Adm: <b>${esc(s.admission_number)}</b></div>
+                <div class="card-info">
+                    <div>👨 Father: <b>${esc(s.father_name)}</b></div>
+                    <div>📱 Mobile: <b>${esc(s.mobile_number)}</b></div>
+                    <div>🗓️ Session: <b>${esc(s.session)}</b></div>
+                </div>
+                <div class="card-actions">
+                    <button class="action-btn print" data-act="print" data-id="${s.id}"><i class="fas fa-print"></i> Print</button>
+                    <button class="action-btn view" data-act="view" data-id="${s.id}"><i class="fas fa-eye"></i> View</button>
+                    <button class="action-btn edit" data-act="edit" data-id="${s.id}"><i class="fas fa-edit"></i> Edit</button>
+                    <button class="action-btn delete" data-act="delete" data-id="${s.id}"><i class="fas fa-trash"></i> Delete</button>
+                </div>
+            </div>
+        </div>`;
+    }).join("");
+}
+
+/* ============================================================ */
+/* PAGINATION                                                    */
+/* ============================================================ */
+function renderPagination() {
+    const { page = 1, pages = 0 } = state.pagination;
+    const wrap = $("#pagination");
+    wrap.innerHTML = "";
+    if (pages <= 1) return;
+
+    const mk = (label, p, disabled = false, active = false) => {
+        const b = document.createElement("button");
+        b.textContent = label;
+        b.disabled = disabled;
+        if (active) b.classList.add("active");
+        b.addEventListener("click", () => { state.page = p; loadStudents(); });
+        return b;
+    };
+
+    wrap.appendChild(mk("«", page - 1, page === 1));
+    const start = Math.max(1, page - 2);
+    const end = Math.min(pages, page + 2);
+    for (let i = start; i <= end; i++) wrap.appendChild(mk(i, i, false, i === page));
+    wrap.appendChild(mk("»", page + 1, page === pages));
+}
+
+/* ============================================================ */
+/* STATS                                                         */
+/* ============================================================ */
+async function loadStats() {
+    try {
+        const res = await apiCall(`${STUDENT_API}?limit=1`);
+        $("#statTotal").textContent = res.pagination?.total || 0;
+
+        const recent = res.data?.[0];
+        if (recent?.session) $("#statSession").textContent = recent.session;
+
+        try {
+            const cls = await apiCall(`${STUDENT_API}/by-class`);
+            if (cls.success) $("#statClasses").textContent = cls.data.length;
+        } catch (e) {}
+
+        try {
+            const pro = await apiCall(`${STUDENT_API}?status=Promoted&limit=1`);
+            $("#statPromoted").textContent = pro.pagination?.total || 0;
+        } catch (e) {}
+    } catch (e) {}
+}
+
+/* ============================================================ */
+/* FILTER EVENTS                                                 */
+/* ============================================================ */
+function readFilters() {
+    state.filters.search = $("#fSearch").value.trim();
+    state.filters.class = $("#fClass").value;
+    state.filters.session = $("#fSession").value;
+    state.filters.gender = $("#fGender").value;
+    state.filters.category = $("#fCategory").value;
+    state.filters.status = $("#fStatus").value;
+    state.sortBy = $("#fSortBy").value;
+    state.order = $("#fOrder").value;
+    state.page = 1;
+}
+
+let searchTimer;
+$("#fSearch").addEventListener("input", () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => { readFilters(); loadStudents(); }, 400);
+});
+
+["fClass", "fSession", "fGender", "fCategory", "fStatus", "fSortBy", "fOrder"]
+    .forEach((id) => $("#" + id).addEventListener("change", () => { readFilters(); loadStudents(); }));
+
+$("#btnReset").addEventListener("click", () => {
+    $("#fSearch").value = "";
+    ["fClass", "fSession", "fGender", "fCategory", "fStatus"].forEach((id) => $("#" + id).value = "");
+    $("#fSortBy").value = "created_at";
+    $("#fOrder").value = "desc";
+    readFilters();
+    loadStudents();
+});
+
+/* ============================================================ */
+/* ADD / EDIT MODAL                                              */
+/* ============================================================ */
+const form = $("#studentForm");
+
+function resetForm() {
+    form.reset();
+    $("#studentPkId").value = "";
+    state.editingId = null;
+    $("#formErrors").classList.add("hidden");
+    $("#formErrors").innerHTML = "";
+    $("#formModalTitle").innerHTML = '<i class="fas fa-user-plus"></i> Add Student';
+}
+
+function openAddModal() {
+    resetForm();
+    openModal("formModal");
+}
+
+async function openEditModal(id) {
+    resetForm();
+    $("#formModalTitle").innerHTML = '<i class="fas fa-edit"></i> Edit Student';
+    try {
+        const { data } = await apiCall(`${STUDENT_API}/${id}`);
+        const s = data.data;
+        $("#studentPkId").value = s.id;
+        state.editingId = s.id;
+
+        const setVal = (name, val) => {
+            const el = form.querySelector(`[name="${name}"]`);
+            if (el) el.value = val ?? "";
+        };
+
+        setVal("studentId", s.student_id);
+        setVal("admissionNumber", s.admission_number);
+        setVal("admissionDate", (s.admission_date || "").split("T")[0]);
+        setVal("session", s.session);
+        setVal("class", s.class);
+        setVal("rollNumber", s.roll_number);
+        setVal("name", s.name);
+        setVal("fatherName", s.father_name);
+        setVal("motherName", s.mother_name);
+        setVal("dob", (s.dob || "").split("T")[0]);
+        setVal("gender", s.gender);
+        setVal("category", s.category);
+        setVal("aadharNumber", s.aadhar_number);
+        setVal("apaarId", s.apaar_id);
+        setVal("mobileNumber", s.mobile_number);
+        setVal("emailId", s.email_id);
+        setVal("address", s.address);
+
+        openModal("formModal");
+    } catch (err) {
+        if (err.message !== "Session expired") showToast("Failed to load student", "error");
+    }
+}
+
+$("#btnSaveForm").addEventListener("click", async () => {
+    const btn = $("#btnSaveForm");
+    $("#formErrors").classList.add("hidden");
+
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+    const fd = new FormData(form);
+    for (const [k, v] of [...fd.entries()]) if (v === "" || v === null) fd.delete(k);
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+
+    try {
+        let res;
+        if (state.editingId) {
+            res = await apiCall(`${STUDENT_API}/${state.editingId}`, { method: "PUT", body: fd });
+        } else {
+            res = await apiCall(`${STUDENT_API}/add`, { method: "POST", body: fd });
+        }
+        showToast(res.message || "Saved ✅", "success");
+        closeModal("formModal");
+        loadStudents();
+        loadStats();
+    } catch (err) {
+        if (err.message !== "Session expired") {
+            const box = $("#formErrors");
+            box.innerHTML = err.message;
+            box.classList.remove("hidden");
+        }
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save"></i> Save Student';
+    }
+});
+
+/* ============================================================ */
+/* VIEW MODAL                                                    */
+/* ============================================================ */
+async function openViewModal(id) {
+    state.viewingId = id;
+    try {
+        const { data } = await apiCall(`${STUDENT_API}/${id}`);
+        const s = data.data;
+
+        const row = (l, v) => `<div class="view-row"><span class="lbl">${esc(l)}</span><span class="val">${esc(v ?? "—")}</span></div>`;
+        const doc = (l, url) => url ? `<a href="${esc(url)}" target="_blank" rel="noopener"><i class="fas fa-file"></i> ${esc(l)}</a>` : "";
+
+        $("#viewTitle").innerHTML = `<i class="fas fa-user-graduate"></i> ${esc(s.name)}`;
+        $("#viewBody").innerHTML = `
+            ${s.student_photo_url ? `<img class="view-photo" src="${esc(s.student_photo_url)}" alt="photo">` : ""}
+            <div class="view-section">
+                <h4>Personal Details</h4>
+                <div class="view-grid">
+                    ${row("Student ID", s.student_id)}
+                    ${row("Admission No", s.admission_number)}
+                    ${row("Admission Date", fmtDate(s.admission_date))}
+                    ${row("Name", s.name)}
+                    ${row("Father", s.father_name)}
+                    ${row("Mother", s.mother_name)}
+                    ${row("DOB", fmtDate(s.dob))}
+                    ${row("Gender", s.gender)}
+                    ${row("Category", s.category)}
+                    ${row("Aadhar", s.aadhar_number)}
+                    ${row("APAAR ID", s.apaar_id)}
+                    ${row("Mobile", s.mobile_number)}
+                    ${row("Email", s.email_id)}
+                </div>
+            </div>
+            <div class="view-section">
+                <h4>Academic</h4>
+                <div class="view-grid">
+                    ${row("Class", s.class)}
+                    ${row("Roll No", s.roll_number)}
+                    ${row("Session", s.session)}
+                    ${row("Status", s.status)}
+                    ${row("Promoted From", s.promoted_from)}
+                    ${row("Promotion Date", fmtDate(s.promotion_date))}
+                </div>
+            </div>
+            <div class="view-section">
+                <h4>Address</h4>
+                <div class="view-row"><span class="val">${esc(s.address || "—")}</span></div>
+            </div>
+            <div class="view-section">
+                <h4>Documents</h4>
+                <div class="doc-links">
+                    ${doc("Aadhar Card", s.aadhar_card_url)}
+                    ${doc("Himachali Bonafide", s.himachali_bonafide_url)}
+                    ${doc("Caste Certificate", s.caste_certificate_url)}
+                    ${doc("APAAR Card", s.apaar_card_url)}
+                    ${doc("Previous Marksheet", s.previous_marksheet_url)}
+                    ${doc("Income Certificate", s.income_certificate_url)}
+                    ${doc("BPL Certificate", s.bpl_certificate_url)}
+                    ${doc("Signature", s.signature_url)}
+                    ${doc("Other Document", s.other_document_url)}
+                </div>
+            </div>
+        `;
+        openModal("viewModal");
+    } catch (err) {
+        if (err.message !== "Session expired") showToast("Failed to load student", "error");
+    }
+}
+
+$("#viewPrintBtn").addEventListener("click", () => {
+    if (state.viewingId) window.open(`${STUDENT_API}/${state.viewingId}/pdf`, "_blank");
+});
+
+/* ============================================================ */
+/* DELETE                                                        */
+/* ============================================================ */
+async function deleteStudent(id, name) {
+    if (!confirm(`Delete "${name}"? Documents bhi delete honge.`)) return;
+    try {
+        const res = await apiCall(`${STUDENT_API}/${id}`, { method: "DELETE" });
+        showToast(res.message || "Deleted ✅", "success");
+        loadStudents();
+        loadStats();
+    } catch (err) {
+        if (err.message !== "Session expired") showToast(err.message, "error");
+    }
+}
+
+/* ============================================================ */
+/* CARD ACTIONS                                                  */
+/* ============================================================ */
+$("#studentGrid").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-act]");
+    if (btn) {
+        const id = btn.dataset.id;
+        const card = btn.closest(".student-card");
+        const name = card?.querySelector(".card-name")?.textContent || "this student";
+        switch (btn.dataset.act) {
+            case "print": window.open(`${STUDENT_API}/${id}/pdf`, "_blank"); break;
+            case "view": openViewModal(id); break;
+            case "edit": openEditModal(id); break;
+            case "delete": deleteStudent(id, name); break;
+        }
+        return;
+    }
+
+    const cb = e.target.closest(".card-select");
+    if (cb) {
+        const id = Number(cb.dataset.id);
+        if (cb.checked) state.selectedIds.add(id); else state.selectedIds.delete(id);
+        $("#selectedCount").textContent = state.selectedIds.size;
+        cb.closest(".student-card").classList.toggle("selected", cb.checked);
+        return;
+    }
+
+    if (state.promoteMode) {
+        const card = e.target.closest(".student-card");
+        if (card && !e.target.closest("[data-act]")) {
+            const id = Number(card.dataset.id);
+            const cb = card.querySelector(".card-select");
+            if (cb) {
+                cb.checked = !cb.checked;
+                if (cb.checked) state.selectedIds.add(id); else state.selectedIds.delete(id);
+                $("#selectedCount").textContent = state.selectedIds.size;
+                card.classList.toggle("selected", cb.checked);
+            }
+        }
+    }
+});
+
+/* ============================================================ */
+/* PROMOTE MODE                                                  */
+/* ============================================================ */
+$("#btnPromoteMode").addEventListener("click", () => {
+    state.promoteMode = true;
+    state.selectedIds.clear();
+    $("#selectedCount").textContent = "0";
+    $("#promoteBar").classList.remove("hidden");
+    renderStudents();
+});
+
+$("#btnCancelPromote").addEventListener("click", () => {
+    state.promoteMode = false;
+    state.selectedIds.clear();
+    $("#promoteBar").classList.add("hidden");
+    renderStudents();
+});
+
+$("#btnPromoteConfirm").addEventListener("click", async () => {
+    const toClass = $("#promoteClass").value;
+    if (!toClass) return showToast("Select target class", "warning");
+    if (!state.selectedIds.size) return showToast("Select at least one student", "warning");
+    if (!confirm(`Promote ${state.selectedIds.size} students to Class ${toClass}?`)) return;
+
+    try {
+        const res = await apiCall(`${STUDENT_API}/promote`, {
+            method: "POST",
+            body: JSON.stringify({ studentIds: [...state.selectedIds], toClass })
+        });
+        showToast(res.message || "Promoted ✅", "success");
+        state.promoteMode = false;
+        state.selectedIds.clear();
+        $("#promoteBar").classList.add("hidden");
+        loadStudents();
+        loadStats();
+    } catch (err) {
+        if (err.message !== "Session expired") showToast(err.message, "error");
+    }
+});
+
+/* ============================================================ */
+/* REFRESH                                                       */
+/* ============================================================ */
+function refreshAll() { loadStudents(); loadStats(); }
+
+/* ============================================================ */
+/* SESSION FILTER LOAD                                           */
+/* ============================================================ */
+async function loadSessionFilter() {
+    try {
+        const data = await apiCall(`${STUDENT_API}?limit=200`);
+        const sessions = [...new Set((data.data || []).map((s) => s.session).filter(Boolean))];
+        const sel = $("#fSession");
+        sessions.sort().reverse().forEach((s) => {
+            const opt = document.createElement("option");
+            opt.value = s; opt.textContent = s;
+            sel.appendChild(opt);
+        });
+    } catch (e) {}
+}
+$("#fSession").addEventListener("change", () => { readFilters(); loadStudents(); });
+
+/* ============================================================ */
+/* CLICK OUTSIDE MODAL CLOSE                                     */
+/* ============================================================ */
+document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("modal-overlay")) e.target.classList.remove("active");
+});
+
+/* ============================================================ */
+/* ESC CLOSE                                                     */
+/* ============================================================ */
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+        closeModal("formModal");
+        closeModal("viewModal");
+    }
+});
+
+/* ============================================================ */
+/* INIT                                                          */
+/* ============================================================ */
+window.addEventListener("DOMContentLoaded", async () => {
+    if (await checkAuth()) {
+        await Promise.all([loadStudents(), loadStats(), loadSessionFilter()]);
+    }
+});
+</script>
+</body>
+</html>
