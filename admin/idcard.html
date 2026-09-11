@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ID Card Manager - Admin | GSSS Shilla</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root {
+    --bg: #f5f7fb; --bg-white: #ffffff; --text-primary: #1a2332; --text-secondary: #5a6a7e;
+    --text-muted: #94a3b8; --gold: #c9972b; --gold-light: #e8b84b; --gold-bg: #fef8ed;
+    --blue: #4a8af4; --blue-bg: #eef4ff; --green: #10b981; --green-bg: #ecfdf5;
+    --purple: #8b5cf6; --purple-bg: #f5f0ff; --pink: #ec4899; --pink-bg: #fdf2f8;
+    --orange: #f59e0b; --orange-bg: #fffbeb; --red: #ef4444; --border: #e8edf8;
+    --shadow: 0 2px 12px rgba(0,0,0,0.04); --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --radius: 16px; --radius-sm: 10px; --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+.navbar { background: var(--bg-white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 68px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
+.navbar .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.navbar .brand .logo-placeholder { width: 42px; height: 42px; border-radius: var(--radius-sm); background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.navbar .brand .logo-placeholder img { width: 46px; height: 46px; border-radius: 10px; object-fit: contain; padding: 4px; }
+.navbar .brand .name { font-size: 16px; font-weight: 700; }
+.navbar .brand .name span { color: var(--gold); }
+.nav-links { display: flex; gap: 8px; list-style: none; }
+.nav-links a { text-decoration: none; color: var(--text-secondary); padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; transition: var(--transition); }
+.nav-links a:hover { background: var(--bg); color: var(--text-primary); }
+.nav-links a.active { background: var(--gold-bg); color: var(--gold); }
+.nav-links a i { margin-right: 6px; }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.admin-badge { display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 10px; background: var(--bg); border-radius: 50px; font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+.online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+.main-container { flex: 1; max-width: 1400px; margin: 0 auto; padding: 24px 32px 40px; width: 100%; }
+.page-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 22px; padding: 20px 26px; background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.page-header h1 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.page-header h1 i { color: var(--gold); }
+.page-header .subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: 'Inter', sans-serif; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-primary { background: var(--gold); color: #fff; } .btn-primary:hover:not(:disabled) { background: var(--gold-light); }
+.btn-success { background: var(--green); color: #fff; } .btn-success:hover:not(:disabled) { background: #059669; }
+.btn-danger { background: var(--red); color: #fff; } .btn-danger:hover:not(:disabled) { background: #dc2626; }
+.btn-outline { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); } .btn-outline:hover:not(:disabled) { background: var(--border); }
+.btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 8px; }
+.btn-xs { padding: 4px 10px; font-size: 11px; border-radius: 6px; }
+
+.card-panel { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 22px 26px; margin-bottom: 20px; }
+.card-panel h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--gold-bg); display: flex; align-items: center; gap: 8px; }
+.card-panel h3 i { color: var(--gold); }
+.card-panel h3 .badge-inline { font-size: 11px; padding: 3px 10px; border-radius: 10px; background: var(--blue-bg); color: var(--blue); font-weight: 700; }
+
+.class-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.class-btn { padding: 8px 20px; border: 2px solid var(--border); background: var(--bg-white); border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--text-secondary); transition: var(--transition); font-family: 'Inter', sans-serif; }
+.class-btn:hover { border-color: var(--gold); color: var(--gold); }
+.class-btn.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+
+.filter-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
+.filter-row input, .filter-row select { padding: 9px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); outline: none; transition: var(--transition); }
+.filter-row input:focus, .filter-row select:focus { border-color: var(--gold); background: #fff; }
+.filter-row input[type="text"] { flex: 1 1 240px; min-width: 200px; }
+.filter-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; }
+
+.student-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 14px; }
+.student-card { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; transition: var(--transition); box-shadow: var(--shadow); display: flex; flex-direction: column; }
+.student-card:hover { box-shadow: var(--shadow-hover); border-color: var(--gold); }
+.card-photo-row { padding: 14px 16px 8px; display: flex; gap: 12px; align-items: center; }
+.card-photo { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold); flex-shrink: 0; background: #f1f5f9; }
+.card-photo-placeholder { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #1a2332, #2c3e50); display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; flex-shrink: 0; border: 3px solid var(--gold); }
+.card-name { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+.card-meta { font-size: 11px; color: var(--text-muted); }
+.card-meta b { color: var(--text-primary); }
+.card-body { padding: 8px 16px 12px; font-size: 12px; color: var(--text-secondary); line-height: 1.7; flex: 1; }
+.card-body b { color: var(--text-primary); }
+.card-actions { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
+.state-box { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 14px; background: var(--bg-white); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); }
+.state-box i { font-size: 42px; color: var(--gold); opacity: 0.4; display: block; margin-bottom: 10px; }
+
+.stats-chips { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.stat-chip { background: var(--bg); border: 1px solid var(--border); padding: 8px 16px; border-radius: 10px; font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.stat-chip b { color: var(--gold); font-size: 14px; }
+
+.info-bar { padding: 14px 18px; background: var(--blue-bg); border-left: 4px solid var(--blue); border-radius: 8px; font-size: 13px; line-height: 1.7; color: var(--text-primary); margin-bottom: 14px; }
+.info-bar strong { color: var(--blue); }
+
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { padding: 14px 22px; border-radius: var(--radius-sm); color: #fff; font-weight: 600; font-size: 13px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); min-width: 250px; animation: slideIn 0.3s ease; }
+.toast-success { background: var(--green); } .toast-error { background: var(--red); }
+.toast-warning { background: var(--orange); } .toast-info { background: var(--text-primary); }
+@keyframes slideIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+
+.footer { background: var(--bg-white); border-top: 1px solid var(--border); padding: 18px 32px; text-align: center; font-size: 13px; color: var(--text-muted); }
+.hidden { display: none !important; }
+
+@media (max-width: 768px) {
+    .navbar { padding: 0 16px; }
+    .nav-links { display: none; }
+    .main-container { padding: 14px; }
+    .page-header { padding: 14px; flex-direction: column; align-items: stretch; }
+    .student-grid { grid-template-columns: 1fr; }
+    .filter-row select, .filter-row input { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="#" class="brand">
+        <div class="logo-placeholder"><img src="logo(1).png" alt="Logo" onerror="this.style.display='none'"></div>
+        <div class="name">GSSS<span> SHILLA</span></div>
+    </a>
+    <ul class="nav-links">
+        <li><a href="admin-students.html"><i class="fas fa-users"></i> Students</a></li>
+        <li><a href="admin-bonafide.html"><i class="fas fa-certificate"></i> Bonafide</a></li>
+        <li><a href="admin-idcard.html" class="active"><i class="fas fa-id-card"></i> ID Cards</a></li>
+    </ul>
+    <div class="nav-right">
+        <div class="admin-badge">
+            <span class="avatar" id="adminAvatar">🛡️</span>
+            <span id="adminName">Admin</span>
+            <span class="online-dot"></span>
+        </div>
+    </div>
+</nav>
+
+<div class="main-container">
+    <div class="page-header">
+        <div>
+            <h1><i class="fas fa-id-card"></i> Student ID Card Generator</h1>
+            <div class="subtitle">Generate professional ID cards — bulk or individual student</div>
+        </div>
+    </div>
+
+    <div class="card-panel">
+        <h3><i class="fas fa-filter"></i> Select Class</h3>
+        <div class="class-buttons" id="classButtons"></div>
+
+        <div class="filter-row">
+            <span class="filter-label"><i class="fas fa-search"></i> Filter:</span>
+            <input type="text" id="searchInput" placeholder="Search by name, student ID, roll no...">
+            <button class="btn btn-success" onclick="downloadBulkClassPDF()" id="bulkBtn" disabled>
+                <i class="fas fa-download"></i> Download Entire Class ID Cards
+            </button>
+        </div>
+
+        <div class="info-bar">
+            <i class="fas fa-info-circle"></i> <strong>Bulk download:</strong> Generate ID cards for all students of selected class. Each PDF page contains 2 students (front + back).
+        </div>
+    </div>
+
+    <div id="loadingState" class="state-box hidden"><i class="fas fa-spinner fa-spin"></i> Loading students…</div>
+    <div id="emptyState" class="state-box hidden"><i class="fas fa-users"></i>No students found. Select a class to begin.</div>
+
+    <div class="card-panel hidden" id="studentsPanel">
+        <h3><i class="fas fa-users"></i> Students <span class="badge-inline" id="studentCount">0</span></h3>
+        <div class="stats-chips">
+            <div class="stat-chip">Showing: <b id="showingCount">0</b></div>
+            <div class="stat-chip">Selected Class: <b id="selectedClass">—</b></div>
+        </div>
+        <section class="student-grid" id="studentGrid"></section>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<footer class="footer"><span>&copy; 2026 Govt. Sr. Sec. School Shilla. All rights reserved.</span></footer>
+
+<script>
+const STUDENT_API = "https://gsssshilla.onrender.com/api/students";
+const IDCARD_API = "https://gsssshilla.onrender.com/api/idcard";
+
+const state = {
+    currentClass: "",
+    students: [],
+    filtered: [],
+    search: ""
+};
+
+const $ = (s) => document.querySelector(s);
+
+function esc(v) {
+    return v === null || v === undefined ? "" : String(v)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function showToast(msg, type = "info") {
+    const c = $("#toastContainer");
+    const t = document.createElement("div");
+    t.className = `toast toast-${type}`;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => { t.style.opacity = "0"; setTimeout(() => t.remove(), 400); }, 4000);
+}
+
+function getAuthHeaders() {
+    try {
+        const token = localStorage.getItem("adminToken");
+        if (!token) { alert("Please login"); window.location.href = "login.html"; return null; }
+        return { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" };
+    } catch (e) { return null; }
+}
+
+async function apiCall(url) {
+    const headers = getAuthHeaders();
+    if (!headers) throw new Error("Not authenticated");
+    const res = await fetch(url, { headers });
+    const text = await res.text();
+    let data;
+    try { data = text ? JSON.parse(text) : {}; } catch (e) { throw new Error("Invalid response"); }
+    if (!res.ok) throw new Error(data.message || `Failed (${res.status})`);
+    return data;
+}
+
+/* ============ CLASS BUTTONS ============ */
+function renderClassButtons() {
+    const classes = ["Nursery","LKG","UKG","1","2","3","4","5","6","7","8","9","10","11","12"];
+    $("#classButtons").innerHTML = classes.map(c => {
+        const label = isNaN(c) ? c : `Class ${c}`;
+        const active = state.currentClass === c ? "active" : "";
+        return `<button class="class-btn ${active}" onclick="selectClass('${c}')">${label}</button>`;
+    }).join("");
+}
+
+function selectClass(c) {
+    state.currentClass = c;
+    state.search = "";
+    $("#searchInput").value = "";
+    $("#selectedClass").textContent = isNaN(c) ? c : `Class ${c}`;
+    renderClassButtons();
+    loadStudents();
+}
+
+/* ============ LOAD STUDENTS ============ */
+async function loadStudents() {
+    if (!state.currentClass) return;
+    $("#loadingState").classList.remove("hidden");
+    $("#emptyState").classList.add("hidden");
+    $("#studentsPanel").classList.add("hidden");
+
+    try {
+        const data = await apiCall(`${STUDENT_API}?class=${encodeURIComponent(state.currentClass)}&limit=500`);
+        state.students = data.data || [];
+        state.filtered = [...state.students];
+
+        $("#loadingState").classList.add("hidden");
+
+        if (!state.students.length) {
+            $("#emptyState").classList.remove("hidden");
+            $("#bulkBtn").disabled = true;
+            return;
+        }
+
+        $("#studentsPanel").classList.remove("hidden");
+        $("#bulkBtn").disabled = false;
+        $("#studentCount").textContent = state.students.length;
+        renderStudents();
+        updateCounts();
+    } catch (err) {
+        $("#loadingState").classList.add("hidden");
+        $("#emptyState").classList.remove("hidden");
+        showToast(err.message, "error");
+    }
+}
+
+function renderStudents() {
+    const grid = $("#studentGrid");
+    grid.innerHTML = state.filtered.map(s => {
+        const photo = s.student_photo_url || "";
+        const isHigher = ["11","12"].includes(String(s.class));
+
+        return `
+        <div class="student-card">
+            <div class="card-photo-row">
+                ${photo
+                    ? `<img class="card-photo" src="${esc(photo)}" onerror="this.outerHTML='<div class=&quot;card-photo-placeholder&quot;>👤</div>'">`
+                    : `<div class="card-photo-placeholder">👤</div>`}
+                <div style="flex:1;min-width:0;">
+                    <div class="card-name">${esc(s.name)}</div>
+                    <div class="card-meta">ID: <b>${esc(s.student_id)}</b> · Roll: <b>${esc(s.roll_number || "—")}</b></div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div>👨 Father: <b>${esc(s.father_name || "—")}</b></div>
+                <div>📚 Class: <b>${esc(s.class)}</b>${isHigher ? " · " + esc(s.stream || "") : ""}</div>
+                <div>📱 Mobile: <b>${esc(s.mobile_number || "—")}</b></div>
+            </div>
+            <div class="card-actions">
+                <button class="btn btn-xs btn-primary" onclick="downloadSingleIDCard('${esc(s.student_id)}')">
+                    <i class="fas fa-id-card"></i> Download ID Card
+                </button>
+            </div>
+        </div>`;
+    }).join("");
+}
+
+function updateCounts() {
+    $("#showingCount").textContent = state.filtered.length;
+    $("#studentCount").textContent = state.filtered.length;
+}
+
+/* ============ SEARCH ============ */
+$("#searchInput").addEventListener("input", () => {
+    const q = $("#searchInput").value.trim().toLowerCase();
+    state.search = q;
+    if (!q) {
+        state.filtered = [...state.students];
+    } else {
+        state.filtered = state.students.filter(s => {
+            const hay = `${s.name} ${s.student_id} ${s.roll_number} ${s.admission_number}`.toLowerCase();
+            return hay.includes(q);
+        });
+    }
+    renderStudents();
+    updateCounts();
+});
+
+/* ============ DOWNLOAD SINGLE ============ */
+function downloadSingleIDCard(studentId) {
+    const token = localStorage.getItem("adminToken");
+    if (!token) return showToast("Please login", "error");
+    const url = `${IDCARD_API}/generate/${encodeURIComponent(studentId)}/pdf?v=${Date.now()}`;
+    window.open(url, "_blank");
+    showToast("Opening ID card PDF…", "info");
+}
+
+/* ============ DOWNLOAD BULK ============ */
+function downloadBulkClassPDF() {
+    if (!state.currentClass) return showToast("Please select a class first", "warning");
+    const token = localStorage.getItem("adminToken");
+    if (!token) return showToast("Please login", "error");
+
+    const total = state.filtered.length;
+    if (!total) return showToast("No students to generate", "warning");
+
+    if (!confirm(`Generate ID cards for all ${total} students of Class ${state.currentClass}?\n\nThis may take some time.`)) return;
+
+    const url = `${IDCARD_API}/generate-class/${encodeURIComponent(state.currentClass)}/pdf?v=${Date.now()}`;
+    window.open(url, "_blank");
+    showToast("Generating bulk ID card PDF…", "info");
+}
+
+/* ============ INIT ============ */
+document.addEventListener("DOMContentLoaded", async () => {
+    // Verify auth
+    try {
+        const token = localStorage.getItem("adminToken");
+        if (!token) { alert("Please login first"); window.location.href = "login.html"; return; }
+        const res = await fetch("https://gsssshilla.onrender.com/api/admin/verify", {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.admin?.username) {
+                $("#adminAvatar").textContent = data.admin.username.charAt(0).toUpperCase();
+                $("#adminName").textContent = data.admin.username;
+            }
+        }
+    } catch (e) {}
+
+    renderClassButtons();
+});
+</script>
+</body>
+</html>
