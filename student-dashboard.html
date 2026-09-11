@@ -255,15 +255,26 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
                     </div>
                 </div>
 
-                <div class="download-card disabled">
-                    <div class="coming-soon">Coming Soon</div>
-                    <div class="dc-icon pink"><i class="fas fa-ticket-alt"></i></div>
-                    <div class="dc-body">
-                        <div class="dc-title">Admit Card</div>
-                        <div class="dc-desc">Download admit card for upcoming examinations</div>
-                        <button class="dc-btn" disabled><i class="fas fa-lock"></i> Locked</button>
-                    </div>
-                </div>
+                <!-- Admit Card — enabled when available -->
+<div class="download-card" id="admitCardAvailable" style="display:none;">
+    <div class="badge-enabled">Available</div>
+    <div class="dc-icon pink"><i class="fas fa-ticket-alt"></i></div>
+    <div class="dc-body">
+        <div class="dc-title">Admit Cards</div>
+        <div class="dc-desc" id="admitCardDesc">Download admit cards for upcoming exams</div>
+        <div id="admitCardList" style="margin-top:8px;display:flex;flex-direction:column;gap:6px;"></div>
+    </div>
+</div>
+
+<!-- Admit Card — locked state -->
+<div class="download-card disabled" id="admitCardLocked">
+    <div class="dc-icon pink" style="opacity:0.6;"><i class="fas fa-lock"></i></div>
+    <div class="dc-body">
+        <div class="dc-title">Admit Cards</div>
+        <div class="dc-desc">No admit cards published yet. Check back later.</div>
+        <button class="dc-btn" disabled><i class="fas fa-lock"></i> Not Available</button>
+    </div>
+</div>
 
                 <div class="download-card disabled">
                     <div class="coming-soon">Coming Soon</div>
@@ -826,6 +837,45 @@ function downloadBonafide() {
     showToast("Opening bonafide certificate…", "info");
 }
 
+    const ADMIT_API = "https://gsssshilla.onrender.com/api/admit-card";
+
+async function checkAdmitCards() {
+    if (!student || !student.student_id) return;
+    try {
+        const res = await fetch(`${ADMIT_API}/student/${encodeURIComponent(student.student_id)}/exams`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const exams = data.data || [];
+
+        const available = document.getElementById("admitCardAvailable");
+        const locked = document.getElementById("admitCardLocked");
+
+        if (!exams.length) {
+            available.style.display = "none";
+            locked.style.display = "flex";
+            return;
+        }
+
+        available.style.display = "flex";
+        locked.style.display = "none";
+
+        document.getElementById("admitCardDesc").textContent = `${exams.length} admit card${exams.length > 1 ? "s" : ""} available`;
+
+        document.getElementById("admitCardList").innerHTML = exams.map((e) => `
+            <button class="dc-btn" style="background:var(--pink);padding:6px 12px;font-size:11px;"
+                onclick="downloadAdmit(${e.exam_id}, '${esc(student.student_id)}')">
+                <i class="fas fa-download"></i> ${esc(e.exam_name)} (${esc(e.academic_session)})
+            </button>
+        `).join("");
+    } catch (e) {
+        console.warn("Admit card check failed:", e.message);
+    }
+}
+
+function downloadAdmit(examId, studentId) {
+    window.open(`https://gsssshilla.onrender.com/api/admit-card/admit/${examId}/${encodeURIComponent(studentId)}/pdf`, "_blank");
+}
+
 /* ============ SESSION TIMEOUT (30 min) ============ */
 setInterval(() => {
     try {
@@ -845,6 +895,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         renderDashboard(student);
         showToast(`Welcome, ${student.name}!`, "success");
         await checkBonafideStatus();
+        await checkAdmitCards();  
     }
 });
 </script>
