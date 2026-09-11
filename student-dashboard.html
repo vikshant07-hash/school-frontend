@@ -147,11 +147,31 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 
 .footer { background: var(--bg-white); border-top: 1px solid var(--border); padding: 18px 32px; text-align: center; font-size: 12px; color: var(--text-muted); }
 
-.toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
-.toast { padding: 14px 22px; border-radius: var(--radius-sm); color: #fff; font-weight: 600; font-size: 13px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); animation: slideIn 0.3s ease; min-width: 240px; }
-.toast-success { background: var(--green); } .toast-error { background: var(--red); }
-.toast-info { background: var(--text-primary); }
-@keyframes slideIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); backdrop-filter: blur(6px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+.modal-overlay.active { display: flex; }
+.modal-content { background: var(--bg-white); border-radius: var(--radius); max-width: 760px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideUp 0.25s ease; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.modal-header { padding: 18px 24px; border-bottom: 2px solid var(--gold-bg); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg-white); z-index: 2; }
+.modal-header h2 { font-size: 17px; font-weight: 800; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.modal-header h2 i { color: var(--gold); font-size: 18px; }
+.close-btn { background: none; border: none; font-size: 26px; color: var(--text-muted); cursor: pointer; transition: var(--transition); line-height: 1; }
+.close-btn:hover { color: var(--red); transform: rotate(90deg); }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; position: sticky; bottom: 0; background: var(--bg-white); }
+
+.admit-info-section { padding: 18px 24px; border-bottom: 1px dashed var(--border); }
+.admit-info-section:last-of-type { border-bottom: none; }
+.admit-info-section h4 { font-size: 12px; font-weight: 800; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.admit-info-section h4 i { font-size: 13px; }
+.admit-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px 20px; }
+.admit-info-item { display: flex; flex-direction: column; gap: 2px; }
+.admit-info-item .lbl { font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; }
+.admit-info-item .val { font-size: 13.5px; color: var(--text-primary); font-weight: 600; word-break: break-word; }
+.admit-info-item.full { grid-column: 1 / -1; }
+.admit-badge-row { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.admit-badge-row .ab { padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px; }
+.ab-published { background: var(--green-bg); color: var(--green); }
+.ab-examtype { background: var(--pink-bg); color: var(--pink); }
 
 @media (max-width: 768px) {
     .navbar { padding: 0 14px; }
@@ -162,6 +182,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
     .hero-info h1 { font-size: 20px; }
     .hero-avatar { width: 80px; height: 80px; }
     .doc-grid { grid-template-columns: 1fr 1fr; }
+    .modal-content { max-width: 100%; }
 }
 </style>
 </head>
@@ -234,7 +255,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
                     </div>
                 </div>
 
-                <!-- Bonafide Card -->
+                <!-- Bonafide -->
                 <div class="download-card" id="bonafideCard" style="display:none;" onclick="downloadBonafide()">
                     <div class="badge-enabled">Available</div>
                     <div class="dc-icon green"><i class="fas fa-certificate"></i></div>
@@ -260,7 +281,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
                         <div class="dc-icon pink"><i class="fas fa-id-badge"></i></div>
                         <div class="dc-body">
                             <div class="dc-title">Admit Cards</div>
-                            <div class="dc-desc" id="admitCardDesc">Download your admit cards for exams</div>
+                            <div class="dc-desc" id="admitCardDesc">Click to view details & download</div>
                         </div>
                     </div>
                     <div id="admitCardList" style="margin-top:14px;display:flex;flex-direction:column;gap:8px;"></div>
@@ -337,6 +358,28 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
     <span>&copy; 2026 Govt. Sr. Sec. School Shilla. All rights reserved.</span>
 </footer>
 
+<!-- Admit Card Preview Modal -->
+<div class="modal-overlay" id="admitModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-id-badge"></i> Admit Card Details</h2>
+            <button class="close-btn" onclick="closeAdmitModal()">&times;</button>
+        </div>
+        <div id="admitModalBody">
+            <div style="text-align:center;padding:40px;">
+                <i class="fas fa-spinner fa-spin" style="font-size:32px;color:var(--gold);"></i>
+                <p style="margin-top:10px;color:var(--text-muted);">Loading…</p>
+            </div>
+        </div>
+        <div class="modal-footer" id="admitModalFooter" style="display:none;">
+            <button class="btn btn-outline" onclick="closeAdmitModal()" style="background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter';">Close</button>
+            <button class="btn btn-primary" id="admitDownloadBtn" style="background:var(--gold);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter';display:inline-flex;align-items:center;gap:8px;">
+                <i class="fas fa-download"></i> Download PDF
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
@@ -387,7 +430,7 @@ function loadStudentFromSession() {
     } catch (e) { window.location.href = "student-login.html"; return null; }
 }
 
-/* ============ RENDER ============ */
+/* ============ RENDER DASHBOARD ============ */
 function renderDashboard(s) {
     document.getElementById("navName").textContent = s.name || "Student";
     const navAvatar = document.getElementById("navAvatar");
@@ -540,12 +583,12 @@ async function checkAdmitCards() {
         card.style.display = "flex";
         locked.style.display = "none";
 
-        document.getElementById("admitCardDesc").textContent = `${items.length} admit card${items.length > 1 ? "s" : ""} available`;
+        document.getElementById("admitCardDesc").textContent = `${items.length} admit card${items.length > 1 ? "s" : ""} available — click to view & download`;
 
         document.getElementById("admitCardList").innerHTML = items.map(a => `
-            <button class="dc-btn" style="background:var(--pink);width:100%;justify-content:center;padding:9px 14px;font-size:12px;"
-                onclick="downloadAdmitPDF('${esc(student.student_id)}', ${a.publish_id})">
-                <i class="fas fa-download"></i> ${esc(a.examination_type)} — ${esc(a.exam_session)}
+            <button class="dc-btn" style="background:var(--pink);width:100%;justify-content:center;padding:10px 14px;font-size:12.5px;"
+                onclick="openAdmitModal(${a.publish_id})">
+                <i class="fas fa-eye"></i> ${esc(a.examination_type)} — ${esc(a.exam_session)}
             </button>
         `).join("");
     } catch (e) {
@@ -553,10 +596,101 @@ async function checkAdmitCards() {
     }
 }
 
+/* ============ ADMIT MODAL ============ */
+async function openAdmitModal(publishId) {
+    if (!student || !student.student_id) return;
+
+    const modal = document.getElementById("admitModal");
+    const body = document.getElementById("admitModalBody");
+    const footer = document.getElementById("admitModalFooter");
+
+    modal.classList.add("active");
+    body.innerHTML = `<div style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-spin" style="font-size:32px;color:var(--gold);"></i><p style="margin-top:10px;color:var(--text-muted);">Loading details…</p></div>`;
+    footer.style.display = "none";
+
+    try {
+        const res = await fetch(`${ADMIT_API}/student/${encodeURIComponent(student.student_id)}/details/${publishId}`);
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.message || "Failed to load");
+        }
+        const data = await res.json();
+        const { admit, student: s, roll_number } = data;
+
+        const isHigher = ["11","12"].includes(String(s.class));
+        const fullAddress = [s.village, s.post_office && "PO " + s.post_office, s.tehsil && "Teh. " + s.tehsil,
+                             s.district && "Distt. " + s.district, s.state, s.pincode].filter(Boolean).join(", ") || s.address || "—";
+
+        body.innerHTML = `
+            <div class="admit-info-section">
+                <div class="admit-badge-row">
+                    <span class="ab ab-published"><i class="fas fa-check-circle"></i> Admit Card Available</span>
+                    <span class="ab ab-examtype">${esc(admit.examination_type)}</span>
+                </div>
+                <h4><i class="fas fa-file-signature"></i> Examination Details</h4>
+                <div class="admit-info-grid">
+                    <div class="admit-info-item"><span class="lbl">Examination Type</span><span class="val">${esc(admit.examination_type)}</span></div>
+                    <div class="admit-info-item"><span class="lbl">Exam Session</span><span class="val">${esc(admit.exam_session)}</span></div>
+                    <div class="admit-info-item"><span class="lbl">Class</span><span class="val">${esc(admit.class)}${["11","12"].includes(String(admit.class)) ? " · " + esc(admit.stream) : ""}</span></div>
+                    ${admit.notes ? `<div class="admit-info-item full"><span class="lbl">Notes</span><span class="val">${esc(admit.notes)}</span></div>` : ""}
+                </div>
+            </div>
+
+            <div class="admit-info-section">
+                <h4><i class="fas fa-user-graduate"></i> Student Details</h4>
+                <div class="admit-info-grid">
+                    <div class="admit-info-item"><span class="lbl">Student ID</span><span class="val">${esc(s.student_id)}</span></div>
+                    <div class="admit-info-item"><span class="lbl">Roll Number</span><span class="val">${esc(roll_number || s.roll_number || "—")}</span></div>
+                    <div class="admit-info-item"><span class="lbl">Admission No</span><span class="val">${esc(s.admission_number || "—")}</span></div>
+                    <div class="admit-info-item"><span class="lbl">Full Name</span><span class="val">${esc(s.name)}</span></div>
+                    <div class="admit-info-item"><span class="lbl">Father's Name</span><span class="val">${esc(s.father_name || "—")}</span></div>
+                    <div class="admit-info-item"><span class="lbl">Mother's Name</span><span class="val">${esc(s.mother_name || "—")}</span></div>
+                    <div class="admit-info-item"><span class="lbl">Date of Birth</span><span class="val">${fmtDate(s.dob)}</span></div>
+                    <div class="admit-info-item"><span class="lbl">Gender</span><span class="val">${esc(s.gender || "—")}</span></div>
+                    <div class="admit-info-item"><span class="lbl">Category</span><span class="val">${esc(s.category || "—")}</span></div>
+                    <div class="admit-info-item"><span class="lbl">Stream</span><span class="val">${isHigher ? esc(s.stream || "—") : "Non-Specialized"}</span></div>
+                    <div class="admit-info-item"><span class="lbl">Aadhar Number</span><span class="val">${esc(s.aadhar_number || "—")}</span></div>
+                    <div class="admit-info-item"><span class="lbl">APAAR ID</span><span class="val">${esc(s.apaar_id || "—")}</span></div>
+                    <div class="admit-info-item"><span class="lbl">Mobile</span><span class="val">${esc(s.mobile_number || "—")}</span></div>
+                    <div class="admit-info-item"><span class="lbl">Email</span><span class="val">${esc(s.email_id || "—")}</span></div>
+                    <div class="admit-info-item full"><span class="lbl">Address</span><span class="val">${esc(fullAddress)}</span></div>
+                </div>
+            </div>
+        `;
+
+        footer.style.display = "flex";
+
+        document.getElementById("admitDownloadBtn").onclick = () => {
+            downloadAdmitPDF(student.student_id, publishId);
+        };
+
+    } catch (e) {
+        body.innerHTML = `<div style="text-align:center;padding:40px;color:var(--red);"><i class="fas fa-exclamation-circle" style="font-size:36px;"></i><p style="margin-top:10px;">${esc(e.message)}</p></div>`;
+    }
+}
+
+function closeAdmitModal() {
+    document.getElementById("admitModal").classList.remove("active");
+}
+
 function downloadAdmitPDF(studentId, publishId) {
     window.open(`${ADMIT_API}/student/${encodeURIComponent(studentId)}/pdf/${publishId}`, "_blank");
-    showToast("Opening admit card…", "info");
+    showToast("Downloading admit card PDF…", "info");
 }
+
+/* Modal click outside close */
+document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("admitModal");
+    if (modal) {
+        modal.addEventListener("click", (e) => {
+            if (e.target.id === "admitModal") closeAdmitModal();
+        });
+    }
+});
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeAdmitModal();
+});
 
 /* ============ BONAFIDE DOWNLOAD ============ */
 function downloadBonafide() {
@@ -728,7 +862,7 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
 </body></html>`;
 }
 
-/* ============ PROVISIONAL APPLICATION FORM ============ */
+/* ============ PROVISIONAL FORM ============ */
 async function downloadProvisionalForm() {
     if (!student) return showToast("No student data", "error");
     showToast("Generating Application Form…", "info");
