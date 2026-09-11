@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admit Card Manager - Admin | GSSS Shilla</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root {
+    --bg: #f5f7fb; --bg-white: #ffffff; --text-primary: #1a2332; --text-secondary: #5a6a7e;
+    --text-muted: #94a3b8; --gold: #c9972b; --gold-light: #e8b84b; --gold-bg: #fef8ed;
+    --blue: #4a8af4; --blue-bg: #eef4ff; --green: #10b981; --green-bg: #ecfdf5;
+    --purple: #8b5cf6; --purple-bg: #f5f0ff; --pink: #ec4899; --pink-bg: #fdf2f8;
+    --orange: #f59e0b; --orange-bg: #fffbeb; --red: #ef4444; --border: #e8edf8;
+    --shadow: 0 2px 12px rgba(0,0,0,0.04); --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --radius: 16px; --radius-sm: 10px; --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+.navbar { background: var(--bg-white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 68px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
+.navbar .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.navbar .brand .logo-placeholder { width: 42px; height: 42px; border-radius: var(--radius-sm); background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.navbar .brand .logo-placeholder img { width: 46px; height: 46px; border-radius: 10px; object-fit: contain; padding: 4px; }
+.navbar .brand .name { font-size: 16px; font-weight: 700; }
+.navbar .brand .name span { color: var(--gold); }
+.nav-links { display: flex; gap: 8px; list-style: none; }
+.nav-links a { text-decoration: none; color: var(--text-secondary); padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; transition: var(--transition); }
+.nav-links a:hover { background: var(--bg); color: var(--text-primary); }
+.nav-links a.active { background: var(--gold-bg); color: var(--gold); }
+.nav-links a i { margin-right: 6px; }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.admin-badge { display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 10px; background: var(--bg); border-radius: 50px; font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+.online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.hamburger { display: none; background: none; border: none; font-size: 22px; cursor: pointer; }
+
+.main-container { flex: 1; max-width: 1400px; margin: 0 auto; padding: 24px 32px 40px; width: 100%; }
+.page-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 22px; padding: 20px 26px; background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.page-header h1 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.page-header h1 i { color: var(--gold); }
+.page-header .subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: 'Inter', sans-serif; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-primary { background: var(--gold); color: #fff; } .btn-primary:hover:not(:disabled) { background: var(--gold-light); }
+.btn-success { background: var(--green); color: #fff; } .btn-success:hover:not(:disabled) { background: #059669; }
+.btn-danger { background: var(--red); color: #fff; } .btn-danger:hover:not(:disabled) { background: #dc2626; }
+.btn-outline { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); } .btn-outline:hover:not(:disabled) { background: var(--border); }
+.btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 8px; }
+.btn-xs { padding: 4px 10px; font-size: 11px; border-radius: 6px; }
+
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--bg-white); padding: 6px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); flex-wrap: wrap; }
+.tab-btn { padding: 10px 22px; border: none; background: transparent; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-size: 13px; color: var(--text-secondary); transition: var(--transition); font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; gap: 6px; }
+.tab-btn:hover { background: var(--bg); }
+.tab-btn.active { background: var(--gold); color: #fff; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.card-panel { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 22px 26px; margin-bottom: 20px; }
+.card-panel h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--gold-bg); display: flex; align-items: center; gap: 8px; }
+.card-panel h3 i { color: var(--gold); }
+
+.filter-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
+.filter-row select, .filter-row input { padding: 9px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); outline: none; transition: var(--transition); }
+.filter-row select:focus, .filter-row input:focus { border-color: var(--gold); background: #fff; }
+.filter-row input[type="text"] { flex: 1 1 220px; min-width: 180px; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+.form-grid label { display: flex; flex-direction: column; font-size: 12px; font-weight: 600; color: var(--text-secondary); gap: 6px; }
+.form-grid input, .form-grid select, .form-grid textarea { padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; font-size: 13px; background: var(--bg); outline: none; transition: var(--transition); color: var(--text-primary); }
+.form-grid input:focus, .form-grid select:focus { border-color: var(--gold); background: #fff; }
+.req-star { color: var(--red); }
+
+table.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.data-table thead th { background: var(--bg); padding: 11px 14px; text-align: left; font-weight: 600; color: var(--text-secondary); border-bottom: 2px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+table.data-table tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text-primary); }
+table.data-table tbody tr:hover td { background: #f8fafc; }
+.table-wrapper { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+
+.badge { display: inline-block; padding: 3px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; }
+.badge-success { background: var(--green-bg); color: var(--green); }
+.badge-warning { background: var(--orange-bg); color: var(--orange); }
+.badge-info { background: var(--blue-bg); color: var(--blue); }
+.badge-danger { background: #fee2e2; color: var(--red); }
+
+.empty-state { text-align: center; padding: 50px 20px; color: var(--text-muted); font-size: 13px; }
+
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+.modal-overlay.active { display: flex; }
+.modal-content { background: var(--bg-white); padding: 28px; border-radius: var(--radius); max-width: 720px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 14px; margin-bottom: 18px; }
+.modal-header h2 { font-size: 18px; font-weight: 700; }
+.modal-header h2 i { color: var(--gold); margin-right: 8px; }
+.close-btn { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; transition: var(--transition); }
+.close-btn:hover { color: var(--red); transform: rotate(90deg); }
+
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { padding: 14px 22px; border-radius: var(--radius-sm); color: #fff; font-weight: 600; font-size: 13px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); min-width: 250px; animation: slideIn 0.3s ease; }
+.toast-success { background: var(--green); } .toast-error { background: var(--red); }
+.toast-warning { background: var(--orange); } .toast-info { background: var(--text-primary); }
+@keyframes slideIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+
+.hidden { display: none !important; }
+.footer { background: var(--bg-white); border-top: 1px solid var(--border); padding: 18px 32px; text-align: center; font-size: 13px; color: var(--text-muted); }
+
+@media (max-width: 768px) {
+    .navbar { padding: 0 16px; }
+    .main-container { padding: 14px; }
+    .form-grid, .form-grid.three { grid-template-columns: 1fr; }
+    .page-header { padding: 14px; flex-direction: column; align-items: stretch; }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="#" class="brand">
+        <div class="logo-placeholder"><img src="logo(1).png" alt="Logo" onerror="this.style.display='none'"></div>
+        <div class="name">GSSS<span> SHILLA</span></div>
+    </a>
+    <ul class="nav-links">
+        <li><a href="admin-students.html"><i class="fas fa-users"></i> Students</a></li>
+        <li><a href="admin-bonafide.html"><i class="fas fa-certificate"></i> Bonafide</a></li>
+        <li><a href="admin-admitcard.html" class="active"><i class="fas fa-id-badge"></i> Admit Cards</a></li>
+    </ul>
+    <div class="nav-right">
+        <div class="admin-badge">
+            <span class="avatar" id="adminAvatar">🛡️</span>
+            <span id="adminName">Admin</span>
+            <span class="online-dot"></span>
+        </div>
+    </div>
+</nav>
+
+<div class="main-container">
+    <div class="page-header">
+        <div>
+            <h1><i class="fas fa-id-badge"></i> Admit Card Manager</h1>
+            <div class="subtitle">Manage subjects → create exams → build datesheet → publish admit cards</div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="subjects" onclick="switchTab('subjects')"><i class="fas fa-book"></i> Subjects</button>
+        <button class="tab-btn" data-tab="exams" onclick="switchTab('exams')"><i class="fas fa-file-signature"></i> Examinations</button>
+        <button class="tab-btn" data-tab="datesheet" onclick="switchTab('datesheet')"><i class="fas fa-calendar-alt"></i> Date Sheet</button>
+        <button class="tab-btn" data-tab="admit" onclick="switchTab('admit')"><i class="fas fa-id-card"></i> Admit Cards</button>
+    </div>
+
+    <!-- SUBJECTS TAB -->
+    <div id="tab-subjects" class="tab-content active">
+        <div class="card-panel">
+            <h3><i class="fas fa-plus-circle"></i> Add Subject</h3>
+            <form id="subjectForm" class="form-grid three">
+                <label>Subject Name <span class="req-star">*</span><input type="text" name="subjectName" required placeholder="e.g., Mathematics"></label>
+                <label>Subject Code <span class="req-star">*</span><input type="text" name="subjectCode" required placeholder="e.g., MATH10" style="text-transform:uppercase;"></label>
+                <label>Max Marks <input type="number" name="maxMarks" value="100" min="1"></label>
+                <label>Class <span class="req-star">*</span>
+                    <select name="class" id="subjectClass" required onchange="onSubjectClassChange()">
+                        <option value="">Select Class</option>
+                        <option>1</option><option>2</option><option>3</option><option>4</option>
+                        <option>5</option><option>6</option><option>7</option><option>8</option>
+                        <option>9</option><option>10</option><option>11</option><option>12</option>
+                    </select>
+                </label>
+                <label>Stream
+                    <select name="stream" id="subjectStream" disabled>
+                        <option value="Non-Specialized">Non-Specialized</option>
+                        <option>Science</option><option>Commerce</option><option>Arts</option>
+                    </select>
+                </label>
+                <label style="justify-content:flex-end;">
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Add Subject</button>
+                </label>
+            </form>
+        </div>
+
+        <div class="card-panel">
+            <h3><i class="fas fa-list"></i> Subjects List</h3>
+            <div class="filter-row">
+                <select id="subjFilterClass" onchange="loadSubjects()">
+                    <option value="">All Classes</option>
+                    <option>1</option><option>2</option><option>3</option><option>4</option>
+                    <option>5</option><option>6</option><option>7</option><option>8</option>
+                    <option>9</option><option>10</option><option>11</option><option>12</option>
+                </select>
+            </div>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead><tr><th>#</th><th>Subject</th><th>Code</th><th>Class</th><th>Stream</th><th>Max</th><th>Actions</th></tr></thead>
+                    <tbody id="subjectsBody"><tr><td colspan="7" class="empty-state">Loading…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXAMS TAB -->
+    <div id="tab-exams" class="tab-content">
+        <div class="card-panel">
+            <h3><i class="fas fa-plus-circle"></i> Create Examination</h3>
+            <form id="examForm" class="form-grid three">
+                <label>Exam Name <span class="req-star">*</span><input type="text" name="examName" required placeholder="e.g., Annual Examination 2025-26"></label>
+                <label>Exam Type <span class="req-star">*</span>
+                    <select name="examType" required>
+                        <option>Annual Examination</option>
+                        <option>Half Yearly Examination</option>
+                        <option>Pre Board</option>
+                        <option>Board Examination</option>
+                        <option>Monthly Test</option>
+                        <option>Unit Test</option>
+                    </select>
+                </label>
+                <label>Class <span class="req-star">*</span>
+                    <select name="class" id="examClass" required onchange="onExamClassChange()">
+                        <option value="">Select Class</option>
+                        <option>1</option><option>2</option><option>3</option><option>4</option>
+                        <option>5</option><option>6</option><option>7</option><option>8</option>
+                        <option>9</option><option>10</option><option>11</option><option>12</option>
+                    </select>
+                </label>
+                <label>Stream
+                    <select name="stream" id="examStream" disabled>
+                        <option value="Non-Specialized">Non-Specialized</option>
+                        <option>Science</option><option>Commerce</option><option>Arts</option>
+                    </select>
+                </label>
+                <label>Exam Session <span class="req-star">*</span><input type="text" name="examSession" placeholder="2025-26" pattern="\d{4}-\d{2,4}" required></label>
+                <label>Academic Session <span class="req-star">*</span><input type="text" name="academicSession" placeholder="2025-26" pattern="\d{4}-\d{2,4}" required></label>
+                <label>Start Date <input type="date" name="startDate"></label>
+                <label>End Date <input type="date" name="endDate"></label>
+                <label style="justify-content:flex-end;">
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Create Exam</button>
+                </label>
+            </form>
+        </div>
+
+        <div class="card-panel">
+            <h3><i class="fas fa-list"></i> Examinations</h3>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead><tr><th>#</th><th>Exam Name</th><th>Type</th><th>Class</th><th>Session</th><th>Subjects</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="examsBody"><tr><td colspan="8" class="empty-state">Loading…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- DATESHEET TAB -->
+    <div id="tab-datesheet" class="tab-content">
+        <div class="card-panel">
+            <h3><i class="fas fa-calendar-alt"></i> Select Examination</h3>
+            <select id="dsExamSelect" onchange="loadDatesheet()" style="padding:11px 14px;border:1px solid var(--border);border-radius:10px;font-family:'Inter';font-size:13px;background:var(--bg);width:100%;max-width:520px;">
+                <option value="">— Choose an Examination —</option>
+            </select>
+        </div>
+
+        <div id="dsPanel" class="card-panel hidden">
+            <h3><i class="fas fa-plus-circle"></i> Add Date Sheet Entry</h3>
+            <form id="dsForm" class="form-grid three">
+                <label>Subject <span class="req-star">*</span>
+                    <select name="subjectId" id="dsSubject" required></select>
+                </label>
+                <label>Exam Date <span class="req-star">*</span><input type="date" name="examDate" required></label>
+                <label>Room <input type="text" name="room" placeholder="e.g., Hall A"></label>
+                <label>Start Time <span class="req-star">*</span><input type="time" name="startTime" required></label>
+                <label>End Time <span class="req-star">*</span><input type="time" name="endTime" required></label>
+                <label style="justify-content:flex-end;">
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Add</button>
+                </label>
+            </form>
+
+            <h3 style="margin-top:24px;"><i class="fas fa-list"></i> Date Sheet Entries</h3>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead><tr><th>#</th><th>Subject</th><th>Code</th><th>Date</th><th>Time</th><th>Room</th><th>Action</th></tr></thead>
+                    <tbody id="dsBody"><tr><td colspan="7" class="empty-state">No entries yet.</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIT CARDS TAB -->
+    <div id="tab-admit" class="tab-content">
+        <div class="card-panel">
+            <h3><i class="fas fa-id-card"></i> Select Examination to Publish</h3>
+            <div class="filter-row">
+                <select id="admitExamSelect" onchange="loadAdmitCards()" style="padding:11px 14px;border:1px solid var(--border);border-radius:10px;font-family:'Inter';font-size:13px;background:var(--bg);min-width:380px;">
+                    <option value="">— Choose an Examination —</option>
+                </select>
+            </div>
+            <div id="admitActions" class="hidden" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+                <button class="btn btn-success" onclick="publishExam()"><i class="fas fa-paper-plane"></i> Publish Admit Cards</button>
+                <button class="btn btn-warning" style="background:var(--orange);color:#fff;" onclick="unpublishExam()"><i class="fas fa-undo"></i> Unpublish</button>
+            </div>
+        </div>
+
+        <div id="admitListPanel" class="card-panel hidden">
+            <h3><i class="fas fa-users"></i> Admit Cards List</h3>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead><tr><th>#</th><th>Roll</th><th>Student Name</th><th>Student ID</th><th>Class</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="admitBody"><tr><td colspan="7" class="empty-state">No admit cards found.</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<footer class="footer"><span>&copy; 2026 Govt. Sr. Sec. School Shilla. All rights reserved.</span></footer>
+
+<script>
+const API = "https://gsssshilla.onrender.com/api/admit-card";
+
+const state = {
+    subjects: [],
+    exams: [],
+    currentExamId: null,
+    currentDsExam: null,
+    currentAdmitExam: null
+};
+
+const $ = (s) => document.querySelector(s);
+
+function esc(v) {
+    return v === null || v === undefined ? "" : String(v)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function showToast(msg, type = "info") {
+    const c = $("#toastContainer");
+    const t = document.createElement("div");
+    t.className = `toast toast-${type}`;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => { t.style.opacity = "0"; setTimeout(() => t.remove(), 400); }, 4000);
+}
+
+function getAuthHeaders(isFormData = false) {
+    try {
+        const token = localStorage.getItem("adminToken");
+        if (!token) { alert("Please login first"); window.location.href = "login.html"; return null; }
+        const headers = { "Authorization": `Bearer ${token}` };
+        if (!isFormData) headers["Content-Type"] = "application/json";
+        return headers;
+    } catch (e) { return null; }
+}
+
+async function apiCall(url, options = {}) {
+    const headers = getAuthHeaders(options.body instanceof FormData);
+    if (!headers) throw new Error("Not authenticated");
+    const res = await fetch(url, { ...options, headers: { ...headers, ...(options.headers || {}) } });
+    const text = await res.text();
+    let data;
+    try { data = text ? JSON.parse(text) : {}; } catch (e) { throw new Error("Invalid server response"); }
+    if (!res.ok) throw new Error(data.message || `Request failed (${res.status})`);
+    return data;
+}
+
+function switchTab(tab) {
+    document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+    document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+    document.getElementById(`tab-${tab}`).classList.add("active");
+    document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add("active");
+
+    if (tab === "subjects") loadSubjects();
+    if (tab === "exams") loadExams();
+    if (tab === "datesheet") populateExamDropdown("dsExamSelect");
+    if (tab === "admit") populateExamDropdown("admitExamSelect");
+}
+
+/* ============ SUBJECTS ============ */
+function onSubjectClassChange() {
+    const cls = $("#subjectClass").value;
+    const stream = $("#subjectStream");
+    if (["11","12"].includes(cls)) { stream.disabled = false; if (!stream.value || stream.value === "Non-Specialized") stream.value = "Science"; }
+    else { stream.disabled = true; stream.value = "Non-Specialized"; }
+}
+
+async function loadSubjects() {
+    const cls = $("#subjFilterClass").value;
+    const params = new URLSearchParams();
+    if (cls) params.set("class", cls);
+    try {
+        const data = await apiCall(`${API}/subjects?${params}`);
+        const tbody = $("#subjectsBody");
+        if (!data.data.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No subjects yet.</td></tr>'; return; }
+        tbody.innerHTML = data.data.map((s, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td>${esc(s.subject_name)}</td>
+                <td><b>${esc(s.subject_code)}</b></td>
+                <td>${esc(s.class)}</td>
+                <td>${esc(s.stream)}</td>
+                <td>${esc(s.max_marks)}</td>
+                <td>
+                    <button class="btn btn-xs btn-danger" onclick="deleteSubject(${s.id})"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>`).join("");
+    } catch (e) { showToast(e.message, "error"); }
+}
+
+document.getElementById("subjectForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const body = {
+        subjectName: fd.get("subjectName"),
+        subjectCode: fd.get("subjectCode"),
+        class: fd.get("class"),
+        stream: fd.get("stream"),
+        maxMarks: parseInt(fd.get("maxMarks")) || 100
+    };
+    try {
+        const res = await apiCall(`${API}/subjects`, { method: "POST", body: JSON.stringify(body) });
+        showToast(res.message, "success");
+        e.target.reset();
+        onSubjectClassChange();
+        loadSubjects();
+    } catch (e) { showToast(e.message, "error"); }
+});
+
+async function deleteSubject(id) {
+    if (!confirm("Delete this subject?")) return;
+    try {
+        await apiCall(`${API}/subjects/${id}`, { method: "DELETE" });
+        showToast("Deleted ✅", "success");
+        loadSubjects();
+    } catch (e) { showToast(e.message, "error"); }
+}
+
+/* ============ EXAMS ============ */
+function onExamClassChange() {
+    const cls = $("#examClass").value;
+    const stream = $("#examStream");
+    if (["11","12"].includes(cls)) { stream.disabled = false; if (!stream.value || stream.value === "Non-Specialized") stream.value = "Science"; }
+    else { stream.disabled = true; stream.value = "Non-Specialized"; }
+}
+
+async function loadExams() {
+    try {
+        const data = await apiCall(`${API}/examinations`);
+        state.exams = data.data;
+        const tbody = $("#examsBody");
+        if (!data.data.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No exams yet.</td></tr>'; return; }
+        tbody.innerHTML = data.data.map((e, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td>${esc(e.exam_name)}</td>
+                <td>${esc(e.exam_type)}</td>
+                <td>${esc(e.class)}${["11","12"].includes(String(e.class)) ? " · " + esc(e.stream) : ""}</td>
+                <td>${esc(e.academic_session)}</td>
+                <td>${e.subjects_count || 0}</td>
+                <td>${e.is_published ? '<span class="badge badge-success">Published</span>' : '<span class="badge badge-warning">Draft</span>'}</td>
+                <td>
+                    <button class="btn btn-xs btn-primary" onclick="goToDatesheet(${e.id})"><i class="fas fa-calendar-alt"></i></button>
+                    <button class="btn btn-xs btn-danger" onclick="deleteExam(${e.id})"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>`).join("");
+    } catch (e) { showToast(e.message, "error"); }
+}
+
+document.getElementById("examForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const body = {};
+    fd.forEach((v, k) => body[k] = v);
+    try {
+        const res = await apiCall(`${API}/examinations`, { method: "POST", body: JSON.stringify(body) });
+        showToast(res.message, "success");
+        e.target.reset();
+        onExamClassChange();
+        loadExams();
+    } catch (e) { showToast(e.message, "error"); }
+});
+
+async function deleteExam(id) {
+    if (!confirm("Delete exam? Its datesheet and admit cards will also be removed.")) return;
+    try {
+        await apiCall(`${API}/examinations/${id}`, { method: "DELETE" });
+        showToast("Exam deleted ✅", "success");
+        loadExams();
+    } catch (e) { showToast(e.message, "error"); }
+}
+
+function goToDatesheet(examId) {
+    switchTab("datesheet");
+    setTimeout(() => {
+        $("#dsExamSelect").value = examId;
+        loadDatesheet();
+    }, 300);
+}
+
+/* ============ DATE SHEET ============ */
+async function populateExamDropdown(selId) {
+    try {
+        const data = await apiCall(`${API}/examinations`);
+        state.exams = data.data;
+        const sel = document.getElementById(selId);
+        sel.innerHTML = '<option value="">— Choose an Examination —</option>';
+        data.data.forEach(e => {
+            const o = document.createElement("option");
+            o.value = e.id;
+            o.textContent = `${e.exam_name} (${e.class}${["11","12"].includes(String(e.class)) ? " · " + e.stream : ""} · ${e.academic_session})${e.is_published ? " ✅" : ""}`;
+            sel.appendChild(o);
+        });
+    } catch (e) {}
+}
+
+async function loadDatesheet() {
+    const examId = $("#dsExamSelect").value;
+    if (!examId) { $("#dsPanel").classList.add("hidden"); return; }
+    state.currentDsExam = state.exams.find(e => String(e.id) === String(examId));
+
+    $("#dsPanel").classList.remove("hidden");
+    $("#dsSubject").innerHTML = "";
+
+    // Load subjects of this exam's class + stream
+    try {
+        const params = new URLSearchParams();
+        params.set("class", state.currentDsExam.class);
+        if (["11","12"].includes(String(state.currentDsExam.class))) params.set("stream", state.currentDsExam.stream);
+        const subjData = await apiCall(`${API}/subjects?${params}`);
+        state.subjects = subjData.data;
+
+        if (!subjData.data.length) {
+            $("#dsSubject").innerHTML = '<option value="">No subjects for this class — add in Subjects tab first</option>';
+        } else {
+            subjData.data.forEach(s => {
+                const o = document.createElement("option");
+                o.value = s.id;
+                o.textContent = `${s.subject_name} (${s.subject_code})`;
+                $("#dsSubject").appendChild(o);
+            });
+        }
+    } catch (e) {}
+
+    // Load existing datesheet
+    try {
+        const data = await apiCall(`${API}/examinations/${examId}/datesheet`);
+        const tbody = $("#dsBody");
+        if (!data.data.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No entries yet.</td></tr>'; return; }
+        tbody.innerHTML = data.data.map((r, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td>${esc(r.subject_name)}</td>
+                <td><b>${esc(r.subject_code)}</b></td>
+                <td>${new Date(r.exam_date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</td>
+                <td>${esc(r.start_time)} – ${esc(r.end_time)}</td>
+                <td>${esc(r.room || "—")}</td>
+                <td><button class="btn btn-xs btn-danger" onclick="deleteDsEntry(${r.id})"><i class="fas fa-trash"></i></button></td>
+            </tr>`).join("");
+    } catch (e) {}
+}
+
+document.getElementById("dsForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const examId = $("#dsExamSelect").value;
+    if (!examId) return showToast("Select exam first", "warning");
+    const fd = new FormData(e.target);
+    const body = {
+        subjectId: parseInt(fd.get("subjectId")),
+        examDate: fd.get("examDate"),
+        startTime: fd.get("startTime"),
+        endTime: fd.get("endTime"),
+        room: fd.get("room") || null
+    };
+    try {
+        const res = await apiCall(`${API}/examinations/${examId}/datesheet`, { method: "POST", body: JSON.stringify(body) });
+        showToast(res.message, "success");
+        e.target.reset();
+        loadDatesheet();
+    } catch (e) { showToast(e.message, "error"); }
+});
+
+async function deleteDsEntry(id) {
+    if (!confirm("Delete this entry?")) return;
+    try {
+        await apiCall(`${API}/datesheet/${id}`, { method: "DELETE" });
+        showToast("Removed ✅", "success");
+        loadDatesheet();
+    } catch (e) { showToast(e.message, "error"); }
+}
+
+/* ============ ADMIT CARDS ============ */
+async function loadAdmitCards() {
+    const examId = $("#admitExamSelect").value;
+    if (!examId) { $("#admitListPanel").classList.add("hidden"); $("#admitActions").classList.add("hidden"); return; }
+    state.currentAdmitExam = state.exams.find(e => String(e.id) === String(examId));
+
+    $("#admitListPanel").classList.remove("hidden");
+    $("#admitActions").classList.remove("hidden");
+    $("#admitActions").style.display = "flex";
+
+    try {
+        const data = await apiCall(`${API}/examinations/${examId}/admitcards`);
+        const tbody = $("#admitBody");
+        if (!data.data.length) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No admit cards yet. Click Publish to generate for all students.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = data.data.map((c, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td><b>${esc(c.roll_number || c.student_roll || "—")}</b></td>
+                <td>${esc(c.name)}</td>
+                <td>${esc(c.student_id)}</td>
+                <td>${esc(c.class)}</td>
+                <td>${c.is_enabled ? '<span class="badge badge-success">Enabled</span>' : '<span class="badge badge-danger">Disabled</span>'}</td>
+                <td>
+                    <button class="btn btn-xs btn-primary" onclick="openAdmitPDF('${esc(c.student_id)}', ${examId})"><i class="fas fa-file-pdf"></i> PDF</button>
+                    <button class="btn btn-xs btn-outline" onclick="toggleAdmit(${c.id}, ${c.is_enabled ? 0 : 1})">${c.is_enabled ? "Disable" : "Enable"}</button>
+                    <button class="btn btn-xs btn-danger" onclick="deleteAdmit(${c.id})"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>`).join("");
+    } catch (e) { showToast(e.message, "error"); }
+}
+
+async function publishExam() {
+    const examId = $("#admitExamSelect").value;
+    if (!examId) return;
+    if (!confirm("Publish admit cards for all active students of this class?")) return;
+    try {
+        const res = await apiCall(`${API}/examinations/${examId}/publish`, { method: "POST" });
+        showToast(res.message, "success");
+        loadAdmitCards();
+    } catch (e) { showToast(e.message, "error"); }
+}
+
+async function unpublishExam() {
+    const examId = $("#admitExamSelect").value;
+    if (!examId) return;
+    if (!confirm("Unpublish this exam? Students will no longer see their admit cards.")) return;
+    try {
+        const res = await apiCall(`${API}/examinations/${examId}/unpublish`, { method: "POST" });
+        showToast(res.message, "success");
+        loadAdmitCards();
+    } catch (e) { showToast(e.message, "error"); }
+}
+
+async function toggleAdmit(id, enable) {
+    try {
+        await apiCall(`${API}/admitcards/${id}`, { method: "PUT", body: JSON.stringify({ isEnabled: !!enable }) });
+        loadAdmitCards();
+    } catch (e) { showToast(e.message, "error"); }
+}
+
+async function deleteAdmit(id) {
+    if (!confirm("Revoke this admit card?")) return;
+    try {
+        await apiCall(`${API}/admitcards/${id}`, { method: "DELETE" });
+        showToast("Revoked ✅", "success");
+        loadAdmitCards();
+    } catch (e) { showToast(e.message, "error"); }
+}
+
+function openAdmitPDF(studentId, examId) {
+    window.open(`https://gsssshilla.onrender.com/api/admit-card/admit/${examId}/${encodeURIComponent(studentId)}/pdf`, "_blank");
+}
+
+/* ============ INIT ============ */
+document.addEventListener("DOMContentLoaded", () => {
+    const token = localStorage.getItem("adminToken");
+    if (!token) { alert("Please login first"); window.location.href = "login.html"; return; }
+    loadSubjects();
+    onSubjectClassChange();
+    onExamClassChange();
+});
+</script>
+</body>
+</html>
