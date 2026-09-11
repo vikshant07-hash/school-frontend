@@ -76,6 +76,7 @@ table.data-table thead th { background: var(--bg); padding: 11px 14px; text-alig
 table.data-table tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text-primary); }
 table.data-table tbody tr:hover td { background: #f8fafc; }
 table.data-table tbody tr.selected td { background: var(--gold-bg); }
+table.data-table tbody tr.expanded td { background: #fef8ed; }
 .table-wrapper { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
 input[type="checkbox"].row-select { width: 18px; height: 18px; cursor: pointer; accent-color: var(--gold); }
 
@@ -83,6 +84,7 @@ input[type="checkbox"].row-select { width: 18px; height: 18px; cursor: pointer; 
 .badge-success { background: var(--green-bg); color: var(--green); }
 .badge-warning { background: var(--orange-bg); color: var(--orange); }
 .badge-danger { background: #fee2e2; color: var(--red); }
+.badge-info { background: var(--blue-bg); color: var(--blue); }
 
 .empty-state { text-align: center; padding: 50px 20px; color: var(--text-muted); font-size: 13px; }
 .empty-state i { font-size: 42px; color: var(--gold); opacity: 0.4; display: block; margin-bottom: 10px; }
@@ -117,6 +119,14 @@ input[type="checkbox"].row-select { width: 18px; height: 18px; cursor: pointer; 
 .tab-btn.active { background: var(--gold); color: #fff; }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
+
+/* DETAIL VIEW */
+.detail-panel { padding: 18px 20px; background: #fffbeb; border-left: 4px solid var(--gold); }
+.detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px 22px; font-size: 13px; }
+.detail-item { display: flex; flex-direction: column; gap: 2px; }
+.detail-item .lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; }
+.detail-item .val { color: var(--text-primary); font-weight: 600; word-break: break-word; }
+.detail-item.full { grid-column: 1 / -1; }
 
 @media (max-width: 768px) {
     .navbar { padding: 0 14px; }
@@ -153,7 +163,7 @@ input[type="checkbox"].row-select { width: 18px; height: 18px; cursor: pointer; 
     <div class="page-header">
         <div>
             <h1><i class="fas fa-id-badge"></i> Admit Card Manager</h1>
-            <div class="subtitle">Class select → Students auto-fatch → PDF upload → Publish</div>
+            <div class="subtitle">Class select → Students fatch → PDF upload → Publish</div>
         </div>
     </div>
 
@@ -165,7 +175,7 @@ input[type="checkbox"].row-select { width: 18px; height: 18px; cursor: pointer; 
     <!-- CREATE TAB -->
     <div id="tab-create" class="tab-content active">
         <div class="card-panel">
-            <h3><i class="fas fa-filter"></i> Step 1: Select Class & Session</h3>
+            <h3><i class="fas fa-filter"></i> Step 1: Class & Session</h3>
             <div class="form-grid three">
                 <label>Class <span class="req-star">*</span>
                     <select id="fetchClass" onchange="onClassChange()">
@@ -193,11 +203,12 @@ input[type="checkbox"].row-select { width: 18px; height: 18px; cursor: pointer; 
         </div>
 
         <div id="studentsPanel" class="card-panel hidden">
-            <h3><i class="fas fa-users"></i> Step 2: Students List <span class="badge-inline">Auto-fetched from Student Management</span></h3>
+            <h3><i class="fas fa-users"></i> Step 2: Students List <span class="badge-inline">From Student Management</span></h3>
             <div class="stats-chips">
                 <div class="stat-chip">Total: <b id="studentTotal">0</b></div>
+                <div class="stat-chip">Selected: <b id="studentSelected">0</b></div>
             </div>
-            <div class="table-wrapper" style="max-height:400px;overflow-y:auto;">
+            <div class="table-wrapper" style="max-height:450px;overflow-y:auto;">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -207,7 +218,9 @@ input[type="checkbox"].row-select { width: 18px; height: 18px; cursor: pointer; 
                             <th>Name</th>
                             <th>Father</th>
                             <th>Class</th>
+                            <th>Gender</th>
                             <th>Photo</th>
+                            <th style="width:60px;">Details</th>
                         </tr>
                     </thead>
                     <tbody id="studentsBody"></tbody>
@@ -241,7 +254,7 @@ input[type="checkbox"].row-select { width: 18px; height: 18px; cursor: pointer; 
                 </label>
             </form>
             <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end;">
-                <button class="btn btn-success" id="btnSave" onclick="saveAdmitRecord()"><i class="fas fa-save"></i> Save Admit Card Record</button>
+                <button class="btn btn-success" id="btnSave" onclick="saveAdmitRecord()"><i class="fas fa-save"></i> Save & Publish for Selected</button>
             </div>
         </div>
     </div>
@@ -286,7 +299,7 @@ input[type="checkbox"].row-select { width: 18px; height: 18px; cursor: pointer; 
             <div id="publishInfo" class="info-bar gold"></div>
 
             <div class="filter-row">
-                <input type="text" id="pubSearch" placeholder="🔍 Search by name, roll, ID..." oninput="applyPubFilter()">
+                <input type="text" id="pubSearch" placeholder="🔍 Search name, roll, ID, father..." oninput="applyPubFilter()">
                 <select id="pubFilterStatus" onchange="applyPubFilter()">
                     <option value="">All</option>
                     <option value="published">Published</option>
@@ -309,10 +322,10 @@ input[type="checkbox"].row-select { width: 18px; height: 18px; cursor: pointer; 
                 <b><span id="pubSelectedCount">0</span> selected</b>
                 <button class="btn btn-success btn-sm" onclick="bulkPublishSelected()"><i class="fas fa-paper-plane"></i> Publish Selected</button>
                 <button class="btn btn-warning btn-sm" onclick="bulkUnpublishSelected()"><i class="fas fa-undo"></i> Unpublish Selected</button>
-                <button class="btn btn-primary btn-sm" onclick="publishAll()" style="margin-left:auto;"><i class="fas fa-bullhorn"></i> Publish All Class</button>
+                <button class="btn btn-primary btn-sm" onclick="publishAll()" style="margin-left:auto;"><i class="fas fa-bullhorn"></i> Publish All</button>
             </div>
 
-            <div class="table-wrapper" style="max-height:450px;overflow-y:auto;">
+            <div class="table-wrapper" style="max-height:500px;overflow-y:auto;">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -320,6 +333,8 @@ input[type="checkbox"].row-select { width: 18px; height: 18px; cursor: pointer; 
                             <th>Roll</th>
                             <th>Student Name</th>
                             <th>Student ID</th>
+                            <th>Father</th>
+                            <th>Gender</th>
                             <th>Photo</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -353,6 +368,12 @@ function esc(v) {
     return v === null || v === undefined ? "" : String(v)
         .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function fmtDate(d) {
+    if (!d) return "—";
+    const dt = new Date(d);
+    return isNaN(dt) ? d : dt.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 }
 
 function showToast(msg, type = "info") {
@@ -412,7 +433,7 @@ async function fetchStudents() {
     if (session) params.set("session", session);
 
     $("#fetchStatus").classList.remove("hidden");
-    $("#fetchStatus").innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching students…';
+    $("#fetchStatus").innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching students from Nstudent…';
 
     try {
         const data = await apiCall(`${API}/class-students?${params}`);
@@ -427,22 +448,48 @@ async function fetchStudents() {
 
         const tbody = $("#studentsBody");
         if (!data.total) {
-            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No students found for this class/session.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No students found for this class/session.</td></tr>';
+            $("#studentSelected").textContent = "0";
             return;
         }
 
-        tbody.innerHTML = data.data.map(s => `
-            <tr>
+        tbody.innerHTML = data.data.map((s, idx) => `
+            <tr data-idx="${idx}">
                 <td><input type="checkbox" class="row-select" data-sid="${esc(s.student_id)}" checked onchange="onFetchedSelect(this)"></td>
                 <td><b>${esc(s.roll_number || "—")}</b></td>
-                <td>${esc(s.student_id)}</td>
-                <td>${esc(s.name)}</td>
+                <td>${esc(s.student_id || "—")}</td>
+                <td>${esc(s.name || "—")}</td>
                 <td>${esc(s.father_name || "—")}</td>
-                <td>${esc(s.class)}</td>
+                <td>${esc(s.class || "—")}</td>
+                <td>${esc(s.gender || "—")}</td>
                 <td>${s.student_photo_url ? `<img src="${esc(s.student_photo_url)}" class="student-photo-thumb">` : `<div class="student-photo-ph">👤</div>`}</td>
-            </tr>`).join("");
+                <td><button class="btn btn-xs btn-outline" onclick="toggleDetail(${idx})"><i class="fas fa-eye"></i></button></td>
+            </tr>
+            <tr class="detail-row hidden" id="detail-${idx}">
+                <td colspan="9">
+                    <div class="detail-panel">
+                        <div class="detail-grid">
+                            <div class="detail-item"><span class="lbl">Admission No</span><span class="val">${esc(s.admission_number || "—")}</span></div>
+                            <div class="detail-item"><span class="lbl">Admission Date</span><span class="val">${fmtDate(s.admission_date)}</span></div>
+                            <div class="detail-item"><span class="lbl">Mother</span><span class="val">${esc(s.mother_name || "—")}</span></div>
+                            <div class="detail-item"><span class="lbl">DOB</span><span class="val">${fmtDate(s.dob)}</span></div>
+                            <div class="detail-item"><span class="lbl">Gender</span><span class="val">${esc(s.gender || "—")}</span></div>
+                            <div class="detail-item"><span class="lbl">Category</span><span class="val">${esc(s.category || "—")}</span></div>
+                            <div class="detail-item"><span class="lbl">Aadhar</span><span class="val">${esc(s.aadhar_number || "—")}</span></div>
+                            <div class="detail-item"><span class="lbl">APAAR ID</span><span class="val">${esc(s.apaar_id || "—")}</span></div>
+                            <div class="detail-item"><span class="lbl">Mobile</span><span class="val">${esc(s.mobile_number || "—")}</span></div>
+                            <div class="detail-item"><span class="lbl">Email</span><span class="val">${esc(s.email_id || "—")}</span></div>
+                            <div class="detail-item"><span class="lbl">Stream</span><span class="val">${esc(s.stream || "Non-Specialized")}</span></div>
+                            <div class="detail-item"><span class="lbl">Session</span><span class="val">${esc(s.session || "—")}</span></div>
+                            <div class="detail-item full"><span class="lbl">Address</span><span class="val">${esc([s.village, s.post_office && "PO " + s.post_office, s.tehsil && "Teh. " + s.tehsil, s.district && "Distt. " + s.district, s.state, s.pincode].filter(Boolean).join(", ") || s.address || "—")}</span></div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `).join("");
 
         data.data.forEach(s => state.selectedStudentIds.add(s.student_id));
+        $("#studentSelected").textContent = state.selectedStudentIds.size;
 
     } catch (e) {
         $("#fetchStatus").innerHTML = `<i class="fas fa-exclamation-circle" style="color:var(--red);"></i> ${esc(e.message)}`;
@@ -450,13 +497,19 @@ async function fetchStudents() {
     }
 }
 
+function toggleDetail(idx) {
+    const row = document.getElementById(`detail-${idx}`);
+    if (row) row.classList.toggle("hidden");
+}
+
 function onFetchedSelect(cb) {
     const sid = cb.dataset.sid;
     if (cb.checked) state.selectedStudentIds.add(sid);
     else state.selectedStudentIds.delete(sid);
+    $("#studentSelected").textContent = state.selectedStudentIds.size;
 }
 
-/* ============ SAVE ADMIT RECORD ============ */
+/* ============ SAVE + PUBLISH ============ */
 async function saveAdmitRecord() {
     const form = $("#createForm");
     const btn = $("#btnSave");
@@ -481,14 +534,12 @@ async function saveAdmitRecord() {
         const res = await apiCall(`${API}/create`, { method: "POST", body: fd });
         showToast("Admit card record created ✅", "success");
 
-        // Auto-publish for selected students
         const publishRes = await apiCall(`${API}/${res.data.id}/publish`, {
             method: "POST",
             body: JSON.stringify({ studentIds: [...state.selectedStudentIds] })
         });
         showToast(publishRes.message || "Published ✅", "success");
 
-        // Reset
         form.reset();
         $("#studentsPanel").classList.add("hidden");
         $("#createPanel").classList.add("hidden");
@@ -496,14 +547,12 @@ async function saveAdmitRecord() {
         $("#fetchClass").value = "";
         $("#fetchSession").value = "";
         onClassChange();
-
-        // Switch to list
         switchTab("list");
     } catch (e) {
         showToast(e.message, "error");
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-save"></i> Save Admit Card Record';
+        btn.innerHTML = '<i class="fas fa-save"></i> Save & Publish for Selected';
     }
 }
 
@@ -512,7 +561,6 @@ async function loadList() {
     const cls = $("#listFilterClass").value;
     const params = new URLSearchParams();
     if (cls) params.set("class", cls);
-
     try {
         const data = await apiCall(`${API}/list?${params}`);
         const tbody = $("#listBody");
@@ -531,7 +579,7 @@ async function loadList() {
                 <td>${p.is_published ? '<span class="badge badge-success">Published</span>' : '<span class="badge badge-warning">Draft</span>'}</td>
                 <td>
                     <button class="btn btn-xs btn-primary" onclick="openPublishPanel(${p.id})"><i class="fas fa-users-cog"></i> Manage</button>
-                    ${p.admit_pdf_url ? `<button class="btn btn-xs btn-outline" onclick="window.open('${esc(p.admit_pdf_url)}', '_blank')"><i class="fas fa-file-pdf"></i> PDF</button>` : ""}
+                    ${p.admit_pdf_url ? `<button class="btn btn-xs btn-outline" onclick="window.open('${esc(p.admit_pdf_url)}', '_blank')"><i class="fas fa-file-pdf"></i></button>` : ""}
                     <button class="btn btn-xs btn-danger" onclick="deleteRecord(${p.id})"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>`).join("");
@@ -542,7 +590,7 @@ async function loadList() {
 }
 
 async function deleteRecord(id) {
-    if (!confirm("Delete this admit card record? PDF file bhi delete ho jayegi.")) return;
+    if (!confirm("Delete this record? PDF bhi Cloudinary se delete ho jayegi.")) return;
     try {
         await apiCall(`${API}/${id}`, { method: "DELETE" });
         showToast("Deleted ✅", "success");
@@ -563,7 +611,7 @@ async function openPublishPanel(id) {
         state.filteredPublishStudents = data.students;
         state.selectedIds.clear();
 
-        $("#publishInfo").innerHTML = `<strong>${esc(data.data.examination_type)}</strong> &nbsp;|&nbsp; Class: <b>${esc(data.data.class)}${["11","12"].includes(String(data.data.class)) ? " · " + esc(data.data.stream) : ""}</b> &nbsp;|&nbsp; Exam Session: <b>${esc(data.data.exam_session)}</b>`;
+        $("#publishInfo").innerHTML = `<strong>${esc(data.data.examination_type)}</strong> | Class: <b>${esc(data.data.class)}${["11","12"].includes(String(data.data.class)) ? " · " + esc(data.data.stream) : ""}</b> | Exam Session: <b>${esc(data.data.exam_session)}</b>`;
 
         applyPubFilter();
     } catch (e) { showToast(e.message, "error"); }
@@ -594,14 +642,13 @@ function resetPubFilter() {
 
 function renderPublishTable() {
     const tbody = $("#pubBody");
-    const examId = state.currentPublishId;
 
     $("#pubTotal").textContent = state.currentPublishStudents.length;
     $("#pubPublished").textContent = state.currentPublishStudents.filter(s => s.is_enabled).length;
     $("#pubShowing").textContent = state.filteredPublishStudents.length;
 
     if (!state.filteredPublishStudents.length) {
-        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No students match filters.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No students match filters.</td></tr>';
         return;
     }
 
@@ -611,13 +658,15 @@ function renderPublishTable() {
         return `
         <tr class="${selected ? "selected" : ""}">
             <td><input type="checkbox" class="row-select" data-sid="${esc(s.student_id)}" ${selected ? "checked" : ""} onchange="onPubSelect(this)"></td>
-            <td><b>${esc(s.roll_number || "—")}</b></td>
+            <td><b>${esc(s.acs_roll || s.roll_number || "—")}</b></td>
             <td>${esc(s.name)}</td>
             <td>${esc(s.student_id)}</td>
+            <td>${esc(s.father_name || "—")}</td>
+            <td>${esc(s.gender || "—")}</td>
             <td>${s.student_photo_url ? `<img src="${esc(s.student_photo_url)}" class="student-photo-thumb">` : `<div class="student-photo-ph">👤</div>`}</td>
             <td>${published ? '<span class="badge badge-success">Published</span>' : '<span class="badge badge-warning">Pending</span>'}</td>
             <td>
-                ${published ? `<button class="btn btn-xs btn-outline" onclick="unpublishOne('${esc(s.student_id)}')"><i class="fas fa-undo"></i> Unpublish</button>` : `<button class="btn btn-xs btn-success" onclick="publishOne('${esc(s.student_id)}')"><i class="fas fa-paper-plane"></i> Publish</button>`}
+                ${published ? `<button class="btn btn-xs btn-outline" onclick="unpublishOne('${esc(s.student_id)}')"><i class="fas fa-undo"></i></button>` : `<button class="btn btn-xs btn-success" onclick="publishOne('${esc(s.student_id)}')"><i class="fas fa-paper-plane"></i></button>`}
             </td>
         </tr>`;
     }).join("");
@@ -669,7 +718,7 @@ async function bulkUnpublishSelected() {
 }
 
 async function publishAll() {
-    if (!confirm("Publish admit cards for ALL students of this class?")) return;
+    if (!confirm("Publish admit cards for ALL students?")) return;
     try {
         const res = await apiCall(`${API}/${state.currentPublishId}/publish`, {
             method: "POST",
