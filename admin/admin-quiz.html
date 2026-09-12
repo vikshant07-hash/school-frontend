@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Manager - Admin | GSSS Shilla</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root { --bg:#f5f7fb;--bg-white:#fff;--text-primary:#1a2332;--text-secondary:#5a6a7e;--text-muted:#94a3b8;--gold:#c9972b;--gold-light:#e8b84b;--gold-bg:#fef8ed;--blue:#4a8af4;--blue-bg:#eef4ff;--green:#10b981;--green-bg:#ecfdf5;--purple:#8b5cf6;--purple-bg:#f5f0ff;--pink:#ec4899;--pink-bg:#fdf2f8;--orange:#f59e0b;--orange-bg:#fffbeb;--red:#ef4444;--border:#e8edf8;--shadow:0 2px 12px rgba(0,0,0,0.04);--shadow-hover:0 8px 30px rgba(0,0,0,0.08);--radius:16px;--radius-sm:10px;--transition:all 0.3s cubic-bezier(0.4,0,0.2,1); }
+* { margin:0;padding:0;box-sizing:border-box; }
+body { font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primary);min-height:100vh;display:flex;flex-direction:column; }
+
+.navbar { background:var(--bg-white);border-bottom:1px solid var(--border);padding:0 32px;height:68px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow); }
+.navbar .brand { display:flex;align-items:center;gap:12px;text-decoration:none; }
+.navbar .brand .logo-placeholder { width:42px;height:42px;border-radius:var(--radius-sm);background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden; }
+.navbar .brand .logo-placeholder img { width:46px;height:46px;border-radius:10px;object-fit:contain;padding:4px; }
+.navbar .brand .name { font-size:16px;font-weight:700; }
+.navbar .brand .name span { color:var(--gold); }
+.nav-links { display:flex;gap:8px;list-style:none; }
+.nav-links a { text-decoration:none;color:var(--text-secondary);padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;transition:var(--transition); }
+.nav-links a:hover { background:var(--bg);color:var(--text-primary); }
+.nav-links a.active { background:var(--gold-bg);color:var(--gold); }
+.nav-links a i { margin-right:6px; }
+.nav-right { display:flex;align-items:center;gap:12px; }
+.admin-badge { display:flex;align-items:center;gap:8px;padding:6px 14px 6px 10px;background:var(--bg);border-radius:50px;font-size:12px;font-weight:600;color:var(--text-secondary); }
+.avatar { width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff; }
+.online-dot { width:6px;height:6px;border-radius:50%;background:var(--green); }
+
+.main-container { flex:1;max-width:1400px;margin:0 auto;padding:24px 32px 40px;width:100%; }
+.page-header { display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:22px;padding:20px 26px;background:var(--bg-white);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow); }
+.page-header h1 { font-size:20px;font-weight:700;display:flex;align-items:center;gap:10px; }
+.page-header h1 i { color:var(--gold); }
+.page-header .subtitle { font-size:12px;color:var(--text-secondary);margin-top:4px; }
+
+.btn { display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;transition:var(--transition);font-family:'Inter',sans-serif; }
+.btn:disabled { opacity:0.6;cursor:not-allowed; }
+.btn-primary { background:var(--gold);color:#fff; } .btn-primary:hover:not(:disabled) { background:var(--gold-light); }
+.btn-success { background:var(--green);color:#fff; } .btn-success:hover:not(:disabled) { background:#059669; }
+.btn-danger { background:var(--red);color:#fff; } .btn-danger:hover:not(:disabled) { background:#dc2626; }
+.btn-warning { background:var(--orange);color:#fff; } .btn-warning:hover:not(:disabled) { background:#d97706; }
+.btn-outline { background:var(--bg);color:var(--text-secondary);border:1px solid var(--border); } .btn-outline:hover:not(:disabled) { background:var(--border); }
+.btn-sm { padding:6px 14px;font-size:12px;border-radius:8px; }
+.btn-xs { padding:4px 10px;font-size:11px;border-radius:6px; }
+
+.tabs { display:flex;gap:4px;margin-bottom:20px;background:var(--bg-white);padding:6px;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);flex-wrap:wrap; }
+.tab-btn { padding:10px 22px;border:none;background:transparent;border-radius:var(--radius-sm);cursor:pointer;font-weight:600;font-size:13px;color:var(--text-secondary);transition:var(--transition);font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:6px; }
+.tab-btn:hover { background:var(--bg); }
+.tab-btn.active { background:var(--gold);color:#fff; }
+.tab-content { display:none; } .tab-content.active { display:block; }
+
+.card-panel { background:var(--bg-white);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:22px 26px;margin-bottom:20px; }
+.card-panel h3 { font-size:15px;font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--gold-bg);display:flex;align-items:center;gap:8px; }
+.card-panel h3 i { color:var(--gold); }
+
+.form-grid { display:grid;grid-template-columns:1fr 1fr;gap:14px; }
+.form-grid.three { grid-template-columns:1fr 1fr 1fr; }
+.form-grid.four { grid-template-columns:1fr 1fr 1fr 1fr; }
+.form-grid label, .full-label { display:flex;flex-direction:column;font-size:12px;font-weight:600;color:var(--text-secondary);gap:6px; }
+.form-grid input, .form-grid select, .form-grid textarea, .full-label input, .full-label textarea { padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:13px;background:var(--bg);outline:none;transition:var(--transition);color:var(--text-primary);width:100%; }
+.form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus, .full-label input:focus, .full-label textarea:focus { border-color:var(--gold);background:#fff; }
+.req-star { color:var(--red); }
+
+table.data-table { width:100%;border-collapse:collapse;font-size:13px; }
+table.data-table thead th { background:var(--bg);padding:11px 14px;text-align:left;font-weight:600;color:var(--text-secondary);border-bottom:2px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap; }
+table.data-table tbody td { padding:11px 14px;border-bottom:1px solid var(--border);color:var(--text-primary); }
+table.data-table tbody tr:hover td { background:#f8fafc; }
+.table-wrapper { overflow-x:auto;border-radius:var(--radius-sm);border:1px solid var(--border); }
+
+.badge { display:inline-block;padding:3px 12px;border-radius:50px;font-size:11px;font-weight:700;white-space:nowrap; }
+.badge-success { background:var(--green-bg);color:var(--green); }
+.badge-warning { background:var(--orange-bg);color:var(--orange); }
+.badge-info { background:var(--blue-bg);color:var(--blue); }
+.badge-danger { background:#fee2e2;color:var(--red); }
+.badge-live { background:var(--red);color:#fff; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+.empty-state { text-align:center;padding:50px 20px;color:var(--text-muted);font-size:13px; }
+.empty-state i { font-size:42px;color:var(--gold);opacity:0.4;display:block;margin-bottom:10px; }
+
+.question-item { background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px; }
+.question-item .q-num { display:inline-block;background:var(--gold);color:#fff;font-weight:800;font-size:11px;padding:2px 10px;border-radius:6px;margin-bottom:8px; }
+
+.toast-container { position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px; }
+.toast { padding:14px 22px;border-radius:var(--radius-sm);color:#fff;font-weight:600;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,0.15);min-width:250px;animation:slideIn 0.3s ease; }
+.toast-success { background:var(--green); } .toast-error { background:var(--red); }
+.toast-warning { background:var(--orange); } .toast-info { background:var(--text-primary); }
+@keyframes slideIn { from { opacity:0;transform:translateX(40px); } to { opacity:1;transform:translateX(0); } }
+
+.footer { background:var(--bg-white);border-top:1px solid var(--border);padding:18px 32px;text-align:center;font-size:13px;color:var(--text-muted); }
+.hidden { display:none !important; }
+
+@media (max-width:768px) {
+    .navbar { padding:0 14px; }
+    .nav-links { display:none; }
+    .main-container { padding:14px; }
+    .form-grid, .form-grid.three, .form-grid.four { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="#" class="brand">
+        <div class="logo-placeholder"><img src="logo(1).png" alt="Logo"></div>
+        <div class="name">GSSS<span> SHILLA</span></div>
+    </a>
+    <ul class="nav-links">
+        <li><a href="admin-students.html"><i class="fas fa-users"></i> Students</a></li>
+        <li><a href="admin-quiz.html" class="active"><i class="fas fa-question-circle"></i> Quiz</a></li>
+    </ul>
+    <div class="nav-right">
+        <div class="admin-badge">
+            <span class="avatar" id="adminAvatar">🛡️</span>
+            <span id="adminName">Admin</span>
+            <span class="online-dot"></span>
+        </div>
+    </div>
+</nav>
+
+<div class="main-container">
+    <div class="page-header">
+        <div>
+            <h1><i class="fas fa-question-circle"></i> Quiz Manager</h1>
+            <div class="subtitle">Create quizzes, add questions, go live, manage attempts</div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-primary" onclick="openCreateModal()"><i class="fas fa-plus"></i> Create Quiz Event</button>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="events" onclick="switchTab('events')"><i class="fas fa-list"></i> Events</button>
+    </div>
+
+    <!-- EVENTS TAB -->
+    <div id="tab-events" class="tab-content active">
+        <div class="card-panel">
+            <h3><i class="fas fa-filter"></i> Filters</h3>
+            <div class="form-grid three">
+                <label>Class <select id="filterClass" onchange="loadEvents()"><option value="">All Classes</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select></label>
+                <label>Status <select id="filterStatus" onchange="loadEvents()"><option value="">All Status</option><option>Draft</option><option>Scheduled</option><option>Live</option><option>Ended</option></select></label>
+                <label style="justify-content:flex-end;"><button class="btn btn-outline" onclick="loadEvents()"><i class="fas fa-sync-alt"></i> Refresh</button></label>
+            </div>
+        </div>
+
+        <div id="eventsLoading" class="empty-state"><i class="fas fa-spinner fa-spin"></i><br>Loading events…</div>
+        <div id="eventsEmpty" class="empty-state hidden"><i class="fas fa-question-circle"></i><br>No quiz events yet. Create one!</div>
+        <div id="eventsContainer"></div>
+    </div>
+</div>
+
+<!-- CREATE EVENT MODAL -->
+<div class="modal-overlay hidden" id="createModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);z-index:1000;justify-content:center;align-items:center;padding:20px;">
+    <div style="background:var(--bg-white);border-radius:var(--radius);max-width:780px;width:100%;max-height:92vh;overflow-y:auto;padding:28px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--border);padding-bottom:14px;margin-bottom:18px;">
+            <h2 style="font-size:18px;font-weight:700;"><i class="fas fa-plus-circle" style="color:var(--gold);"></i> Create Quiz Event</h2>
+            <button onclick="closeCreateModal()" style="background:none;border:none;font-size:24px;color:var(--text-muted);cursor:pointer;">&times;</button>
+        </div>
+
+        <form id="eventForm">
+            <div class="form-grid">
+                <label>Quiz Title <span class="req-star">*</span><input type="text" name="title" required placeholder="GK Quiz 2025"></label>
+                <label>Class <span class="req-star">*</span>
+                    <select name="class" id="formClass" required onchange="onFormClassChange()">
+                        <option value="">Select Class</option>
+                        <option>1</option><option>2</option><option>3</option><option>4</option>
+                        <option>5</option><option>6</option><option>7</option><option>8</option>
+                        <option>9</option><option>10</option><option>11</option><option>12</option>
+                    </select>
+                </label>
+                <label>Stream (for 11/12)
+                    <select name="stream" id="formStream" disabled>
+                        <option value="Non-Specialized">Non-Specialized</option>
+                        <option>Science</option><option>Commerce</option><option>Arts</option>
+                    </select>
+                </label>
+                <label>Language
+                    <select name="language">
+                        <option value="English">English</option>
+                        <option value="Hindi">Hindi</option>
+                        <option value="Both">Both (Hindi + English)</option>
+                    </select>
+                </label>
+                <label>Duration (minutes) <span class="req-star">*</span><input type="number" name="durationMinutes" required min="1" max="180" value="30"></label>
+                <label>Total Questions <span class="req-star">*</span><input type="number" name="totalQuestions" required min="20" max="100" value="20"><small style="font-size:10px;color:var(--text-muted);font-weight:400;">Minimum 20</small></label>
+                <label>Pass Percentage <input type="number" name="passPercentage" min="0" max="100" value="40"></label>
+                <label>Scheduled At (optional)<input type="datetime-local" name="scheduledAt"></label>
+            </div>
+            <label class="full-label" style="margin-top:12px;">Description<textarea name="description" rows="2" placeholder="Brief description..."></textarea></label>
+
+            <div style="display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border);padding-top:16px;margin-top:20px;">
+                <button type="button" class="btn btn-outline" onclick="closeCreateModal()">Cancel</button>
+                <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Create Event</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<footer class="footer"><span>&copy; 2026 Govt. Sr. Sec. School Shilla. All rights reserved.</span></footer>
+
+<script>
+const QUIZ_API = "https://gsssshilla.onrender.com/api/quiz";
+
+const $ = (s) => document.querySelector(s);
+const state = { events: [] };
+
+function esc(v) {
+    return v === null || v === undefined ? "" : String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+}
+function showToast(msg, type="info") {
+    const c = $("#toastContainer");
+    const t = document.createElement("div");
+    t.className = `toast toast-${type}`;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => { t.style.opacity="0"; setTimeout(() => t.remove(), 400); }, 4000);
+}
+function getAuthHeaders() {
+    const token = localStorage.getItem("adminToken");
+    if (!token) { alert("Please login"); window.location.href="login.html"; return null; }
+    return { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" };
+}
+async function apiCall(url, options={}) {
+    const headers = getAuthHeaders();
+    if (!headers) throw new Error("Not authenticated");
+    const res = await fetch(url, { ...options, headers: { ...headers, ...(options.headers||{}) } });
+    const text = await res.text();
+    let data;
+    try { data = text ? JSON.parse(text) : {}; } catch (e) { throw new Error("Invalid response"); }
+    if (!res.ok) throw new Error(data.message || `Failed (${res.status})`);
+    return data;
+}
+
+function switchTab(tab) {
+    document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+    document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+    document.getElementById(`tab-${tab}`).classList.add("active");
+    document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add("active");
+}
+
+/* CREATE MODAL */
+function openCreateModal() { $("#createModal").classList.remove("hidden"); }
+function closeCreateModal() { $("#createModal").classList.add("hidden"); $("#eventForm").reset(); onFormClassChange(); }
+
+function onFormClassChange() {
+    const cls = $("#formClass").value;
+    const stream = $("#formStream");
+    if (["11","12"].includes(cls)) { stream.disabled = false; if (!stream.value || stream.value === "Non-Specialized") stream.value = "Science"; }
+    else { stream.disabled = true; stream.value = "Non-Specialized"; }
+}
+
+$("#eventForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const body = {};
+    fd.forEach((v, k) => body[k] = v);
+
+    try {
+        const res = await apiCall(`${QUIZ_API}/events`, { method: "POST", body: JSON.stringify(body) });
+        showToast(res.message || "Event created ✅", "success");
+        closeCreateModal();
+        loadEvents();
+    } catch (err) {
+        showToast(err.message, "error");
+    }
+});
+
+/* LOAD EVENTS */
+async function loadEvents() {
+    $("#eventsLoading").classList.remove("hidden");
+    $("#eventsEmpty").classList.add("hidden");
+    $("#eventsContainer").innerHTML = "";
+
+    try {
+        const params = new URLSearchParams();
+        const cls = $("#filterClass").value;
+        const st = $("#filterStatus").value;
+        if (cls) params.set("class", cls);
+        if (st) params.set("status", st);
+
+        const data = await apiCall(`${QUIZ_API}/events?${params}`);
+        state.events = data.data || [];
+        $("#eventsLoading").classList.add("hidden");
+
+        if (!state.events.length) {
+            $("#eventsEmpty").classList.remove("hidden");
+            return;
+        }
+
+        $("#eventsContainer").innerHTML = state.events.map(e => {
+            const statusBadge = e.status === "Live" ? '<span class="badge badge-live">🔴 LIVE</span>' :
+                e.status === "Ended" ? '<span class="badge badge-info">Ended</span>' :
+                e.status === "Scheduled" ? '<span class="badge badge-warning">Scheduled</span>' :
+                '<span class="badge badge-warning">Draft</span>';
+            return `
+            <div class="card-panel" style="border-left:4px solid ${e.status === "Live" ? "#ef4444" : "#c9972b"};">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+                    <div style="flex:1;min-width:240px;">
+                        <h2 style="font-size:17px;font-weight:800;margin-bottom:4px;">${esc(e.title)}</h2>
+                        <div style="font-size:12px;color:var(--text-secondary);">${esc(e.description || "")}</div>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:11.5px;color:var(--text-muted);">
+                            <span><b>Class:</b> ${esc(e.class)}${["11","12"].includes(String(e.class)) ? " · " + esc(e.stream) : ""}</span>
+                            <span><b>Duration:</b> ${e.duration_minutes} min</span>
+                            <span><b>Questions:</b> ${e.questions_count || 0}/${e.total_questions}</span>
+                            <span><b>Attempts:</b> ${e.attempts_count || 0}</span>
+                            <span><b>Language:</b> ${esc(e.language)}</span>
+                        </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+                        ${statusBadge}
+                    </div>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:12px;">
+                    <button class="btn btn-primary btn-sm" onclick="manageQuestions(${e.id})"><i class="fas fa-list-ol"></i> Questions</button>
+                    ${e.status !== "Live" ? `<button class="btn btn-success btn-sm" onclick="goLive(${e.id})"><i class="fas fa-play"></i> Go Live</button>` : ""}
+                    ${e.status === "Live" ? `<button class="btn btn-warning btn-sm" onclick="endQuiz(${e.id})"><i class="fas fa-stop"></i> End Quiz</button>` : ""}
+                    <button class="btn btn-outline btn-sm" onclick="viewAttempts(${e.id})"><i class="fas fa-users"></i> Attempts (${e.attempts_count || 0})</button>
+                    ${e.attempts_count > 0 ? `<button class="btn btn-outline btn-sm" onclick="resetQuiz(${e.id})"><i class="fas fa-undo"></i> Reset All</button>` : ""}
+                    <button class="btn btn-danger btn-sm" onclick="deleteEvent(${e.id})"><i class="fas fa-trash"></i> Delete</button>
+                </div>
+            </div>`;
+        }).join("");
+    } catch (err) {
+        $("#eventsLoading").classList.add("hidden");
+        showToast(err.message, "error");
+    }
+}
+
+async function goLive(id) {
+    if (!confirm("Start this quiz now? Students will be able to attempt it immediately.")) return;
+    try {
+        const res = await apiCall(`${QUIZ_API}/events/${id}/go-live`, { method: "POST" });
+        showToast(res.message, "success");
+        loadEvents();
+    } catch (err) { showToast(err.message, "error"); }
+}
+
+async function endQuiz(id) {
+    if (!confirm("End this quiz? All in-progress attempts will be auto-submitted.")) return;
+    try {
+        const res = await apiCall(`${QUIZ_API}/events/${id}/end`, { method: "POST" });
+        showToast(res.message, "success");
+        loadEvents();
+    } catch (err) { showToast(err.message, "error"); }
+}
+
+async function resetQuiz(id) {
+    if (!confirm("Reset this event? All student attempts will be deleted. This cannot be undone.")) return;
+    try {
+        const res = await apiCall(`${QUIZ_API}/events/${id}/reset`, { method: "POST" });
+        showToast(res.message, "success");
+        loadEvents();
+    } catch (err) { showToast(err.message, "error"); }
+}
+
+async function deleteEvent(id) {
+    if (!confirm("Delete this quiz permanently? All questions and attempts will be removed.")) return;
+    try {
+        const res = await apiCall(`${QUIZ_API}/events/${id}`, { method: "DELETE" });
+        showToast(res.message, "success");
+        loadEvents();
+    } catch (err) { showToast(err.message, "error"); }
+}
+
+function manageQuestions(id) {
+    window.location.href = `admin-quiz-questions.html?id=${id}`;
+}
+
+function viewAttempts(id) {
+    window.location.href = `admin-quiz-attempts.html?id=${id}`;
+}
+
+/* INIT */
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const token = localStorage.getItem("adminToken");
+        if (!token) { window.location.href = "login.html"; return; }
+        const res = await fetch("https://gsssshilla.onrender.com/api/admin/verify", { headers: { Authorization: `Bearer ${token}` } });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.admin?.username) {
+                $("#adminAvatar").textContent = data.admin.username.charAt(0).toUpperCase();
+                $("#adminName").textContent = data.admin.username;
+            }
+        }
+    } catch (e) {}
+    loadEvents();
+});
+</script>
+</body>
+</html>
