@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Questions - Admin | GSSS Shilla</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root { --bg:#f5f7fb;--bg-white:#fff;--text-primary:#1a2332;--text-secondary:#5a6a7e;--text-muted:#94a3b8;--gold:#c9972b;--gold-light:#e8b84b;--gold-bg:#fef8ed;--blue:#4a8af4;--blue-bg:#eef4ff;--green:#10b981;--green-bg:#ecfdf5;--orange:#f59e0b;--orange-bg:#fffbeb;--red:#ef4444;--border:#e8edf8;--shadow:0 2px 12px rgba(0,0,0,0.04);--radius:16px;--radius-sm:10px;--transition:all 0.3s cubic-bezier(0.4,0,0.2,1); }
+* { margin:0;padding:0;box-sizing:border-box; }
+body { font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primary);min-height:100vh;padding-bottom:100px; }
+
+.topbar { background:var(--bg-white);border-bottom:1px solid var(--border);padding:0 32px;height:68px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow); }
+.topbar .brand { display:flex;align-items:center;gap:12px; }
+.topbar .brand .name { font-size:15px;font-weight:700; }
+.topbar .brand .name span { color:var(--gold); }
+.topbar .info { font-size:12px;color:var(--text-secondary); }
+.topbar .info b { color:var(--text-primary); }
+.topbar .info .pill { background:var(--gold-bg);color:var(--gold);padding:3px 10px;border-radius:10px;font-weight:700;margin-left:8px; }
+
+.main-container { max-width:1400px;margin:0 auto;padding:24px 32px; }
+
+.btn { display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;transition:var(--transition);font-family:'Inter',sans-serif; }
+.btn-primary { background:var(--gold);color:#fff; } .btn-primary:hover { background:var(--gold-light); }
+.btn-success { background:var(--green);color:#fff; } .btn-success:hover { background:#059669; }
+.btn-danger { background:var(--red);color:#fff; } .btn-danger:hover { background:#dc2626; }
+.btn-outline { background:var(--bg);color:var(--text-secondary);border:1px solid var(--border); } .btn-outline:hover { background:var(--border); }
+.btn-sm { padding:6px 14px;font-size:12px;border-radius:8px; }
+
+.q-card { background:var(--bg-white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--shadow);position:relative; }
+.q-card .q-head { display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border); }
+.q-card .q-num { background:var(--gold);color:#fff;font-size:12px;font-weight:800;padding:4px 12px;border-radius:8px; }
+.q-card .q-actions { display:flex;gap:6px; }
+.q-card textarea, .q-card input, .q-card select { width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Inter';font-size:13px;background:var(--bg);outline:none;transition:var(--transition); }
+.q-card textarea:focus, .q-card input:focus, .q-card select:focus { border-color:var(--gold);background:#fff; }
+.q-card label { display:block;font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;margin-top:10px; }
+
+.options-grid { display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px; }
+
+.section-title { font-size:14px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin:20px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--gold-bg); }
+
+.sticky-actions { position:fixed;bottom:0;left:0;right:0;background:var(--bg-white);border-top:1px solid var(--border);padding:14px 32px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 -4px 20px rgba(0,0,0,0.08);z-index:50; }
+
+.toast-container { position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px; }
+.toast { padding:14px 22px;border-radius:var(--radius-sm);color:#fff;font-weight:600;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,0.15);min-width:250px;animation:slideIn 0.3s ease; }
+.toast-success { background:var(--green); } .toast-error { background:var(--red); }
+.toast-info { background:var(--text-primary); }
+@keyframes slideIn { from { opacity:0;transform:translateX(40px); } to { opacity:1;transform:translateX(0); } }
+
+@media (max-width:768px) {
+    .main-container { padding:14px; }
+    .options-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="brand">
+        <div class="name">GSSS<span> SHILLA</span> · Question Manager</div>
+    </div>
+    <div class="info">
+        <span id="eventInfo">Loading…</span>
+        <span class="pill" id="qCount">0 questions</span>
+    </div>
+    <div>
+        <a href="admin-quiz.html" class="btn btn-outline btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+    </div>
+</div>
+
+<div class="main-container" id="mainContainer">
+    <div style="text-align:center;padding:60px;"><i class="fas fa-spinner fa-spin" style="font-size:32px;color:var(--gold);"></i><p style="margin-top:10px;color:var(--text-muted);">Loading…</p></div>
+</div>
+
+<div class="sticky-actions">
+    <div><b id="statusText">0 questions added</b> · <span style="font-size:12px;color:var(--text-muted);">Minimum 20 required</span></div>
+    <div style="display:flex;gap:10px;">
+        <button class="btn btn-outline" onclick="addQuestion()"><i class="fas fa-plus"></i> Add Question</button>
+        <button class="btn btn-success" onclick="saveAllQuestions()" id="btnSave"><i class="fas fa-save"></i> Save All Questions</button>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const QUIZ_API = "https://gsssshilla.onrender.com/api/quiz";
+
+const params = new URLSearchParams(location.search);
+const eventId = params.get("id");
+
+const $ = (s) => document.querySelector(s);
+let eventData = null;
+let questions = [];
+
+function esc(v) {
+    return v === null || v === undefined ? "" : String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+}
+function showToast(msg, type="info") {
+    const c = $("#toastContainer");
+    const t = document.createElement("div");
+    t.className = `toast toast-${type}`;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => { t.style.opacity="0"; setTimeout(() => t.remove(), 400); }, 4000);
+}
+function getAuthHeaders() {
+    const token = localStorage.getItem("adminToken");
+    if (!token) { alert("Please login"); window.location.href="login.html"; return null; }
+    return { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" };
+}
+async function apiCall(url, options={}) {
+    const headers = getAuthHeaders();
+    if (!headers) throw new Error("Not authenticated");
+    const res = await fetch(url, { ...options, headers: { ...headers, ...(options.headers||{}) } });
+    const text = await res.text();
+    let data;
+    try { data = text ? JSON.parse(text) : {}; } catch (e) { throw new Error("Invalid response"); }
+    if (!res.ok) throw new Error(data.message || `Failed (${res.status})`);
+    return data;
+}
+
+/* INIT */
+async function loadData() {
+    if (!eventId) { alert("Event ID missing"); window.location.href = "admin-quiz.html"; return; }
+
+    try {
+        const res = await apiCall(`${QUIZ_API}/events/${eventId}`);
+        eventData = res.data;
+        questions = (res.questions || []).map(q => ({
+            questionEn: q.question_en,
+            questionHi: q.question_hi || "",
+            optionAEn: q.option_a_en,
+            optionBEn: q.option_b_en,
+            optionCEn: q.option_c_en,
+            optionDEn: q.option_d_en,
+            optionAHi: q.option_a_hi || "",
+            optionBHi: q.option_b_hi || "",
+            optionCHi: q.option_c_hi || "",
+            optionDHi: q.option_d_hi || "",
+            correctAnswer: q.correct_answer,
+            explanationEn: q.explanation_en || "",
+            explanationHi: q.explanation_hi || ""
+        }));
+
+        $("#eventInfo").innerHTML = `<b>${esc(eventData.title)}</b> · Class ${esc(eventData.class)}${["11","12"].includes(String(eventData.class)) ? " · " + esc(eventData.stream) : ""} · ${eventData.duration_minutes} min`;
+        $("#qCount").textContent = `${questions.length} questions`;
+
+        // Auto-populate if empty and language is Both/Hindi
+        if (!questions.length) {
+            for (let i = 0; i < 20; i++) addQuestion(true);
+        }
+
+        renderQuestions();
+        updateStatus();
+    } catch (err) {
+        showToast(err.message, "error");
+    }
+}
+
+function renderQuestions() {
+    const isHindi = eventData && (eventData.language === "Hindi" || eventData.language === "Both");
+    const isEnglish = eventData && (eventData.language === "English" || eventData.language === "Both");
+
+    $("#mainContainer").innerHTML = questions.map((q, i) => `
+        <div class="q-card" data-idx="${i}">
+            <div class="q-head">
+                <span class="q-num">Question ${i + 1}</span>
+                <div class="q-actions">
+                    <button class="btn btn-outline btn-sm" onclick="moveQuestion(${i}, -1)" title="Move up"><i class="fas fa-arrow-up"></i></button>
+                    <button class="btn btn-outline btn-sm" onclick="moveQuestion(${i}, 1)" title="Move down"><i class="fas fa-arrow-down"></i></button>
+                    <button class="btn btn-danger btn-sm" onclick="removeQuestion(${i})"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+
+            ${isEnglish ? `
+                <label>Question (English) *</label>
+                <textarea rows="2" oninput="updateField(${i}, 'questionEn', this.value)" placeholder="Enter question in English">${esc(q.questionEn)}</textarea>
+            ` : ""}
+
+            ${isHindi ? `
+                <label>Question (Hindi)</label>
+                <textarea rows="2" oninput="updateField(${i}, 'questionHi', this.value)" placeholder="प्रश्न हिंदी में लिखें">${esc(q.questionHi)}</textarea>
+            ` : ""}
+
+            <label>Options (English)</label>
+            <div class="options-grid">
+                <div><span style="font-size:11px;font-weight:700;color:#16a34a;">A</span> <input type="text" value="${esc(q.optionAEn)}" oninput="updateField(${i}, 'optionAEn', this.value)" placeholder="Option A"></div>
+                <div><span style="font-size:11px;font-weight:700;color:#16a34a;">B</span> <input type="text" value="${esc(q.optionBEn)}" oninput="updateField(${i}, 'optionBEn', this.value)" placeholder="Option B"></div>
+                <div><span style="font-size:11px;font-weight:700;color:#16a34a;">C</span> <input type="text" value="${esc(q.optionCEn)}" oninput="updateField(${i}, 'optionCEn', this.value)" placeholder="Option C"></div>
+                <div><span style="font-size:11px;font-weight:700;color:#16a34a;">D</span> <input type="text" value="${esc(q.optionDEn)}" oninput="updateField(${i}, 'optionDEn', this.value)" placeholder="Option D"></div>
+            </div>
+
+            ${isHindi ? `
+                <label>Options (Hindi)</label>
+                <div class="options-grid">
+                    <div><span style="font-size:11px;font-weight:700;color:#16a34a;">A</span> <input type="text" value="${esc(q.optionAHi)}" oninput="updateField(${i}, 'optionAHi', this.value)" placeholder="विकल्प A"></div>
+                    <div><span style="font-size:11px;font-weight:700;color:#16a34a;">B</span> <input type="text" value="${esc(q.optionBHi)}" oninput="updateField(${i}, 'optionBHi', this.value)" placeholder="विकल्प B"></div>
+                    <div><span style="font-size:11px;font-weight:700;color:#16a34a;">C</span> <input type="text" value="${esc(q.optionCHi)}" oninput="updateField(${i}, 'optionCHi', this.value)" placeholder="विकल्प C"></div>
+                    <div><span style="font-size:11px;font-weight:700;color:#16a34a;">D</span> <input type="text" value="${esc(q.optionDHi)}" oninput="updateField(${i}, 'optionDHi', this.value)" placeholder="विकल्प D"></div>
+                </div>
+            ` : ""}
+
+            <label style="margin-top:14px;">Correct Answer *</label>
+            <select onchange="updateField(${i}, 'correctAnswer', this.value)">
+                <option value="A" ${q.correctAnswer === "A" ? "selected" : ""}>Option A</option>
+                <option value="B" ${q.correctAnswer === "B" ? "selected" : ""}>Option B</option>
+                <option value="C" ${q.correctAnswer === "C" ? "selected" : ""}>Option C</option>
+                <option value="D" ${q.correctAnswer === "D" ? "selected" : ""}>Option D</option>
+            </select>
+        </div>
+    `).join("");
+}
+
+function updateField(idx, field, value) {
+    if (questions[idx]) questions[idx][field] = value;
+}
+
+function addQuestion(silent) {
+    questions.push({
+        questionEn: "", questionHi: "",
+        optionAEn: "", optionBEn: "", optionCEn: "", optionDEn: "",
+        optionAHi: "", optionBHi: "", optionCHi: "", optionDHi: "",
+        correctAnswer: "A",
+        explanationEn: "", explanationHi: ""
+    });
+    if (!silent) {
+        renderQuestions();
+        updateStatus();
+        // Scroll to new question
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+}
+
+function removeQuestion(idx) {
+    if (!confirm(`Delete Question ${idx + 1}?`)) return;
+    questions.splice(idx, 1);
+    renderQuestions();
+    updateStatus();
+}
+
+function moveQuestion(idx, dir) {
+    const newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= questions.length) return;
+    [questions[idx], questions[newIdx]] = [questions[newIdx], questions[idx]];
+    renderQuestions();
+    updateStatus();
+}
+
+function updateStatus() {
+    $("#statusText").textContent = `${questions.length} question${questions.length !== 1 ? "s" : ""} added`;
+}
+
+async function saveAllQuestions() {
+    if (questions.length < 20) {
+        showToast(`Minimum 20 questions required. Currently ${questions.length}.`, "warning");
+        return;
+    }
+
+    // Validate all filled
+    for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        if (!q.questionEn && !q.questionHi) { showToast(`Question ${i + 1}: Question text required`, "error"); return; }
+        if (!q.optionAEn || !q.optionBEn || !q.optionCEn || !q.optionDEn) {
+            if (eventData.language === "Hindi" && q.optionAHi && q.optionBHi && q.optionCHi && q.optionDHi) {
+                // Hindi only is fine
+            } else {
+                showToast(`Question ${i + 1}: All 4 options required`, "error");
+                return;
+            }
+        }
+    }
+
+    const btn = $("#btnSave");
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+
+    try {
+        const res = await apiCall(`${QUIZ_API}/events/${eventId}/questions`, {
+            method: "POST",
+            body: JSON.stringify({ questions })
+        });
+        showToast(res.message, "success");
+        $("#qCount").textContent = `${res.count} questions`;
+    } catch (err) {
+        showToast(err.message, "error");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save"></i> Save All Questions';
+    }
+}
+
+document.addEventListener("DOMContentLoaded", loadData);
+</script>
+</body>
+</html>
