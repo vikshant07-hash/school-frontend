@@ -174,7 +174,7 @@ table.data-table tbody tr:hover td { background:#f8fafc; }
                 <label>Stream <select name="stream" id="formStream" disabled><option value="Non-Specialized">Non-Specialized</option><option>Science</option><option>Commerce</option><option>Arts</option></select></label>
                 <label>Language <select name="language"><option>English</option><option>Hindi</option><option>Both</option></select></label>
                 <label>Duration (minutes) <span class="req-star">*</span><input type="number" name="durationMinutes" min="1" max="180" value="30" required></label>
-                <label>Total Questions <span class="req-star">*</span><input type="number" name="totalQuestions" min="20" max="100" value="20" required><small style="font-size:10px;color:var(--text-muted);">Minimum 20</small></label>
+                <label>Total Questions <span class="req-star">*</span><input type="number" name="totalQuestions" min="3" max="100" value="3" required><small style="font-size:10px;color:var(--text-muted);">Minimum 3</small></label>
                 <label>Pass Percentage <input type="number" name="passPercentage" min="0" max="100" value="40"></label>
                 <label>Group Names (optional)<input type="text" name="groupNames" placeholder="e.g. Group A, Group B"></label>
                 <label>🕐 Scheduled Start (auto-live)<input type="datetime-local" name="scheduledStart"></label>
@@ -197,7 +197,7 @@ table.data-table tbody tr:hover td { background:#f8fafc; }
             <button class="close-btn" onclick="closeModal('questionsModal')">&times;</button>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-            <div>Total: <b id="qCount">0</b> questions (min 20)</div>
+            <div>Total: <b id="qCount">0</b> questions (min 3)</div>
             <div style="display:flex;gap:8px;">
                 <button class="btn btn-outline btn-sm" onclick="addQuestionRow()"><i class="fas fa-plus"></i> Add</button>
                 <button class="btn btn-success btn-sm" onclick="saveAllQuestions()"><i class="fas fa-save"></i> Save All</button>
@@ -352,7 +352,7 @@ async function openQuestions(id) {
             correctAnswer: q.correct_answer || "A"
         }));
         if (!state.questions.length) {
-            for (let i = 0; i < 20; i++) state.questions.push({questionEn:"",questionHi:"",optionAEn:"",optionBEn:"",optionCEn:"",optionDEn:"",optionAHi:"",optionBHi:"",optionCHi:"",optionDHi:"",correctAnswer:"A"});
+            for (let i = 0; i < 3; i++) state.questions.push({questionEn:"",questionHi:"",optionAEn:"",optionBEn:"",optionCEn:"",optionDEn:"",optionAHi:"",optionBHi:"",optionCHi:"",optionDHi:"",correctAnswer:"A"});
         }
         $("#qEventTitle").textContent = ev.title;
         renderQuestions();
@@ -409,7 +409,7 @@ function removeQ(i) {
     renderQuestions();
 }
 async function saveAllQuestions() {
-    if (state.questions.length < 20) return showToast(`Minimum 20 questions required. Currently ${state.questions.length}.`, "warning");
+    if (state.questions.length < 3) return showToast(`Minimum 3 questions required. Currently ${state.questions.length}.`, "warning");
     for (let i=0; i<state.questions.length; i++) {
         const q = state.questions[i];
         if (!q.questionEn && !q.questionHi) return showToast(`Question ${i+1}: text required`, "error");
@@ -488,7 +488,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     } catch (e) {}
     loadEvents();
-    // Auto-refresh every 30 sec for live status updates
     setInterval(loadEvents, 30000);
 });
 </script>
