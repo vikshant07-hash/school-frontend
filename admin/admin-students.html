@@ -196,13 +196,18 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .field-msg.warning { color: var(--orange); }
 .field-msg.info { color: var(--blue); }
 
-/* ===== OTP VERIFICATION STYLES ===== */
-.otp-row {
+/* ===== EMAIL OTP STYLES ===== */
+.email-otp-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.email-input-row {
     display: flex;
     gap: 8px;
     align-items: stretch;
 }
-.otp-row input {
+.email-input-row input {
     flex: 1;
     min-width: 0;
 }
@@ -221,7 +226,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    min-width: 110px;
+    min-width: 120px;
     justify-content: center;
 }
 .otp-send-btn:hover:not(:disabled) {
@@ -229,28 +234,27 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
     box-shadow: 0 4px 12px rgba(74,138,244,0.35);
 }
 .otp-send-btn:disabled {
-    opacity: 0.6;
+    opacity: 0.7;
     cursor: not-allowed;
 }
 .otp-send-btn.verified {
     background: var(--green);
+    cursor: default;
 }
 .otp-send-btn.verified:hover {
     transform: none;
     box-shadow: none;
-    cursor: default;
 }
-.otp-box {
+.otp-input-row {
     display: none;
-    margin-top: 8px;
     gap: 8px;
     align-items: stretch;
 }
-.otp-box.show {
+.otp-input-row.show {
     display: flex;
     animation: slideUp 0.3s ease;
 }
-.otp-box input {
+.otp-input-row input {
     flex: 1;
     letter-spacing: 6px;
     text-align: center;
@@ -263,7 +267,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
     background: #fff;
     outline: none;
 }
-.otp-box input:focus {
+.otp-input-row input:focus {
     border-color: var(--gold);
     box-shadow: 0 0 0 3px rgba(201,151,43,0.15);
 }
@@ -294,10 +298,10 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .otp-status {
     font-size: 11px;
     font-weight: 600;
-    margin-top: 6px;
     display: flex;
     align-items: center;
     gap: 5px;
+    min-height: 16px;
 }
 .otp-status.success { color: var(--green); }
 .otp-status.error { color: var(--red); }
@@ -338,9 +342,9 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
     .form-grid, .form-grid.three, .file-grid, .view-grid { grid-template-columns: 1fr; }
     .doc-links { grid-template-columns: 1fr; }
     .session-bar { flex-direction: column; align-items: stretch; }
-    .otp-row { flex-direction: column; }
+    .email-input-row { flex-direction: column; }
     .otp-send-btn { width: 100%; }
-    .otp-box { flex-direction: column; }
+    .otp-input-row { flex-direction: column; }
 }
 </style>
 </head>
@@ -586,46 +590,36 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
                 </label>
             </div>
 
-            <!-- ✅ EMAIL with OTP -->
+            <!-- ✅ Email with OTP Verification -->
             <div class="form-grid" style="margin-top:12px;">
                 <label>
                     Email ID <span class="req-star">*</span>
-                    <div class="otp-row">
-                        <input type="email" name="emailId" id="emailInput" placeholder="student@example.com" required autocomplete="off">
-                        <button type="button" class="otp-send-btn" id="emailSendBtn" onclick="sendEmailOTP()">
-                            <i class="fas fa-paper-plane"></i> Send OTP
-                        </button>
+                    <div class="email-otp-wrapper">
+                        <div class="email-input-row">
+                            <input type="email" name="emailId" id="emailInput" placeholder="student@example.com" required autocomplete="off">
+                            <button type="button" class="otp-send-btn" id="emailSendBtn" onclick="sendEmailOTP()">
+                                <i class="fas fa-paper-plane"></i> Send OTP
+                            </button>
+                        </div>
+                        <div class="otp-input-row" id="emailOtpRow">
+                            <input type="text" id="emailOtpInput" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="off">
+                            <button type="button" class="otp-verify-btn" id="emailVerifyBtn" onclick="verifyEmailOTP()">
+                                <i class="fas fa-check"></i> Verify
+                            </button>
+                        </div>
+                        <div class="otp-status" id="emailStatus"></div>
                     </div>
-                    <div class="otp-box" id="emailOtpBox">
-                        <input type="text" id="emailOtpInput" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="off">
-                        <button type="button" class="otp-verify-btn" id="emailVerifyBtn" onclick="verifyEmailOTP()">
-                            <i class="fas fa-check"></i> Verify
-                        </button>
-                    </div>
-                    <div class="otp-status" id="emailStatus"></div>
                 </label>
 
-                <!-- ✅ MOBILE with WhatsApp OTP -->
-                <label>
-                    Mobile Number <span class="req-star">*</span>
-                    <div class="otp-row">
-                        <input type="tel" name="mobileNumber" id="mobileInput" pattern="[6-9]\d{9}" maxlength="10" placeholder="98XXXXXXXX" required autocomplete="off">
-                        <button type="button" class="otp-send-btn" id="mobileSendBtn" onclick="sendMobileOTP()">
-                            <i class="fab fa-whatsapp"></i> Send OTP
-                        </button>
-                    </div>
-                    <div class="otp-box" id="mobileOtpBox">
-                        <input type="text" id="mobileOtpInput" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="off">
-                        <button type="button" class="otp-verify-btn" id="mobileVerifyBtn" onclick="verifyMobileOTP()">
-                            <i class="fas fa-check"></i> Verify
-                        </button>
-                    </div>
-                    <div class="otp-status" id="mobileStatus"></div>
+                <label>Mobile Number <span class="req-star">*</span>
+                    <input type="tel" name="mobileNumber" id="mobileInput" pattern="[6-9]\d{9}" maxlength="10" placeholder="98XXXXXXXX" required autocomplete="off">
+                    <small style="font-size:10px;color:var(--text-muted);font-weight:400;margin-top:2px;">
+                        Max 3 students per mobile number allowed
+                    </small>
                 </label>
             </div>
 
             <input type="hidden" name="emailVerified" id="emailVerifiedField" value="false">
-            <input type="hidden" name="mobileVerified" id="mobileVerifiedField" value="false">
 
             <h3 class="form-section"><i class="fas fa-map-marker-alt"></i> Structured Address</h3>
             <div class="form-grid three">
@@ -762,8 +756,7 @@ const state = {
     editingId: null, viewingId: null,
     currentSession: "", previewSession: "",
     aadharVerified: false, aadharVerifiedValue: "",
-    emailVerified: false, emailVerifiedValue: "",
-    mobileVerified: false, mobileVerifiedValue: ""
+    emailVerified: false, emailVerifiedValue: ""
 };
 
 const $ = (s) => document.querySelector(s);
@@ -893,15 +886,13 @@ async function sendEmailOTP() {
         const data = await res.json();
         if (!data.success) throw new Error(data.message);
 
-        // Show OTP input box
-        $("#emailOtpBox").classList.add("show");
+        $("#emailOtpRow").classList.add("show");
         $("#emailOtpInput").value = "";
         $("#emailOtpInput").focus();
 
         status.className = "otp-status success";
         status.innerHTML = '<i class="fas fa-check-circle"></i> OTP sent to your email. Check inbox + spam.';
 
-        // Start cooldown
         startCooldown(btn, 45, "Resend");
     } catch (err) {
         status.className = "otp-status error";
@@ -932,28 +923,28 @@ async function verifyEmailOTP() {
         const res = await fetch(`${STUDENT_API}/verify-email-otp`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-            body: JSON.stringify({ email, otp })
+            body: JSON.stringify({
+                email,
+                otp,
+                purpose: state.editingId ? "update" : "add"
+            })
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.message);
 
-        // Mark as verified
         state.emailVerified = true;
         state.emailVerifiedValue = email;
         $("#emailVerifiedField").value = "true";
 
-        // Update UI
-        $("#emailOtpBox").classList.remove("show");
+        $("#emailOtpRow").classList.remove("show");
         status.className = "otp-status success";
         status.innerHTML = '<i class="fas fa-check-circle"></i> Email verified ✅';
 
-        // Lock the send button
         const sendBtn = $("#emailSendBtn");
         sendBtn.disabled = true;
         sendBtn.classList.add("verified");
         sendBtn.innerHTML = '<i class="fas fa-check-circle"></i> Verified';
 
-        // Lock email input
         $("#emailInput").readOnly = true;
         $("#emailInput").style.background = "#f0fdf4";
 
@@ -968,119 +959,6 @@ async function verifyEmailOTP() {
     }
 }
 
-// ============================================================
-// ✅ WHATSAPP OTP (Mobile)
-// ============================================================
-async function sendMobileOTP() {
-    const mobileInput = $("#mobileInput");
-    const mobile = mobileInput.value.trim().replace(/\D/g, "");
-    if (!/^[6-9]\d{9}$/.test(mobile)) {
-        showToast("Please enter a valid 10-digit mobile number", "error");
-        mobileInput.focus();
-        return;
-    }
-
-    const btn = $("#mobileSendBtn");
-    const status = $("#mobileStatus");
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
-    status.className = "otp-status info";
-    status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending WhatsApp OTP…';
-
-    try {
-        const token = localStorage.getItem("adminToken");
-        const res = await fetch(`${STUDENT_API}/send-mobile-otp`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-            body: JSON.stringify({
-                mobile,
-                purpose: state.editingId ? "update" : "add",
-                excludeStudentId: state.editingId || undefined
-            })
-        });
-        const data = await res.json();
-        if (!data.success) throw new Error(data.message);
-
-        // Show OTP input box
-        $("#mobileOtpBox").classList.add("show");
-        $("#mobileOtpInput").value = "";
-        $("#mobileOtpInput").focus();
-
-        let msg = "OTP sent to your WhatsApp ✅";
-        if (typeof data.remainingSlots === "number") {
-            msg += ` (${data.remainingSlots} slots left)`;
-        }
-        status.className = "otp-status success";
-        status.innerHTML = `<i class="fab fa-whatsapp"></i> ${esc(msg)}`;
-
-        // Cooldown
-        startCooldown(btn, 45, "Resend");
-    } catch (err) {
-        status.className = "otp-status error";
-        status.innerHTML = `<i class="fas fa-times-circle"></i> ${esc(err.message)}`;
-        showToast(err.message, "error");
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fab fa-whatsapp"></i> Send OTP';
-    }
-}
-
-async function verifyMobileOTP() {
-    const mobile = $("#mobileInput").value.trim().replace(/\D/g, "");
-    const otp = $("#mobileOtpInput").value.trim();
-    const status = $("#mobileStatus");
-    const btn = $("#mobileVerifyBtn");
-
-    if (!otp || otp.length !== 6) {
-        showToast("Please enter the 6-digit OTP", "error");
-        $("#mobileOtpInput").focus();
-        return;
-    }
-
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying…';
-
-    try {
-        const token = localStorage.getItem("adminToken");
-        const res = await fetch(`${STUDENT_API}/verify-mobile-otp`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-            body: JSON.stringify({ mobile, otp })
-        });
-        const data = await res.json();
-        if (!data.success) throw new Error(data.message);
-
-        // Mark as verified
-        state.mobileVerified = true;
-        state.mobileVerifiedValue = mobile;
-        $("#mobileVerifiedField").value = "true";
-
-        // Update UI
-        $("#mobileOtpBox").classList.remove("show");
-        status.className = "otp-status success";
-        status.innerHTML = '<i class="fas fa-check-circle"></i> Mobile verified ✅';
-
-        // Lock the send button
-        const sendBtn = $("#mobileSendBtn");
-        sendBtn.disabled = true;
-        sendBtn.classList.add("verified");
-        sendBtn.innerHTML = '<i class="fas fa-check-circle"></i> Verified';
-
-        // Lock mobile input
-        $("#mobileInput").readOnly = true;
-        $("#mobileInput").style.background = "#f0fdf4";
-
-        showToast("Mobile verified ✅", "success");
-    } catch (err) {
-        status.className = "otp-status error";
-        status.innerHTML = `<i class="fas fa-times-circle"></i> ${esc(err.message)}`;
-        showToast(err.message, "error");
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-check"></i> Verify';
-    }
-}
-
-// Cooldown timer for resend
 function startCooldown(btn, seconds, label) {
     let remaining = seconds;
     const originalLabel = label || "Resend";
@@ -1096,13 +974,10 @@ function startCooldown(btn, seconds, label) {
     }, 1000);
 }
 
-// Reset OTP state when email/mobile changes manually
+// Reset email OTP when user changes email manually
 document.addEventListener("input", (e) => {
     if (e.target.id === "emailInput" && state.emailVerifiedValue && e.target.value.trim().toLowerCase() !== state.emailVerifiedValue) {
         resetEmailOTP();
-    }
-    if (e.target.id === "mobileInput" && state.mobileVerifiedValue && e.target.value.trim() !== state.mobileVerifiedValue) {
-        resetMobileOTP();
     }
 });
 
@@ -1110,7 +985,7 @@ function resetEmailOTP() {
     state.emailVerified = false;
     state.emailVerifiedValue = "";
     $("#emailVerifiedField").value = "false";
-    $("#emailOtpBox").classList.remove("show");
+    $("#emailOtpRow").classList.remove("show");
     $("#emailStatus").className = "otp-status";
     $("#emailStatus").innerHTML = "";
     const btn = $("#emailSendBtn");
@@ -1119,21 +994,6 @@ function resetEmailOTP() {
     btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
     $("#emailInput").readOnly = false;
     $("#emailInput").style.background = "";
-}
-
-function resetMobileOTP() {
-    state.mobileVerified = false;
-    state.mobileVerifiedValue = "";
-    $("#mobileVerifiedField").value = "false";
-    $("#mobileOtpBox").classList.remove("show");
-    $("#mobileStatus").className = "otp-status";
-    $("#mobileStatus").innerHTML = "";
-    const btn = $("#mobileSendBtn");
-    btn.disabled = false;
-    btn.classList.remove("verified");
-    btn.innerHTML = '<i class="fab fa-whatsapp"></i> Send OTP';
-    $("#mobileInput").readOnly = false;
-    $("#mobileInput").style.background = "";
 }
 
 // ============================================================
@@ -1631,8 +1491,6 @@ function resetForm() {
     state.aadharVerifiedValue = "";
     state.emailVerified = false;
     state.emailVerifiedValue = "";
-    state.mobileVerified = false;
-    state.mobileVerifiedValue = "";
 
     $("#formErrors").classList.add("hidden");
     $("#formErrors").innerHTML = "";
@@ -1645,7 +1503,7 @@ function resetForm() {
 
     // Reset email OTP UI
     $("#emailVerifiedField").value = "false";
-    $("#emailOtpBox").classList.remove("show");
+    $("#emailOtpRow").classList.remove("show");
     $("#emailOtpInput").value = "";
     $("#emailStatus").className = "otp-status";
     $("#emailStatus").innerHTML = "";
@@ -1655,19 +1513,6 @@ function resetForm() {
     emailBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
     $("#emailInput").readOnly = false;
     $("#emailInput").style.background = "";
-
-    // Reset mobile OTP UI
-    $("#mobileVerifiedField").value = "false";
-    $("#mobileOtpBox").classList.remove("show");
-    $("#mobileOtpInput").value = "";
-    $("#mobileStatus").className = "otp-status";
-    $("#mobileStatus").innerHTML = "";
-    const mobileBtn = $("#mobileSendBtn");
-    mobileBtn.disabled = false;
-    mobileBtn.classList.remove("verified");
-    mobileBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Send OTP';
-    $("#mobileInput").readOnly = false;
-    $("#mobileInput").style.background = "";
 
     document.querySelectorAll(".file-preview").forEach(el => el.remove());
     clearExistingDocHints();
@@ -1721,15 +1566,11 @@ async function openEditModal(id) {
         setVal("state", s.state);
         setVal("pincode", s.pincode);
 
-        // In edit mode, mark existing email/mobile as verified
+        // Edit mode: existing email is already verified
         state.emailVerified = true;
         state.emailVerifiedValue = (s.email_id || "").toLowerCase();
-        state.mobileVerified = true;
-        state.mobileVerifiedValue = s.mobile_number || "";
         $("#emailVerifiedField").value = "true";
-        $("#mobileVerifiedField").value = "true";
 
-        // Show verified state in UI
         const emailBtn = $("#emailSendBtn");
         emailBtn.classList.add("verified");
         emailBtn.innerHTML = '<i class="fas fa-check-circle"></i> Verified';
@@ -1738,15 +1579,6 @@ async function openEditModal(id) {
         $("#emailStatus").innerHTML = '<i class="fas fa-check-circle"></i> Already verified';
         $("#emailInput").readOnly = true;
         $("#emailInput").style.background = "#f0fdf4";
-
-        const mobileBtn = $("#mobileSendBtn");
-        mobileBtn.classList.add("verified");
-        mobileBtn.innerHTML = '<i class="fas fa-check-circle"></i> Verified';
-        mobileBtn.disabled = true;
-        $("#mobileStatus").className = "otp-status success";
-        $("#mobileStatus").innerHTML = '<i class="fas fa-check-circle"></i> Already verified';
-        $("#mobileInput").readOnly = true;
-        $("#mobileInput").style.background = "#f0fdf4";
 
         onClassChange();
         buildFullAddress();
@@ -1783,7 +1615,6 @@ $("#btnSaveForm").addEventListener("click", async () => {
     $("#formErrors").classList.add("hidden");
     $("#formErrors").innerHTML = "";
 
-    // Aadhaar must be verified
     const rawAadhaar = aadharInput.value.replace(/\s/g, "");
     if (rawAadhaar.length === 12 && !state.aadharVerified) {
         showToast("Please wait for Aadhaar verification (click outside the field)", "warning");
@@ -1791,18 +1622,12 @@ $("#btnSaveForm").addEventListener("click", async () => {
         return;
     }
 
-    // ✅ Email + Mobile must be OTP verified
+    // ✅ Email must be verified
     const emailChanged = state.editingId ? $("#emailInput").value.trim().toLowerCase() !== state.emailVerifiedValue : true;
-    const mobileChanged = state.editingId ? $("#mobileInput").value.trim() !== state.mobileVerifiedValue : true;
 
     if (!state.emailVerified && emailChanged) {
         showToast("Please verify your email with OTP before saving", "warning");
         $("#emailInput").focus();
-        return;
-    }
-    if (!state.mobileVerified && mobileChanged) {
-        showToast("Please verify your mobile with WhatsApp OTP before saving", "warning");
-        $("#mobileInput").focus();
         return;
     }
 
@@ -1848,9 +1673,7 @@ $("#btnSaveForm").addEventListener("click", async () => {
 
     const fd = new FormData(form);
     fd.set("aadharNumber", aadhar);
-    // ✅ Ensure verification flags are set
     fd.set("emailVerified", state.emailVerified ? "true" : "false");
-    fd.set("mobileVerified", state.mobileVerified ? "true" : "false");
     for (const [k, v] of [...fd.entries()]) if (v === "" || v === null) fd.delete(k);
 
     btn.disabled = true;
@@ -1922,7 +1745,7 @@ async function openViewModal(id) {
                     ${row("Category", s.category)}
                     ${row("Aadhar", s.aadhar_number)}
                     ${row("APAAR ID", s.apaar_id)}
-                    ${row("Mobile", s.mobile_number + (s.mobile_verified ? " ✅" : ""))}
+                    ${row("Mobile", s.mobile_number)}
                     ${row("Email", s.email_id + (s.email_verified ? " ✅" : ""))}
                 </div>
             </div>
@@ -2084,7 +1907,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 /* ============================================================ */
-/* QR + PRINT PDF (unchanged) */
+/* QR + PRINT PDF */
 /* ============================================================ */
 function generateQRCodeBase64(url, size = 140) {
     return new Promise((resolve) => {
@@ -2288,7 +2111,7 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
 }
 
 /* ============================================================ */
-/* INIT                                                          */
+/* INIT */
 /* ============================================================ */
 window.addEventListener("DOMContentLoaded", async () => {
     if (await checkAuth()) {
