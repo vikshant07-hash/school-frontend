@@ -3,128 +3,270 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>School Documents | Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<title>Document Editor — Professional</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&family=Georgia&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
 <style>
 :root {
-    --bg: #f5f7fb; --card: #fff; --text: #1a2332; --text-2: #5a6a7e;
-    --text-3: #94a3b8; --gold: #c9972b; --gold-bg: #fef8ed;
-    --blue: #4a8af4; --blue-bg: #eef4ff; --green: #10b981; --green-bg: #ecfdf5;
-    --red: #ef4444; --red-bg: #fee2e2; --orange: #f59e0b; --orange-bg: #fffbeb;
-    --purple: #8b5cf6; --purple-bg: #f5f0ff; --pink: #ec4899; --pink-bg: #fdf2f8;
-    --border: #e8edf8; --radius: 14px; --radius-sm: 10px;
-    --shadow: 0 2px 12px rgba(0,0,0,0.04);
-    --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+    --bg: #eef1f7;
+    --card: #fff;
+    --text: #1a2332;
+    --text-2: #5a6a7e;
+    --text-3: #94a3b8;
+    --gold: #c9972b;
+    --gold-bg: #fef8ed;
+    --blue: #4a8af4;
+    --blue-bg: #eef4ff;
+    --green: #10b981;
+    --green-bg: #ecfdf5;
+    --red: #ef4444;
+    --red-bg: #fee2e2;
+    --orange: #f59e0b;
+    --border: #dfe4ef;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.05);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-/* ============ TOP BAR ============ */
-.topbar { background: #fff; border-bottom: 1px solid var(--border); padding: 0 28px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
-.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
-.brand img { width: 40px; height: 40px; border-radius: 10px; }
-.brand .name { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; }
-.brand .name span { color: var(--gold); }
-.topbar nav { display: flex; gap: 4px; }
-.topbar nav a { color: var(--text-2); text-decoration: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; transition: all 0.2s; }
-.topbar nav a:hover { background: var(--bg); }
-.topbar nav a.active { background: var(--gold-bg); color: var(--gold); }
-.topbar nav a i { margin-right: 6px; }
+/* ============ TOPBAR ============ */
+.topbar { background: #1a2332; color: #fff; padding: 0 20px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+.topbar .brand { display: flex; align-items: center; gap: 10px; }
+.topbar .brand img { width: 34px; height: 34px; border-radius: 8px; background: #fff; padding: 3px; }
+.topbar .brand .name { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; }
+.topbar .brand .name span { color: var(--gold); }
+.topbar .actions { display: flex; gap: 8px; align-items: center; }
 
-/* ============ CONTAINER ============ */
-.wrap { max-width: 1400px; margin: 0 auto; padding: 24px 28px 40px; }
-
-/* ============ PAGE HEAD ============ */
-.page-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
-.page-head h1 { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
-.page-head h1 i { color: var(--gold); }
-.page-head .actions { display: flex; gap: 10px; }
-
-.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; text-decoration: none; }
+.btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border: none; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all 0.18s; font-family: inherit; text-decoration: none; color: #fff; }
 .btn:active { transform: scale(0.97); }
-.btn-primary { background: var(--gold); color: #fff; }
-.btn-primary:hover { background: #b8851f; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(201,151,43,0.3); }
-.btn-outline { background: #fff; color: var(--text-2); border: 1.5px solid var(--border); }
-.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
-.btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-primary { background: var(--gold); }
+.btn-primary:hover:not(:disabled) { background: #b8851f; }
+.btn-success { background: var(--green); }
+.btn-success:hover:not(:disabled) { background: #059669; }
+.btn-outline { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+.btn-outline:hover { background: rgba(255,255,255,0.15); }
+.btn-sm { padding: 6px 12px; font-size: 11.5px; }
+.btn-ghost { background: transparent; color: var(--text-2); border: 1.5px solid var(--border); }
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
 
-/* ============ STATS ============ */
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 20px; }
-.stat { background: #fff; padding: 18px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); transition: all 0.2s; }
-.stat:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
-.stat h4 { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; margin-bottom: 6px; }
-.stat .num { font-size: 26px; font-weight: 800; font-family: 'Space Grotesk', sans-serif; }
-.num.gold { color: var(--gold); } .num.green { color: var(--green); }
-.num.blue { color: var(--blue); } .num.orange { color: var(--orange); }
+/* ============ LAYOUT ============ */
+.layout { display: grid; grid-template-columns: 480px 1fr; gap: 0; height: calc(100vh - 60px); }
+@media (max-width: 1200px) { .layout { grid-template-columns: 420px 1fr; } }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; height: auto; } }
 
-/* ============ FILTERS ============ */
-.filters { background: #fff; padding: 16px 20px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 18px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-.filters input, .filters select { padding: 9px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 13px; background: var(--bg); outline: none; transition: all 0.2s; }
-.filters input:focus, .filters select:focus { border-color: var(--gold); background: #fff; box-shadow: 0 0 0 3px rgba(201,151,43,0.1); }
-.filters input[type="text"] { flex: 1 1 260px; min-width: 200px; }
+/* ============ LEFT PANEL ============ */
+.left-panel { background: #fff; border-right: 1px solid var(--border); overflow-y: auto; padding: 16px; }
+.left-panel::-webkit-scrollbar { width: 6px; }
+.left-panel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 
-/* ============ DOCUMENT LIST ============ */
-.doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
-.doc-card { background: #fff; border-radius: var(--radius); border: 1px solid var(--border); padding: 18px 20px; box-shadow: var(--shadow); transition: all 0.25s; position: relative; overflow: hidden; }
-.doc-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--gold); }
-.doc-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--gold), #e8b84b); }
+.section { margin-bottom: 18px; }
+.section-title { font-size: 10.5px; font-weight: 800; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; padding-bottom: 6px; border-bottom: 2px solid var(--gold-bg); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
 
-.doc-type-badge { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; background: var(--gold-bg); color: var(--gold); }
-.doc-card h3 { font-size: 15px; font-weight: 700; margin: 10px 0 6px; line-height: 1.4; }
-.doc-card .subj { font-size: 12.5px; color: var(--text-2); line-height: 1.55; margin-bottom: 10px; min-height: 38px; }
-.doc-card .meta { display: flex; flex-wrap: wrap; gap: 10px 16px; font-size: 11.5px; color: var(--text-3); padding-top: 10px; border-top: 1px dashed var(--border); margin-bottom: 12px; }
-.doc-card .meta div { display: flex; align-items: center; gap: 5px; }
-.doc-card .meta i { color: var(--gold); font-size: 10px; }
-.doc-card .badge-status { padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-.status-Draft { background: var(--orange-bg); color: var(--orange); }
-.status-Published { background: var(--green-bg); color: var(--green); }
-.status-Archived { background: #e5e7eb; color: #4b5563; }
-.doc-card .card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-.action-btn { padding: 6px 12px; border: none; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; }
-.action-btn:hover { transform: translateY(-1px); }
-.action-btn.view { background: var(--blue-bg); color: var(--blue); }
-.action-btn.edit { background: var(--orange-bg); color: var(--orange); }
-.action-btn.pdf { background: var(--pink-bg); color: var(--pink); }
-.action-btn.dup { background: var(--purple-bg); color: var(--purple); }
-.action-btn.del { background: var(--red-bg); color: var(--red); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.form-grid.one { grid-template-columns: 1fr; }
+.form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+.field { display: flex; flex-direction: column; gap: 3px; }
+.field label { font-size: 10px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.5px; }
+.field input, .field select, .field textarea { padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 7px; font-family: inherit; font-size: 12.5px; background: #fafbfd; outline: none; transition: all 0.15s; color: var(--text); width: 100%; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); background: #fff; box-shadow: 0 0 0 3px rgba(201,151,43,0.1); }
 
-/* ============ EMPTY / LOADING ============ */
-.state-box { text-align: center; padding: 70px 20px; background: #fff; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); }
-.state-box i { font-size: 48px; color: var(--text-3); margin-bottom: 14px; display: block; }
-.state-box p { color: var(--text-2); font-size: 14px; }
-.spinner { display: inline-block; width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.9s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+/* ============ STYLE CONTROLS (mini-toolbar for title/subject) ============ */
+.style-bar { display: flex; gap: 4px; align-items: center; padding: 6px; background: #fafbfd; border: 1.5px solid var(--border); border-top: none; border-radius: 0 0 7px 7px; margin-top: -8px; margin-bottom: 4px; }
+.style-bar button { width: 26px; height: 26px; border: 1px solid var(--border); background: #fff; border-radius: 5px; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; color: var(--text-2); transition: all 0.15s; }
+.style-bar button:hover { background: var(--gold-bg); color: var(--gold); border-color: var(--gold); }
+.style-bar button.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+.style-bar .sep { width: 1px; height: 18px; background: var(--border); margin: 0 3px; }
+.style-bar select { padding: 3px 4px; border: 1px solid var(--border); border-radius: 5px; font-size: 11px; font-family: inherit; background: #fff; }
+.style-bar input[type="color"] { width: 26px; height: 26px; border: 1px solid var(--border); border-radius: 5px; cursor: pointer; padding: 2px; }
 
-/* ============ PAGINATION ============ */
-.pagination { display: flex; justify-content: center; gap: 6px; margin-top: 24px; flex-wrap: wrap; }
-.pagination button { padding: 8px 14px; border: 1.5px solid var(--border); background: #fff; border-radius: 8px; font-family: inherit; font-weight: 700; font-size: 13px; color: var(--text-2); cursor: pointer; transition: all 0.2s; }
-.pagination button:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
-.pagination button.active { background: var(--gold); color: #fff; border-color: var(--gold); }
-.pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+/* ============ QUILL ============ */
+#editorWrap { border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; }
+#editorWrap:focus-within { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,151,43,0.08); }
+.ql-toolbar.ql-snow { border: none; border-bottom: 1.5px solid var(--border); background: #fafbfd; padding: 8px 6px; }
+.ql-container.ql-snow { border: none; font-family: 'Inter', sans-serif; font-size: 13.5px; }
+.ql-editor { min-height: 320px; padding: 14px; line-height: 1.7; font-family: 'Inter', sans-serif; }
+.ql-snow .ql-picker-label, .ql-snow .ql-picker-item { font-family: 'Inter', sans-serif; }
+.ql-snow .ql-stroke { stroke: #475569; }
+.ql-snow .ql-fill, .ql-snow .ql-stroke.ql-fill { fill: #475569; }
+.ql-snow .ql-picker { color: #475569; }
+.ql-snow.ql-toolbar button:hover, .ql-snow.ql-toolbar button.ql-active { color: var(--gold); }
+.ql-snow.ql-toolbar button:hover .ql-stroke, .ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke: var(--gold); }
+.ql-snow.ql-toolbar button:hover .ql-fill, .ql-snow.ql-toolbar button.ql-active .ql-fill { fill: var(--gold); }
+
+/* ============ SIGNATURE UPLOAD ============ */
+.sign-upload-area { border: 2px dashed var(--border); border-radius: 10px; padding: 14px; text-align: center; cursor: pointer; transition: all 0.2s; background: #fafbfd; position: relative; }
+.sign-upload-area:hover { border-color: var(--gold); background: var(--gold-bg); }
+.sign-upload-area input[type="file"] { display: none; }
+.sign-upload-area i { font-size: 24px; color: var(--gold); margin-bottom: 6px; display: block; }
+.sign-upload-area .txt { font-size: 12px; font-weight: 600; color: var(--text-2); }
+.sign-preview { display: none; margin-top: 10px; padding: 10px; background: #fff; border: 1.5px solid var(--border); border-radius: 8px; text-align: center; }
+.sign-preview img { max-height: 70px; max-width: 100%; object-fit: contain; margin-bottom: 6px; }
+.sign-preview .del-btn { padding: 4px 12px; background: var(--red-bg); color: var(--red); border: none; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
+
+/* ============ STATUS ============ */
+.status-row { display: flex; gap: 6px; }
+.status-btn { flex: 1; padding: 7px 10px; border: 1.5px solid var(--border); background: #fff; border-radius: 7px; font-family: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: all 0.15s; color: var(--text-2); }
+.status-btn.active[data-status="Draft"] { border-color: var(--orange); background: #fffbeb; color: var(--orange); }
+.status-btn.active[data-status="Published"] { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.status-btn.active[data-status="Archived"] { border-color: #64748b; background: #f1f5f9; color: #334155; }
+
+/* ============ RIGHT PREVIEW ============ */
+.right-panel { background: #e8ecf5; overflow-y: auto; padding: 24px; }
+.right-panel::-webkit-scrollbar { width: 8px; }
+.right-panel::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+.right-panel::-webkit-scrollbar-track { background: #d0d5e0; }
+
+.preview-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding: 10px 16px; background: #fff; border-radius: 10px; box-shadow: var(--shadow); }
+.preview-toolbar .info { font-size: 12px; color: var(--text-2); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.preview-toolbar .info .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+.preview-toolbar .tools { display: flex; gap: 6px; }
+.zoom-btn { padding: 5px 10px; background: #fafbfd; border: 1.5px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; color: var(--text-2); transition: all 0.15s; }
+.zoom-btn:hover { border-color: var(--gold); color: var(--gold); }
+.zoom-btn.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+
+/* ============ A4 PAGE (EXACT) ============ */
+.page-container { display: flex; justify-content: center; padding: 20px 0; min-height: 500px; }
+.a4-page {
+    width: 210mm;
+    min-height: 297mm;
+    background: #fff;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+    position: relative;
+    padding: 15mm 16mm 18mm;
+    font-family: 'Georgia', serif;
+    color: #1a2332;
+    transition: transform 0.3s;
+    overflow: hidden;
+}
+.a4-page.zoom-75 { transform: scale(0.75); transform-origin: top center; margin-bottom: -25%; }
+.a4-page.zoom-100 { transform: scale(1); }
+.a4-page.zoom-125 { transform: scale(1.25); transform-origin: top center; margin-bottom: 25%; }
+
+/* ============ WATERMARK (Logo + Pattern) ============ */
+.page-watermark {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+.wm-pattern {
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(45deg, transparent 0 40px, rgba(201,151,43,0.05) 40px 42px);
+    background-size: 56px 56px;
+}
+.wm-logo {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+    opacity: 0.05;
+    background: url('https://gsssshilla07.pages.dev/logo(1).png') center/contain no-repeat;
+    filter: grayscale(100%);
+}
+.wm-corners {
+    position: absolute;
+    inset: 0;
+}
+.wm-corner {
+    position: absolute;
+    width: 40px; height: 40px;
+    border: 2px solid rgba(201,151,43,0.15);
+}
+.wm-corner.tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+.wm-corner.tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+.wm-corner.bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+.wm-corner.br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+.page-content { position: relative; z-index: 1; }
+
+/* ============ LETTERHEAD ============ */
+.p-header { text-align: center; padding-bottom: 10px; border-bottom: 3px solid var(--gold); position: relative; margin-bottom: 4px; }
+.p-header::after { content: ''; position: absolute; bottom: -6px; left: 0; right: 0; height: 1px; background: #0d1b2a; }
+
+.p-header .logo-row { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 4px; }
+.p-header .logo { width: 72px; height: 72px; border-radius: 50%; border: 2px solid var(--gold); padding: 4px; background: #fff; object-fit: contain; flex-shrink: 0; }
+.p-header .school-info { text-align: center; flex: 1; }
+.p-header .sname { font-family: 'Georgia', serif; font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 2.5px; color: #0d1b2a; line-height: 1.15; }
+.p-header .tagline { font-size: 10.5px; color: #5a6a7e; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; margin-top: 3px; }
+.p-header .sub-line { font-size: 9px; color: #94a3b8; letter-spacing: 1.2px; margin-top: 2px; font-weight: 600; }
+
+/* ============ META ============ */
+.p-meta { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #0d1b2a; margin: 12px 0 8px; }
+.p-meta .lbl { color: #5a6a7e; font-weight: 600; }
+
+.p-type-badge { text-align: center; margin: 10px 0; }
+.p-type-badge span { display: inline-block; background: #0d1b2a; color: #fff; padding: 5px 32px; font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; border-radius: 24px; border: 2px solid var(--gold); }
+
+/* ============ TITLE ============ */
+.p-title { text-align: center; font-size: 16px; font-weight: 900; color: #0d1b2a; text-transform: uppercase; letter-spacing: 1.5px; margin: 12px 0 8px; padding: 6px 0; }
+
+/* ============ SUBJECT ============ */
+.p-subject { font-size: 12.5px; color: #1a2332; margin: 8px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--gold); line-height: 1.6; }
+.p-subject strong { color: #0d1b2a; font-weight: 800; }
+
+/* ============ BODY ============ */
+.p-body { font-size: 12.5px; line-height: 1.85; color: #1a2332; text-align: justify; min-height: 300px; font-family: 'Georgia', serif; }
+.p-body p { margin: 0 0 10px; }
+.p-body h1 { font-size: 19px; font-weight: 800; margin: 14px 0 8px; color: #0d1b2a; }
+.p-body h2 { font-size: 16px; font-weight: 800; margin: 12px 0 6px; color: #0d1b2a; }
+.p-body h3 { font-size: 14px; font-weight: 800; margin: 10px 0 5px; color: #0d1b2a; }
+.p-body h4 { font-size: 13px; font-weight: 800; margin: 8px 0 4px; color: #0d1b2a; }
+.p-body ul, .p-body ol { margin: 8px 0 10px 24px; }
+.p-body li { margin-bottom: 4px; }
+.p-body blockquote { border-left: 3px solid var(--gold); padding: 6px 12px; margin: 10px 0; background: #fef8ed; font-style: italic; color: #475569; }
+.p-body table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 11.5px; font-family: 'Inter', sans-serif; }
+.p-body table td, .p-body table th { border: 1px solid #94a3b8; padding: 6px 10px; }
+.p-body table th { background: #fef8ed; font-weight: 800; color: #0d1b2a; }
+.p-body img { max-width: 100%; height: auto; margin: 8px auto; display: block; border-radius: 4px; }
+.p-body a { color: var(--blue); text-decoration: underline; }
+.p-body strong, .p-body b { font-weight: 800; }
+.p-body em, .p-body i { font-style: italic; }
+.p-body u { text-decoration: underline; }
+.p-body s, .p-body strike { text-decoration: line-through; }
+.p-body pre, .p-body code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 11px; }
+
+/* ============ SIGNATURE ============ */
+.p-sign-area { display: flex; justify-content: flex-end; margin-top: 40px; }
+.p-sign-block { text-align: center; min-width: 210px; }
+.p-sign-block .sign-img { height: 65px; max-width: 180px; object-fit: contain; display: block; margin: 0 auto 4px; }
+.p-sign-block .line { border-top: 1.5px solid #64748b; width: 180px; margin: 8px auto 4px; }
+.p-sign-block .name { font-size: 13px; font-weight: 800; color: #0d1b2a; font-family: 'Inter', sans-serif; }
+.p-sign-block .desig { font-size: 11px; color: #475569; font-weight: 600; font-family: 'Inter', sans-serif; margin-top: 2px; }
+
+/* ============ FOOTER ============ */
+.p-footer { position: absolute; bottom: 8mm; left: 16mm; right: 16mm; z-index: 2; }
+.p-footer .strip { height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin-bottom: 6px; }
+.p-footer .row { display: flex; justify-content: space-between; align-items: center; font-size: 8px; color: #64748b; font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 0.5px; }
+.p-footer .row .center { text-align: center; flex: 1; }
+.p-footer .row .code { color: #94a3b8; font-family: monospace; }
 
 /* ============ TOAST ============ */
-.toast-wrap { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
-.toast { padding: 14px 20px; border-radius: 10px; color: #fff; font-weight: 600; font-size: 13px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); min-width: 260px; animation: toastIn 0.3s ease; display: flex; align-items: center; gap: 10px; }
+.toast-wrap { position: fixed; top: 74px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { padding: 12px 18px; border-radius: 10px; color: #fff; font-weight: 600; font-size: 13px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); min-width: 240px; animation: toastIn 0.3s; display: flex; align-items: center; gap: 8px; }
 .toast.success { background: var(--green); }
 .toast.error { background: var(--red); }
-.toast.info { background: var(--text); }
+.toast.info { background: #1a2332; }
 .toast.warning { background: var(--orange); }
 @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
 
-/* ============ SESSION OVERLAY ============ */
-.session-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); z-index: 9999; justify-content: center; align-items: center; }
+.session-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); z-index: 9999; justify-content: center; align-items: center; }
 .session-overlay.on { display: flex; }
-.session-popup { background: #fff; padding: 40px 32px; border-radius: 20px; max-width: 400px; text-align: center; box-shadow: var(--shadow-lg); }
-.session-popup h2 { font-size: 22px; margin-bottom: 8px; }
-.session-popup p { color: var(--text-2); font-size: 14px; margin-bottom: 20px; }
-.session-popup a { display: inline-block; padding: 12px 32px; background: var(--gold); color: #fff; text-decoration: none; border-radius: 30px; font-weight: 700; }
+.session-popup { background: #fff; padding: 36px 30px; border-radius: 16px; max-width: 400px; text-align: center; }
+.session-popup a { display: inline-block; padding: 10px 28px; background: var(--gold); color: #fff; text-decoration: none; border-radius: 30px; font-weight: 700; margin-top: 14px; }
 
-@media (max-width: 768px) {
-    .topbar { padding: 0 16px; }
-    .topbar nav a span { display: none; }
-    .wrap { padding: 16px; }
-    .doc-grid { grid-template-columns: 1fr; }
+@media (max-width: 900px) {
+    .a4-page { width: 100%; min-height: auto; padding: 12mm; }
+    .page-container { padding: 10px; }
+    .a4-page.zoom-75, .a4-page.zoom-100, .a4-page.zoom-125 { transform: none; margin-bottom: 0; }
 }
 </style>
 </head>
@@ -133,96 +275,276 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 <div class="session-overlay" id="sessionOverlay">
     <div class="session-popup">
         <h2>🔒 Session Expired</h2>
-        <p>Please login again to continue.</p>
+        <p style="margin: 8px 0; color: #5a6a7e;">Please login again.</p>
         <a href="login.html">Login Again</a>
     </div>
 </div>
 
+<!-- TOPBAR -->
 <div class="topbar">
-    <a href="#" class="brand">
-        <img src="logo(1).png" alt="Logo" onerror="this.style.display='none'">
-        <div class="name">GSSS<span> Shilla</span></div>
-    </a>
-    <nav>
-        <a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
-        <a href="admin-students.html"><i class="fas fa-users"></i> <span>Students</span></a>
-        <a href="admin-documents.html" class="active"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
-    </nav>
+    <div class="brand">
+        <a href="admin-documents.html" style="color:#fff;text-decoration:none;"><i class="fas fa-arrow-left"></i></a>
+        <img src="logo(1).png" onerror="this.style.display='none'">
+        <div class="name">GSSS<span> Shilla</span> · Document Editor</div>
+    </div>
+    <div class="actions">
+        <span id="modeLabel" style="font-size:11px; background:rgba(255,255,255,0.15); padding:4px 12px; border-radius:20px; font-weight:700;">NEW</span>
+        <button class="btn btn-outline btn-sm" id="btnPreview"><i class="fas fa-eye"></i> Preview</button>
+        <button class="btn btn-outline btn-sm" id="btnPrint" disabled><i class="fas fa-print"></i> Print</button>
+        <button class="btn btn-outline btn-sm" id="btnPdf" disabled><i class="fas fa-file-pdf"></i> PDF</button>
+        <button class="btn btn-success btn-sm" id="btnSave"><i class="fas fa-save"></i> Save</button>
+    </div>
 </div>
 
-<div class="wrap">
+<div class="layout">
 
-    <div class="page-head">
-        <h1><i class="fas fa-file-alt"></i> School Documents</h1>
-        <div class="actions">
-            <button class="btn btn-outline" onclick="loadStats()"><i class="fas fa-sync-alt"></i> Refresh</button>
-            <a href="admin-document-editor.html" class="btn btn-primary"><i class="fas fa-plus"></i> New Document</a>
+    <!-- LEFT: EDITOR -->
+    <div class="left-panel">
+
+        <div class="section">
+            <div class="section-title"><i class="fas fa-info-circle"></i> Document Metadata</div>
+            <div class="form-grid">
+                <div class="field">
+                    <label>Doc Number *</label>
+                    <input type="text" id="docNumber" placeholder="GSSS/2026/NOTICE/001">
+                </div>
+                <div class="field">
+                    <label>Date *</label>
+                    <input type="date" id="docDate">
+                </div>
+            </div>
+            <div class="form-grid" style="margin-top: 8px;">
+                <div class="field">
+                    <label>Type *</label>
+                    <select id="docType">
+                        <option value="">Select...</option>
+                        <option>Notice</option><option>Circular</option><option>Order</option>
+                        <option>Letter</option><option>Certificate</option><option>Memorandum</option>
+                        <option>Report</option><option>Other</option>
+                    </select>
+                </div>
+                <div class="field" id="customTypeWrap" style="display:none;">
+                    <label>Custom Type *</label>
+                    <input type="text" id="customType" placeholder="Enter type">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="fas fa-heading"></i> Title</div>
+            <div class="field">
+                <input type="text" id="titleInput" placeholder="Enter document title..." maxlength="255" style="font-weight:700;">
+            </div>
+            <div class="style-bar" id="titleStyleBar">
+                <button data-cmd="bold" data-target="title" title="Bold"><i class="fas fa-bold"></i></button>
+                <button data-cmd="italic" data-target="title" title="Italic"><i class="fas fa-italic"></i></button>
+                <button data-cmd="underline" data-target="title" title="Underline"><i class="fas fa-underline"></i></button>
+                <span class="sep"></span>
+                <select data-style="fontSize" data-target="title">
+                    <option value="14">14px</option>
+                    <option value="16" selected>16px</option>
+                    <option value="18">18px</option>
+                    <option value="20">20px</option>
+                    <option value="22">22px</option>
+                </select>
+                <span class="sep"></span>
+                <button data-align="left" data-target="title" title="Left"><i class="fas fa-align-left"></i></button>
+                <button data-align="center" data-target="title" class="active" title="Center"><i class="fas fa-align-center"></i></button>
+                <button data-align="right" data-target="title" title="Right"><i class="fas fa-align-right"></i></button>
+                <span class="sep"></span>
+                <input type="color" data-style="color" data-target="title" value="#0d1b2a" title="Color">
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="fas fa-tag"></i> Subject</div>
+            <div class="field">
+                <input type="text" id="subjectInput" placeholder="Enter subject line..." maxlength="500">
+            </div>
+            <div class="style-bar" id="subjectStyleBar">
+                <button data-cmd="bold" data-target="subject" title="Bold"><i class="fas fa-bold"></i></button>
+                <button data-cmd="italic" data-target="subject" title="Italic"><i class="fas fa-italic"></i></button>
+                <button data-cmd="underline" data-target="subject" title="Underline"><i class="fas fa-underline"></i></button>
+                <span class="sep"></span>
+                <select data-style="fontSize" data-target="subject">
+                    <option value="11">11px</option>
+                    <option value="12" selected>12px</option>
+                    <option value="13">13px</option>
+                    <option value="14">14px</option>
+                </select>
+                <span class="sep"></span>
+                <input type="color" data-style="color" data-target="subject" value="#1a2332" title="Color">
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="fas fa-pen-fancy"></i> Body Content</div>
+            <div id="editorWrap"><div id="editor"></div></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="fas fa-user-tie"></i> Issued By</div>
+            <div class="form-grid">
+                <div class="field">
+                    <label>Name</label>
+                    <input type="text" id="issuedByName" placeholder="e.g. Mr. Vikshant Kralta">
+                </div>
+                <div class="field">
+                    <label>Designation</label>
+                    <input type="text" id="issuedByDesignation" placeholder="e.g. Principal">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="fas fa-signature"></i> Signature Image</div>
+            <div class="sign-upload-area" id="signUpload">
+                <input type="file" id="signFile" accept="image/*">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <div class="txt">Click to upload signature image</div>
+                <div style="font-size:10px;color:#94a3b8;margin-top:4px;">PNG/JPG · Max 3 MB</div>
+            </div>
+            <div class="sign-preview" id="signPreview">
+                <img id="signPreviewImg" src="" alt="signature">
+                <div>
+                    <button class="del-btn" id="signDel"><i class="fas fa-trash"></i> Remove</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="fas fa-flag"></i> Status</div>
+            <div class="status-row">
+                <button type="button" class="status-btn active" data-status="Draft">Draft</button>
+                <button type="button" class="status-btn" data-status="Published">Published</button>
+                <button type="button" class="status-btn" data-status="Archived">Archived</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- RIGHT: PREVIEW -->
+    <div class="right-panel">
+        <div class="preview-toolbar">
+            <div class="info">
+                <span class="dot"></span>
+                <span>Live Preview · A4</span>
+            </div>
+            <div class="tools">
+                <button class="zoom-btn" data-zoom="75">75%</button>
+                <button class="zoom-btn active" data-zoom="100">100%</button>
+                <button class="zoom-btn" data-zoom="125">125%</button>
+            </div>
+        </div>
+
+        <div class="page-container">
+            <div class="a4-page zoom-100" id="a4Page">
+
+                <!-- Watermark -->
+                <div class="page-watermark">
+                    <div class="wm-pattern"></div>
+                    <div class="wm-logo"></div>
+                    <div class="wm-corners">
+                        <div class="wm-corner tl"></div>
+                        <div class="wm-corner tr"></div>
+                        <div class="wm-corner bl"></div>
+                        <div class="wm-corner br"></div>
+                    </div>
+                </div>
+
+                <div class="page-content">
+
+                    <!-- HEADER -->
+                    <div class="p-header">
+                        <div class="logo-row">
+                            <img src="https://gsssshilla07.pages.dev/logo(1).png" class="logo" onerror="this.style.display='none'">
+                            <div class="school-info">
+                                <div class="sname">Govt. Sr. Sec. School Shilla</div>
+                                <div class="tagline">Shilla · Nerwa · Distt. Shimla · Himachal Pradesh — 171210</div>
+                                <div class="sub-line">Affiliated to HPBOSE · Recognized by Govt. of Himachal Pradesh</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- META -->
+                    <div class="p-meta">
+                        <div><span class="lbl">Ref. No:</span> <span id="prevNo">—</span></div>
+                        <div><span class="lbl">Date:</span> <span id="prevDate">—</span></div>
+                    </div>
+
+                    <!-- TYPE BADGE -->
+                    <div class="p-type-badge"><span id="prevType">DOCUMENT</span></div>
+
+                    <!-- TITLE -->
+                    <div class="p-title" id="prevTitle" style="font-size:16px;font-weight:900;text-align:center;color:#0d1b2a;">Document Title</div>
+
+                    <!-- SUBJECT -->
+                    <div class="p-subject" id="prevSubjectWrap" style="display:none;">
+                        <strong>Subject:</strong> <span id="prevSubject"></span>
+                    </div>
+
+                    <!-- BODY -->
+                    <div class="p-body" id="prevBody">
+                        <p style="color:#94a3b8;font-style:italic;text-align:center;padding:40px 0;">Start typing in the editor to see the live preview…</p>
+                    </div>
+
+                    <!-- SIGNATURE -->
+                    <div class="p-sign-area">
+                        <div class="p-sign-block">
+                            <img id="prevSignImg" class="sign-img" src="" style="display:none;">
+                            <div class="line"></div>
+                            <div class="name" id="prevName">Principal</div>
+                            <div class="desig" id="prevDesig">Govt. Sr. Sec. School Shilla</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="p-footer">
+                    <div class="strip"></div>
+                    <div class="row">
+                        <div>Official Document · GSSS Shilla</div>
+                        <div class="center">Generated: <span id="prevGenTime">—</span></div>
+                        <div class="code">GSSS-<span id="prevCode">----</span></div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 
-    <div class="stats">
-        <div class="stat"><h4>Total</h4><div class="num gold" id="statTotal">0</div></div>
-        <div class="stat"><h4>Published</h4><div class="num green" id="statPub">0</div></div>
-        <div class="stat"><h4>Drafts</h4><div class="num orange" id="statDraft">0</div></div>
-        <div class="stat"><h4>This Month</h4><div class="num blue" id="statMonth">0</div></div>
-    </div>
-
-    <div class="filters">
-        <input type="text" id="fSearch" placeholder="🔍 Search title, number, subject, issued by...">
-        <select id="fType">
-            <option value="">All Types</option>
-            <option>Notice</option><option>Circular</option><option>Order</option>
-            <option>Letter</option><option>Certificate</option><option>Memorandum</option>
-            <option>Report</option><option>Other</option>
-        </select>
-        <select id="fStatus">
-            <option value="">All Status</option>
-            <option>Draft</option><option>Published</option><option>Archived</option>
-        </select>
-        <select id="fSort">
-            <option value="created_at-desc">Newest First</option>
-            <option value="created_at-asc">Oldest First</option>
-            <option value="doc_date-desc">Date (new → old)</option>
-            <option value="doc_date-asc">Date (old → new)</option>
-            <option value="title-asc">Title A-Z</option>
-            <option value="doc_number-asc">Doc No A-Z</option>
-        </select>
-        <button class="btn btn-outline btn-sm" onclick="resetFilters()">Reset</button>
-    </div>
-
-    <div id="listState" class="state-box">
-        <div class="spinner"></div>
-        <p style="margin-top: 14px;">Loading documents…</p>
-    </div>
-
-    <div class="doc-grid" id="docGrid" style="display: none;"></div>
-    <div class="pagination" id="pagination"></div>
 </div>
 
 <div class="toast-wrap" id="toastWrap"></div>
 
 <script>
 const API = "https://gsssshilla.onrender.com/api/documents";
-
-const state = {
-    page: 1, limit: 12,
-    search: "", type: "", status: "",
-    sortBy: "created_at", order: "desc"
-};
-
 const $ = (id) => document.getElementById(id);
 
+let editingId = null;
+let currentStatus = "Draft";
+let quill = null;
+let signatureUrl = null;
+let signaturePublicId = null;
+let autoSaveTimer = null;
+let titleStyle = { bold: false, italic: false, underline: false, fontSize: "16", align: "center", color: "#0d1b2a" };
+let subjectStyle = { bold: false, italic: false, underline: false, fontSize: "12", color: "#1a2332" };
+
 function esc(v) {
-    return v === null || v === undefined ? "" : String(v)
-        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    return v === null || v === undefined ? "" : String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function fmtDate(d) {
-    if (!d) return "-";
+    if (!d) return "—";
     const dt = new Date(d);
     if (isNaN(dt)) return d;
-    return dt.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+    return dt.toLocaleDateString("en-IN", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
+function todayISO() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
 
 function showToast(msg, type = "info") {
@@ -256,153 +578,460 @@ async function apiCall(url, opts = {}) {
     return data;
 }
 
-async function loadStats() {
-    try {
-        const r = await apiCall(`${API}/stats`);
-        if (r.success) {
-            $("statTotal").textContent = r.data.total;
-            $("statPub").textContent = r.data.published;
-            $("statDraft").textContent = r.data.drafts;
-            $("statMonth").textContent = r.data.thisMonth;
+// ============================================================
+// QUILL INIT — Rich Toolbar
+// ============================================================
+function initQuill() {
+    quill = new Quill('#editor', {
+        theme: 'snow',
+        placeholder: 'Write your document body here…',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                [{ 'font': ['serif', 'monospace', 'Arial', 'Georgia', 'Times New Roman', 'Courier New'] }],
+                [{ 'size': ['small', false, 'large', 'huge'] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'script': 'sub' }, { 'script': 'super' }],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'list': 'check' }],
+                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                [{ 'align': [] }],
+                [{ 'direction': 'rtl' }],
+                ['blockquote', 'code-block'],
+                ['link', 'image', 'video'],
+                ['clean']
+            ]
         }
-    } catch (e) {}
-}
-
-async function loadDocuments() {
-    $("listState").style.display = "block";
-    $("docGrid").style.display = "none";
-    $("listState").innerHTML = '<div class="spinner"></div><p style="margin-top: 14px;">Loading documents…</p>';
-    $("pagination").innerHTML = "";
-
-    const params = new URLSearchParams({
-        search: state.search, type: state.type, status: state.status,
-        sortBy: state.sortBy, order: state.order,
-        page: state.page, limit: state.limit
     });
 
-    try {
-        const r = await apiCall(`${API}?${params}`);
-        const docs = r.data || [];
-        if (!docs.length) {
-            $("listState").innerHTML = '<i class="fas fa-inbox"></i><p>No documents found.</p>';
-            return;
+    // Custom image handler — upload to Cloudinary
+    quill.getModule('toolbar').addHandler('image', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = async () => {
+            const file = input.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) { showToast("Image max 5 MB", "error"); return; }
+
+            showToast("Uploading image...", "info");
+            const fd = new FormData();
+            fd.append('image', file);
+
+            try {
+                const token = localStorage.getItem("adminToken");
+                const res = await fetch(`${API}/upload-image`, {
+                    method: 'POST',
+                    headers: { "Authorization": `Bearer ${token}` },
+                    body: fd
+                });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.message);
+
+                const range = quill.getSelection(true);
+                quill.insertEmbed(range.index, 'image', data.url, 'user');
+                quill.setSelection(range.index + 1);
+                showToast("Image inserted ✅", "success");
+            } catch (e) {
+                showToast("Upload failed: " + e.message, "error");
+            }
+        };
+        input.click();
+    });
+
+    quill.on('text-change', () => {
+        updatePreview();
+        if (editingId) {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => autoSave(), 30000);
         }
-        renderDocs(docs);
-        renderPagination(r.pagination);
-        $("listState").style.display = "none";
-        $("docGrid").style.display = "grid";
-    } catch (err) {
-        if (err.message !== "Session expired") {
-            $("listState").innerHTML = `<i class="fas fa-exclamation-triangle"></i><p>${esc(err.message)}</p>`;
-            showToast(err.message, "error");
+    });
+}
+
+// ============================================================
+// STYLE BAR HANDLERS (title & subject)
+// ============================================================
+function bindStyleBars() {
+    document.querySelectorAll('.style-bar button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.dataset.target;
+            const cmd = btn.dataset.cmd;
+            const align = btn.dataset.align;
+            const style = target === 'title' ? titleStyle : subjectStyle;
+
+            if (cmd) {
+                style[cmd] = !style[cmd];
+                btn.classList.toggle('active', style[cmd]);
+            } else if (align) {
+                style.align = align;
+                // Reset others in this bar
+                btn.parentElement.querySelectorAll('[data-align]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            updatePreview();
+        });
+    });
+
+    document.querySelectorAll('.style-bar select[data-style]').forEach(sel => {
+        sel.addEventListener('change', () => {
+            const target = sel.dataset.target;
+            const style = target === 'title' ? titleStyle : subjectStyle;
+            style.fontSize = sel.value;
+            updatePreview();
+        });
+    });
+
+    document.querySelectorAll('.style-bar input[type="color"]').forEach(inp => {
+        inp.addEventListener('input', () => {
+            const target = inp.dataset.target;
+            const style = target === 'title' ? titleStyle : subjectStyle;
+            style.color = inp.value;
+            updatePreview();
+        });
+    });
+}
+
+function applyStyle(el, style) {
+    el.style.fontWeight = style.bold ? '900' : '400';
+    el.style.fontStyle = style.italic ? 'italic' : 'normal';
+    el.style.textDecoration = style.underline ? 'underline' : 'none';
+    el.style.fontSize = style.fontSize + 'px';
+    el.style.textAlign = style.align || 'center';
+    el.style.color = style.color;
+}
+
+// ============================================================
+// PREVIEW
+// ============================================================
+function updatePreview() {
+    $("prevNo").textContent = $("docNumber").value || "—";
+    $("prevDate").textContent = $("docDate").value ? fmtDate($("docDate").value) : "—";
+
+    const type = getSelectedType();
+    $("prevType").textContent = (type || "DOCUMENT").toUpperCase();
+
+    // Title
+    const titleVal = $("titleInput").value.trim();
+    const prevTitle = $("prevTitle");
+    if (titleVal) {
+        prevTitle.textContent = titleVal;
+        prevTitle.style.display = "block";
+        applyStyle(prevTitle, titleStyle);
+    } else {
+        prevTitle.textContent = "Document Title";
+        prevTitle.style.display = "block";
+        applyStyle(prevTitle, { ...titleStyle, color: "#94a3b8" });
+    }
+
+    // Subject
+    const subjVal = $("subjectInput").value.trim();
+    const prevSubjWrap = $("prevSubjectWrap");
+    const prevSubj = $("prevSubject");
+    if (subjVal) {
+        prevSubjWrap.style.display = "block";
+        prevSubj.textContent = subjVal;
+        applyStyle(prevSubj, subjectStyle);
+    } else {
+        prevSubjWrap.style.display = "none";
+    }
+
+    // Body
+    const html = quill.root.innerHTML;
+    const isEmpty = quill.getText().trim().length === 0;
+    if (isEmpty) {
+        $("prevBody").innerHTML = '<p style="color:#94a3b8;font-style:italic;text-align:center;padding:40px 0;">Start typing in the editor to see the live preview…</p>';
+    } else {
+        $("prevBody").innerHTML = html;
+    }
+
+    // Signature
+    $("prevName").textContent = $("issuedByName").value.trim() || "Principal";
+    $("prevDesig").textContent = $("issuedByDesignation").value.trim() || "Govt. Sr. Sec. School Shilla";
+
+    // Generation time + code
+    $("prevGenTime").textContent = new Date().toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    $("prevCode").textContent = (editingId ? String(editingId).padStart(4, "0") : "NEW") + "-" + new Date().getFullYear();
+}
+
+function getSelectedType() {
+    const t = $("docType").value;
+    if (t === "Other") return $("customType").value.trim();
+    return t;
+}
+
+// ============================================================
+// BIND INPUTS
+// ============================================================
+function bindInputs() {
+    ["docNumber", "docDate", "titleInput", "subjectInput", "issuedByName", "issuedByDesignation", "customType"].forEach(id => {
+        $(id).addEventListener("input", updatePreview);
+    });
+
+    $("docType").addEventListener("change", async () => {
+        const isOther = $("docType").value === "Other";
+        $("customTypeWrap").style.display = isOther ? "flex" : "none";
+        updatePreview();
+
+        if (!editingId && !$("docNumber").value) {
+            const type = getSelectedType();
+            if (type) {
+                try {
+                    const r = await apiCall(`${API}/next-number/${encodeURIComponent(type)}`);
+                    if (r.success && r.docNumber) {
+                        $("docNumber").value = r.docNumber;
+                        updatePreview();
+                    }
+                } catch (e) {}
+            }
+        }
+    });
+
+    document.querySelectorAll(".status-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".status-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentStatus = btn.dataset.status;
+        });
+    });
+
+    // Signature upload
+    $("signUpload").addEventListener("click", () => $("signFile").click());
+    $("signFile").addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith("image/")) { showToast("Only image files", "error"); return; }
+        if (file.size > 3 * 1024 * 1024) { showToast("Max 3 MB", "error"); return; }
+
+        showToast("Uploading signature...", "info");
+        const fd = new FormData();
+        fd.append("signature", file);
+
+        try {
+            const token = localStorage.getItem("adminToken");
+            const res = await fetch(`${API}/upload-signature`, {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${token}` },
+                body: fd
+            });
+            const data = await res.json();
+            if (!data.success) throw new Error(data.message);
+
+            signatureUrl = data.url;
+            signaturePublicId = data.public_id;
+
+            $("signPreviewImg").src = data.url;
+            $("signPreview").style.display = "block";
+            $("signUpload").style.display = "none";
+
+            // Update preview
+            const prevImg = $("prevSignImg");
+            prevImg.src = data.url;
+            prevImg.style.display = "block";
+
+            showToast("Signature uploaded ✅", "success");
+        } catch (e) {
+            showToast("Upload failed: " + e.message, "error");
+        }
+    });
+
+    $("signDel").addEventListener("click", () => {
+        signatureUrl = null;
+        signaturePublicId = null;
+        $("signPreview").style.display = "none";
+        $("signUpload").style.display = "block";
+        $("prevSignImg").style.display = "none";
+        $("signFile").value = "";
+    });
+
+    // Zoom buttons
+    document.querySelectorAll(".zoom-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".zoom-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            const a4 = $("a4Page");
+            a4.classList.remove("zoom-75", "zoom-100", "zoom-125");
+            a4.classList.add("zoom-" + btn.dataset.zoom);
+        });
+    });
+}
+
+// ============================================================
+// SAVE
+// ============================================================
+async function saveDoc(isAuto = false) {
+    const docNumber = $("docNumber").value.trim();
+    const docDate = $("docDate").value;
+    const docType = getSelectedType();
+    const title = $("titleInput").value.trim();
+    const bodyHtml = quill.root.innerHTML;
+    const bodyText = quill.getText().trim();
+
+    if (!docNumber) { if (!isAuto) showToast("Doc number required", "error"); return; }
+    if (!docDate) { if (!isAuto) showToast("Date required", "error"); return; }
+    if (!docType) { if (!isAuto) showToast("Type required", "error"); return; }
+    if (!title) { if (!isAuto) showToast("Title required", "error"); return; }
+    if (!bodyText) { if (!isAuto) showToast("Body required", "error"); return; }
+
+    const payload = {
+        docNumber, docDate, docType, title,
+        titleStyle: JSON.stringify(titleStyle),
+        subject: $("subjectInput").value.trim(),
+        subjectStyle: JSON.stringify(subjectStyle),
+        bodyHtml,
+        issuedByName: $("issuedByName").value.trim(),
+        issuedByDesignation: $("issuedByDesignation").value.trim(),
+        signatureUrl,
+        signaturePublicId,
+        status: currentStatus
+    };
+
+    const btn = $("btnSave");
+    if (!isAuto) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+    }
+
+    try {
+        let r;
+        if (editingId) {
+            r = await apiCall(`${API}/${editingId}`, { method: "PUT", body: JSON.stringify(payload) });
+        } else {
+            r = await apiCall(`${API}`, { method: "POST", body: JSON.stringify(payload) });
+            editingId = r.data.id;
+            $("modeLabel").textContent = "EDIT #" + editingId;
+            $("btnPrint").disabled = false;
+            $("btnPdf").disabled = false;
+            history.replaceState(null, "", `?id=${editingId}`);
+            updatePreview();
+        }
+        if (!isAuto) showToast("Saved ✅", "success");
+    } catch (e) {
+        if (!isAuto) showToast(e.message, "error");
+    } finally {
+        if (!isAuto) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> Save';
         }
     }
 }
 
-function renderDocs(docs) {
-    const grid = $("docGrid");
-    grid.innerHTML = docs.map(d => `
-        <div class="doc-card">
-            <div style="display:flex;justify-content:space-between;align-items:start;">
-                <span class="doc-type-badge">${esc(d.doc_type)}</span>
-                <span class="badge-status status-${esc(d.status)}">${esc(d.status)}</span>
-            </div>
-            <h3>${esc(d.title)}</h3>
-            <div class="subj">${esc(d.subject || "—")}</div>
-            <div class="meta">
-                <div><i class="fas fa-hashtag"></i> ${esc(d.doc_number)}</div>
-                <div><i class="fas fa-calendar"></i> ${fmtDate(d.doc_date)}</div>
-                <div><i class="fas fa-user"></i> ${esc(d.issued_by_name || "—")}</div>
-            </div>
-            <div class="card-actions">
-                <button class="action-btn view" onclick="viewDoc(${d.id})"><i class="fas fa-eye"></i> View</button>
-                <a class="action-btn edit" href="admin-document-editor.html?id=${d.id}"><i class="fas fa-edit"></i> Edit</a>
-                <a class="action-btn pdf" href="${API}/${d.id}/pdf" target="_blank" download><i class="fas fa-file-pdf"></i> PDF</a>
-                <button class="action-btn dup" onclick="duplicateDoc(${d.id})"><i class="fas fa-copy"></i> Copy</button>
-                <button class="action-btn del" onclick="deleteDoc(${d.id}, '${esc(d.title).replace(/'/g, "")}')"><i class="fas fa-trash"></i></button>
-            </div>
-        </div>
-    `).join("");
+async function autoSave() {
+    if (!editingId) return;
+    try { await saveDoc(true); } catch (e) {}
 }
 
-function renderPagination(p) {
-    if (!p || p.pages <= 1) return;
-    const wrap = $("pagination");
-    wrap.innerHTML = "";
-    const mk = (label, page, disabled, active) => {
-        const b = document.createElement("button");
-        b.textContent = label;
-        b.disabled = disabled;
-        if (active) b.classList.add("active");
-        b.onclick = () => { state.page = page; loadDocuments(); window.scrollTo({ top: 0, behavior: "smooth" }); };
-        return b;
-    };
-    wrap.appendChild(mk("«", p.page - 1, p.page === 1));
-    const start = Math.max(1, p.page - 2);
-    const end = Math.min(p.pages, p.page + 2);
-    for (let i = start; i <= end; i++) wrap.appendChild(mk(i, i, false, i === p.page));
-    wrap.appendChild(mk("»", p.page + 1, p.page === p.pages));
-}
-
-function viewDoc(id) {
-    window.open(`${API}/${id}/pdf`, "_blank");
-}
-
-async function duplicateDoc(id) {
-    if (!confirm("Duplicate this document?")) return;
+// ============================================================
+// LOAD EXISTING
+// ============================================================
+async function loadExisting(id) {
     try {
-        const r = await apiCall(`${API}/${id}/duplicate`, { method: "POST" });
-        showToast(r.message || "Duplicated ✅", "success");
-        loadDocuments();
-        loadStats();
+        const r = await apiCall(`${API}/${id}`);
+        const d = r.data;
+
+        $("docNumber").value = d.doc_number || "";
+        $("docDate").value = (d.doc_date || "").split("T")[0];
+        $("titleInput").value = d.title || "";
+        $("subjectInput").value = d.subject || "";
+        $("issuedByName").value = d.issued_by_name || "";
+        $("issuedByDesignation").value = d.issued_by_designation || "";
+
+        // Title style
+        if (d.title_style) {
+            try { Object.assign(titleStyle, JSON.parse(d.title_style)); } catch (e) {}
+            // Reflect in UI
+            document.querySelectorAll('#titleStyleBar button').forEach(b => {
+                if (b.dataset.cmd) b.classList.toggle('active', !!titleStyle[b.dataset.cmd]);
+                if (b.dataset.align) b.classList.toggle('active', b.dataset.align === titleStyle.align);
+            });
+            document.querySelector('#titleStyleBar select[data-style="fontSize"]').value = titleStyle.fontSize;
+            document.querySelector('#titleStyleBar input[type="color"]').value = titleStyle.color;
+        }
+
+        // Subject style
+        if (d.subject_style) {
+            try { Object.assign(subjectStyle, JSON.parse(d.subject_style)); } catch (e) {}
+            document.querySelectorAll('#subjectStyleBar button').forEach(b => {
+                if (b.dataset.cmd) b.classList.toggle('active', !!subjectStyle[b.dataset.cmd]);
+            });
+            document.querySelector('#subjectStyleBar select[data-style="fontSize"]').value = subjectStyle.fontSize;
+            document.querySelector('#subjectStyleBar input[type="color"]').value = subjectStyle.color;
+        }
+
+        // Type
+        const stdTypes = ["Notice","Circular","Order","Letter","Certificate","Memorandum","Report"];
+        if (stdTypes.includes(d.doc_type)) {
+            $("docType").value = d.doc_type;
+        } else {
+            $("docType").value = "Other";
+            $("customTypeWrap").style.display = "flex";
+            $("customType").value = d.doc_type;
+        }
+
+        // Status
+        currentStatus = d.status || "Draft";
+        document.querySelectorAll(".status-btn").forEach(b => b.classList.toggle("active", b.dataset.status === currentStatus));
+
+        // Body
+        if (d.body_html) quill.root.innerHTML = d.body_html;
+
+        // Signature
+        if (d.signature_url) {
+            signatureUrl = d.signature_url;
+            signaturePublicId = d.signature_public_id;
+            $("signPreviewImg").src = d.signature_url;
+            $("signPreview").style.display = "block";
+            $("signUpload").style.display = "none";
+            $("prevSignImg").src = d.signature_url;
+            $("prevSignImg").style.display = "block";
+        }
+
+        editingId = d.id;
+        $("modeLabel").textContent = "EDIT #" + d.id;
+        $("btnPrint").disabled = false;
+        $("btnPdf").disabled = false;
+
+        updatePreview();
+        showToast("Loaded ✅", "success");
     } catch (e) { showToast(e.message, "error"); }
 }
 
-async function deleteDoc(id, title) {
-    if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
-    try {
-        const r = await apiCall(`${API}/${id}`, { method: "DELETE" });
-        showToast(r.message || "Deleted ✅", "success");
-        loadDocuments();
-        loadStats();
-    } catch (e) { showToast(e.message, "error"); }
-}
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener("DOMContentLoaded", async () => {
+    if (!localStorage.getItem("adminToken")) { $("sessionOverlay").classList.add("on"); return; }
 
-function resetFilters() {
-    $("fSearch").value = "";
-    $("fType").value = "";
-    $("fStatus").value = "";
-    $("fSort").value = "created_at-desc";
-    state.search = ""; state.type = ""; state.status = "";
-    state.sortBy = "created_at"; state.order = "desc";
-    state.page = 1;
-    loadDocuments();
-}
+    $("docDate").value = todayISO();
+    initQuill();
+    bindStyleBars();
+    bindInputs();
 
-let searchT;
-$("fSearch").addEventListener("input", () => {
-    clearTimeout(searchT);
-    searchT = setTimeout(() => {
-        state.search = $("fSearch").value.trim();
-        state.page = 1;
-        loadDocuments();
-    }, 400);
-});
+    const urlId = new URLSearchParams(window.location.search).get("id");
+    if (urlId) await loadExisting(urlId);
 
-["fType", "fStatus", "fSort"].forEach(id => {
-    $(id).addEventListener("change", () => {
-        state.type = $("fType").value;
-        state.status = $("fStatus").value;
-        const [sb, o] = $("fSort").value.split("-");
-        state.sortBy = sb; state.order = o;
-        state.page = 1;
-        loadDocuments();
+    updatePreview();
+
+    // Buttons
+    $("btnSave").addEventListener("click", () => saveDoc());
+    $("btnPrint").addEventListener("click", () => { if (editingId) window.open(`${API}/${editingId}/pdf`, "_blank"); });
+    $("btnPdf").addEventListener("click", () => { if (editingId) window.location.href = `${API}/${editingId}/pdf`; });
+    $("btnPreview").addEventListener("click", () => $("a4Page").scrollIntoView({ behavior: "smooth", block: "start" }));
+
+    // Ctrl+S
+    document.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+            e.preventDefault();
+            saveDoc();
+        }
     });
-});
 
-window.addEventListener("DOMContentLoaded", () => {
-    loadStats();
-    loadDocuments();
+    // Unsaved changes warning
+    window.addEventListener("beforeunload", (e) => {
+        if (quill.getText().trim() && !editingId) {
+            e.preventDefault();
+            e.returnValue = "";
+        }
+    });
 });
 </script>
 </body>
