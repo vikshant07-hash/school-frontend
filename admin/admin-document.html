@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School Documents | Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root {
+    --bg: #f5f7fb; --card: #fff; --text: #1a2332; --text-2: #5a6a7e;
+    --text-3: #94a3b8; --gold: #c9972b; --gold-bg: #fef8ed;
+    --blue: #4a8af4; --blue-bg: #eef4ff; --green: #10b981; --green-bg: #ecfdf5;
+    --red: #ef4444; --red-bg: #fee2e2; --orange: #f59e0b; --orange-bg: #fffbeb;
+    --purple: #8b5cf6; --purple-bg: #f5f0ff; --pink: #ec4899; --pink-bg: #fdf2f8;
+    --border: #e8edf8; --radius: 14px; --radius-sm: 10px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.04);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ============ TOP BAR ============ */
+.topbar { background: #fff; border-bottom: 1px solid var(--border); padding: 0 28px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
+.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
+.brand img { width: 40px; height: 40px; border-radius: 10px; }
+.brand .name { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; }
+.brand .name span { color: var(--gold); }
+.topbar nav { display: flex; gap: 4px; }
+.topbar nav a { color: var(--text-2); text-decoration: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+.topbar nav a:hover { background: var(--bg); }
+.topbar nav a.active { background: var(--gold-bg); color: var(--gold); }
+.topbar nav a i { margin-right: 6px; }
+
+/* ============ CONTAINER ============ */
+.wrap { max-width: 1400px; margin: 0 auto; padding: 24px 28px 40px; }
+
+/* ============ PAGE HEAD ============ */
+.page-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+.page-head h1 { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+.page-head h1 i { color: var(--gold); }
+.page-head .actions { display: flex; gap: 10px; }
+
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; text-decoration: none; }
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--gold); color: #fff; }
+.btn-primary:hover { background: #b8851f; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(201,151,43,0.3); }
+.btn-outline { background: #fff; color: var(--text-2); border: 1.5px solid var(--border); }
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+.btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+
+/* ============ STATS ============ */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 20px; }
+.stat { background: #fff; padding: 18px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); transition: all 0.2s; }
+.stat:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
+.stat h4 { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; margin-bottom: 6px; }
+.stat .num { font-size: 26px; font-weight: 800; font-family: 'Space Grotesk', sans-serif; }
+.num.gold { color: var(--gold); } .num.green { color: var(--green); }
+.num.blue { color: var(--blue); } .num.orange { color: var(--orange); }
+
+/* ============ FILTERS ============ */
+.filters { background: #fff; padding: 16px 20px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 18px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.filters input, .filters select { padding: 9px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 13px; background: var(--bg); outline: none; transition: all 0.2s; }
+.filters input:focus, .filters select:focus { border-color: var(--gold); background: #fff; box-shadow: 0 0 0 3px rgba(201,151,43,0.1); }
+.filters input[type="text"] { flex: 1 1 260px; min-width: 200px; }
+
+/* ============ DOCUMENT LIST ============ */
+.doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+.doc-card { background: #fff; border-radius: var(--radius); border: 1px solid var(--border); padding: 18px 20px; box-shadow: var(--shadow); transition: all 0.25s; position: relative; overflow: hidden; }
+.doc-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--gold); }
+.doc-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--gold), #e8b84b); }
+
+.doc-type-badge { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; background: var(--gold-bg); color: var(--gold); }
+.doc-card h3 { font-size: 15px; font-weight: 700; margin: 10px 0 6px; line-height: 1.4; }
+.doc-card .subj { font-size: 12.5px; color: var(--text-2); line-height: 1.55; margin-bottom: 10px; min-height: 38px; }
+.doc-card .meta { display: flex; flex-wrap: wrap; gap: 10px 16px; font-size: 11.5px; color: var(--text-3); padding-top: 10px; border-top: 1px dashed var(--border); margin-bottom: 12px; }
+.doc-card .meta div { display: flex; align-items: center; gap: 5px; }
+.doc-card .meta i { color: var(--gold); font-size: 10px; }
+.doc-card .badge-status { padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.status-Draft { background: var(--orange-bg); color: var(--orange); }
+.status-Published { background: var(--green-bg); color: var(--green); }
+.status-Archived { background: #e5e7eb; color: #4b5563; }
+.doc-card .card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.action-btn { padding: 6px 12px; border: none; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; }
+.action-btn:hover { transform: translateY(-1px); }
+.action-btn.view { background: var(--blue-bg); color: var(--blue); }
+.action-btn.edit { background: var(--orange-bg); color: var(--orange); }
+.action-btn.pdf { background: var(--pink-bg); color: var(--pink); }
+.action-btn.dup { background: var(--purple-bg); color: var(--purple); }
+.action-btn.del { background: var(--red-bg); color: var(--red); }
+
+/* ============ EMPTY / LOADING ============ */
+.state-box { text-align: center; padding: 70px 20px; background: #fff; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); }
+.state-box i { font-size: 48px; color: var(--text-3); margin-bottom: 14px; display: block; }
+.state-box p { color: var(--text-2); font-size: 14px; }
+.spinner { display: inline-block; width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============ PAGINATION ============ */
+.pagination { display: flex; justify-content: center; gap: 6px; margin-top: 24px; flex-wrap: wrap; }
+.pagination button { padding: 8px 14px; border: 1.5px solid var(--border); background: #fff; border-radius: 8px; font-family: inherit; font-weight: 700; font-size: 13px; color: var(--text-2); cursor: pointer; transition: all 0.2s; }
+.pagination button:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+.pagination button.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+.pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ============ TOAST ============ */
+.toast-wrap { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { padding: 14px 20px; border-radius: 10px; color: #fff; font-weight: 600; font-size: 13px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); min-width: 260px; animation: toastIn 0.3s ease; display: flex; align-items: center; gap: 10px; }
+.toast.success { background: var(--green); }
+.toast.error { background: var(--red); }
+.toast.info { background: var(--text); }
+.toast.warning { background: var(--orange); }
+@keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+
+/* ============ SESSION OVERLAY ============ */
+.session-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); z-index: 9999; justify-content: center; align-items: center; }
+.session-overlay.on { display: flex; }
+.session-popup { background: #fff; padding: 40px 32px; border-radius: 20px; max-width: 400px; text-align: center; box-shadow: var(--shadow-lg); }
+.session-popup h2 { font-size: 22px; margin-bottom: 8px; }
+.session-popup p { color: var(--text-2); font-size: 14px; margin-bottom: 20px; }
+.session-popup a { display: inline-block; padding: 12px 32px; background: var(--gold); color: #fff; text-decoration: none; border-radius: 30px; font-weight: 700; }
+
+@media (max-width: 768px) {
+    .topbar { padding: 0 16px; }
+    .topbar nav a span { display: none; }
+    .wrap { padding: 16px; }
+    .doc-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="session-overlay" id="sessionOverlay">
+    <div class="session-popup">
+        <h2>🔒 Session Expired</h2>
+        <p>Please login again to continue.</p>
+        <a href="login.html">Login Again</a>
+    </div>
+</div>
+
+<div class="topbar">
+    <a href="#" class="brand">
+        <img src="logo(1).png" alt="Logo" onerror="this.style.display='none'">
+        <div class="name">GSSS<span> Shilla</span></div>
+    </a>
+    <nav>
+        <a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+        <a href="admin-students.html"><i class="fas fa-users"></i> <span>Students</span></a>
+        <a href="admin-documents.html" class="active"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+    </nav>
+</div>
+
+<div class="wrap">
+
+    <div class="page-head">
+        <h1><i class="fas fa-file-alt"></i> School Documents</h1>
+        <div class="actions">
+            <button class="btn btn-outline" onclick="loadStats()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <a href="admin-document-editor.html" class="btn btn-primary"><i class="fas fa-plus"></i> New Document</a>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat"><h4>Total</h4><div class="num gold" id="statTotal">0</div></div>
+        <div class="stat"><h4>Published</h4><div class="num green" id="statPub">0</div></div>
+        <div class="stat"><h4>Drafts</h4><div class="num orange" id="statDraft">0</div></div>
+        <div class="stat"><h4>This Month</h4><div class="num blue" id="statMonth">0</div></div>
+    </div>
+
+    <div class="filters">
+        <input type="text" id="fSearch" placeholder="🔍 Search title, number, subject, issued by...">
+        <select id="fType">
+            <option value="">All Types</option>
+            <option>Notice</option><option>Circular</option><option>Order</option>
+            <option>Letter</option><option>Certificate</option><option>Memorandum</option>
+            <option>Report</option><option>Other</option>
+        </select>
+        <select id="fStatus">
+            <option value="">All Status</option>
+            <option>Draft</option><option>Published</option><option>Archived</option>
+        </select>
+        <select id="fSort">
+            <option value="created_at-desc">Newest First</option>
+            <option value="created_at-asc">Oldest First</option>
+            <option value="doc_date-desc">Date (new → old)</option>
+            <option value="doc_date-asc">Date (old → new)</option>
+            <option value="title-asc">Title A-Z</option>
+            <option value="doc_number-asc">Doc No A-Z</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="resetFilters()">Reset</button>
+    </div>
+
+    <div id="listState" class="state-box">
+        <div class="spinner"></div>
+        <p style="margin-top: 14px;">Loading documents…</p>
+    </div>
+
+    <div class="doc-grid" id="docGrid" style="display: none;"></div>
+    <div class="pagination" id="pagination"></div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+const API = "https://gsssshilla.onrender.com/api/documents";
+
+const state = {
+    page: 1, limit: 12,
+    search: "", type: "", status: "",
+    sortBy: "created_at", order: "desc"
+};
+
+const $ = (id) => document.getElementById(id);
+
+function esc(v) {
+    return v === null || v === undefined ? "" : String(v)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function fmtDate(d) {
+    if (!d) return "-";
+    const dt = new Date(d);
+    if (isNaN(dt)) return d;
+    return dt.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+function showToast(msg, type = "info") {
+    const wrap = $("toastWrap");
+    const t = document.createElement("div");
+    t.className = `toast ${type}`;
+    const icons = { success: "fa-check-circle", error: "fa-exclamation-circle", info: "fa-info-circle", warning: "fa-exclamation-triangle" };
+    t.innerHTML = `<i class="fas ${icons[type]}"></i><span>${esc(msg)}</span>`;
+    wrap.appendChild(t);
+    setTimeout(() => { t.style.opacity = "0"; t.style.transform = "translateX(40px)"; setTimeout(() => t.remove(), 400); }, 4000);
+}
+
+function authHeaders() {
+    const token = localStorage.getItem("adminToken");
+    if (!token) { $("sessionOverlay").classList.add("on"); return null; }
+    return { "Authorization": `Bearer ${token}` };
+}
+
+async function apiCall(url, opts = {}) {
+    const headers = authHeaders();
+    if (!headers) throw new Error("Session expired");
+    const res = await fetch(url, {
+        ...opts,
+        headers: { ...headers, "Content-Type": "application/json", ...(opts.headers || {}) }
+    });
+    if (res.status === 401) { $("sessionOverlay").classList.add("on"); throw new Error("Session expired"); }
+    const text = await res.text();
+    let data;
+    try { data = text ? JSON.parse(text) : {}; } catch { throw new Error("Server error"); }
+    if (!res.ok) throw new Error(data.message || "Request failed");
+    return data;
+}
+
+async function loadStats() {
+    try {
+        const r = await apiCall(`${API}/stats`);
+        if (r.success) {
+            $("statTotal").textContent = r.data.total;
+            $("statPub").textContent = r.data.published;
+            $("statDraft").textContent = r.data.drafts;
+            $("statMonth").textContent = r.data.thisMonth;
+        }
+    } catch (e) {}
+}
+
+async function loadDocuments() {
+    $("listState").style.display = "block";
+    $("docGrid").style.display = "none";
+    $("listState").innerHTML = '<div class="spinner"></div><p style="margin-top: 14px;">Loading documents…</p>';
+    $("pagination").innerHTML = "";
+
+    const params = new URLSearchParams({
+        search: state.search, type: state.type, status: state.status,
+        sortBy: state.sortBy, order: state.order,
+        page: state.page, limit: state.limit
+    });
+
+    try {
+        const r = await apiCall(`${API}?${params}`);
+        const docs = r.data || [];
+        if (!docs.length) {
+            $("listState").innerHTML = '<i class="fas fa-inbox"></i><p>No documents found.</p>';
+            return;
+        }
+        renderDocs(docs);
+        renderPagination(r.pagination);
+        $("listState").style.display = "none";
+        $("docGrid").style.display = "grid";
+    } catch (err) {
+        if (err.message !== "Session expired") {
+            $("listState").innerHTML = `<i class="fas fa-exclamation-triangle"></i><p>${esc(err.message)}</p>`;
+            showToast(err.message, "error");
+        }
+    }
+}
+
+function renderDocs(docs) {
+    const grid = $("docGrid");
+    grid.innerHTML = docs.map(d => `
+        <div class="doc-card">
+            <div style="display:flex;justify-content:space-between;align-items:start;">
+                <span class="doc-type-badge">${esc(d.doc_type)}</span>
+                <span class="badge-status status-${esc(d.status)}">${esc(d.status)}</span>
+            </div>
+            <h3>${esc(d.title)}</h3>
+            <div class="subj">${esc(d.subject || "—")}</div>
+            <div class="meta">
+                <div><i class="fas fa-hashtag"></i> ${esc(d.doc_number)}</div>
+                <div><i class="fas fa-calendar"></i> ${fmtDate(d.doc_date)}</div>
+                <div><i class="fas fa-user"></i> ${esc(d.issued_by_name || "—")}</div>
+            </div>
+            <div class="card-actions">
+                <button class="action-btn view" onclick="viewDoc(${d.id})"><i class="fas fa-eye"></i> View</button>
+                <a class="action-btn edit" href="admin-document-editor.html?id=${d.id}"><i class="fas fa-edit"></i> Edit</a>
+                <a class="action-btn pdf" href="${API}/${d.id}/pdf" target="_blank" download><i class="fas fa-file-pdf"></i> PDF</a>
+                <button class="action-btn dup" onclick="duplicateDoc(${d.id})"><i class="fas fa-copy"></i> Copy</button>
+                <button class="action-btn del" onclick="deleteDoc(${d.id}, '${esc(d.title).replace(/'/g, "")}')"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+    `).join("");
+}
+
+function renderPagination(p) {
+    if (!p || p.pages <= 1) return;
+    const wrap = $("pagination");
+    wrap.innerHTML = "";
+    const mk = (label, page, disabled, active) => {
+        const b = document.createElement("button");
+        b.textContent = label;
+        b.disabled = disabled;
+        if (active) b.classList.add("active");
+        b.onclick = () => { state.page = page; loadDocuments(); window.scrollTo({ top: 0, behavior: "smooth" }); };
+        return b;
+    };
+    wrap.appendChild(mk("«", p.page - 1, p.page === 1));
+    const start = Math.max(1, p.page - 2);
+    const end = Math.min(p.pages, p.page + 2);
+    for (let i = start; i <= end; i++) wrap.appendChild(mk(i, i, false, i === p.page));
+    wrap.appendChild(mk("»", p.page + 1, p.page === p.pages));
+}
+
+function viewDoc(id) {
+    window.open(`${API}/${id}/pdf`, "_blank");
+}
+
+async function duplicateDoc(id) {
+    if (!confirm("Duplicate this document?")) return;
+    try {
+        const r = await apiCall(`${API}/${id}/duplicate`, { method: "POST" });
+        showToast(r.message || "Duplicated ✅", "success");
+        loadDocuments();
+        loadStats();
+    } catch (e) { showToast(e.message, "error"); }
+}
+
+async function deleteDoc(id, title) {
+    if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+    try {
+        const r = await apiCall(`${API}/${id}`, { method: "DELETE" });
+        showToast(r.message || "Deleted ✅", "success");
+        loadDocuments();
+        loadStats();
+    } catch (e) { showToast(e.message, "error"); }
+}
+
+function resetFilters() {
+    $("fSearch").value = "";
+    $("fType").value = "";
+    $("fStatus").value = "";
+    $("fSort").value = "created_at-desc";
+    state.search = ""; state.type = ""; state.status = "";
+    state.sortBy = "created_at"; state.order = "desc";
+    state.page = 1;
+    loadDocuments();
+}
+
+let searchT;
+$("fSearch").addEventListener("input", () => {
+    clearTimeout(searchT);
+    searchT = setTimeout(() => {
+        state.search = $("fSearch").value.trim();
+        state.page = 1;
+        loadDocuments();
+    }, 400);
+});
+
+["fType", "fStatus", "fSort"].forEach(id => {
+    $(id).addEventListener("change", () => {
+        state.type = $("fType").value;
+        state.status = $("fStatus").value;
+        const [sb, o] = $("fSort").value.split("-");
+        state.sortBy = sb; state.order = o;
+        state.page = 1;
+        loadDocuments();
+    });
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+    loadStats();
+    loadDocuments();
+});
+</script>
+</body>
+</html>
