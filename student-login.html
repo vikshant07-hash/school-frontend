@@ -11,12 +11,11 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
 :root {
-    /* balanced muted palette — soft but with depth */
-    --primary-1: #5b6bc0;    /* deep periwinkle */
-    --primary-2: #7c4d9e;    /* muted plum */
-    --primary-3: #3d7ca8;    /* dusty blue */
-    --primary-4: #4a9d8f;    /* muted teal */
-    --primary-5: #a06a9e;    /* soft mauve */
+    --primary-1: #5b6bc0;
+    --primary-2: #7c4d9e;
+    --primary-3: #3d7ca8;
+    --primary-4: #4a9d8f;
+    --primary-5: #a06a9e;
 
     --accent-1: #6d5cc7;
     --accent-2: #b3628f;
@@ -79,9 +78,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* ============================================================
-   SOFT ANIMATED BACKGROUND
-============================================================ */
 .bg {
     position: fixed;
     inset: 0;
@@ -151,9 +147,6 @@ body {
     -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000 20%, transparent 80%);
 }
 
-/* ============================================================
-   LOGIN CARD
-============================================================ */
 .card {
     position: relative;
     z-index: 3;
@@ -197,9 +190,6 @@ body {
     100% { background-position: 200% 50%; }
 }
 
-/* ============================================================
-   HEADER
-============================================================ */
 .head {
     text-align: center;
     padding-bottom: clamp(18px, 3vw, 24px);
@@ -324,9 +314,6 @@ body {
 
 .tag i { font-size: 9px; color: var(--primary-2); }
 
-/* ============================================================
-   ALERT
-============================================================ */
 .alert {
     display: none;
     align-items: flex-start;
@@ -417,9 +404,6 @@ body {
 }
 .alert.warn .alert-title { color: #7a4f12; }
 
-/* ============================================================
-   FORM
-============================================================ */
 .group { margin-bottom: clamp(14px, 2.6vw, 17px); position: relative; }
 
 .label {
@@ -505,9 +489,6 @@ input[type="date"].input::-webkit-calendar-picker-indicator {
 }
 input[type="date"].input::-webkit-calendar-picker-indicator:hover { opacity: 1; }
 
-/* ============================================================
-   CUSTOM DROPDOWN
-============================================================ */
 .dd { position: relative; user-select: none; }
 
 .dd-trigger {
@@ -641,9 +622,6 @@ input[type="date"].input::-webkit-calendar-picker-indicator:hover { opacity: 1; 
     color: var(--primary-1);
 }
 
-/* ============================================================
-   CAPTCHA
-============================================================ */
 .cap-row { display: flex; gap: clamp(10px, 2vw, 12px); }
 
 .cap-box {
@@ -743,9 +721,6 @@ input[type="date"].input::-webkit-calendar-picker-indicator:hover { opacity: 1; 
     font-family: var(--font-display);
 }
 
-/* ============================================================
-   SUBMIT BUTTON
-============================================================ */
 .btn {
     width: 100%;
     padding: clamp(14px, 3vw, 16px);
@@ -815,9 +790,6 @@ input[type="date"].input::-webkit-calendar-picker-indicator:hover { opacity: 1; 
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ============================================================
-   FOOTER
-============================================================ */
 .foot {
     text-align: center;
     margin-top: clamp(16px, 3vw, 22px);
@@ -839,9 +811,6 @@ input[type="date"].input::-webkit-calendar-picker-indicator:hover { opacity: 1; 
 }
 .foot a:hover { color: var(--primary-2); text-decoration: underline; }
 
-/* ============================================================
-   FULLSCREEN LOADER
-============================================================ */
 .loader {
     position: fixed;
     inset: 0;
@@ -925,9 +894,6 @@ input[type="date"].input::-webkit-calendar-picker-indicator:hover { opacity: 1; 
     100% { transform: translateX(100%); }
 }
 
-/* ============================================================
-   RESPONSIVE
-============================================================ */
 @media (min-width: 900px) and (min-height: 800px) {
     .card { max-width: 500px; }
 }
@@ -1054,9 +1020,10 @@ input[type="date"].input::-webkit-calendar-picker-indicator:hover { opacity: 1; 
             <label class="label" for="apaar">APAAR ID</label>
             <div class="field">
                 <i class="fas fa-fingerprint fi"></i>
-                <input type="number" id="apaar" class="input" maxlength="12"
+                <!-- ✅ CHANGED: type="number" → type="text" with inputmode numeric -->
+                <input type="text" id="apaar" class="input" maxlength="12"
                        placeholder="Enter 12-digit APAAR ID" inputmode="numeric"
-                       autocomplete="off" spellcheck="false">
+                       pattern="\d{12}" autocomplete="off" spellcheck="false">
             </div>
         </div>
 
@@ -1273,8 +1240,9 @@ input[type="date"].input::-webkit-calendar-picker-indicator:hover { opacity: 1; 
     }
 
     function bindInputs() {
+        // ✅ CHANGED: slice(0, 12) — previously 11
         apaar.addEventListener('input', function () {
-            this.value = this.value.replace(/\D/g, '').slice(0, 11);
+            this.value = this.value.replace(/\D/g, '').slice(0, 12);
             this.classList.remove('invalid');
         });
         capInput.addEventListener('input', function () {
@@ -1307,15 +1275,17 @@ input[type="date"].input::-webkit-calendar-picker-indicator:hover { opacity: 1; 
             return false;
         }
         const apaarVal = apaar.value.trim();
+
+        // ✅ CHANGED: All 11 → 12 in messages and regex
         if (!apaarVal) {
             markInvalid(apaar);
-            showAlert('err', 'APAAR ID Required', 'Please enter your 11-digit APAAR ID.');
+            showAlert('err', 'APAAR ID Required', 'Please enter your 12-digit APAAR ID.');
             return false;
         }
-        if (!/^\d{11}$/.test(apaarVal)) {
+        if (!/^\d{12}$/.test(apaarVal)) {
             markInvalid(apaar);
             showAlert('err', 'Invalid APAAR ID',
-                'APAAR ID must contain exactly 11 digits. You entered ' + apaarVal.length + '.');
+                'APAAR ID must contain exactly 12 digits. You entered ' + apaarVal.length + '.');
             return false;
         }
         if (!dob.value) {
