@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Students Manager - Admin | GSSS Shilla</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
 :root {
@@ -12,26 +12,32 @@
     --text-muted: #94a3b8; --gold: #c9972b; --gold-light: #e8b84b; --gold-bg: #fef8ed;
     --blue: #4a8af4; --blue-bg: #eef4ff; --green: #10b981; --green-bg: #ecfdf5;
     --purple: #8b5cf6; --purple-bg: #f5f0ff; --pink: #ec4899; --pink-bg: #fdf2f8;
-    --orange: #f59e0b; --orange-bg: #fffbeb; --red: #ef4444; --border: #e8edf8;
+    --orange: #f59e0b; --orange-bg: #fffbeb; --red: #ef4444; --red-bg: #fee2e2;
+    --border: #e8edf8; --border-strong: #d0d9e8;
     --shadow: 0 2px 12px rgba(0,0,0,0.04); --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
-    --radius: 16px; --radius-sm: 10px; --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
+    --radius: 16px; --radius-sm: 10px; --radius-xs: 8px;
+    --transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
 
-.session-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 9999; justify-content: center; align-items: center; }
+/* ===== SESSION OVERLAY ===== */
+.session-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 9999; justify-content: center; align-items: center; animation: fadeIn 0.3s ease; }
 .session-overlay.active { display: flex; }
-.session-popup { background: var(--bg-white); border-radius: 24px; padding: 40px 32px; max-width: 440px; width: 92%; text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.3); }
+.session-popup { background: var(--bg-white); border-radius: 24px; padding: 40px 32px; max-width: 440px; width: 92%; text-align: center; box-shadow: var(--shadow-lg); animation: slideUp 0.4s cubic-bezier(0.4,0,0.2,1); }
 .session-popup h2 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
 .session-popup h2 span { color: var(--gold); }
 .sub-text { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; }
-.login-again-btn { display: inline-flex; align-items: center; gap: 12px; padding: 14px 40px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #fff; border: none; border-radius: 50px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
+.login-again-btn { display: inline-flex; align-items: center; gap: 12px; padding: 14px 40px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #fff; border: none; border-radius: 50px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: var(--transition); }
+.login-again-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,151,43,0.4); }
 
+/* ===== NAVBAR ===== */
 .navbar { background: var(--bg-white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 68px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
 .navbar .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
 .navbar .brand .logo-placeholder { width: 42px; height: 42px; border-radius: var(--radius-sm); background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .navbar .brand .logo-placeholder img { width: 46px; height: 46px; border-radius: 10px; object-fit: contain; padding: 4px; }
-.navbar .brand .name { font-size: 16px; font-weight: 700; }
+.navbar .brand .name { font-size: 16px; font-weight: 700; color: var(--text-primary); }
 .navbar .brand .name span { color: var(--gold); }
 .nav-links { display: flex; gap: 8px; list-style: none; }
 .nav-links a { text-decoration: none; color: var(--text-secondary); padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; transition: var(--transition); }
@@ -41,10 +47,17 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .nav-right { display: flex; align-items: center; gap: 12px; }
 .admin-badge { display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 10px; background: var(--bg); border-radius: 50px; font-size: 12px; font-weight: 600; color: var(--text-secondary); }
 .avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
-.online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
-.hamburger { display: none; background: none; border: none; font-size: 22px; cursor: pointer; }
+.online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+.hamburger { display: none; background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-primary); }
+
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
 .main-container { flex: 1; max-width: 1400px; margin: 0 auto; padding: 24px 32px 40px; width: 100%; }
+
+/* ===== PAGE HEADER ===== */
 .page-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; padding: 18px 24px; background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
 .page-header h1 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
 .page-header h1 i { color: var(--gold); }
@@ -52,46 +65,51 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 
 .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: 'Inter', sans-serif; }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-primary { background: var(--gold); color: #fff; } .btn-primary:hover:not(:disabled) { background: var(--gold-light); }
-.btn-success { background: var(--green); color: #fff; } .btn-success:hover:not(:disabled) { background: #059669; }
+.btn:active:not(:disabled) { transform: scale(0.97); }
+.btn-primary { background: var(--gold); color: #fff; } .btn-primary:hover:not(:disabled) { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(201,151,43,0.3); }
+.btn-success { background: var(--green); color: #fff; } .btn-success:hover:not(:disabled) { background: #059669; transform: translateY(-1px); }
 .btn-danger { background: var(--red); color: #fff; } .btn-danger:hover:not(:disabled) { background: #dc2626; }
-.btn-outline { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); } .btn-outline:hover:not(:disabled) { background: var(--border); }
+.btn-outline { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); } .btn-outline:hover:not(:disabled) { background: var(--border); color: var(--text-primary); }
 .btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 8px; }
 
+/* ===== SESSION BAR ===== */
 .session-bar { background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 22px; margin-bottom: 20px; box-shadow: var(--shadow); display: flex; flex-wrap: wrap; align-items: center; gap: 16px; justify-content: space-between; }
 .session-bar .session-info { display: flex; align-items: center; gap: 14px; }
 .session-bar .session-icon { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; }
 .session-bar .session-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; }
 .session-bar .session-value { font-size: 20px; font-weight: 800; color: var(--text-primary); }
 .session-bar .session-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.session-bar select { padding: 9px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; background: var(--bg); cursor: pointer; outline: none; }
+.session-bar select { padding: 9px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; background: var(--bg); cursor: pointer; outline: none; transition: var(--transition); }
 .session-bar select:focus { border-color: var(--gold); background: #fff; }
 
+/* ===== STATS ===== */
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 20px; }
 .stat-card { background: var(--bg-white); padding: 16px; border-radius: var(--radius); border: 1px solid var(--border); text-align: center; box-shadow: var(--shadow); transition: var(--transition); }
 .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
 .stat-card h3 { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; font-weight: 700; }
-.stat-card .number { font-size: 24px; font-weight: 800; }
+.stat-card .number { font-size: 24px; font-weight: 800; transition: var(--transition); }
 .number.gold { color: var(--gold); } .number.green { color: var(--green); } .number.red { color: var(--red); } .number.blue { color: var(--blue); }
 
+/* ===== FILTERS ===== */
 .class-nav { background: var(--bg-white); padding: 18px 22px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 18px; box-shadow: var(--shadow); }
 .filter-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .filter-row input, .filter-row select { padding: 9px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); outline: none; transition: var(--transition); }
-.filter-row input:focus, .filter-row select:focus { border-color: var(--gold); background: #fff; }
+.filter-row input:focus, .filter-row select:focus { border-color: var(--gold); background: #fff; box-shadow: 0 0 0 3px rgba(201,151,43,0.1); }
 .filter-row input[type="text"] { flex: 1 1 240px; min-width: 200px; }
-
 .promote-mode-btn { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); padding: 8px 14px; font-size: 12px; }
 .promote-mode-btn.active { background: var(--blue-bg); color: var(--blue); border-color: var(--blue); }
-.promote-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); font-size: 13px; }
+.promote-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); font-size: 13px; animation: slideUp 0.3s ease; }
 .promote-bar b { color: var(--blue); }
 .hidden { display: none !important; }
 
+/* ===== STUDENT GRID ===== */
 .student-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 14px; }
-.student-card { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; transition: var(--transition); box-shadow: var(--shadow); position: relative; display: flex; flex-direction: column; }
+.student-card { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; transition: var(--transition); box-shadow: var(--shadow); position: relative; display: flex; flex-direction: column; animation: slideUp 0.3s ease backwards; }
 .student-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--gold); }
 .student-card.selected { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(74,138,244,0.15); }
-.card-photo-wrap { position: relative; height: 160px; background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%); display: flex; align-items: center; justify-content: center; }
-.card-photo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; }
+.card-photo-wrap { position: relative; height: 160px; background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.card-photo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; transition: var(--transition); }
+.student-card:hover .card-photo { transform: scale(1.05); }
 .card-photo-placeholder { width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.15); border: 4px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #fff; }
 .card-class-badge { position: absolute; top: 10px; right: 10px; background: var(--gold); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
 .card-status { position: absolute; bottom: 10px; left: 10px; font-size: 9px; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.4px; }
@@ -108,23 +126,31 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .card-info b { color: var(--text-primary); }
 .card-actions { display: flex; gap: 5px; padding-top: 10px; margin-top: auto; border-top: 1px solid var(--border); justify-content: flex-end; flex-wrap: wrap; }
 .action-btn { padding: 4px 10px; border: none; border-radius: 6px; font-size: 10.5px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; gap: 4px; }
-.action-btn:hover { transform: scale(1.04); }
+.action-btn:hover { transform: scale(1.05); }
 .action-btn.edit { background: var(--orange-bg); color: var(--orange); }
-.action-btn.delete { background: #fee2e2; color: var(--red); }
+.action-btn.delete { background: var(--red-bg); color: var(--red); }
 .action-btn.print { background: var(--pink-bg); color: var(--pink); }
 .action-btn.view { background: var(--purple-bg); color: var(--purple); }
+
+/* ===== SKELETON ===== */
+.skeleton { background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+.skeleton-card { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow); }
+.skeleton-card .s-photo { height: 160px; }
+.skeleton-card .s-body { padding: 14px; }
+.skeleton-card .s-line { height: 12px; margin-bottom: 10px; }
 
 .state-box { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 14px; background: var(--bg-white); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); }
 .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 24px; flex-wrap: wrap; }
 .pagination button { padding: 7px 14px; border: 1px solid var(--border); background: var(--bg-white); border-radius: var(--radius-sm); cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px; color: var(--text-secondary); transition: var(--transition); }
-.pagination button:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+.pagination button:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); transform: translateY(-1px); }
 .pagination button.active { background: var(--gold); color: #fff; border-color: var(--gold); }
 .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
 
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+/* ===== MODAL ===== */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; animation: fadeIn 0.2s ease; }
 .modal-overlay.active { display: flex; }
-.modal-content { background: var(--bg-white); padding: 28px; border-radius: var(--radius); max-width: 820px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
-.modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 14px; margin-bottom: 18px; }
+.modal-content { background: var(--bg-white); padding: 28px; border-radius: var(--radius); max-width: 820px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: var(--shadow-lg); animation: slideUp 0.35s cubic-bezier(0.4,0,0.2,1); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 14px; margin-bottom: 18px; position: sticky; top: -28px; background: var(--bg-white); padding-top: 6px; z-index: 2; }
 .modal-header h2 { font-size: 18px; font-weight: 700; }
 .modal-header h2 i { color: var(--gold); margin-right: 8px; }
 .close-btn { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; transition: var(--transition); }
@@ -137,19 +163,40 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
 .form-grid label, .modal-content > label.full { display: flex; flex-direction: column; font-size: 12px; font-weight: 600; color: var(--text-secondary); gap: 6px; }
 .form-grid input, .form-grid select, .form-grid textarea, .modal-content textarea { padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; font-size: 13px; background: var(--bg); outline: none; transition: var(--transition); color: var(--text-primary); }
-.form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus { border-color: var(--gold); background: #fff; }
+.form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus { border-color: var(--gold); background: #fff; box-shadow: 0 0 0 3px rgba(201,151,43,0.1); }
 .form-grid input[type="file"] { padding: 8px 10px; font-size: 12px; cursor: pointer; }
 .form-grid input:disabled, .form-grid select:disabled { background: #f1f5f9; cursor: not-allowed; color: var(--text-muted); }
 .modal-content > label.full { margin-top: 12px; }
 .file-grid { grid-template-columns: 1fr 1fr; }
 .hint { font-size: 12px; color: var(--text-muted); margin: -4px 0 14px; }
-.form-errors { background: #fee2e2; color: #991b1b; padding: 12px 16px; border-radius: var(--radius-sm); margin-top: 14px; font-size: 13px; border-left: 4px solid var(--red); }
+.form-errors { background: var(--red-bg); color: #991b1b; padding: 12px 16px; border-radius: var(--radius-sm); margin-top: 14px; font-size: 13px; border-left: 4px solid var(--red); }
 .req-star { color: var(--red); }
-.file-preview { margin-top: 6px; padding: 6px; background: #f0fdf4; border-radius: 6px; font-size: 11px; color: var(--green); display: flex; align-items: center; gap: 8px; }
-.file-preview img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid var(--green); }
-.file-existing { margin-top: 6px; padding: 6px 10px; background: var(--gold-bg); border-radius: 6px; font-size: 11px; display: flex; align-items: center; gap: 8px; }
+.file-preview { margin-top: 6px; padding: 8px; background: var(--green-bg); border-radius: 6px; font-size: 11px; color: var(--green); display: flex; align-items: center; gap: 8px; border: 1px solid rgba(16,185,129,0.3); }
+.file-preview img { width: 44px; height: 44px; object-fit: cover; border-radius: 4px; border: 1px solid var(--green); }
+.file-existing { margin-top: 6px; padding: 6px 10px; background: var(--gold-bg); border-radius: 6px; font-size: 11px; display: flex; align-items: center; gap: 8px; border: 1px solid rgba(201,151,43,0.3); }
 .file-existing a { color: var(--gold); text-decoration: none; font-weight: 600; }
+.file-existing a:hover { text-decoration: underline; }
 
+/* Conditional field animation */
+.conditional-field { max-height: 500px; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease, margin 0.3s ease; opacity: 1; margin-top: 0; }
+.conditional-field.hidden-cond { max-height: 0; opacity: 0; margin-top: 0 !important; pointer-events: none; }
+
+/* Aadhaar verification states */
+.input-group { position: relative; }
+.input-group input { width: 100%; padding-right: 40px; }
+.input-status { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; }
+.input-status.verified { color: var(--green); }
+.input-status.verifying { color: var(--blue); animation: spin 1s linear infinite; }
+.input-status.error { color: var(--red); }
+@keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+
+.field-msg { font-size: 11px; margin-top: 4px; display: flex; align-items: center; gap: 5px; animation: slideUp 0.2s ease; }
+.field-msg.success { color: var(--green); }
+.field-msg.error { color: var(--red); }
+.field-msg.warning { color: var(--orange); }
+.field-msg.info { color: var(--blue); }
+
+/* ===== VIEW MODAL ===== */
 .view-section { margin-bottom: 20px; }
 .view-section h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--gold); margin: 0 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
 .view-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; font-size: 13px; }
@@ -159,10 +206,12 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .view-photo { width: 120px; height: 140px; border-radius: 10px; object-fit: cover; border: 3px solid var(--gold); margin-bottom: 16px; display: block; }
 .doc-links { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .doc-links a { color: var(--gold); text-decoration: none; font-size: 12px; padding: 8px 12px; background: var(--gold-bg); border-radius: 8px; transition: var(--transition); display: flex; align-items: center; gap: 8px; }
+.doc-links a:hover { background: var(--gold); color: #fff; transform: translateY(-1px); }
 .doc-links .empty { color: var(--text-muted); font-size: 12px; padding: 8px 12px; background: var(--bg); border-radius: 8px; display: flex; align-items: center; gap: 8px; }
 
+/* ===== TOAST ===== */
 .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
-.toast { padding: 14px 22px; border-radius: var(--radius-sm); color: #fff; font-weight: 600; font-size: 13px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); min-width: 250px; animation: slideIn 0.3s ease; }
+.toast { padding: 14px 22px; border-radius: var(--radius-sm); color: #fff; font-weight: 600; font-size: 13px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); min-width: 250px; animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 10px; }
 .toast-success { background: var(--green); } .toast-error { background: var(--red); }
 .toast-warning { background: var(--orange); } .toast-info { background: var(--text-primary); }
 @keyframes slideIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
@@ -171,8 +220,8 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 
 @media (max-width: 768px) {
     .navbar { padding: 0 16px; }
-    .nav-links { display: none; flex-direction: column; position: absolute; top: 68px; left: 0; right: 0; background: var(--bg-white); padding: 14px; border-bottom: 1px solid var(--border); }
-    .nav-links.open { display: flex; }
+    .nav-links { display: none; flex-direction: column; position: absolute; top: 68px; left: 0; right: 0; background: var(--bg-white); padding: 14px; border-bottom: 1px solid var(--border); box-shadow: var(--shadow-hover); }
+    .nav-links.open { display: flex; animation: slideUp 0.3s ease; }
     .hamburger { display: block; }
     .main-container { padding: 14px; }
     .page-header { padding: 14px; flex-direction: column; align-items: stretch; }
@@ -320,7 +369,11 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
         </div>
     </div>
 
-    <div id="loadingState" class="state-box"><i class="fas fa-spinner fa-spin"></i> Loading students…</div>
+    <div id="loadingState" class="student-grid">
+        <div class="skeleton-card"><div class="skeleton s-photo"></div><div class="s-body"><div class="skeleton s-line" style="width:70%"></div><div class="skeleton s-line" style="width:40%"></div><div class="skeleton s-line" style="width:90%"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton s-photo"></div><div class="s-body"><div class="skeleton s-line" style="width:60%"></div><div class="skeleton s-line" style="width:50%"></div><div class="skeleton s-line" style="width:85%"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton s-photo"></div><div class="s-body"><div class="skeleton s-line" style="width:75%"></div><div class="skeleton s-line" style="width:45%"></div><div class="skeleton s-line" style="width:80%"></div></div></div>
+    </div>
     <div id="emptyState" class="state-box hidden">No students found.</div>
     <section class="student-grid" id="studentGrid"></section>
     <div class="pagination" id="pagination"></div>
@@ -391,7 +444,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
                     </select>
                 </label>
                 <label>Category <span class="req-star">*</span>
-                    <select name="category" required>
+                    <select name="category" id="formCategory" required>
                         <option value="">Select</option>
                         <option>General</option><option>SC</option><option>ST</option>
                         <option>OBC</option><option>EWS</option><option>Other</option>
@@ -401,8 +454,25 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 
             <h3 class="form-section"><i class="fas fa-id-card"></i> ID & Contact</h3>
             <div class="form-grid">
-                <label>Aadhar Number <span class="req-star">*</span><input type="text" name="aadharNumber" pattern="\d{12}" maxlength="12" required></label>
-                <label>APAAR ID <input type="text" name="apaarId"></label>
+                <label>
+                    Aadhar Number <span class="req-star">*</span>
+                    <div class="input-group">
+                        <input type="text" name="aadharNumber" id="aadharInput"
+                               placeholder="1234 5678 9012" maxlength="14" inputmode="numeric"
+                               pattern="\d{4}\s?\d{4}\s?\d{4}" required autocomplete="off">
+                        <span class="input-status" id="aadharStatus"></span>
+                    </div>
+                    <div class="field-msg hidden" id="aadharMsg"></div>
+                </label>
+                <label>
+                    APAAR ID <span class="req-star">*</span>
+                    <div class="input-group">
+                        <input type="text" name="apaarId" id="apaarInput"
+                               placeholder="12-digit APAAR ID" maxlength="12" inputmode="numeric"
+                               pattern="\d{12}" required autocomplete="off">
+                    </div>
+                    <div class="field-msg hidden" id="apaarMsg"></div>
+                </label>
                 <label>Mobile Number <span class="req-star">*</span><input type="tel" name="mobileNumber" pattern="[6-9]\d{9}" maxlength="10" required></label>
                 <label>Email ID <span class="req-star">*</span><input type="email" name="emailId" required></label>
             </div>
@@ -421,19 +491,47 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
                 <textarea name="address" id="fullAddress" rows="2" readonly style="background:#f8fafc;cursor:not-allowed;"></textarea>
             </label>
 
-            <h3 class="form-section"><i class="fas fa-file-upload"></i> Documents <span class="auto-badge">7 required</span></h3>
-            <p class="hint">Allowed: JPG, PNG, WEBP, PDF (max 5MB each)</p>
+            <h3 class="form-section"><i class="fas fa-file-upload"></i> Documents <span class="auto-badge" id="reqDocBadge">6 required</span></h3>
+            <p class="hint">
+                <b>Photo & Signature:</b> JPG/PNG/WEBP only, max <b>3 MB</b> each.<br>
+                <b>All other docs:</b> PDF only, max <b>2 MB</b> each.
+            </p>
             <div class="form-grid file-grid">
-                <label>Student Photo <span class="req-star" data-req>*</span><input type="file" name="studentPhoto" accept="image/*,application/pdf"></label>
-                <label>Signature <span class="req-star" data-req>*</span><input type="file" name="signature" accept="image/*,application/pdf"></label>
-                <label>Aadhar Card <span class="req-star" data-req>*</span><input type="file" name="aadharCard" accept="image/*,application/pdf"></label>
-                <label>Himachali Bonafide <span class="req-star" data-req>*</span><input type="file" name="himachaliBonafide" accept="image/*,application/pdf"></label>
-                <label>Caste Certificate <span class="req-star" data-req>*</span><input type="file" name="casteCertificate" accept="image/*,application/pdf"></label>
-                <label>APAAR Card <span class="req-star" data-req>*</span><input type="file" name="apaarCard" accept="image/*,application/pdf"></label>
-                <label>Previous Marksheet <span class="req-star" data-req>*</span><input type="file" name="previousMarksheet" accept="image/*,application/pdf"></label>
-                <label>Income Certificate <small style="color:var(--text-muted);font-weight:400;">(Optional)</small><input type="file" name="incomeCertificate" accept="image/*,application/pdf"></label>
-                <label>BPL Certificate <small style="color:var(--text-muted);font-weight:400;">(Optional)</small><input type="file" name="bplCertificate" accept="image/*,application/pdf"></label>
-                <label>Any Other Document <small style="color:var(--text-muted);font-weight:400;">(Optional)</small><input type="file" name="otherDocument" accept="image/*,application/pdf"></label>
+                <label>Student Photo <span class="req-star" data-req>*</span>
+                    <input type="file" name="studentPhoto" accept="image/jpeg,image/jpg,image/png,image/webp" data-max="3145728" data-img="true">
+                </label>
+                <label>Signature <span class="req-star" data-req>*</span>
+                    <input type="file" name="signature" accept="image/jpeg,image/jpg,image/png,image/webp" data-max="3145728" data-img="true">
+                </label>
+                <label>Aadhar Card <span class="req-star" data-req>*</span>
+                    <input type="file" name="aadharCard" accept="application/pdf" data-max="2097152" data-pdf="true">
+                </label>
+                <label>Himachali Bonafide <span class="req-star" data-req>*</span>
+                    <input type="file" name="himachaliBonafide" accept="application/pdf" data-max="2097152" data-pdf="true">
+                </label>
+
+                <!-- ✅ Conditional Caste Certificate -->
+                <div class="conditional-field hidden-cond" id="casteCertWrapper" style="display:contents;">
+                    <label id="casteCertLabel">Caste Certificate <span class="req-star" data-req>*</span>
+                        <input type="file" name="casteCertificate" accept="application/pdf" data-max="2097152" data-pdf="true">
+                    </label>
+                </div>
+
+                <label>APAAR Card <span class="req-star" data-req>*</span>
+                    <input type="file" name="apaarCard" accept="application/pdf" data-max="2097152" data-pdf="true">
+                </label>
+                <label>Previous Marksheet <span class="req-star" data-req>*</span>
+                    <input type="file" name="previousMarksheet" accept="application/pdf" data-max="2097152" data-pdf="true">
+                </label>
+                <label>Income Certificate <small style="color:var(--text-muted);font-weight:400;">(Optional)</small>
+                    <input type="file" name="incomeCertificate" accept="application/pdf" data-max="2097152" data-pdf="true">
+                </label>
+                <label>BPL Certificate <small style="color:var(--text-muted);font-weight:400;">(Optional)</small>
+                    <input type="file" name="bplCertificate" accept="application/pdf" data-max="2097152" data-pdf="true">
+                </label>
+                <label>Any Other Document <small style="color:var(--text-muted);font-weight:400;">(Optional)</small>
+                    <input type="file" name="otherDocument" accept="application/pdf" data-max="2097152" data-pdf="true">
+                </label>
             </div>
 
             <div class="form-errors hidden" id="formErrors"></div>
@@ -502,23 +600,24 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 const STUDENT_API = "https://gsssshilla.onrender.com/api/students";
 const CURRENT_SESSION_KEY = "currentSession";
 
+// ✅ Category rules
+const CASTE_REQUIRED_CATEGORIES = ["SC", "ST", "OBC", "Other", "EWS"];
+const IMAGE_MAX_BYTES = 3 * 1024 * 1024;
+const PDF_MAX_BYTES = 2 * 1024 * 1024;
+
 const state = {
-    page: 1,
-    limit: 12,
+    page: 1, limit: 12,
     filters: { search: "", class: "", stream: "", gender: "", category: "", status: "" },
-    sortBy: "created_at",
-    order: "desc",
-    students: [],
-    pagination: {},
-    promoteMode: false,
-    selectedIds: new Set(),
-    editingId: null,
-    viewingId: null,
-    currentSession: "",
-    previewSession: ""
+    sortBy: "created_at", order: "desc",
+    students: [], pagination: {},
+    promoteMode: false, selectedIds: new Set(),
+    editingId: null, viewingId: null,
+    currentSession: "", previewSession: "",
+    aadharVerified: false, aadharVerifiedValue: ""
 };
 
 const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
 
 function esc(v) {
     return v === null || v === undefined ? "" : String(v)
@@ -532,17 +631,20 @@ function fmtDate(d) {
     return isNaN(dt) ? "-" : dt.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-function showToast(msg, type = "info") {
+// ============ TOAST ============
+function showToast(msg, type = "info", duration = 4200) {
     const c = $("#toastContainer");
+    const icons = { success: "fa-check-circle", error: "fa-exclamation-circle", warning: "fa-exclamation-triangle", info: "fa-info-circle" };
     const t = document.createElement("div");
     t.className = `toast toast-${type}`;
-    t.textContent = msg;
+    t.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> <span>${esc(msg)}</span>`;
     c.appendChild(t);
-    setTimeout(() => { t.style.opacity = "0"; setTimeout(() => t.remove(), 400); }, 4200);
+    setTimeout(() => { t.style.opacity = "0"; t.style.transform = "translateX(40px)"; setTimeout(() => t.remove(), 400); }, duration);
 }
 
-function openModal(id) { $("#" + id).classList.add("active"); }
-function closeModal(id) { $("#" + id).classList.remove("active"); }
+// ============ MODAL ============
+function openModal(id) { $("#" + id).classList.add("active"); document.body.style.overflow = "hidden"; }
+function closeModal(id) { $("#" + id).classList.remove("active"); document.body.style.overflow = ""; }
 function toggleNav() { $("#navLinks").classList.toggle("open"); }
 
 function showPopup() {
@@ -588,11 +690,7 @@ async function apiCall(url, options = {}, retries = 2) {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 30000);
         try {
-            const res = await fetch(url, {
-                ...options,
-                headers: { ...headers, ...(options.headers || {}) },
-                signal: controller.signal
-            });
+            const res = await fetch(url, { ...options, headers: { ...headers, ...(options.headers || {}) }, signal: controller.signal });
             clearTimeout(timeout);
             if (res.status === 401) { showPopup(); throw new Error("Session expired"); }
             const text = await res.text();
@@ -608,20 +706,16 @@ async function apiCall(url, options = {}, retries = 2) {
         } catch (err) {
             clearTimeout(timeout);
             const retryable = err.name === "AbortError" || err.message === "Failed to fetch";
-            if (attempt < retries && retryable) { await new Promise(r => setTimeout(r, 2200)); continue; }
+            if (attempt < retries && retryable) { await new Promise(r => setTimeout(r, 1800)); continue; }
             throw err;
         }
     }
 }
 
+// ============ QUERY ============
 function buildQuery() {
     const p = new URLSearchParams();
-    if (state.filters.search) p.set("search", state.filters.search);
-    if (state.filters.class) p.set("class", state.filters.class);
-    if (state.filters.stream) p.set("stream", state.filters.stream);
-    if (state.filters.gender) p.set("gender", state.filters.gender);
-    if (state.filters.category) p.set("category", state.filters.category);
-    if (state.filters.status) p.set("status", state.filters.status);
+    Object.entries(state.filters).forEach(([k, v]) => { if (v) p.set(k, v); });
     const sessionToUse = state.previewSession || state.currentSession;
     if (sessionToUse) p.set("session", sessionToUse);
     p.set("sortBy", state.sortBy);
@@ -631,6 +725,7 @@ function buildQuery() {
     return p.toString();
 }
 
+// ============ LOAD STUDENTS ============
 async function loadStudents() {
     $("#loadingState").classList.remove("hidden");
     $("#emptyState").classList.add("hidden");
@@ -656,19 +751,18 @@ async function loadStudents() {
 
 function renderStudents() {
     const grid = $("#studentGrid");
-    grid.innerHTML = state.students.map((s) => {
+    grid.innerHTML = state.students.map((s, i) => {
         const photo = s.student_photo_url || "";
         const statusClass = `status-${s.status || "Active"}`;
         const selected = state.selectedIds.has(s.id) ? "selected" : "";
         const isHigher = ["11","12"].includes(String(s.class));
         const streamLabel = isHigher ? (s.stream || "—") : "";
-
         return `
-        <div class="student-card ${selected}" data-id="${s.id}">
+        <div class="student-card ${selected}" data-id="${s.id}" style="animation-delay:${Math.min(i * 30, 300)}ms">
             ${state.promoteMode ? `<input type="checkbox" class="card-select" data-id="${s.id}" ${selected ? "checked" : ""}>` : ""}
             <div class="card-photo-wrap">
                 ${photo
-                    ? `<img class="card-photo" src="${esc(photo)}" alt="photo" onerror="this.outerHTML='<div class=&quot;card-photo-placeholder&quot;>👤</div>'">`
+                    ? `<img class="card-photo" src="${esc(photo)}" alt="photo" loading="lazy" onerror="this.outerHTML='<div class=&quot;card-photo-placeholder&quot;>👤</div>'">`
                     : `<div class="card-photo-placeholder">👤</div>`}
                 <span class="card-class-badge">Class ${esc(s.class)}${streamLabel ? " · " + esc(streamLabel) : ""}</span>
                 <span class="card-status ${statusClass}">${esc(s.status || "Active")}</span>
@@ -717,23 +811,31 @@ function updateStats() {
     const active = state.students.filter(s => (s.status || "Active") === "Active").length;
     const dropped = state.students.filter(s => s.status === "Dropped").length;
     const classes = new Set(state.students.map(s => s.class)).size;
-    $("#statTotal").textContent = total;
-    $("#statActive").textContent = active;
-    $("#statDropped").textContent = dropped;
-    $("#statClasses").textContent = classes;
+    animateNumber($("#statTotal"), total);
+    animateNumber($("#statActive"), active);
+    animateNumber($("#statDropped"), dropped);
+    animateNumber($("#statClasses"), classes);
 }
 
+function animateNumber(el, target) {
+    const current = parseInt(el.textContent) || 0;
+    if (current === target) return;
+    const steps = 12, diff = target - current;
+    let i = 0;
+    const timer = setInterval(() => {
+        i++;
+        el.textContent = Math.round(current + (diff * i / steps));
+        if (i >= steps) { el.textContent = target; clearInterval(timer); }
+    }, 30);
+}
+
+// ============ SESSION ============
 async function loadCurrentSession() {
     try {
         const res = await apiCall(`${STUDENT_API}/current-session`);
-        if (res.session) {
-            state.currentSession = res.session;
-            try { localStorage.setItem(CURRENT_SESSION_KEY, res.session); } catch (e) {}
-        }
+        if (res.session) { state.currentSession = res.session; try { localStorage.setItem(CURRENT_SESSION_KEY, res.session); } catch (e) {} }
     } catch (e) {}
-    if (!state.currentSession) {
-        try { state.currentSession = localStorage.getItem(CURRENT_SESSION_KEY) || ""; } catch (e) {}
-    }
+    if (!state.currentSession) { try { state.currentSession = localStorage.getItem(CURRENT_SESSION_KEY) || ""; } catch (e) {} }
     if (!state.currentSession) {
         const y = new Date().getFullYear();
         state.currentSession = `${y}-${(y + 1).toString().substring(2)}`;
@@ -748,10 +850,7 @@ async function fillSessionDropdown() {
     const sel = $("#previewSessionSelect");
     sel.innerHTML = '<option value="">— Select Session —</option>';
     let extra = [];
-    try {
-        const data = await apiCall(`${STUDENT_API}?limit=200`);
-        extra = [...new Set((data.data || []).map(s => s.session).filter(Boolean))];
-    } catch (e) {}
+    try { const data = await apiCall(`${STUDENT_API}?limit=200`); extra = [...new Set((data.data || []).map(s => s.session).filter(Boolean))]; } catch (e) {}
     const all = [...new Set([...options, ...extra, state.currentSession].filter(Boolean))].sort().reverse();
     all.forEach(s => {
         const o = document.createElement("option");
@@ -766,11 +865,7 @@ async function fillSessionDropdown() {
 function computeSessionOptions() {
     const y = new Date().getFullYear();
     const opts = [];
-    for (let i = -3; i <= 3; i++) {
-        const start = y + i;
-        const end = (start + 1).toString().substring(2);
-        opts.push(`${start}-${end}`);
-    }
+    for (let i = -3; i <= 3; i++) { const start = y + i; opts.push(`${start}-${(start + 1).toString().substring(2)}`); }
     return opts;
 }
 
@@ -785,9 +880,7 @@ function onPreviewSessionChange() {
 }
 
 function toggleResetButton() {
-    const btn = $("#resetSessionBtn");
-    if (state.previewSession && state.previewSession !== state.currentSession) btn.style.display = "inline-flex";
-    else btn.style.display = "none";
+    $("#resetSessionBtn").style.display = (state.previewSession && state.previewSession !== state.currentSession) ? "inline-flex" : "none";
 }
 
 function resetToCurrentSession() {
@@ -818,16 +911,13 @@ $("#btnConfirmSession").addEventListener("click", async () => {
 
     const [startYear] = newSession.split("-").map(Number);
     const now = new Date().getFullYear();
-    if (startYear < now - 5 || startYear > now + 5) {
-        errBox.innerHTML = "• Year out of allowed range (±5 years).";
-        errBox.classList.remove("hidden"); return;
-    }
+    if (startYear < now - 5 || startYear > now + 5) { errBox.innerHTML = "• Year out of allowed range (±5 years)."; errBox.classList.remove("hidden"); return; }
+
+    const btn = $("#btnConfirmSession");
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
 
     try {
-        const res = await apiCall(`${STUDENT_API}/current-session`, {
-            method: "POST",
-            body: JSON.stringify({ session: newSession })
-        });
+        const res = await apiCall(`${STUDENT_API}/current-session`, { method: "POST", body: JSON.stringify({ session: newSession }) });
         state.currentSession = newSession;
         state.previewSession = "";
         try { localStorage.setItem(CURRENT_SESSION_KEY, newSession); } catch (e) {}
@@ -839,9 +929,12 @@ $("#btnConfirmSession").addEventListener("click", async () => {
     } catch (err) {
         errBox.innerHTML = "• " + err.message;
         errBox.classList.remove("hidden");
+    } finally {
+        btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Confirm';
     }
 });
 
+// ============ FILTERS ============
 function readFilters() {
     state.filters.search = $("#fSearch").value.trim();
     state.filters.class = $("#fClass").value;
@@ -871,6 +964,7 @@ $("#btnReset").addEventListener("click", () => {
     loadStudents();
 });
 
+// ============ CLASS / STREAM ============
 function onClassChange() {
     const cls = $("#formClass").value;
     const streamSel = $("#formStream");
@@ -889,30 +983,209 @@ function onClassChange() {
     }
 }
 
-function buildFullAddress() {
-    const v = (n) => (document.querySelector(`[name="${n}"]`)?.value || "").trim();
-    const parts = [
-        v("village"),
-        v("postOffice") ? "PO " + v("postOffice") : "",
-        v("tehsil") ? "Teh. " + v("tehsil") : "",
-        v("district") ? "Distt. " + v("district") : "",
-        v("state"),
-        v("pincode")
-    ].filter(Boolean);
-    $("#fullAddress").value = parts.join(", ");
+// ============ CATEGORY → CASTE CERT TOGGLE ============
+function updateCasteCertificateField() {
+    const category = $("#formCategory").value;
+    const wrapper = $("#casteCertWrapper");
+    const input = wrapper.querySelector('input[name="casteCertificate"]');
+    const star = wrapper.querySelector("[data-req]");
+    const needsCaste = CASTE_REQUIRED_CATEGORIES.includes(category);
+
+    if (needsCaste) {
+        wrapper.classList.remove("hidden-cond");
+        if (!state.editingId) input.required = true;
+        if (star) star.style.display = "inline";
+        // Update badge
+        $("#reqDocBadge").textContent = "7 required";
+    } else {
+        wrapper.classList.add("hidden-cond");
+        input.required = false;
+        input.value = "";
+        const prev = input.parentElement.querySelector(".file-preview");
+        if (prev) prev.remove();
+        if (star) star.style.display = "none";
+        $("#reqDocBadge").textContent = "6 required";
+    }
 }
 
-document.querySelectorAll('[name="village"],[name="postOffice"],[name="tehsil"],[name="district"],[name="state"],[name="pincode"]')
+$("#formCategory").addEventListener("change", updateCasteCertificateField);
+
+// ============ ADDRESS ============
+function buildFullAddress() {
+    const v = (n) => (document.querySelector(`[name="${n}"]`)?.value || "").trim();
+    const parts = [v("village"), v("postOffice") ? "PO " + v("postOffice") : "", v("tehsil") ? "Teh. " + v("tehsil") : "",
+        v("district") ? "Distt. " + v("district") : "", v("state"), v("pincode")].filter(Boolean);
+    $("#fullAddress").value = parts.join(", ");
+}
+$$('[name="village"],[name="postOffice"],[name="tehsil"],[name="district"],[name="state"],[name="pincode"]')
     .forEach(el => el.addEventListener("input", buildFullAddress));
 
+// ============ AADHAAR FORMAT + VERIFY ============
+const aadharInput = $("#aadharInput");
+const aadharStatus = $("#aadharStatus");
+const aadharMsg = $("#aadharMsg");
+
+// Auto-format as 4-4-4
+aadharInput.addEventListener("input", (e) => {
+    let v = e.target.value.replace(/\D/g, "").slice(0, 12);
+    v = v.replace(/(\d{4})(?=\d)/g, "$1 ");
+    e.target.value = v;
+    // Reset verification on edit
+    if (state.aadharVerifiedValue && state.aadharVerifiedValue !== v.replace(/\s/g, "")) {
+        state.aadharVerified = false;
+        state.aadharVerifiedValue = "";
+        aadharStatus.className = "input-status";
+        aadharStatus.textContent = "";
+        aadharMsg.classList.add("hidden");
+    }
+});
+
+// Verify on blur
+aadharInput.addEventListener("blur", async () => {
+    const raw = aadharInput.value.replace(/\s/g, "");
+    if (raw.length !== 12) {
+        aadharStatus.className = "input-status error";
+        aadharStatus.innerHTML = '<i class="fas fa-times-circle"></i>';
+        aadharMsg.className = "field-msg error";
+        aadharMsg.innerHTML = '<i class="fas fa-times-circle"></i> Aadhaar must be 12 digits';
+        return;
+    }
+    await verifyAadhaar(raw);
+});
+
+async function verifyAadhaar(aadhaar12) {
+    aadharStatus.className = "input-status verifying";
+    aadharStatus.innerHTML = '<i class="fas fa-spinner"></i>';
+    aadharMsg.classList.add("hidden");
+
+    try {
+        const token = localStorage.getItem("adminToken");
+        const res = await fetch(`${STUDENT_API}/verify-aadhaar`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+            body: JSON.stringify({
+                aadharNumber: aadhaar12,
+                name: $("#studentForm [name='name']").value.trim(),
+                fatherName: $("#studentForm [name='fatherName']").value.trim(),
+                dob: $("#studentForm [name='dob']").value
+            })
+        });
+        const data = await res.json();
+
+        if (!data.verified) {
+            aadharStatus.className = "input-status error";
+            aadharStatus.innerHTML = '<i class="fas fa-times-circle"></i>';
+            aadharMsg.className = "field-msg error";
+            aadharMsg.innerHTML = `<i class="fas fa-times-circle"></i> ${esc(data.message || "Verification failed")}`;
+            state.aadharVerified = false;
+            return;
+        }
+
+        // Success
+        state.aadharVerified = true;
+        state.aadharVerifiedValue = aadhaar12;
+        aadharStatus.className = "input-status verified";
+        aadharStatus.innerHTML = '<i class="fas fa-check-circle"></i>';
+
+        let msgHtml = '<i class="fas fa-check-circle"></i> Aadhaar verified';
+        let msgClass = "field-msg success";
+
+        if (data.alreadyExists) {
+            msgClass = "field-msg warning";
+            msgHtml = `<i class="fas fa-exclamation-triangle"></i> Already registered — Student ID: <b>${esc(data.existingRecord.student_id)}</b>`;
+        } else if (data.nameMatch && data.nameMatch.nameMatches === false) {
+            msgClass = "field-msg warning";
+            msgHtml = `<i class="fas fa-exclamation-triangle"></i> Name mismatch with existing record`;
+        }
+
+        aadharMsg.className = msgClass;
+        aadharMsg.innerHTML = msgHtml;
+    } catch (err) {
+        aadharStatus.className = "input-status error";
+        aadharStatus.innerHTML = '<i class="fas fa-times-circle"></i>';
+        aadharMsg.className = "field-msg error";
+        aadharMsg.innerHTML = `<i class="fas fa-times-circle"></i> Verification error`;
+    }
+}
+
+// ============ APAAR ID (12 digits numeric) ============
+const apaarInput = $("#apaarInput");
+const apaarMsg = $("#apaarMsg");
+apaarInput.addEventListener("input", (e) => {
+    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 12);
+    if (e.target.value.length === 12) {
+        apaarMsg.className = "field-msg success";
+        apaarMsg.innerHTML = '<i class="fas fa-check-circle"></i> 12-digit APAAR ID';
+    } else if (e.target.value.length > 0) {
+        apaarMsg.className = "field-msg info";
+        apaarMsg.innerHTML = `<i class="fas fa-info-circle"></i> ${e.target.value.length}/12 digits`;
+    } else {
+        apaarMsg.classList.add("hidden");
+    }
+});
+
+// ============ FILE UPLOAD PREVIEW + VALIDATION ============
+const IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+const PDF_TYPES = ["application/pdf"];
+
+$$('#studentForm input[type="file"]').forEach(input => {
+    input.addEventListener("change", e => {
+        const file = e.target.files[0];
+        const label = input.parentElement;
+        label.querySelectorAll(".file-preview").forEach(el => el.remove());
+        if (!file) return;
+
+        const isImageField = input.dataset.img === "true";
+        const isPdfField = input.dataset.pdf === "true";
+        const maxSize = parseInt(input.dataset.max) || PDF_MAX_BYTES;
+
+        // Type check
+        if (isImageField && !IMAGE_TYPES.includes(file.type)) {
+            showToast(`"${input.name}" must be JPG, PNG, or WEBP`, "error");
+            input.value = "";
+            return;
+        }
+        if (isPdfField && !PDF_TYPES.includes(file.type)) {
+            showToast(`"${input.name}" must be a PDF file`, "error");
+            input.value = "";
+            return;
+        }
+
+        // Size check
+        if (file.size > maxSize) {
+            const mb = (maxSize / 1024 / 1024).toFixed(0);
+            showToast(`"${file.name}" exceeds ${mb} MB limit`, "warning");
+            input.value = "";
+            return;
+        }
+
+        const preview = document.createElement("div");
+        preview.className = "file-preview";
+        if (file.type.startsWith("image/")) {
+            const r = new FileReader();
+            r.onload = ev => { preview.innerHTML = `<img src="${ev.target.result}" alt="preview"><span>✅ ${esc(file.name)} (${(file.size/1024).toFixed(0)} KB)</span>`; };
+            r.readAsDataURL(file);
+        } else {
+            preview.innerHTML = `<span style="font-size:18px;">📄</span><span>✅ ${esc(file.name)} (${(file.size/1024/1024).toFixed(2)} MB)</span>`;
+        }
+        label.appendChild(preview);
+    });
+});
+
+// ============ FORM ============
 const form = $("#studentForm");
-const REQUIRED_DOCS = ["studentPhoto", "signature", "aadharCard", "himachaliBonafide", "casteCertificate", "apaarCard", "previousMarksheet"];
+const REQUIRED_DOCS = ["studentPhoto", "signature", "aadharCard", "himachaliBonafide", "apaarCard", "previousMarksheet"];
 
 function setRequiredDocs(isEdit) {
-    REQUIRED_DOCS.forEach((name) => {
+    [...REQUIRED_DOCS, "casteCertificate"].forEach((name) => {
         const input = form.querySelector(`[name="${name}"]`);
         const star = input?.parentElement.querySelector("[data-req]");
-        if (input) input.required = !isEdit;
+        if (input) {
+            // Don't require caste cert if category doesn't need it
+            const needsCaste = name === "casteCertificate" && CASTE_REQUIRED_CATEGORIES.includes($("#formCategory").value);
+            const shouldRequire = (name !== "casteCertificate" || needsCaste) && !isEdit;
+            input.required = shouldRequire;
+        }
         if (star) star.style.display = isEdit ? "none" : "inline";
     });
 }
@@ -923,13 +1196,20 @@ function resetForm() {
     form.reset();
     $("#studentPkId").value = "";
     state.editingId = null;
+    state.aadharVerified = false;
+    state.aadharVerifiedValue = "";
     $("#formErrors").classList.add("hidden");
     $("#formErrors").innerHTML = "";
     $("#formModalTitle").innerHTML = '<i class="fas fa-user-plus"></i> Add Student';
+    aadharStatus.className = "input-status";
+    aadharStatus.textContent = "";
+    aadharMsg.classList.add("hidden");
+    apaarMsg.classList.add("hidden");
     document.querySelectorAll(".file-preview").forEach(el => el.remove());
     clearExistingDocHints();
     buildFullAddress();
     onClassChange();
+    updateCasteCertificateField();
 }
 
 function openAddModal() {
@@ -964,7 +1244,9 @@ async function openEditModal(id) {
         setVal("dob", (s.dob || "").split("T")[0]);
         setVal("gender", s.gender);
         setVal("category", s.category);
-        setVal("aadharNumber", s.aadhar_number);
+        // Format Aadhaar with spaces
+        const rawAadhaar = (s.aadhar_number || "").replace(/\s/g, "");
+        form.querySelector('[name="aadharNumber"]').value = rawAadhaar.replace(/(\d{4})(?=\d)/g, "$1 ");
         setVal("apaarId", s.apaar_id);
         setVal("mobileNumber", s.mobile_number);
         setVal("emailId", s.email_id);
@@ -976,6 +1258,9 @@ async function openEditModal(id) {
         setVal("pincode", s.pincode);
         onClassChange();
         buildFullAddress();
+        updateCasteCertificateField();
+
+        // Show existing doc hints
         const existingDocs = {
             studentPhoto: s.student_photo_url, signature: s.signature_url,
             aadharCard: s.aadhar_card_url, himachaliBonafide: s.himachali_bonafide_url,
@@ -999,61 +1284,52 @@ async function openEditModal(id) {
     }
 }
 
-document.querySelectorAll('#studentForm input[type="file"]').forEach(input => {
-    input.addEventListener("change", e => {
-        const file = e.target.files[0];
-        const label = input.parentElement;
-        label.querySelectorAll(".file-preview").forEach(el => el.remove());
-        if (!file) return;
-        if (file.size > 5 * 1024 * 1024) {
-            showToast(`"${file.name}" over 5MB`, "warning");
-            input.value = "";
-            return;
-        }
-        const preview = document.createElement("div");
-        preview.className = "file-preview";
-        if (file.type.startsWith("image/")) {
-            const r = new FileReader();
-            r.onload = ev => { preview.innerHTML = `<img src="${ev.target.result}"><span>✅ ${esc(file.name)}</span>`; };
-            r.readAsDataURL(file);
-        } else {
-            preview.innerHTML = `<span style="font-size:16px;">📄</span><span>✅ ${esc(file.name)} (${(file.size/1024).toFixed(0)} KB)</span>`;
-        }
-        label.appendChild(preview);
-    });
-});
-
+// ============ SUBMIT ============
 $("#btnSaveForm").addEventListener("click", async () => {
     const btn = $("#btnSaveForm");
     $("#formErrors").classList.add("hidden");
     $("#formErrors").innerHTML = "";
+
+    // Aadhaar must be verified
+    const rawAadhaar = aadharInput.value.replace(/\s/g, "");
+    if (rawAadhaar.length === 12 && !state.aadharVerified) {
+        showToast("Please wait for Aadhaar verification (click outside the field)", "warning");
+        aadharInput.focus();
+        return;
+    }
+
     if (!form.checkValidity()) { form.reportValidity(); return; }
 
-    const aadhar = form.querySelector('[name="aadharNumber"]').value.trim();
+    const aadhar = aadharInput.value.replace(/\s/g, "");
+    const apaar = apaarInput.value.trim();
     const mobile = form.querySelector('[name="mobileNumber"]').value.trim();
     const email = form.querySelector('[name="emailId"]').value.trim();
     const session = form.querySelector('[name="session"]').value.trim();
     const cls = form.querySelector('[name="class"]').value;
     const stream = form.querySelector('[name="stream"]').value;
     const pincode = form.querySelector('[name="pincode"]').value.trim();
+    const category = $("#formCategory").value;
 
     const errors = [];
-    if (!/^\d{12}$/.test(aadhar)) errors.push("Aadhar must be 12 digits.");
+    if (!/^\d{12}$/.test(aadhar)) errors.push("Aadhaar must be 12 digits.");
+    if (!/^\d{12}$/.test(apaar)) errors.push("APAAR ID must be 12 digits.");
     if (!/^[6-9]\d{9}$/.test(mobile)) errors.push("Invalid mobile number.");
     if (!/^\S+@\S+\.\S+$/.test(email)) errors.push("Invalid email.");
     if (!/^\d{4}-\d{2,4}$/.test(session)) errors.push("Session format invalid.");
     if (!/^\d{6}$/.test(pincode)) errors.push("Pincode must be 6 digits.");
-    if (["11", "12"].includes(cls) && !["Science","Commerce","Arts"].includes(stream)) {
-        errors.push("Stream required for Class 11/12.");
-    }
+    if (["11", "12"].includes(cls) && !["Science","Commerce","Arts"].includes(stream)) errors.push("Stream required for Class 11/12.");
+
     if (!state.editingId) {
-        for (const docName of REQUIRED_DOCS) {
+        const docsToCheck = [...REQUIRED_DOCS];
+        if (CASTE_REQUIRED_CATEGORIES.includes(category)) docsToCheck.push("casteCertificate");
+        for (const docName of docsToCheck) {
             const input = form.querySelector(`[name="${docName}"]`);
             if (!input || !input.files || !input.files[0]) {
                 errors.push(`"${docName.replace(/([A-Z])/g, ' $1')}" required.`);
             }
         }
     }
+
     if (errors.length) {
         const box = $("#formErrors");
         box.innerHTML = errors.map(e => `• ${esc(e)}`).join("<br>");
@@ -1063,7 +1339,10 @@ $("#btnSaveForm").addEventListener("click", async () => {
     }
 
     const fd = new FormData(form);
+    // Send Aadhaar without spaces
+    fd.set("aadharNumber", aadhar);
     for (const [k, v] of [...fd.entries()]) if (v === "" || v === null) fd.delete(k);
+
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
 
@@ -1071,11 +1350,7 @@ $("#btnSaveForm").addEventListener("click", async () => {
         const url = state.editingId ? `${STUDENT_API}/${state.editingId}` : `${STUDENT_API}/add`;
         const method = state.editingId ? "PUT" : "POST";
         const token = localStorage.getItem("adminToken");
-        const res = await fetch(url, {
-            method,
-            headers: { "Authorization": `Bearer ${token}` },
-            body: fd
-        });
+        const res = await fetch(url, { method, headers: { "Authorization": `Bearer ${token}` }, body: fd });
         if (res.status === 401) { showPopup(); return; }
         const text = await res.text();
         let data;
@@ -1105,6 +1380,7 @@ $("#btnSaveForm").addEventListener("click", async () => {
     }
 });
 
+// ============ VIEW ============
 async function openViewModal(id) {
     state.viewingId = id;
     try {
@@ -1119,7 +1395,7 @@ async function openViewModal(id) {
                           s.district && "Distt. " + s.district, s.state, s.pincode].filter(Boolean).join(", ");
         $("#viewTitle").innerHTML = `<i class="fas fa-user-graduate"></i> ${esc(s.name)}`;
         $("#viewBody").innerHTML = `
-            ${s.student_photo_url ? `<img class="view-photo" src="${esc(s.student_photo_url)}" alt="photo">` : ""}
+            ${s.student_photo_url ? `<img class="view-photo" src="${esc(s.student_photo_url)}" alt="photo" onerror="this.style.display='none'">` : ""}
             <div class="view-section">
                 <h4>Personal Details</h4>
                 <div class="view-grid">
@@ -1186,13 +1462,10 @@ async function openViewModal(id) {
 }
 
 $("#viewPrintBtn").addEventListener("click", () => {
-    if (state.viewingId) {
-        const id = state.viewingId;
-        closeModal("viewModal");
-        printStudentProfile(id);
-    }
+    if (state.viewingId) { const id = state.viewingId; closeModal("viewModal"); printStudentProfile(id); }
 });
 
+// ============ DELETE ============
 async function deleteStudent(id, name) {
     if (!confirm(`Delete "${name}"? All documents will also be deleted.`)) return;
     try {
@@ -1204,6 +1477,7 @@ async function deleteStudent(id, name) {
     }
 }
 
+// ============ CARD EVENTS ============
 $("#studentGrid").addEventListener("click", (e) => {
     const btn = e.target.closest("[data-act]");
     if (btn) {
@@ -1246,12 +1520,8 @@ $("#btnPromoteMode").addEventListener("click", () => {
     $("#btnPromoteMode").classList.toggle("active", state.promoteMode);
     state.selectedIds.clear();
     $("#selectedCount").textContent = "0";
-    if (state.promoteMode) {
-        $("#promoteBar").classList.remove("hidden");
-        showToast("Select students, then choose a class", "info");
-    } else {
-        $("#promoteBar").classList.add("hidden");
-    }
+    if (state.promoteMode) { $("#promoteBar").classList.remove("hidden"); showToast("Select students, then choose a class", "info"); }
+    else $("#promoteBar").classList.add("hidden");
     renderStudents();
 });
 
@@ -1288,44 +1558,35 @@ function refreshAll() { loadStudents(); }
 
 document.addEventListener("click", (e) => {
     if (e.target.classList.contains("modal-overlay")) e.target.classList.remove("active");
+    if (e.target.classList.contains("modal-overlay")) document.body.style.overflow = "";
 });
 
 document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
-        closeModal("formModal");
-        closeModal("viewModal");
-        closeModal("setSessionModal");
+        closeModal("formModal"); closeModal("viewModal"); closeModal("setSessionModal");
     }
 });
 
 /* ============================================================ */
-/* QR GENERATOR                                                  */
+/* QR + PRINT PDF                                                */
 /* ============================================================ */
 function generateQRCodeBase64(url, size = 140) {
     return new Promise((resolve) => {
         const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(url)}`;
-        fetch(apiUrl)
-            .then(res => res.blob())
-            .then(blob => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.onerror = () => resolve(null);
-                reader.readAsDataURL(blob);
-            })
-            .catch(() => resolve(null));
+        fetch(apiUrl).then(res => res.blob()).then(blob => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+        }).catch(() => resolve(null));
     });
 }
 
-/* ============================================================ */
-/* PROFESSIONAL STUDENT PROFILE PDF — Full design with watermark */
-/* ============================================================ */
 async function printStudentProfile(studentId) {
     try {
         showToast("Generating PDF…", "info");
         const token = localStorage.getItem("adminToken");
-        const res = await fetch(`${STUDENT_API}/${studentId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await fetch(`${STUDENT_API}/${studentId}`, { headers: { Authorization: `Bearer ${token}` } });
         if (!res.ok) throw new Error("Failed to fetch student");
         const result = await res.json();
         const s = result?.data || result;
@@ -1334,27 +1595,19 @@ async function printStudentProfile(studentId) {
         const adminData = JSON.parse(localStorage.getItem("adminData") || "{}");
         const downloadedBy = adminData.name || adminData.username || localStorage.getItem("adminName") || "Admin";
 
-        const verificationData = {
-            student_id: s.student_id,
-            name: s.name,
-            father_name: s.father_name || "",
-            dob: s.dob || "",
-            class: s.class || "",
-            session: s.session || "",
-            apaar_id: s.apaar_id || ""
-        };
+        const verificationData = { student_id: s.student_id, name: s.name, father_name: s.father_name || "", dob: s.dob || "", class: s.class || "", session: s.session || "", apaar_id: s.apaar_id || "" };
         const verificationUrl = `https://gsssshilla07.pages.dev/verify-student.html?data=${encodeURIComponent(JSON.stringify(verificationData))}`;
         const verificationQR = await generateQRCodeBase64(verificationUrl, 180);
 
         const docs = [
-            { label: "Aadhar Card",         url: s.aadhar_card_url,        has: !!s.aadhar_card_url },
-            { label: "Himachali Bonafide",  url: s.himachali_bonafide_url, has: !!s.himachali_bonafide_url },
-            { label: "Caste Certificate",   url: s.caste_certificate_url,  has: !!s.caste_certificate_url },
-            { label: "APAAR Card",          url: s.apaar_card_url,         has: !!s.apaar_card_url },
-            { label: "Previous Marksheet",  url: s.previous_marksheet_url, has: !!s.previous_marksheet_url },
-            { label: "Income Certificate",  url: s.income_certificate_url, has: !!s.income_certificate_url },
-            { label: "BPL Certificate",     url: s.bpl_certificate_url,    has: !!s.bpl_certificate_url },
-            { label: "Any Other Document",  url: s.other_document_url,     has: !!s.other_document_url }
+            { label: "Aadhar Card", url: s.aadhar_card_url, has: !!s.aadhar_card_url },
+            { label: "Himachali Bonafide", url: s.himachali_bonafide_url, has: !!s.himachali_bonafide_url },
+            { label: "Caste Certificate", url: s.caste_certificate_url, has: !!s.caste_certificate_url },
+            { label: "APAAR Card", url: s.apaar_card_url, has: !!s.apaar_card_url },
+            { label: "Previous Marksheet", url: s.previous_marksheet_url, has: !!s.previous_marksheet_url },
+            { label: "Income Certificate", url: s.income_certificate_url, has: !!s.income_certificate_url },
+            { label: "BPL Certificate", url: s.bpl_certificate_url, has: !!s.bpl_certificate_url },
+            { label: "Any Other Document", url: s.other_document_url, has: !!s.other_document_url }
         ];
 
         const docsWithQR = await Promise.all(docs.map(async (d) => {
@@ -1364,28 +1617,14 @@ async function printStudentProfile(studentId) {
 
         let docRows = "";
         docsWithQR.forEach((d, i) => {
-            const shortUrl = d.url
-                ? (d.url.length > 55 ? d.url.substring(0, 50) + "…" : d.url)
-                : "—";
+            const shortUrl = d.url ? (d.url.length > 55 ? d.url.substring(0, 50) + "…" : d.url) : "—";
             docRows += `
                 <tr>
                     <td style="text-align:center;padding:8px 6px;border:1px solid #94a3b8;font-size:11px;">${i + 1}</td>
                     <td style="padding:8px 10px;border:1px solid #94a3b8;font-weight:600;font-size:12px;">${esc(d.label)}</td>
-                    <td style="text-align:center;padding:8px 6px;border:1px solid #94a3b8;font-size:11px;">
-                        ${d.has
-                            ? '<span style="color:#10b981;font-weight:700;">✅ Yes</span>'
-                            : '<span style="color:#94a3b8;">❌ No</span>'}
-                    </td>
-                    <td style="padding:8px 10px;border:1px solid #94a3b8;font-size:9.5px;word-break:break-all;color:#2563eb;">
-                        ${d.has
-                            ? `<a href="${esc(d.url)}" style="color:#2563eb;text-decoration:none;">${esc(shortUrl)}</a>`
-                            : "—"}
-                    </td>
-                    <td style="text-align:center;padding:5px;border:1px solid #94a3b8;width:80px;">
-                        ${d.qr
-                            ? `<img src="${d.qr}" width="65" height="65" style="border:2px solid #c9972b;border-radius:5px;background:white;">`
-                            : '<div style="font-size:9px;color:#cbd5e1;">—</div>'}
-                    </td>
+                    <td style="text-align:center;padding:8px 6px;border:1px solid #94a3b8;font-size:11px;">${d.has ? '<span style="color:#10b981;font-weight:700;">✅ Yes</span>' : '<span style="color:#94a3b8;">❌ No</span>'}</td>
+                    <td style="padding:8px 10px;border:1px solid #94a3b8;font-size:9.5px;word-break:break-all;color:#2563eb;">${d.has ? `<a href="${esc(d.url)}" style="color:#2563eb;text-decoration:none;">${esc(shortUrl)}</a>` : "—"}</td>
+                    <td style="text-align:center;padding:5px;border:1px solid #94a3b8;width:80px;">${d.qr ? `<img src="${d.qr}" width="65" height="65" style="border:2px solid #c9972b;border-radius:5px;background:white;">` : '<div style="font-size:9px;color:#cbd5e1;">—</div>'}</td>
                 </tr>`;
         });
 
@@ -1393,51 +1632,30 @@ async function printStudentProfile(studentId) {
         const signatureUrl = s.signature_url || "";
         const isHigherClass = ["11", "12"].includes(String(s.class));
         const streamDisplay = isHigherClass ? (s.stream || "—") : "Non-Specialized";
-
         const totalDocs = 10;
-        const availableDocs = [
-            photoUrl, signatureUrl,
-            s.aadhar_card_url, s.himachali_bonafide_url, s.caste_certificate_url,
-            s.apaar_card_url, s.previous_marksheet_url, s.income_certificate_url,
-            s.bpl_certificate_url, s.other_document_url
-        ].filter(Boolean).length;
+        const availableDocs = [photoUrl, signatureUrl, s.aadhar_card_url, s.himachali_bonafide_url, s.caste_certificate_url, s.apaar_card_url, s.previous_marksheet_url, s.income_certificate_url, s.bpl_certificate_url, s.other_document_url].filter(Boolean).length;
 
-        const fullAddress = [
-            s.village,
-            s.post_office ? "PO " + s.post_office : "",
-            s.tehsil ? "Teh. " + s.tehsil : "",
-            s.district ? "Distt. " + s.district : "",
-            s.state,
-            s.pincode
-        ].filter(Boolean).join(", ") || s.address || "—";
+        const fullAddress = [s.village, s.post_office ? "PO " + s.post_office : "", s.tehsil ? "Teh. " + s.tehsil : "", s.district ? "Distt. " + s.district : "", s.state, s.pincode].filter(Boolean).join(", ") || s.address || "—";
 
         const pw = window.open("", "_blank", "width=1000,height=800");
         pw.document.write(`<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Student Profile: ${esc(s.name)} - ${esc(s.student_id)}</title>
+<html><head><meta charset="UTF-8"><title>Student Profile: ${esc(s.name)} - ${esc(s.student_id)}</title>
 <style>
 @page { size: A4; margin: 10mm 10mm 12mm 10mm; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { height: auto; }
 body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; background: #ffffff; font-size: 13px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 .page-container { width: 100%; max-width: 190mm; margin: 0 auto; padding: 4px 6px 90px; position: relative; }
-
 .watermark-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 9999; overflow: hidden; }
 .watermark-pattern { position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(201,151,43,0.07) 40px, rgba(201,151,43,0.07) 42px); background-size: 56px 56px; }
 .watermark-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 550px; height: 550px; opacity: 0.09; background: url('https://gsssshilla07.pages.dev/logo(1).png') center/contain no-repeat; filter: grayscale(100%); border-radius: 50%; }
-
 .page-header { text-align: center; padding-bottom: 14px; border-bottom: 4px solid #c9972b; position: relative; z-index: 1; background: rgba(255,255,255,0.96); }
 .page-header .logo { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #c9972b; padding: 5px; background: white; margin: 0 auto 8px; display: block; }
 .page-header .school-name { font-family: 'Georgia', serif; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 2.5px; color: #0d1b2a; }
 .page-header .school-tagline { font-size: 12px; color: #5a6a7e; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; font-weight: 600; }
 .page-header .heading-box { display: inline-block; background: #0d1b2a; color: #fff; padding: 8px 32px; border-radius: 30px; font-size: 16px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; border: 3px solid #c9972b; margin-top: 10px; }
-
 .content-area { position: relative; z-index: 1; }
-
 .section-heading { font-size: 15px; font-weight: 800; margin: 18px 0 10px; padding: 10px 18px; background: #fef8ed; border-left: 5px solid #c9972b; letter-spacing: 1.5px; color: #0d1b2a; text-transform: uppercase; border-radius: 0 6px 6px 0; }
-
 .info-table { width: 100%; border-collapse: collapse; margin: 0 0 10px; border: 2px solid #0d1b2a; }
 .info-table td { padding: 9px 13px; border: 1px solid #94a3b8; font-size: 12.5px; vertical-align: middle; }
 .info-table .label-cell { font-weight: 800; background: #fef8ed; color: #0d1b2a; width: 16%; letter-spacing: 0.8px; text-transform: uppercase; font-size: 10.5px; }
@@ -1451,180 +1669,82 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
 .signature-box-small img { width: 100%; height: 100%; object-fit: contain; }
 .signature-placeholder { font-size: 10px; color: #94a3b8; }
 .signature-label { font-size: 10px; color: #475569; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-
 .address-box { border: 2px solid #0d1b2a; border-radius: 8px; padding: 14px 18px; background: #f8fafc; font-size: 13.5px; line-height: 1.7; }
-
 .doc-table { width: 100%; border-collapse: collapse; margin: 6px 0; border: 2px solid #0d1b2a; }
 .doc-table th { background: #0d1b2a; color: #fff; padding: 11px 10px; border: 1px solid #0d1b2a; font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; text-align: center; font-weight: 700; }
 .doc-table td { padding: 8px 10px; border: 1px solid #94a3b8; font-size: 12px; }
-
 .signature-area { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 14px; align-items: flex-end; }
 .signature-box { text-align: center; font-size: 12px; width: 220px; }
 .signature-box .signature-img { height: 70px; max-width: 180px; object-fit: contain; display: block; margin: 0 auto 5px; }
 .signature-box .line { width: 160px; height: 1px; border-top: 1.5px dashed #64748b; margin: 16px auto 5px; }
 .signature-box strong { font-size: 14px; color: #0d1b2a; font-weight: 800; }
 .signature-box small { font-size: 11px; color: #475569; display: block; margin-top: 2px; }
-
 .date-box { border: 3px solid #c9972b; background: #fef8ed; padding: 12px 18px; border-radius: 8px; font-size: 13px; text-align: center; min-width: 180px; }
 .date-box strong { display: block; color: #0d1b2a; font-size: 14px; font-weight: 800; }
 .date-box span { color: #475569; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-top: 4px; display: block; }
-
 .verification-section { display: flex; align-items: center; gap: 22px; margin: 20px 0 10px; padding: 16px 22px; border: 3px solid #c9972b; background: #fef8ed; border-radius: 12px; }
 .verification-qr { width: 120px; height: 120px; border: 3px solid #0d1b2a; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: white; display: flex; align-items: center; justify-content: center; }
 .verification-qr img { width: 112px; height: 112px; }
 .verification-text { flex: 1; color: #0d1b2a; }
 .verification-text strong { display: block; font-size: 17px; margin-bottom: 6px; color: #c9972b; font-weight: 800; letter-spacing: 0.5px; }
 .verification-text p { font-size: 12px; color: #475569; margin: 4px 0; line-height: 1.6; }
-
 .footer-wrapper { position: fixed; left: 50%; transform: translateX(-50%); width: 190mm; bottom: 0; z-index: 1; }
 .security-text-line { text-align: center; font-size: 8px; color: rgba(13, 27, 42, 0.28); letter-spacing: 4px; padding: 6px 0; border-top: 1px dashed #cbd5e1; border-bottom: 1px dashed #cbd5e1; text-transform: uppercase; white-space: nowrap; background: rgba(255,255,255,0.95); font-weight: 600; }
 .page-footer { padding-top: 10px; border-top: 3px solid #c9972b; font-size: 11px; color: #475569; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.98); }
 .footer-left { text-align: left; font-weight: 600; }
 .footer-center { text-align: center; font-weight: 700; color: #0d1b2a; font-size: 12px; }
 .footer-right { text-align: right; font-weight: 600; }
-
-@media print {
-    html, body { margin: 0; padding: 0; height: auto; }
-    .page-container { max-width: 100%; }
-    .footer-wrapper { page-break-inside: avoid; }
-    .watermark-container { display: block !important; }
-}
-</style>
-</head>
-<body>
-
-<div class="watermark-container">
-    <div class="watermark-pattern"></div>
-    <div class="watermark-logo"></div>
-</div>
-
+@media print { html, body { margin: 0; padding: 0; height: auto; } .page-container { max-width: 100%; } .footer-wrapper { page-break-inside: avoid; } .watermark-container { display: block !important; } }
+</style></head><body>
+<div class="watermark-container"><div class="watermark-pattern"></div><div class="watermark-logo"></div></div>
 <div class="page-container">
-
     <div class="page-header">
         <img src="https://gsssshilla07.pages.dev/logo(1).png" class="logo" onerror="this.style.display='none'">
         <div class="school-name">Govt. Sr. Sec. School Shilla</div>
         <div class="school-tagline">Shilla • Nerwa • District Shimla • Himachal Pradesh - 171210</div>
         <div class="heading-box">STUDENT PROFILE RECORD</div>
     </div>
-
     <div class="content-area">
-
         <div class="section-heading">▸ Personal Information</div>
         <table class="info-table">
             <tr>
-                <td class="label-cell">Student ID</td>
-                <td class="value-cell"><b>${esc(s.student_id)}</b></td>
-                <td class="label-cell">Admission No</td>
-                <td class="value-cell"><b>${esc(s.admission_number || "-")}</b></td>
+                <td class="label-cell">Student ID</td><td class="value-cell"><b>${esc(s.student_id)}</b></td>
+                <td class="label-cell">Admission No</td><td class="value-cell"><b>${esc(s.admission_number || "-")}</b></td>
                 <td class="photo-cell" rowspan="6">
                     <div class="photo-label">Student Photo</div>
-                    <div class="photo-box">
-                        ${photoUrl
-                            ? `<img src="${esc(photoUrl)}" onerror="this.parentElement.innerHTML='<div class=&quot;photo-placeholder&quot;>👤</div>'">`
-                            : `<div class="photo-placeholder">👤</div>`}
-                    </div>
+                    <div class="photo-box">${photoUrl ? `<img src="${esc(photoUrl)}" onerror="this.parentElement.innerHTML='<div class=&quot;photo-placeholder&quot;>👤</div>'">` : `<div class="photo-placeholder">👤</div>`}</div>
                     <div class="signature-label">Signature</div>
-                    <div class="signature-box-small">
-                        ${signatureUrl
-                            ? `<img src="${esc(signatureUrl)}" onerror="this.innerHTML='<span class=&quot;signature-placeholder&quot;>No Sign</span>'">`
-                            : `<span class="signature-placeholder">No Sign</span>`}
-                    </div>
+                    <div class="signature-box-small">${signatureUrl ? `<img src="${esc(signatureUrl)}" onerror="this.parentElement.innerHTML='<span class=&quot;signature-placeholder&quot;>No Sign</span>'">` : `<span class="signature-placeholder">No Sign</span>`}</div>
                 </td>
             </tr>
-            <tr>
-                <td class="label-cell">Full Name</td>
-                <td class="value-cell" style="font-weight:800;font-size:15px;">${esc(s.name)}</td>
-                <td class="label-cell">Gender</td>
-                <td class="value-cell">${esc(s.gender || "-")}</td>
-            </tr>
-            <tr>
-                <td class="label-cell">Father's Name</td>
-                <td class="value-cell">${esc(s.father_name || "-")}</td>
-                <td class="label-cell">Mother's Name</td>
-                <td class="value-cell">${esc(s.mother_name || "-")}</td>
-            </tr>
-            <tr>
-                <td class="label-cell">Date of Birth</td>
-                <td class="value-cell">${s.dob ? new Date(s.dob).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "-"}</td>
-                <td class="label-cell">Category</td>
-                <td class="value-cell"><b>${esc(s.category || "-")}</b></td>
-            </tr>
-            <tr>
-                <td class="label-cell">Aadhar Number</td>
-                <td class="value-cell">${esc(s.aadhar_number || "-")}</td>
-                <td class="label-cell">APAAR ID</td>
-                <td class="value-cell">${esc(s.apaar_id || "-")}</td>
-            </tr>
-            <tr>
-                <td class="label-cell">Mobile</td>
-                <td class="value-cell">${esc(s.mobile_number || "-")}</td>
-                <td class="label-cell">Email</td>
-                <td class="value-cell" style="font-size:12px;">${esc(s.email_id || "-")}</td>
-            </tr>
+            <tr><td class="label-cell">Full Name</td><td class="value-cell" style="font-weight:800;font-size:15px;">${esc(s.name)}</td><td class="label-cell">Gender</td><td class="value-cell">${esc(s.gender || "-")}</td></tr>
+            <tr><td class="label-cell">Father's Name</td><td class="value-cell">${esc(s.father_name || "-")}</td><td class="label-cell">Mother's Name</td><td class="value-cell">${esc(s.mother_name || "-")}</td></tr>
+            <tr><td class="label-cell">Date of Birth</td><td class="value-cell">${s.dob ? new Date(s.dob).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "-"}</td><td class="label-cell">Category</td><td class="value-cell"><b>${esc(s.category || "-")}</b></td></tr>
+            <tr><td class="label-cell">Aadhar Number</td><td class="value-cell">${esc(s.aadhar_number || "-")}</td><td class="label-cell">APAAR ID</td><td class="value-cell">${esc(s.apaar_id || "-")}</td></tr>
+            <tr><td class="label-cell">Mobile</td><td class="value-cell">${esc(s.mobile_number || "-")}</td><td class="label-cell">Email</td><td class="value-cell" style="font-size:12px;">${esc(s.email_id || "-")}</td></tr>
         </table>
-
         <div class="section-heading">▸ Academic Information</div>
         <table class="info-table">
-            <tr>
-                <td class="label-cell">Class</td>
-                <td class="value-cell"><b>${esc(s.class || "-")}</b></td>
-                <td class="label-cell">Stream</td>
-                <td class="value-cell">${esc(streamDisplay)}</td>
-            </tr>
-            <tr>
-                <td class="label-cell">Roll Number</td>
-                <td class="value-cell">${esc(s.roll_number || "-")}</td>
-                <td class="label-cell">Session</td>
-                <td class="value-cell"><b>${esc(s.session || "-")}</b></td>
-            </tr>
-            <tr>
-                <td class="label-cell">Status</td>
-                <td class="value-cell">
-                    <span style="display:inline-block;background:${s.status === "Active" ? "#dcfce7" : s.status === "Promoted" ? "#dbeafe" : "#fef3c7"};color:${s.status === "Active" ? "#166534" : s.status === "Promoted" ? "#1e40af" : "#92400e"};padding:4px 14px;border-radius:14px;font-size:11px;font-weight:800;text-transform:uppercase;">${esc(s.status || "Active")}</span>
-                </td>
-                <td class="label-cell">Admission Date</td>
-                <td class="value-cell">${s.admission_date ? new Date(s.admission_date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "-"}</td>
-            </tr>
+            <tr><td class="label-cell">Class</td><td class="value-cell"><b>${esc(s.class || "-")}</b></td><td class="label-cell">Stream</td><td class="value-cell">${esc(streamDisplay)}</td></tr>
+            <tr><td class="label-cell">Roll Number</td><td class="value-cell">${esc(s.roll_number || "-")}</td><td class="label-cell">Session</td><td class="value-cell"><b>${esc(s.session || "-")}</b></td></tr>
+            <tr><td class="label-cell">Status</td><td class="value-cell"><span style="display:inline-block;background:${s.status === "Active" ? "#dcfce7" : s.status === "Promoted" ? "#dbeafe" : "#fef3c7"};color:${s.status === "Active" ? "#166534" : s.status === "Promoted" ? "#1e40af" : "#92400e"};padding:4px 14px;border-radius:14px;font-size:11px;font-weight:800;text-transform:uppercase;">${esc(s.status || "Active")}</span></td><td class="label-cell">Admission Date</td><td class="value-cell">${s.admission_date ? new Date(s.admission_date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "-"}</td></tr>
         </table>
-
         <div class="section-heading">▸ Residential Address</div>
-        <div class="address-box">
-            <strong>${esc(fullAddress)}</strong>
-        </div>
-
+        <div class="address-box"><strong>${esc(fullAddress)}</strong></div>
         <div class="section-heading">▸ Uploaded Documents (${availableDocs}/${totalDocs}) — with URLs & QR Codes</div>
         <table class="doc-table">
-            <thead>
-                <tr>
-                    <th style="width:36px;">#</th>
-                    <th style="width:150px;">Document</th>
-                    <th style="width:70px;">Status</th>
-                    <th>Cloudinary URL</th>
-                    <th style="width:90px;">QR Code</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${docRows}
-            </tbody>
+            <thead><tr><th style="width:36px;">#</th><th style="width:150px;">Document</th><th style="width:70px;">Status</th><th>Cloudinary URL</th><th style="width:90px;">QR Code</th></tr></thead>
+            <tbody>${docRows}</tbody>
         </table>
-
         <div class="signature-area">
-            <div class="date-box">
-                <strong>${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}</strong>
-                <span>Date of Issue</span>
-            </div>
+            <div class="date-box"><strong>${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}</strong><span>Date of Issue</span></div>
             <div class="signature-box">
                 <img src="https://gsssshilla07.pages.dev/principal.png" class="signature-img" onerror="this.style.display='none'">
-                <div class="line"></div>
-                <strong>Principal</strong>
-                <small>Govt. Sr. Sec. School Shilla</small>
+                <div class="line"></div><strong>Principal</strong><small>Govt. Sr. Sec. School Shilla</small>
             </div>
         </div>
-
         <div class="verification-section">
-            <div class="verification-qr">
-                ${verificationQR ? `<img src="${verificationQR}" alt="Verification QR">` : '<div style="font-size:10px;color:#94a3b8;text-align:center;">QR N/A</div>'}
-            </div>
+            <div class="verification-qr">${verificationQR ? `<img src="${verificationQR}" alt="Verification QR">` : '<div style="font-size:10px;color:#94a3b8;text-align:center;">QR N/A</div>'}</div>
             <div class="verification-text">
                 <strong>Scan to Verify Student Profile</strong>
                 <p>Scan this QR code to verify the authenticity of this student profile document.</p>
@@ -1632,9 +1752,7 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
                 <p style="font-size:11px;color:#94a3b8;margin-top:4px;">Verification ID: ${esc(s.student_id)}-${Date.now().toString().substring(8)}</p>
             </div>
         </div>
-
     </div>
-
     <div class="footer-wrapper">
         <div class="security-text-line">GSSS SHILLA OFFICIAL DOCUMENT | GSSS SHILLA OFFICIAL DOCUMENT | GSSS SHILLA OFFICIAL DOCUMENT</div>
         <div class="page-footer">
@@ -1643,11 +1761,8 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
             <div class="footer-right"><strong>Session:</strong> ${esc(s.session || "-")}<br><span style="font-size:9px;">GSSS Shilla - Official Document</span></div>
         </div>
     </div>
-
 </div>
-
-</body>
-</html>`);
+</body></html>`);
         pw.document.close();
         setTimeout(() => { pw.focus(); pw.print(); }, 1500);
     } catch (e) {
