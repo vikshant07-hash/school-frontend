@@ -196,6 +196,114 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .field-msg.warning { color: var(--orange); }
 .field-msg.info { color: var(--blue); }
 
+/* ===== OTP VERIFICATION STYLES ===== */
+.otp-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
+.otp-row input {
+    flex: 1;
+    min-width: 0;
+}
+.otp-send-btn {
+    padding: 10px 16px;
+    background: linear-gradient(135deg, var(--blue), #2c6fd6);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 110px;
+    justify-content: center;
+}
+.otp-send-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74,138,244,0.35);
+}
+.otp-send-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.otp-send-btn.verified {
+    background: var(--green);
+}
+.otp-send-btn.verified:hover {
+    transform: none;
+    box-shadow: none;
+    cursor: default;
+}
+.otp-box {
+    display: none;
+    margin-top: 8px;
+    gap: 8px;
+    align-items: stretch;
+}
+.otp-box.show {
+    display: flex;
+    animation: slideUp 0.3s ease;
+}
+.otp-box input {
+    flex: 1;
+    letter-spacing: 6px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 16px;
+    font-family: 'Inter', monospace;
+    padding: 10px 14px;
+    border: 2px solid var(--blue);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    outline: none;
+}
+.otp-box input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,151,43,0.15);
+}
+.otp-verify-btn {
+    padding: 10px 16px;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.otp-verify-btn:hover:not(:disabled) {
+    background: #059669;
+    transform: translateY(-1px);
+}
+.otp-verify-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.otp-status {
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.otp-status.success { color: var(--green); }
+.otp-status.error { color: var(--red); }
+.otp-status.info { color: var(--blue); }
+.otp-status.warning { color: var(--orange); }
+
 /* ===== VIEW MODAL ===== */
 .view-section { margin-bottom: 20px; }
 .view-section h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--gold); margin: 0 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
@@ -230,6 +338,9 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
     .form-grid, .form-grid.three, .file-grid, .view-grid { grid-template-columns: 1fr; }
     .doc-links { grid-template-columns: 1fr; }
     .session-bar { flex-direction: column; align-items: stretch; }
+    .otp-row { flex-direction: column; }
+    .otp-send-btn { width: 100%; }
+    .otp-box { flex-direction: column; }
 }
 </style>
 </head>
@@ -473,9 +584,48 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
                     </div>
                     <div class="field-msg hidden" id="apaarMsg"></div>
                 </label>
-                <label>Mobile Number <span class="req-star">*</span><input type="tel" name="mobileNumber" pattern="[6-9]\d{9}" maxlength="10" required></label>
-                <label>Email ID <span class="req-star">*</span><input type="email" name="emailId" required></label>
             </div>
+
+            <!-- ✅ EMAIL with OTP -->
+            <div class="form-grid" style="margin-top:12px;">
+                <label>
+                    Email ID <span class="req-star">*</span>
+                    <div class="otp-row">
+                        <input type="email" name="emailId" id="emailInput" placeholder="student@example.com" required autocomplete="off">
+                        <button type="button" class="otp-send-btn" id="emailSendBtn" onclick="sendEmailOTP()">
+                            <i class="fas fa-paper-plane"></i> Send OTP
+                        </button>
+                    </div>
+                    <div class="otp-box" id="emailOtpBox">
+                        <input type="text" id="emailOtpInput" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="off">
+                        <button type="button" class="otp-verify-btn" id="emailVerifyBtn" onclick="verifyEmailOTP()">
+                            <i class="fas fa-check"></i> Verify
+                        </button>
+                    </div>
+                    <div class="otp-status" id="emailStatus"></div>
+                </label>
+
+                <!-- ✅ MOBILE with WhatsApp OTP -->
+                <label>
+                    Mobile Number <span class="req-star">*</span>
+                    <div class="otp-row">
+                        <input type="tel" name="mobileNumber" id="mobileInput" pattern="[6-9]\d{9}" maxlength="10" placeholder="98XXXXXXXX" required autocomplete="off">
+                        <button type="button" class="otp-send-btn" id="mobileSendBtn" onclick="sendMobileOTP()">
+                            <i class="fab fa-whatsapp"></i> Send OTP
+                        </button>
+                    </div>
+                    <div class="otp-box" id="mobileOtpBox">
+                        <input type="text" id="mobileOtpInput" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="off">
+                        <button type="button" class="otp-verify-btn" id="mobileVerifyBtn" onclick="verifyMobileOTP()">
+                            <i class="fas fa-check"></i> Verify
+                        </button>
+                    </div>
+                    <div class="otp-status" id="mobileStatus"></div>
+                </label>
+            </div>
+
+            <input type="hidden" name="emailVerified" id="emailVerifiedField" value="false">
+            <input type="hidden" name="mobileVerified" id="mobileVerifiedField" value="false">
 
             <h3 class="form-section"><i class="fas fa-map-marker-alt"></i> Structured Address</h3>
             <div class="form-grid three">
@@ -510,7 +660,6 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
                     <input type="file" name="himachaliBonafide" accept="application/pdf" data-max="2097152" data-pdf="true">
                 </label>
 
-                <!-- ✅ Conditional Caste Certificate -->
                 <div class="conditional-field hidden-cond" id="casteCertWrapper" style="display:contents;">
                     <label id="casteCertLabel">Caste Certificate <span class="req-star" data-req>*</span>
                         <input type="file" name="casteCertificate" accept="application/pdf" data-max="2097152" data-pdf="true">
@@ -600,7 +749,6 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 const STUDENT_API = "https://gsssshilla.onrender.com/api/students";
 const CURRENT_SESSION_KEY = "currentSession";
 
-// ✅ Category rules
 const CASTE_REQUIRED_CATEGORIES = ["SC", "ST", "OBC", "Other", "EWS"];
 const IMAGE_MAX_BYTES = 3 * 1024 * 1024;
 const PDF_MAX_BYTES = 2 * 1024 * 1024;
@@ -613,7 +761,9 @@ const state = {
     promoteMode: false, selectedIds: new Set(),
     editingId: null, viewingId: null,
     currentSession: "", previewSession: "",
-    aadharVerified: false, aadharVerifiedValue: ""
+    aadharVerified: false, aadharVerifiedValue: "",
+    emailVerified: false, emailVerifiedValue: "",
+    mobileVerified: false, mobileVerifiedValue: ""
 };
 
 const $ = (s) => document.querySelector(s);
@@ -631,7 +781,6 @@ function fmtDate(d) {
     return isNaN(dt) ? "-" : dt.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-// ============ TOAST ============
 function showToast(msg, type = "info", duration = 4200) {
     const c = $("#toastContainer");
     const icons = { success: "fa-check-circle", error: "fa-exclamation-circle", warning: "fa-exclamation-triangle", info: "fa-info-circle" };
@@ -642,7 +791,6 @@ function showToast(msg, type = "info", duration = 4200) {
     setTimeout(() => { t.style.opacity = "0"; t.style.transform = "translateX(40px)"; setTimeout(() => t.remove(), 400); }, duration);
 }
 
-// ============ MODAL ============
 function openModal(id) { $("#" + id).classList.add("active"); document.body.style.overflow = "hidden"; }
 function closeModal(id) { $("#" + id).classList.remove("active"); document.body.style.overflow = ""; }
 function toggleNav() { $("#navLinks").classList.toggle("open"); }
@@ -712,7 +860,285 @@ async function apiCall(url, options = {}, retries = 2) {
     }
 }
 
-// ============ QUERY ============
+// ============================================================
+// ✅ EMAIL OTP
+// ============================================================
+async function sendEmailOTP() {
+    const emailInput = $("#emailInput");
+    const email = emailInput.value.trim().toLowerCase();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showToast("Please enter a valid email first", "error");
+        emailInput.focus();
+        return;
+    }
+
+    const btn = $("#emailSendBtn");
+    const status = $("#emailStatus");
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
+    status.className = "otp-status info";
+    status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending OTP…';
+
+    try {
+        const token = localStorage.getItem("adminToken");
+        const res = await fetch(`${STUDENT_API}/send-email-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+            body: JSON.stringify({
+                email,
+                purpose: state.editingId ? "update" : "add",
+                excludeStudentId: state.editingId || undefined
+            })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+
+        // Show OTP input box
+        $("#emailOtpBox").classList.add("show");
+        $("#emailOtpInput").value = "";
+        $("#emailOtpInput").focus();
+
+        status.className = "otp-status success";
+        status.innerHTML = '<i class="fas fa-check-circle"></i> OTP sent to your email. Check inbox + spam.';
+
+        // Start cooldown
+        startCooldown(btn, 45, "Resend");
+    } catch (err) {
+        status.className = "otp-status error";
+        status.innerHTML = `<i class="fas fa-times-circle"></i> ${esc(err.message)}`;
+        showToast(err.message, "error");
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
+    }
+}
+
+async function verifyEmailOTP() {
+    const email = $("#emailInput").value.trim().toLowerCase();
+    const otp = $("#emailOtpInput").value.trim();
+    const status = $("#emailStatus");
+    const btn = $("#emailVerifyBtn");
+
+    if (!otp || otp.length !== 6) {
+        showToast("Please enter the 6-digit OTP", "error");
+        $("#emailOtpInput").focus();
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying…';
+
+    try {
+        const token = localStorage.getItem("adminToken");
+        const res = await fetch(`${STUDENT_API}/verify-email-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+            body: JSON.stringify({ email, otp })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+
+        // Mark as verified
+        state.emailVerified = true;
+        state.emailVerifiedValue = email;
+        $("#emailVerifiedField").value = "true";
+
+        // Update UI
+        $("#emailOtpBox").classList.remove("show");
+        status.className = "otp-status success";
+        status.innerHTML = '<i class="fas fa-check-circle"></i> Email verified ✅';
+
+        // Lock the send button
+        const sendBtn = $("#emailSendBtn");
+        sendBtn.disabled = true;
+        sendBtn.classList.add("verified");
+        sendBtn.innerHTML = '<i class="fas fa-check-circle"></i> Verified';
+
+        // Lock email input
+        $("#emailInput").readOnly = true;
+        $("#emailInput").style.background = "#f0fdf4";
+
+        showToast("Email verified ✅", "success");
+    } catch (err) {
+        status.className = "otp-status error";
+        status.innerHTML = `<i class="fas fa-times-circle"></i> ${esc(err.message)}`;
+        showToast(err.message, "error");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check"></i> Verify';
+    }
+}
+
+// ============================================================
+// ✅ WHATSAPP OTP (Mobile)
+// ============================================================
+async function sendMobileOTP() {
+    const mobileInput = $("#mobileInput");
+    const mobile = mobileInput.value.trim().replace(/\D/g, "");
+    if (!/^[6-9]\d{9}$/.test(mobile)) {
+        showToast("Please enter a valid 10-digit mobile number", "error");
+        mobileInput.focus();
+        return;
+    }
+
+    const btn = $("#mobileSendBtn");
+    const status = $("#mobileStatus");
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
+    status.className = "otp-status info";
+    status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending WhatsApp OTP…';
+
+    try {
+        const token = localStorage.getItem("adminToken");
+        const res = await fetch(`${STUDENT_API}/send-mobile-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+            body: JSON.stringify({
+                mobile,
+                purpose: state.editingId ? "update" : "add",
+                excludeStudentId: state.editingId || undefined
+            })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+
+        // Show OTP input box
+        $("#mobileOtpBox").classList.add("show");
+        $("#mobileOtpInput").value = "";
+        $("#mobileOtpInput").focus();
+
+        let msg = "OTP sent to your WhatsApp ✅";
+        if (typeof data.remainingSlots === "number") {
+            msg += ` (${data.remainingSlots} slots left)`;
+        }
+        status.className = "otp-status success";
+        status.innerHTML = `<i class="fab fa-whatsapp"></i> ${esc(msg)}`;
+
+        // Cooldown
+        startCooldown(btn, 45, "Resend");
+    } catch (err) {
+        status.className = "otp-status error";
+        status.innerHTML = `<i class="fas fa-times-circle"></i> ${esc(err.message)}`;
+        showToast(err.message, "error");
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fab fa-whatsapp"></i> Send OTP';
+    }
+}
+
+async function verifyMobileOTP() {
+    const mobile = $("#mobileInput").value.trim().replace(/\D/g, "");
+    const otp = $("#mobileOtpInput").value.trim();
+    const status = $("#mobileStatus");
+    const btn = $("#mobileVerifyBtn");
+
+    if (!otp || otp.length !== 6) {
+        showToast("Please enter the 6-digit OTP", "error");
+        $("#mobileOtpInput").focus();
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying…';
+
+    try {
+        const token = localStorage.getItem("adminToken");
+        const res = await fetch(`${STUDENT_API}/verify-mobile-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+            body: JSON.stringify({ mobile, otp })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+
+        // Mark as verified
+        state.mobileVerified = true;
+        state.mobileVerifiedValue = mobile;
+        $("#mobileVerifiedField").value = "true";
+
+        // Update UI
+        $("#mobileOtpBox").classList.remove("show");
+        status.className = "otp-status success";
+        status.innerHTML = '<i class="fas fa-check-circle"></i> Mobile verified ✅';
+
+        // Lock the send button
+        const sendBtn = $("#mobileSendBtn");
+        sendBtn.disabled = true;
+        sendBtn.classList.add("verified");
+        sendBtn.innerHTML = '<i class="fas fa-check-circle"></i> Verified';
+
+        // Lock mobile input
+        $("#mobileInput").readOnly = true;
+        $("#mobileInput").style.background = "#f0fdf4";
+
+        showToast("Mobile verified ✅", "success");
+    } catch (err) {
+        status.className = "otp-status error";
+        status.innerHTML = `<i class="fas fa-times-circle"></i> ${esc(err.message)}`;
+        showToast(err.message, "error");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check"></i> Verify';
+    }
+}
+
+// Cooldown timer for resend
+function startCooldown(btn, seconds, label) {
+    let remaining = seconds;
+    const originalLabel = label || "Resend";
+    btn.disabled = true;
+    const interval = setInterval(() => {
+        btn.innerHTML = `<i class="fas fa-clock"></i> ${remaining}s`;
+        remaining--;
+        if (remaining < 0) {
+            clearInterval(interval);
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fas fa-redo"></i> ${originalLabel}`;
+        }
+    }, 1000);
+}
+
+// Reset OTP state when email/mobile changes manually
+document.addEventListener("input", (e) => {
+    if (e.target.id === "emailInput" && state.emailVerifiedValue && e.target.value.trim().toLowerCase() !== state.emailVerifiedValue) {
+        resetEmailOTP();
+    }
+    if (e.target.id === "mobileInput" && state.mobileVerifiedValue && e.target.value.trim() !== state.mobileVerifiedValue) {
+        resetMobileOTP();
+    }
+});
+
+function resetEmailOTP() {
+    state.emailVerified = false;
+    state.emailVerifiedValue = "";
+    $("#emailVerifiedField").value = "false";
+    $("#emailOtpBox").classList.remove("show");
+    $("#emailStatus").className = "otp-status";
+    $("#emailStatus").innerHTML = "";
+    const btn = $("#emailSendBtn");
+    btn.disabled = false;
+    btn.classList.remove("verified");
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
+    $("#emailInput").readOnly = false;
+    $("#emailInput").style.background = "";
+}
+
+function resetMobileOTP() {
+    state.mobileVerified = false;
+    state.mobileVerifiedValue = "";
+    $("#mobileVerifiedField").value = "false";
+    $("#mobileOtpBox").classList.remove("show");
+    $("#mobileStatus").className = "otp-status";
+    $("#mobileStatus").innerHTML = "";
+    const btn = $("#mobileSendBtn");
+    btn.disabled = false;
+    btn.classList.remove("verified");
+    btn.innerHTML = '<i class="fab fa-whatsapp"></i> Send OTP';
+    $("#mobileInput").readOnly = false;
+    $("#mobileInput").style.background = "";
+}
+
+// ============================================================
+// QUERY / LOAD
+// ============================================================
 function buildQuery() {
     const p = new URLSearchParams();
     Object.entries(state.filters).forEach(([k, v]) => { if (v) p.set(k, v); });
@@ -725,7 +1151,6 @@ function buildQuery() {
     return p.toString();
 }
 
-// ============ LOAD STUDENTS ============
 async function loadStudents() {
     $("#loadingState").classList.remove("hidden");
     $("#emptyState").classList.add("hidden");
@@ -829,7 +1254,9 @@ function animateNumber(el, target) {
     }, 30);
 }
 
-// ============ SESSION ============
+// ============================================================
+// SESSION
+// ============================================================
 async function loadCurrentSession() {
     try {
         const res = await apiCall(`${STUDENT_API}/current-session`);
@@ -934,7 +1361,9 @@ $("#btnConfirmSession").addEventListener("click", async () => {
     }
 });
 
-// ============ FILTERS ============
+// ============================================================
+// FILTERS
+// ============================================================
 function readFilters() {
     state.filters.search = $("#fSearch").value.trim();
     state.filters.class = $("#fClass").value;
@@ -964,7 +1393,9 @@ $("#btnReset").addEventListener("click", () => {
     loadStudents();
 });
 
-// ============ CLASS / STREAM ============
+// ============================================================
+// CLASS / STREAM / CASTE
+// ============================================================
 function onClassChange() {
     const cls = $("#formClass").value;
     const streamSel = $("#formStream");
@@ -983,7 +1414,6 @@ function onClassChange() {
     }
 }
 
-// ============ CATEGORY → CASTE CERT TOGGLE ============
 function updateCasteCertificateField() {
     const category = $("#formCategory").value;
     const wrapper = $("#casteCertWrapper");
@@ -995,7 +1425,6 @@ function updateCasteCertificateField() {
         wrapper.classList.remove("hidden-cond");
         if (!state.editingId) input.required = true;
         if (star) star.style.display = "inline";
-        // Update badge
         $("#reqDocBadge").textContent = "7 required";
     } else {
         wrapper.classList.add("hidden-cond");
@@ -1010,7 +1439,9 @@ function updateCasteCertificateField() {
 
 $("#formCategory").addEventListener("change", updateCasteCertificateField);
 
-// ============ ADDRESS ============
+// ============================================================
+// ADDRESS
+// ============================================================
 function buildFullAddress() {
     const v = (n) => (document.querySelector(`[name="${n}"]`)?.value || "").trim();
     const parts = [v("village"), v("postOffice") ? "PO " + v("postOffice") : "", v("tehsil") ? "Teh. " + v("tehsil") : "",
@@ -1020,17 +1451,17 @@ function buildFullAddress() {
 $$('[name="village"],[name="postOffice"],[name="tehsil"],[name="district"],[name="state"],[name="pincode"]')
     .forEach(el => el.addEventListener("input", buildFullAddress));
 
-// ============ AADHAAR FORMAT + VERIFY ============
+// ============================================================
+// AADHAAR FORMAT + VERIFY
+// ============================================================
 const aadharInput = $("#aadharInput");
 const aadharStatus = $("#aadharStatus");
 const aadharMsg = $("#aadharMsg");
 
-// Auto-format as 4-4-4
 aadharInput.addEventListener("input", (e) => {
     let v = e.target.value.replace(/\D/g, "").slice(0, 12);
     v = v.replace(/(\d{4})(?=\d)/g, "$1 ");
     e.target.value = v;
-    // Reset verification on edit
     if (state.aadharVerifiedValue && state.aadharVerifiedValue !== v.replace(/\s/g, "")) {
         state.aadharVerified = false;
         state.aadharVerifiedValue = "";
@@ -1040,7 +1471,6 @@ aadharInput.addEventListener("input", (e) => {
     }
 });
 
-// Verify on blur
 aadharInput.addEventListener("blur", async () => {
     const raw = aadharInput.value.replace(/\s/g, "");
     if (raw.length !== 12) {
@@ -1081,7 +1511,6 @@ async function verifyAadhaar(aadhaar12) {
             return;
         }
 
-        // Success
         state.aadharVerified = true;
         state.aadharVerifiedValue = aadhaar12;
         aadharStatus.className = "input-status verified";
@@ -1108,7 +1537,9 @@ async function verifyAadhaar(aadhaar12) {
     }
 }
 
-// ============ APAAR ID (12 digits numeric) ============
+// ============================================================
+// APAAR ID
+// ============================================================
 const apaarInput = $("#apaarInput");
 const apaarMsg = $("#apaarMsg");
 apaarInput.addEventListener("input", (e) => {
@@ -1124,7 +1555,9 @@ apaarInput.addEventListener("input", (e) => {
     }
 });
 
-// ============ FILE UPLOAD PREVIEW + VALIDATION ============
+// ============================================================
+// FILE UPLOAD PREVIEW + VALIDATION
+// ============================================================
 const IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 const PDF_TYPES = ["application/pdf"];
 
@@ -1139,7 +1572,6 @@ $$('#studentForm input[type="file"]').forEach(input => {
         const isPdfField = input.dataset.pdf === "true";
         const maxSize = parseInt(input.dataset.max) || PDF_MAX_BYTES;
 
-        // Type check
         if (isImageField && !IMAGE_TYPES.includes(file.type)) {
             showToast(`"${input.name}" must be JPG, PNG, or WEBP`, "error");
             input.value = "";
@@ -1150,8 +1582,6 @@ $$('#studentForm input[type="file"]').forEach(input => {
             input.value = "";
             return;
         }
-
-        // Size check
         if (file.size > maxSize) {
             const mb = (maxSize / 1024 / 1024).toFixed(0);
             showToast(`"${file.name}" exceeds ${mb} MB limit`, "warning");
@@ -1172,7 +1602,9 @@ $$('#studentForm input[type="file"]').forEach(input => {
     });
 });
 
-// ============ FORM ============
+// ============================================================
+// FORM
+// ============================================================
 const form = $("#studentForm");
 const REQUIRED_DOCS = ["studentPhoto", "signature", "aadharCard", "himachaliBonafide", "apaarCard", "previousMarksheet"];
 
@@ -1181,7 +1613,6 @@ function setRequiredDocs(isEdit) {
         const input = form.querySelector(`[name="${name}"]`);
         const star = input?.parentElement.querySelector("[data-req]");
         if (input) {
-            // Don't require caste cert if category doesn't need it
             const needsCaste = name === "casteCertificate" && CASTE_REQUIRED_CATEGORIES.includes($("#formCategory").value);
             const shouldRequire = (name !== "casteCertificate" || needsCaste) && !isEdit;
             input.required = shouldRequire;
@@ -1198,13 +1629,46 @@ function resetForm() {
     state.editingId = null;
     state.aadharVerified = false;
     state.aadharVerifiedValue = "";
+    state.emailVerified = false;
+    state.emailVerifiedValue = "";
+    state.mobileVerified = false;
+    state.mobileVerifiedValue = "";
+
     $("#formErrors").classList.add("hidden");
     $("#formErrors").innerHTML = "";
     $("#formModalTitle").innerHTML = '<i class="fas fa-user-plus"></i> Add Student';
+
     aadharStatus.className = "input-status";
     aadharStatus.textContent = "";
     aadharMsg.classList.add("hidden");
     apaarMsg.classList.add("hidden");
+
+    // Reset email OTP UI
+    $("#emailVerifiedField").value = "false";
+    $("#emailOtpBox").classList.remove("show");
+    $("#emailOtpInput").value = "";
+    $("#emailStatus").className = "otp-status";
+    $("#emailStatus").innerHTML = "";
+    const emailBtn = $("#emailSendBtn");
+    emailBtn.disabled = false;
+    emailBtn.classList.remove("verified");
+    emailBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
+    $("#emailInput").readOnly = false;
+    $("#emailInput").style.background = "";
+
+    // Reset mobile OTP UI
+    $("#mobileVerifiedField").value = "false";
+    $("#mobileOtpBox").classList.remove("show");
+    $("#mobileOtpInput").value = "";
+    $("#mobileStatus").className = "otp-status";
+    $("#mobileStatus").innerHTML = "";
+    const mobileBtn = $("#mobileSendBtn");
+    mobileBtn.disabled = false;
+    mobileBtn.classList.remove("verified");
+    mobileBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Send OTP';
+    $("#mobileInput").readOnly = false;
+    $("#mobileInput").style.background = "";
+
     document.querySelectorAll(".file-preview").forEach(el => el.remove());
     clearExistingDocHints();
     buildFullAddress();
@@ -1229,6 +1693,7 @@ async function openEditModal(id) {
         if (!s || !s.id) throw new Error("Student not found");
         $("#studentPkId").value = s.id;
         state.editingId = s.id;
+
         const setVal = (name, val) => { const el = form.querySelector(`[name="${name}"]`); if (el) el.value = val ?? ""; };
         setVal("studentId", s.student_id);
         setVal("admissionNumber", s.admission_number);
@@ -1244,7 +1709,6 @@ async function openEditModal(id) {
         setVal("dob", (s.dob || "").split("T")[0]);
         setVal("gender", s.gender);
         setVal("category", s.category);
-        // Format Aadhaar with spaces
         const rawAadhaar = (s.aadhar_number || "").replace(/\s/g, "");
         form.querySelector('[name="aadharNumber"]').value = rawAadhaar.replace(/(\d{4})(?=\d)/g, "$1 ");
         setVal("apaarId", s.apaar_id);
@@ -1256,11 +1720,38 @@ async function openEditModal(id) {
         setVal("district", s.district);
         setVal("state", s.state);
         setVal("pincode", s.pincode);
+
+        // In edit mode, mark existing email/mobile as verified
+        state.emailVerified = true;
+        state.emailVerifiedValue = (s.email_id || "").toLowerCase();
+        state.mobileVerified = true;
+        state.mobileVerifiedValue = s.mobile_number || "";
+        $("#emailVerifiedField").value = "true";
+        $("#mobileVerifiedField").value = "true";
+
+        // Show verified state in UI
+        const emailBtn = $("#emailSendBtn");
+        emailBtn.classList.add("verified");
+        emailBtn.innerHTML = '<i class="fas fa-check-circle"></i> Verified';
+        emailBtn.disabled = true;
+        $("#emailStatus").className = "otp-status success";
+        $("#emailStatus").innerHTML = '<i class="fas fa-check-circle"></i> Already verified';
+        $("#emailInput").readOnly = true;
+        $("#emailInput").style.background = "#f0fdf4";
+
+        const mobileBtn = $("#mobileSendBtn");
+        mobileBtn.classList.add("verified");
+        mobileBtn.innerHTML = '<i class="fas fa-check-circle"></i> Verified';
+        mobileBtn.disabled = true;
+        $("#mobileStatus").className = "otp-status success";
+        $("#mobileStatus").innerHTML = '<i class="fas fa-check-circle"></i> Already verified';
+        $("#mobileInput").readOnly = true;
+        $("#mobileInput").style.background = "#f0fdf4";
+
         onClassChange();
         buildFullAddress();
         updateCasteCertificateField();
 
-        // Show existing doc hints
         const existingDocs = {
             studentPhoto: s.student_photo_url, signature: s.signature_url,
             aadharCard: s.aadhar_card_url, himachaliBonafide: s.himachali_bonafide_url,
@@ -1284,7 +1775,9 @@ async function openEditModal(id) {
     }
 }
 
-// ============ SUBMIT ============
+// ============================================================
+// SUBMIT
+// ============================================================
 $("#btnSaveForm").addEventListener("click", async () => {
     const btn = $("#btnSaveForm");
     $("#formErrors").classList.add("hidden");
@@ -1295,6 +1788,21 @@ $("#btnSaveForm").addEventListener("click", async () => {
     if (rawAadhaar.length === 12 && !state.aadharVerified) {
         showToast("Please wait for Aadhaar verification (click outside the field)", "warning");
         aadharInput.focus();
+        return;
+    }
+
+    // ✅ Email + Mobile must be OTP verified
+    const emailChanged = state.editingId ? $("#emailInput").value.trim().toLowerCase() !== state.emailVerifiedValue : true;
+    const mobileChanged = state.editingId ? $("#mobileInput").value.trim() !== state.mobileVerifiedValue : true;
+
+    if (!state.emailVerified && emailChanged) {
+        showToast("Please verify your email with OTP before saving", "warning");
+        $("#emailInput").focus();
+        return;
+    }
+    if (!state.mobileVerified && mobileChanged) {
+        showToast("Please verify your mobile with WhatsApp OTP before saving", "warning");
+        $("#mobileInput").focus();
         return;
     }
 
@@ -1339,8 +1847,10 @@ $("#btnSaveForm").addEventListener("click", async () => {
     }
 
     const fd = new FormData(form);
-    // Send Aadhaar without spaces
     fd.set("aadharNumber", aadhar);
+    // ✅ Ensure verification flags are set
+    fd.set("emailVerified", state.emailVerified ? "true" : "false");
+    fd.set("mobileVerified", state.mobileVerified ? "true" : "false");
     for (const [k, v] of [...fd.entries()]) if (v === "" || v === null) fd.delete(k);
 
     btn.disabled = true;
@@ -1380,7 +1890,9 @@ $("#btnSaveForm").addEventListener("click", async () => {
     }
 });
 
-// ============ VIEW ============
+// ============================================================
+// VIEW
+// ============================================================
 async function openViewModal(id) {
     state.viewingId = id;
     try {
@@ -1410,8 +1922,8 @@ async function openViewModal(id) {
                     ${row("Category", s.category)}
                     ${row("Aadhar", s.aadhar_number)}
                     ${row("APAAR ID", s.apaar_id)}
-                    ${row("Mobile", s.mobile_number)}
-                    ${row("Email", s.email_id)}
+                    ${row("Mobile", s.mobile_number + (s.mobile_verified ? " ✅" : ""))}
+                    ${row("Email", s.email_id + (s.email_verified ? " ✅" : ""))}
                 </div>
             </div>
             <div class="view-section">
@@ -1465,7 +1977,9 @@ $("#viewPrintBtn").addEventListener("click", () => {
     if (state.viewingId) { const id = state.viewingId; closeModal("viewModal"); printStudentProfile(id); }
 });
 
-// ============ DELETE ============
+// ============================================================
+// DELETE
+// ============================================================
 async function deleteStudent(id, name) {
     if (!confirm(`Delete "${name}"? All documents will also be deleted.`)) return;
     try {
@@ -1477,7 +1991,9 @@ async function deleteStudent(id, name) {
     }
 }
 
-// ============ CARD EVENTS ============
+// ============================================================
+// CARD EVENTS / PROMOTE
+// ============================================================
 $("#studentGrid").addEventListener("click", (e) => {
     const btn = e.target.closest("[data-act]");
     if (btn) {
@@ -1568,7 +2084,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 /* ============================================================ */
-/* QR + PRINT PDF                                                */
+/* QR + PRINT PDF (unchanged) */
 /* ============================================================ */
 function generateQRCodeBase64(url, size = 140) {
     return new Promise((resolve) => {
