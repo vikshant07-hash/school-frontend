@@ -69,13 +69,13 @@
         .class-nav h3 { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 12px; } .class-nav h3 i { color: var(--gold); margin-right: 6px; }
         .class-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
         .class-btn { padding: 8px 20px; border: 2px solid var(--border); background: var(--bg-white); border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--text-secondary); transition: var(--transition); font-family: 'Inter', sans-serif; } .class-btn:hover { border-color: var(--gold); color: var(--gold); } .class-btn.active { background: var(--gold); color: #fff; border-color: var(--gold); }
-        .class-stats { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px; font-size: 13px; color: var(--text-secondary); } .class-stats strong { color: var(--text-primary); }
+        .class-stats { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px; font-size: 13px; color: var(--text-secondary); align-items: center; } .class-stats strong { color: var(--text-primary); }
 
         .student-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; margin-top: 16px; }
         .student-card { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow); } .student-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: var(--gold); }
         .card-header { padding: 16px 20px 12px; display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border); }
         .student-name { font-size: 16px; font-weight: 700; color: var(--text-primary); } .student-id { font-size: 12px; color: var(--text-muted); }
-        .status-badge { font-size: 11px; padding: 3px 12px; border-radius: 50px; font-weight: 600; } .uploaded { background: var(--green-bg); color: var(--green); } .pending { background: var(--orange-bg); color: var(--orange); }
+        .status-badge { font-size: 11px; padding: 3px 12px; border-radius: 50px; font-weight: 600; white-space: nowrap; } .uploaded { background: var(--green-bg); color: var(--green); } .pending { background: var(--orange-bg); color: var(--orange); }
         .card-body { padding: 12px 20px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; } .detail { font-size: 13px; color: var(--text-secondary); } .detail label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; display: block; font-weight: 600; } .detail span { font-weight: 500; color: var(--text-primary); }
         .card-footer { padding: 10px 20px 14px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; } .exam-tag { font-size: 10px; padding: 2px 10px; border-radius: 12px; background: var(--bg); color: var(--text-secondary); }
         .action-btns { display: flex; gap: 6px; flex-wrap: wrap; } .action-btn { padding: 4px 12px; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; gap: 4px; } .action-btn:hover { transform: scale(1.05); } .edit { background: var(--orange-bg); color: var(--orange); } .delete { background: #fee2e2; color: var(--red); } .print { background: var(--pink-bg); color: var(--pink); } .view { background: var(--purple-bg); color: var(--purple); }
@@ -92,6 +92,7 @@
         @keyframes slideIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
 
         .alert-box { padding: 14px 18px; border-radius: var(--radius-sm); margin: 12px 0; } .alert-box.error { background: #fee2e2; color: var(--red); border: 1px solid #fecaca; } .alert-box.success { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; } .alert-box.info { background: var(--blue-bg); color: var(--blue); border: 1px solid #bfdbfe; }
+        .loading { text-align: center; padding: 40px; color: var(--text-muted); }
 
         .footer { background: var(--bg-white); border-top: 1px solid var(--border); padding: 20px 32px; text-align: center; font-size: 13px; color: var(--text-muted); }
 
@@ -104,6 +105,7 @@
             .page-header { padding: 16px; flex-direction: column; align-items: stretch; } 
             .student-grid { grid-template-columns: 1fr; } 
             .student-detail-grid { grid-template-columns: 1fr; }
+            .class-stats { flex-direction: column; align-items: flex-start; gap: 8px; }
         }
     </style>
 </head>
@@ -144,20 +146,9 @@
     <div class="page-header">
         <h1><i class="fas fa-graduation-cap"></i> Result Management</h1>
         <div class="header-actions">
-            <select id="sessionFilter" class="btn btn-outline" style="padding:8px 14px; font-family:'Inter',sans-serif;">
-    <option value="">All Sessions</option>
-    <option value="2030-31">2030-31</option>
-    <option value="2029-30">2029-30</option>
-    <option value="2028-29">2028-29</option>
-    <option value="2027-28">2027-28</option>
-    <option value="2026-27">2026-27</option>
-    <option value="2025-26" selected>2025-26</option>
-    <option value="2024-25">2024-25</option>
-    <option value="2023-24">2023-24</option>
-    <option value="2022-23">2022-23</option>
-    <option value="2021-22">2021-22</option>
-    <option value="2020-21">2020-21</option>
-</select>
+            <select id="sessionFilter" class="btn btn-outline" style="padding:8px 14px; font-family:'Inter',sans-serif; cursor:pointer;">
+                <option value="">All Sessions</option>
+            </select>
             <button class="btn btn-primary" onclick="refreshAll()"><i class="fas fa-sync-alt"></i> Refresh</button>
             <a href="admin-students.html" class="btn btn-outline"><i class="fas fa-users"></i> Manage Students</a>
         </div>
@@ -199,7 +190,7 @@
                 <button class="btn btn-sm btn-primary" onclick="printClassStudents()"><i class="fas fa-print"></i> Print All</button>
             </div>
         </div>
-        <div id="studentGridContainer"><div class="loading" style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Loading students...</div></div>
+        <div id="studentGridContainer"><div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading students...</div></div>
         <div class="pagination" id="pagination" style="display:flex;justify-content:center;gap:6px;margin-top:20px;"></div>
     </div>
 
@@ -210,15 +201,50 @@
                 <i class="fas fa-info-circle"></i> Students add karne ke liye <a href="admin-students.html" style="color:var(--gold);font-weight:600;">Student Management</a> me jao. Yahan sirf marksheet upload hoti hai.
             </div>
             <form id="marksheetUploadForm" enctype="multipart/form-data" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
-                <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Student ID *</label><input type="text" id="uploadStudentId" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" placeholder="Enter Student ID" required></div>
-                <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Student Name</label><input type="text" id="uploadStudentName" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" disabled></div>
-                <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Academic Session</label><input type="text" id="uploadSession" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" disabled></div>
-                <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Class</label><input type="text" id="uploadClass" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" disabled></div>
-                <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Exam Type *</label><select id="uploadExamType" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);"><option>Annual Examination</option><option>Half Yearly Examination</option><option>Pre Board</option><option>Board Examination</option><option>Final Examination</option><option>Monthly Test</option><option>Unit Test</option></select></div>
-                <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Exam Session (When exam held) *</label><input type="month" id="uploadExamSession" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" required></div>
-                <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Total Obtained Marks</label><input type="text" id="uploadObtainedMarks" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" placeholder="e.g. 407"></div>
-                <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Maximum Marks</label><input type="text" id="uploadMaxMarks" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" placeholder="e.g. 500"></div>
-                <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">PDF File * (Max 10MB)</label><input type="file" id="uploadPdf" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" accept=".pdf" required></div>
+                <div class="form-group">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Student ID *</label>
+                    <input type="text" id="uploadStudentId" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" placeholder="Enter Student ID" required>
+                </div>
+                <div class="form-group">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Student Name</label>
+                    <input type="text" id="uploadStudentName" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" disabled>
+                </div>
+                <div class="form-group">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Academic Session</label>
+                    <input type="text" id="uploadSession" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" disabled>
+                </div>
+                <div class="form-group">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Class</label>
+                    <input type="text" id="uploadClass" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" disabled>
+                </div>
+                <div class="form-group">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Exam Type *</label>
+                    <select id="uploadExamType" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);">
+                        <option>Annual Examination</option>
+                        <option>Half Yearly Examination</option>
+                        <option>Pre Board</option>
+                        <option>Board Examination</option>
+                        <option>Final Examination</option>
+                        <option>Monthly Test</option>
+                        <option>Unit Test</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Exam Session (When held) *</label>
+                    <input type="month" id="uploadExamSession" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" required>
+                </div>
+                <div class="form-group">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Total Obtained Marks</label>
+                    <input type="text" id="uploadObtainedMarks" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" placeholder="e.g. 407">
+                </div>
+                <div class="form-group">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Maximum Marks</label>
+                    <input type="text" id="uploadMaxMarks" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" placeholder="e.g. 500">
+                </div>
+                <div class="form-group">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-secondary);">PDF File * (Max 10MB)</label>
+                    <input type="file" id="uploadPdf" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" accept=".pdf" required>
+                </div>
                 <div style="grid-column:1/-1;display:flex;gap:10px;">
                     <button type="button" class="btn btn-primary" onclick="fetchStudentForUpload()"><i class="fas fa-search"></i> Fetch Student</button>
                     <button type="submit" class="btn btn-success" id="uploadSubmitBtn"><i class="fas fa-upload"></i> Upload Marksheet</button>
@@ -241,8 +267,17 @@
                 <button class="class-btn" data-class="12" onclick="selectPublishClass(12)">Class 12</button>
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:10px;margin:16px 0;">
-                <select id="publishExamFilter" class="form-control" style="width:auto;min-width:180px;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" onchange="loadPublishableStudents(publishClass)"><option value="">All Exams</option><option>Annual Examination</option><option>Half Yearly Examination</option><option>Pre Board</option><option>Board Examination</option><option>Final Examination</option><option>Monthly Test</option><option>Unit Test</option></select>
-                <label style="font-weight:600;font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:6px;">Declaration Date * <input type="date" id="publishDate" class="form-control" style="padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" required></label>
+                <select id="publishExamFilter" style="width:auto;min-width:180px;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" onchange="loadPublishableStudents(publishClass)">
+                    <option value="">All Exams</option>
+                    <option>Annual Examination</option>
+                    <option>Half Yearly Examination</option>
+                    <option>Pre Board</option>
+                    <option>Board Examination</option>
+                    <option>Final Examination</option>
+                    <option>Monthly Test</option>
+                    <option>Unit Test</option>
+                </select>
+                <label style="font-weight:600;font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:6px;">Declaration Date * <input type="date" id="publishDate" style="padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" required></label>
                 <button class="btn btn-success" onclick="bulkPublish()" style="margin-left:auto;"><i class="fas fa-check-double"></i> Bulk Publish</button>
             </div>
             <div style="overflow-x:auto;">
@@ -257,7 +292,7 @@
                             <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--text-secondary);border-bottom:2px solid var(--border);">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="publishTableBody"><tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr></tbody>
+                    <tbody id="publishTableBody"><tr><td colspan="6" class="loading">Loading...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -267,7 +302,7 @@
 <div class="modal-overlay" id="studentModal">
     <div class="modal-content">
         <div class="modal-header"><h2 id="modalStudentName"><i class="fas fa-user-graduate"></i> Student Details</h2><button class="close-btn" onclick="closeModal('studentModal')">&times;</button></div>
-        <div id="modalStudentContent"><div class="loading" style="text-align:center;padding:40px;color:var(--text-muted);">Loading...</div></div>
+        <div id="modalStudentContent"><div class="loading">Loading...</div></div>
     </div>
 </div>
 
@@ -281,6 +316,30 @@ const PAGE_SIZE = 20;
 
 let sortField = 'roll';
 let sortOrder = 'asc';
+
+// ============================================================
+// AUTO-POPULATE SESSION DROPDOWN (2020-21 to 2030-31)
+// ============================================================
+function populateSessionDropdown() {
+    const sel = document.getElementById('sessionFilter');
+    if (!sel) return;
+    
+    const currentYear = new Date().getFullYear();
+    const startYear = 2020;
+    const endYear = Math.max(currentYear + 5, 2030);
+    
+    let html = '<option value="">All Sessions</option>';
+    
+    // Descending order (newest first)
+    for (let y = endYear; y >= startYear; y--) {
+        const endShort = String(y + 1).slice(-2);
+        const session = `${y}-${endShort}`;
+        const selected = (y === currentYear) ? ' selected' : '';
+        html += `<option value="${session}"${selected}>${session}</option>`;
+    }
+    
+    sel.innerHTML = html;
+}
 
 function sortStudents(students) {
     return students.sort((a, b) => {
@@ -313,7 +372,6 @@ function applySort() {
     }
     loadStudents(currentClass, currentPage);
 }
-    
 
 function getAuthHeaders() {
     try { const token = localStorage.getItem('adminToken'); if (!token) { showPopup('invalid'); return null; } return {'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json'}; }
@@ -359,9 +417,9 @@ function showToast(msg, type='info'){ const c=document.getElementById('toastCont
 async function apiCall(url, options={}) {
     const headers=getAuthHeaders(); if(!headers) throw new Error('Not authenticated');
     let res; try { res=await fetch(url,{...options, headers:{...headers, ...(options.headers||{})}}); }
-    catch(e){ throw new Error('Network error'); }
+    catch(e){ throw new Error('Network error. Please check connection.'); }
     if(res.status===401){ showPopup('expired'); throw new Error('Session expired'); }
-    let data; try{ data=await res.json(); }catch(e){ throw new Error(`Server error ${res.status}`); }
+    let data; try{ data=await res.json(); } catch(e){ throw new Error(`Server error ${res.status}`); }
     if(!res.ok) throw new Error(data.message||`Request failed ${res.status}`);
     return data;
 }
@@ -396,7 +454,7 @@ async function loadStudents(classNum, page = 1) {
     if (session) params.set('session', session);
     
     const container = document.getElementById('studentGridContainer');
-    container.innerHTML = '<div class="loading" style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+    container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
     
     try {
         const data = await apiCall(`${API_BASE}/class/${classNum}/students?${params}`);
@@ -417,7 +475,7 @@ async function loadStudents(classNum, page = 1) {
 function renderStudentCards(students){
     const container=document.getElementById('studentGridContainer');
     if(!students||students.length===0){
-        container.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-users" style="font-size:40px;"></i><p>No students found</p><p style="font-size:12px;margin-top:8px;">Add students from <a href="admin-students.html" style="color:var(--gold);">Student Management</a></p></div>';
+        container.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-users" style="font-size:40px;"></i><p style="margin-top:12px;">No students found</p><p style="font-size:12px;margin-top:8px;">Add students from <a href="admin-students.html" style="color:var(--gold);font-weight:600;">Student Management</a></p></div>';
         return;
     }
     container.innerHTML=students.map(s=>{
@@ -438,10 +496,10 @@ function renderStudentCards(students){
                 <div class="detail"><label>Roll No</label><span>${esc(s.exam_roll_no||'-')}</span></div>
                 <div class="detail"><label>Session</label><span>${esc(s.session||'-')}</span></div>
                 <div class="detail"><label>Father</label><span>${esc(s.father_name||'-')}</span></div>
-                <div class="detail"><label>Section</label><span>${esc(s.section||'-')}</span></div>
+                <div class="detail"><label>Class</label><span>${esc(s.class||'-')}</span></div>
             </div>
             <div class="card-footer">
-                <span class="exam-tag">${s.marksheet_count} marksheet(s)</span>
+                <span class="exam-tag">${s.marksheet_count || 0} marksheet(s)</span>
                 <div class="action-btns">
                     <button class="action-btn view" onclick="event.stopPropagation();openStudentDetail('${esc(s.student_id)}')"><i class="fas fa-eye"></i> View</button>
                     <button class="action-btn print" onclick="event.stopPropagation();printStudent('${esc(s.student_id)}')"><i class="fas fa-print"></i> Print</button>
@@ -471,12 +529,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const now = new Date();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const year = now.getFullYear();
-    document.getElementById('uploadExamSession').value = `${year}-${month}`;
+    const examSessionInput = document.getElementById('uploadExamSession');
+    if (examSessionInput) examSessionInput.value = `${year}-${month}`;
+    
+    // ✅ Auto-populate session dropdown
+    populateSessionDropdown();
 });
 
-// ============================================================
-// FETCH STUDENT FOR UPLOAD (from Nstudent)
-// ============================================================
 async function fetchStudentForUpload(){
     const studentId=document.getElementById('uploadStudentId').value.trim();
     if(!studentId) return;
@@ -529,44 +588,19 @@ document.getElementById('marksheetUploadForm').addEventListener('submit', async 
 
 async function openStudentDetail(studentId) {
     const modalContent = document.getElementById('modalStudentContent');
-    modalContent.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+    modalContent.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
     openModal('studentModal');
     document.getElementById('studentModal').dataset.studentId = studentId;
     try { const data = await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`); renderStudentDetail(data.data); }
     catch (error) { modalContent.innerHTML = `<div class="alert-box error">${esc(error.message)} <button onclick="openStudentDetail('${studentId}')" style="background:none;border:none;color:var(--gold);cursor:pointer;font-weight:600;">Retry</button></div>`; }
 }
 
-    // ✅ Auto-populate session dropdown (2020-21 to 2030-31)
-function populateSessionDropdown() {
-    const sel = document.getElementById('sessionFilter');
-    if (!sel) return;
-    
-    const currentYear = new Date().getFullYear();
-    const startYear = Math.min(currentYear - 5, 2020);  // 2020 se
-    const endYear = Math.max(currentYear + 5, 2030);    // 2030 tak
-    
-    let html = '<option value="">All Sessions</option>';
-    
-    // Descending order (newest first)
-    for (let y = endYear; y >= startYear; y--) {
-        const endShort = String(y + 1).slice(-2);
-        const session = `${y}-${endShort}`;
-        const selected = (y === currentYear) ? ' selected' : '';
-        html += `<option value="${session}"${selected}>${session}</option>`;
-    }
-    
-    sel.innerHTML = html;
-}
-
-// Call karo
-populateSessionDropdown();
-
 function renderStudentDetail(data) {
     const s = data.student; const marksheets = data.marksheets || [];
     document.getElementById('modalStudentName').innerHTML = `<i class="fas fa-user-graduate"></i> ${esc(s.name)}`;
     const modalContent = document.getElementById('modalStudentContent');
-    let marksheetHtml = marksheets.length === 0 ? `<div class="alert-box info">No marksheets uploaded yet.</div>` : marksheets.map(m => `<div class="exam-item"><div class="exam-info"><span class="exam-name">${esc(m.exam_type)}</span><span class="exam-session"><i class="far fa-calendar-alt"></i> Exam: ${formatMonth(m.exam_session)}</span><span class="exam-session"><i class="fas fa-school"></i> Session: ${esc(m.session)}</span><span class="exam-session"><i class="fas fa-star"></i> Marks: ${esc(m.obtained_marks||'-')}/${esc(m.max_marks||'-')}</span><span class="badge ${m.is_published?'badge-success':'badge-warning'}">${m.is_published?' Published':' Unpublished'}</span></div><div class="action-btns"><button class="action-btn view" onclick="viewMarksheet(${m.id})"><i class="fas fa-eye"></i> View</button><button class="action-btn delete" onclick="deleteExam(${m.id})"><i class="fas fa-trash"></i> Delete</button></div></div>`).join('');
-    modalContent.innerHTML = `<div class="student-detail-grid"><div class="item"><label>Student ID</label><span>${esc(s.student_id)}</span></div><div class="item"><label>APAAR ID</label><span>${esc(s.apaar_id||'-')}</span></div><div class="item"><label>Father's Name</label><span>${esc(s.father_name||'-')}</span></div><div class="item"><label>Mother's Name</label><span>${esc(s.mother_name||'-')}</span></div><div class="item"><label>Date of Birth</label><span>${s.dob?formatDate(s.dob):'-'}</span></div><div class="item"><label>Academic Session</label><span>${esc(s.session||'-')}</span></div><div class="item"><label>Class</label><span>${esc(s.class||'-')}${s.section ? ' - ' + esc(s.section) : ''}</span></div><div class="item"><label>Roll No</label><span>${esc(s.exam_roll_no||'-')}</span></div></div><div class="exam-list"><h4 style="font-size:14px;color:var(--text-secondary);margin-bottom:10px;"><i class="fas fa-file-pdf"></i> Marksheets (${marksheets.length})</h4>${marksheetHtml}</div><div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-sm btn-primary" onclick="printStudent('${esc(s.student_id)}')"><i class="fas fa-print"></i> Print Marksheet</button><button class="btn btn-sm btn-outline" onclick="closeModal('studentModal')"><i class="fas fa-times"></i> Close</button></div>`;
+    let marksheetHtml = marksheets.length === 0 ? `<div class="alert-box info">No marksheets uploaded yet.</div>` : marksheets.map(m => `<div class="exam-item"><div class="exam-info"><span class="exam-name">${esc(m.exam_type)}</span><span class="exam-session"><i class="far fa-calendar-alt"></i> ${formatMonth(m.exam_session)}</span><span class="exam-session"><i class="fas fa-star"></i> ${esc(m.obtained_marks||'-')}/${esc(m.max_marks||'-')}</span><span class="badge ${m.is_published?'badge-success':'badge-warning'}">${m.is_published?'Published':'Unpublished'}</span></div><div class="action-btns"><button class="action-btn view" onclick="viewMarksheet(${m.id})"><i class="fas fa-eye"></i></button><button class="action-btn delete" onclick="deleteExam(${m.id})"><i class="fas fa-trash"></i></button></div></div>`).join('');
+    modalContent.innerHTML = `<div class="student-detail-grid"><div class="item"><label>Student ID</label><span>${esc(s.student_id)}</span></div><div class="item"><label>APAAR ID</label><span>${esc(s.apaar_id||'-')}</span></div><div class="item"><label>Father's Name</label><span>${esc(s.father_name||'-')}</span></div><div class="item"><label>Mother's Name</label><span>${esc(s.mother_name||'-')}</span></div><div class="item"><label>Date of Birth</label><span>${s.dob?formatDate(s.dob):'-'}</span></div><div class="item"><label>Academic Session</label><span>${esc(s.session||'-')}</span></div><div class="item"><label>Class</label><span>${esc(s.class||'-')}</span></div><div class="item"><label>Roll No</label><span>${esc(s.exam_roll_no||'-')}</span></div></div><div class="exam-list"><h4 style="font-size:14px;color:var(--text-secondary);margin-bottom:10px;"><i class="fas fa-file-pdf"></i> Marksheets (${marksheets.length})</h4>${marksheetHtml}</div><div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-sm btn-primary" onclick="printStudent('${esc(s.student_id)}')"><i class="fas fa-print"></i> Print Marksheet</button><button class="btn btn-sm btn-outline" onclick="closeModal('studentModal')"><i class="fas fa-times"></i> Close</button></div>`;
 }
 
 async function deleteExam(id) {
@@ -590,11 +624,16 @@ function viewMarksheet(id) {
         .catch(e=>showToast('Failed to open','error'));
 }
 
-function selectPublishClass(c){ publishClass=c; document.querySelectorAll('#publishClassButtons .class-btn').forEach(b=>b.classList.remove('active')); document.querySelector(`#publishClassButtons .class-btn[data-class="${c}"]`).classList.add('active'); loadPublishableStudents(c); }
+function selectPublishClass(c){ 
+    publishClass=c; 
+    document.querySelectorAll('#publishClassButtons .class-btn').forEach(b=>b.classList.remove('active')); 
+    document.querySelector(`#publishClassButtons .class-btn[data-class="${c}"]`).classList.add('active'); 
+    loadPublishableStudents(c); 
+}
 
 async function loadPublishableStudents(classNum){
     const tbody=document.getElementById('publishTableBody');
-    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr>';
+    tbody.innerHTML='<tr><td colspan="6" class="loading">Loading...</td></tr>';
     try{
         const session=document.getElementById('sessionFilter').value;
         const examFilter=document.getElementById('publishExamFilter').value;
@@ -604,7 +643,7 @@ async function loadPublishableStudents(classNum){
         if(examFilter) url+=`&exam_type=${encodeURIComponent(examFilter)}`;
         const data=await apiCall(url);
         if(!data.data || data.data.length===0){
-            tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">No marksheets found for this class</td></tr>';
+            tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">No marksheets found</td></tr>';
             return;
         }
         tbody.innerHTML=data.data.map(m=>`<tr><td><input type="checkbox" class="publish-checkbox" data-id="${m.id}"></td><td>${esc(m.student_id)}</td><td>${esc(m.name)}</td><td>${esc(m.exam_type)}</td><td><span class="badge ${m.is_published?'badge-success':'badge-warning'}">${m.is_published?'✅ Published':'⏳ Unpublished'}</span></td><td><button class="btn btn-xs btn-success" onclick="publishSingle(${m.id})" ${m.is_published?'disabled':''}>Publish</button> <button class="btn btn-xs btn-danger" onclick="unpublishSingle(${m.id})" ${!m.is_published?'disabled':''}>Unpublish</button></td></tr>`).join('');
@@ -626,9 +665,6 @@ function refreshAll(){ loadStudents(currentClass); loadPublishableStudents(publi
 document.getElementById('sessionFilter').addEventListener('change',()=>{ currentPage=1; loadStudents(currentClass,1); loadPublishableStudents(publishClass); });
 document.getElementById('publishDate').value=new Date().toISOString().split('T')[0];
 
-// ============================================================
-// QR CODE GENERATE
-// ============================================================
 function generateQRCodeBase64(url) {
     return new Promise((resolve) => {
         const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(url)}`;
@@ -641,9 +677,6 @@ function generateQRCodeBase64(url) {
     });
 }
 
-// ============================================================
-// PRINT STUDENT MARKSHEET
-// ============================================================
 async function printStudent(studentId) {
     try {
         const data = await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`);
@@ -656,79 +689,70 @@ async function printStudent(studentId) {
         const verificationData = {
             student_id: s.student_id, name: s.name, father_name: s.father_name || '',
             mother_name: s.mother_name || '', dob: s.dob || '', class: s.class || '',
-            section: s.section || '', session: s.session || '', exam_roll_no: s.exam_roll_no || '',
+            session: s.session || '', exam_roll_no: s.exam_roll_no || '',
             apaar_id: s.apaar_id || ''
         };
         const verificationUrl = `https://gsssshilla07.pages.dev/verify.html?data=${encodeURIComponent(JSON.stringify(verificationData))}`;
         const verificationQRBase64 = await generateQRCodeBase64(verificationUrl);
         
-        const marksheetsWithQR = await Promise.all(marksheets.map(async (m) => {
-            const qrBase64 = await generateQRCodeBase64(m.cloudinary_url || '#');
-            return { ...m, qrBase64 };
-        }));
-        
         let marksheetRows = '';
-        marksheetsWithQR.forEach((m, idx) => {
+        for (let idx = 0; idx < marksheets.length; idx++) {
+            const m = marksheets[idx];
+            const qrBase64 = m.cloudinary_url ? await generateQRCodeBase64(m.cloudinary_url) : null;
             marksheetRows += `
                 <tr>
                     <td style="text-align:center;padding:6px 8px;border:1px solid #d1d5db;font-size:12px;">${idx+1}</td>
                     <td style="padding:6px 8px;border:1px solid #d1d5db;font-weight:600;font-size:12px;">${esc(m.exam_type)}</td>
                     <td style="padding:6px 8px;border:1px solid #d1d5db;text-align:center;font-size:12px;">${formatMonth(m.exam_session)}</td>
-                    <td style="padding:6px 8px;border:1px solid #d1d5db;text-align:center;font-weight:700;color:#0d1b2a;font-size:12px;">${esc(m.obtained_marks||'-')}</td>
-                    <td style="padding:6px 8px;border:1px solid #d1d5db;text-align:center;font-weight:700;color:#0d1b2a;font-size:12px;">${esc(m.max_marks||'-')}</td>
-                    <td style="padding:6px 8px;border:1px solid #d1d5db;font-size:9px;word-break:break-all;color:#6b7280;">${esc(m.cloudinary_url||'-')}</td>
-                    <td style="text-align:center;padding:6px 8px;border:1px solid #d1d5db;">${m.qrBase64 ? `<img src="${m.qrBase64}" width="55" height="55" style="border:2px solid #c9972b;padding:3px;background:white;border-radius:4px;">` : '<div style="font-size:8px;color:#94a3b8;">N/A</div>'}</td>
+                    <td style="padding:6px 8px;border:1px solid #d1d5db;text-align:center;font-weight:700;font-size:12px;">${esc(m.obtained_marks||'-')}</td>
+                    <td style="padding:6px 8px;border:1px solid #d1d5db;text-align:center;font-weight:700;font-size:12px;">${esc(m.max_marks||'-')}</td>
+                    <td style="text-align:center;padding:6px 8px;border:1px solid #d1d5db;">${qrBase64 ? `<img src="${qrBase64}" width="55" height="55" style="border:2px solid #c9972b;padding:3px;background:white;border-radius:4px;">` : 'N/A'}</td>
                 </tr>`;
-        });
+        }
+
+        const totalObtained = marksheets.reduce((sum, m) => sum + (parseInt(m.obtained_marks) || 0), 0);
+        const totalMax = marksheets.reduce((sum, m) => sum + (parseInt(m.max_marks) || 0), 0);
+        const percentage = totalMax === 0 ? '-' : ((totalObtained / totalMax) * 100).toFixed(2) + '%';
 
         const pw = window.open('', '_blank', 'width=1000,height=800');
         pw.document.write(`<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><title>Marksheet: ${esc(s.name)} - ${esc(s.student_id)}</title>
+<html><head><meta charset="UTF-8"><title>Marksheet: ${esc(s.name)}</title>
 <style>
-@page { size: A4; margin: 8mm 10mm 8mm 10mm; }
+@page { size: A4; margin: 8mm 10mm; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { height: auto; }
-body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; background: #ffffff; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-.page-container { width: 100%; max-width: 190mm; margin: 0 auto; padding: 6px 8px 50px; position: relative; }
-.watermark-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 9999; overflow: hidden; }
-.watermark-pattern { position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(201,151,43,0.08) 40px, rgba(201,151,43,0.08) 42px); background-size: 56px 56px; }
-.watermark-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; height: 500px; opacity: 0.10; background: url('https://gsssshilla07.pages.dev/logo(1).png') center/contain no-repeat; filter: grayscale(100%); }
-.page-header { text-align: center; padding-bottom: 10px; border-bottom: 3px solid #c9972b; position: relative; z-index: 1; background: rgba(255,255,255,0.95); }
+body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a2332; background: #fff; -webkit-print-color-adjust: exact; }
+.page-container { max-width: 190mm; margin: 0 auto; padding: 6px 8px 40px; position: relative; }
+.watermark-container { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
+.watermark-pattern { position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(201,151,43,0.07) 40px, rgba(201,151,43,0.07) 42px); background-size: 56px 56px; }
+.watermark-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; height: 500px; opacity: 0.08; background: url('https://gsssshilla07.pages.dev/logo(1).png') center/contain no-repeat; }
+.page-header { text-align: center; padding-bottom: 10px; border-bottom: 3px solid #c9972b; position: relative; z-index: 1; }
 .page-header .logo { width: 64px; height: 64px; border-radius: 50%; border: 2px solid #c9972b; padding: 3px; background: white; margin: 0 auto 3px; display: block; }
-.page-header .school-name { font-family: 'Georgia', serif; font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: #0d1b2a; }
+.page-header .school-name { font-family: Georgia, serif; font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: #0d1b2a; }
 .page-header .school-tagline { font-size: 8px; color: #5a6a7e; letter-spacing: 2.5px; text-transform: uppercase; }
-.page-header .heading-box { display: inline-block; background: #0d1b2a; color: #fff; padding: 4px 22px; border-radius: 25px; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: 2px solid #c9972b; margin-top: 4px; }
-.content-area { position: relative; z-index: 1; }
+.page-header .heading-box { display: inline-block; background: #0d1b2a; color: #fff; padding: 4px 22px; border-radius: 25px; font-size: 12px; font-weight: 700; letter-spacing: 2px; border: 2px solid #c9972b; margin-top: 4px; }
 .student-info-table { width: 100%; border-collapse: collapse; margin: 12px 0; border: 2px solid #0d1b2a; position: relative; z-index: 1; }
-.student-info-table td { padding: 8px 10px; border: 1px solid #d1d5db; font-size: 11px; vertical-align: middle; }
+.student-info-table td { padding: 8px 10px; border: 1px solid #d1d5db; font-size: 11px; }
 .student-info-table .label-cell { font-weight: 700; background: #fef8ed; color: #0d1b2a; width: 14%; text-transform: uppercase; font-size: 9px; }
-.student-info-table .value-cell { font-weight: 500; color: #1a2332; width: 30%; font-size: 11px; }
+.student-info-table .value-cell { font-weight: 500; width: 30%; font-size: 11px; }
 .photo-cell { width: 80px; text-align: center; background: #f8fafc; }
 .photo-box { width: 65px; height: 80px; border: 3px solid #c9972b; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; margin: 0 auto; }
 .photo-box img { width: 100%; height: 100%; object-fit: cover; }
 .photo-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #cbd5e1; }
-.marksheet-heading { font-size: 12px; font-weight: 700; margin: 10px 0 6px; padding: 5px 12px; background: #fef8ed; border-left: 4px solid #c9972b; letter-spacing: 1px; }
-.marksheet-table { width: 100%; border-collapse: collapse; margin: 4px 0; border: 2px solid #0d1b2a; }
+.marksheet-heading { font-size: 12px; font-weight: 700; margin: 10px 0 6px; padding: 5px 12px; background: #fef8ed; border-left: 4px solid #c9972b; position: relative; z-index: 1; }
+.marksheet-table { width: 100%; border-collapse: collapse; margin: 4px 0; border: 2px solid #0d1b2a; position: relative; z-index: 1; }
 .marksheet-table th { background: #0d1b2a; color: #fff; padding: 6px 8px; border: 1px solid #0d1b2a; font-size: 9px; text-transform: uppercase; text-align: center; }
 .marksheet-table td { padding: 6px 8px; border: 1px solid #d1d5db; font-size: 11px; text-align: center; }
-.marks-summary-box { border: 2px solid #c9972b; border-radius: 8px; padding: 10px 16px; margin: 10px 0 14px; background: #fef8ed; display: flex; justify-content: center; gap: 50px; flex-wrap: wrap; }
+.marks-summary-box { border: 2px solid #c9972b; border-radius: 8px; padding: 10px 16px; margin: 10px 0; background: #fef8ed; display: flex; justify-content: center; gap: 50px; flex-wrap: wrap; position: relative; z-index: 1; }
 .marks-summary-box .summary-item { text-align: center; }
 .marks-summary-box .summary-item .label { font-size: 8px; text-transform: uppercase; color: #5a6a7e; font-weight: 600; }
 .marks-summary-box .summary-item .value { font-size: 15px; font-weight: 800; color: #0d1b2a; }
 .marks-summary-box .summary-item .value.gold { color: #c9972b; }
-.declaration-box { background: #fef8ed; border-left: 4px solid #c9972b; border-right: 4px solid #c9972b; padding: 8px 16px; margin: 14px 0; border-radius: 4px; font-size: 11px; font-style: italic; text-align: center; }
-.declaration-box i { color: #10b981; margin-right: 6px; }
-.verification-section { display: flex; align-items: center; gap: 16px; margin: 20px 0 15px; padding: 10px 16px; border: 2px solid #c9972b; background: #fef8ed; border-radius: 8px; }
+.verification-section { display: flex; align-items: center; gap: 16px; margin: 20px 0 15px; padding: 10px 16px; border: 2px solid #c9972b; background: #fef8ed; border-radius: 8px; position: relative; z-index: 1; }
 .verification-qr { width: 70px; height: 70px; border: 2px solid #0d1b2a; border-radius: 6px; overflow: hidden; flex-shrink: 0; background: white; display: flex; align-items: center; justify-content: center; }
 .verification-qr img { width: 65px; height: 65px; }
 .verification-text { flex: 1; font-size: 9px; }
 .verification-text strong { display: block; font-size: 11px; margin-bottom: 2px; color: #c9972b; }
-.signature-area { display: flex; justify-content: flex-end; margin-top: 10px; }
-.signature-box { text-align: center; font-size: 9px; width: 180px; }
-.signature-box .line { width: 120px; height: 1px; border-top: 1px dashed #94a3b8; margin: 14px auto 3px; }
-.footer-wrapper { position: fixed; left: 50%; transform: translateX(-50%); width: 190mm; bottom: 0; z-index: 1; }
-.page-footer { padding-top: 6px; border-top: 2px solid #c9972b; font-size: 8px; color: #64748b; display: flex; justify-content: space-between; background: rgba(255,255,255,0.95); }
-@media print { html, body { margin: 0; padding: 0; } .page-container { max-width: 100%; } }
+@media print { .page-container { max-width: 100%; } }
 </style></head><body>
 <div class="watermark-container"><div class="watermark-pattern"></div><div class="watermark-logo"></div></div>
 <div class="page-container">
@@ -738,42 +762,36 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
         <div class="school-tagline">Shilla • Nerwa • District Shimla • Himachal Pradesh - 171210</div>
         <div class="heading-box">STUDENT MARKSHEET</div>
     </div>
-    <div class="content-area">
-        <table class="student-info-table">
-            <tr>
-                <td class="label-cell">Student ID</td><td class="value-cell">${esc(s.student_id)}</td>
-                <td class="label-cell">Roll No</td><td class="value-cell">${esc(s.exam_roll_no||'-')}</td>
-                <td class="photo-cell" rowspan="5">
-                    <div class="photo-box">${studentPhoto ? `<img src="${esc(studentPhoto)}" onerror="this.parentElement.innerHTML='<div class=&quot;photo-placeholder&quot;>👤</div>'">` : `<div class="photo-placeholder">👤</div>`}</div>
-                </td>
-            </tr>
-            <tr><td class="label-cell">Name</td><td class="value-cell" style="font-weight:700;font-size:13px;">${esc(s.name)}</td><td class="label-cell">Father</td><td class="value-cell">${esc(s.father_name||'-')}</td></tr>
-            <tr><td class="label-cell">Mother</td><td class="value-cell">${esc(s.mother_name||'-')}</td><td class="label-cell">DOB</td><td class="value-cell">${s.dob ? new Date(s.dob).toLocaleDateString('en-IN', {day:'2-digit',month:'2-digit',year:'numeric'}) : '-'}</td></tr>
-            <tr><td class="label-cell">Session</td><td class="value-cell">${esc(s.session||'-')}</td><td class="label-cell">Class</td><td class="value-cell">${esc(s.class||'-')}${s.section ? ' - ' + esc(s.section) : ''}</td></tr>
-            <tr><td class="label-cell">APAAR ID</td><td class="value-cell">${esc(s.apaar_id||'-')}</td><td class="label-cell">Result</td><td class="value-cell" style="font-weight:700;color:#10b981;">PASS</td></tr>
-        </table>
-        <div class="marksheet-heading">📄 TOTAL EXAMINATIONS (${marksheets.length})</div>
-        <table class="marksheet-table">
-            <thead><tr><th style="width:25px;">#</th><th>Exam Type</th><th style="width:65px;">Session</th><th style="width:55px;">Obtained</th><th style="width:55px;">Max</th><th>URL</th><th style="width:75px;">QR</th></tr></thead>
-            <tbody>${marksheetRows || '<tr><td colspan="7" style="text-align:center;padding:12px;font-size:12px;">No marksheets available</td></tr>'}</tbody>
-        </table>
-        <div class="marks-summary-box">
-            <div class="summary-item"><div class="label">Total Obtained</div><div class="value gold">${marksheets.reduce((sum, m) => sum + (parseInt(m.obtained_marks) || 0), 0)}</div></div>
-            <div class="summary-item"><div class="label">Maximum Marks</div><div class="value">${marksheets.reduce((sum, m) => sum + (parseInt(m.max_marks) || 0), 0)}</div></div>
-            <div class="summary-item"><div class="label">Percentage</div><div class="value gold">${(() => { const t1 = marksheets.reduce((s, m) => s + (parseInt(m.obtained_marks) || 0), 0); const t2 = marksheets.reduce((s, m) => s + (parseInt(m.max_marks) || 0), 0); return t2 === 0 ? '-' : ((t1/t2)*100).toFixed(2) + '%'; })()}</div></div>
-        </div>
-        <div class="declaration-box"><i class="fas fa-check-circle"></i> This is to certify that <strong>${esc(s.name)}</strong> (Student ID: ${esc(s.student_id)}) has successfully completed the <strong>${esc(s.session||'')}</strong> academic session and is declared <strong>PASS</strong>.</div>
-        <div class="signature-area"><div class="signature-box"><div class="line"></div><strong>Principal</strong><div style="font-size:8px;color:#94a3b8;">Govt. Sr. Sec. School Shilla</div></div></div>
-        <div class="verification-section">
-            <div class="verification-qr">${verificationQRBase64 ? `<img src="${verificationQRBase64}" alt="QR">` : '<div style="font-size:8px;color:#94a3b8;">QR N/A</div>'}</div>
-            <div class="verification-text"><strong>Scan to Verify</strong><p>Scan to verify the authenticity of this marksheet.</p><p style="font-size:8px;color:#94a3b8;">Verification ID: ${esc(s.student_id)}-${Date.now().toString().substring(8)}</p></div>
-        </div>
+    <table class="student-info-table">
+        <tr>
+            <td class="label-cell">Student ID</td><td class="value-cell">${esc(s.student_id)}</td>
+            <td class="label-cell">Roll No</td><td class="value-cell">${esc(s.exam_roll_no||'-')}</td>
+            <td class="photo-cell" rowspan="5">
+                <div class="photo-box">${studentPhoto ? `<img src="${esc(studentPhoto)}" onerror="this.parentElement.innerHTML='<div class=&quot;photo-placeholder&quot;>👤</div>'">` : `<div class="photo-placeholder">👤</div>`}</div>
+            </td>
+        </tr>
+        <tr><td class="label-cell">Name</td><td class="value-cell" style="font-weight:700;">${esc(s.name)}</td><td class="label-cell">Father</td><td class="value-cell">${esc(s.father_name||'-')}</td></tr>
+        <tr><td class="label-cell">Mother</td><td class="value-cell">${esc(s.mother_name||'-')}</td><td class="label-cell">DOB</td><td class="value-cell">${s.dob ? new Date(s.dob).toLocaleDateString('en-IN') : '-'}</td></tr>
+        <tr><td class="label-cell">Session</td><td class="value-cell">${esc(s.session||'-')}</td><td class="label-cell">Class</td><td class="value-cell">${esc(s.class||'-')}</td></tr>
+        <tr><td class="label-cell">APAAR ID</td><td class="value-cell">${esc(s.apaar_id||'-')}</td><td class="label-cell">Result</td><td class="value-cell" style="color:#10b981;font-weight:700;">PASS</td></tr>
+    </table>
+    <div class="marksheet-heading">📄 TOTAL EXAMINATIONS (${marksheets.length})</div>
+    <table class="marksheet-table">
+        <thead><tr><th style="width:25px;">#</th><th>Exam Type</th><th style="width:65px;">Session</th><th style="width:55px;">Obtained</th><th style="width:55px;">Max</th><th style="width:75px;">QR</th></tr></thead>
+        <tbody>${marksheetRows || '<tr><td colspan="6" style="text-align:center;padding:12px;">No marksheets</td></tr>'}</tbody>
+    </table>
+    <div class="marks-summary-box">
+        <div class="summary-item"><div class="label">Total Obtained</div><div class="value gold">${totalObtained}</div></div>
+        <div class="summary-item"><div class="label">Max Marks</div><div class="value">${totalMax}</div></div>
+        <div class="summary-item"><div class="label">Percentage</div><div class="value gold">${percentage}</div></div>
     </div>
-    <div class="footer-wrapper">
-        <div class="page-footer">
-            <div><strong>Print Date:</strong> ${new Date().toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'})}</div>
-            <div><strong>Issued by:</strong> ${esc(downloadedBy)}</div>
-            <div><strong>Page 1 of 1</strong></div>
+    <div class="verification-section">
+        <div class="verification-qr">${verificationQRBase64 ? `<img src="${verificationQRBase64}">` : 'N/A'}</div>
+        <div class="verification-text"><strong>Scan to Verify</strong><p>Scan to verify the authenticity of this marksheet.</p></div>
+    </div>
+    <div style="text-align:right;margin-top:20px;font-size:10px;">
+        <div style="display:inline-block;border-top:1px dashed #94a3b8;padding-top:6px;width:180px;text-align:center;">
+            <strong>Principal</strong><br>Govt. Sr. Sec. School Shilla
         </div>
     </div>
 </div>
@@ -796,13 +814,14 @@ async function printClassStudents() {
         const pw = window.open('', '_blank', 'width=800,height=600');
         let rows = '';
         students.forEach((s, i) => { rows += `<tr><td>${i+1}</td><td>${esc(s.student_id)}</td><td>${esc(s.name)}</td><td>${esc(s.father_name||'-')}</td><td>${esc(s.session||'-')}</td><td>${esc(s.class||'-')}</td><td>${s.marksheet_count||0}</td><td>${s.published_count||0}</td></tr>`; });
-        pw.document.write(`<html><head><title>Class ${currentClass} Students</title><style>body{font-family:'Inter',sans-serif;padding:20px}.print-header{display:flex;align-items:center;justify-content:center;gap:16px;border-bottom:3px solid #c9972b;padding-bottom:12px;margin-bottom:20px}.print-header img{width:70px;height:70px;border-radius:50%}table{width:100%;border-collapse:collapse;margin:16px 0}th,td{padding:8px 12px;border:1px solid #cbd5e1;font-size:12px}th{background:#f1f5f9}.print-footer{margin-top:30px;display:flex;justify-content:space-between;font-size:12px;color:#64748b;border-top:1px solid #cbd5e1;padding-top:10px}</style></head><body><div class="print-header"><img src="https://gsssshilla07.pages.dev/logo(1).png"><div><h1>Govt. Sr. Sec. School Shilla</h1><p>Class ${currentClass} Students List</p></div></div><table><thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Father's Name</th><th>Session</th><th>Class</th><th>Marksheets</th><th>Published</th></tr></thead><tbody>${rows}</tbody></table><div class="print-footer"><span>Print Date: ${new Date().toLocaleString('en-IN')}</span><span>Downloaded by: ${esc(downloadedBy)}</span></div></body></html>`);
+        pw.document.write(`<html><head><title>Class ${currentClass} Students</title><style>body{font-family:Inter,Arial,sans-serif;padding:20px}.print-header{display:flex;align-items:center;justify-content:center;gap:16px;border-bottom:3px solid #c9972b;padding-bottom:12px;margin-bottom:20px}.print-header img{width:70px;height:70px;border-radius:50%}table{width:100%;border-collapse:collapse;margin:16px 0}th,td{padding:8px 12px;border:1px solid #cbd5e1;font-size:12px}th{background:#f1f5f9}</style></head><body><div class="print-header"><img src="https://gsssshilla07.pages.dev/logo(1).png"><div><h1>Govt. Sr. Sec. School Shilla</h1><p>Class ${currentClass} Students List</p></div></div><table><thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Father's Name</th><th>Session</th><th>Class</th><th>Marksheets</th><th>Published</th></tr></thead><tbody>${rows}</tbody></table><p style="text-align:right;font-size:11px;color:#64748b;">Printed by: ${esc(downloadedBy)} • ${new Date().toLocaleString('en-IN')}</p></body></html>`);
         pw.document.close();
         setTimeout(() => { pw.print(); }, 500);
     } catch(e) { showToast(e.message,'error'); }
 }
 
 window.addEventListener('DOMContentLoaded', async() => {
+    populateSessionDropdown();
     if (await checkAuth()) {
         loadStudents(currentClass);
         loadPublishableStudents(publishClass);
