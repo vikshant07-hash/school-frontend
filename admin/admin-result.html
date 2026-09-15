@@ -145,11 +145,19 @@
         <h1><i class="fas fa-graduation-cap"></i> Result Management</h1>
         <div class="header-actions">
             <select id="sessionFilter" class="btn btn-outline" style="padding:8px 14px; font-family:'Inter',sans-serif;">
-                <option value="">All Sessions</option>
-                <option value="2025-26" selected>2025-26</option>
-                <option value="2024-25">2024-25</option>
-                <option value="2023-24">2023-24</option>
-            </select>
+    <option value="">All Sessions</option>
+    <option value="2030-31">2030-31</option>
+    <option value="2029-30">2029-30</option>
+    <option value="2028-29">2028-29</option>
+    <option value="2027-28">2027-28</option>
+    <option value="2026-27">2026-27</option>
+    <option value="2025-26" selected>2025-26</option>
+    <option value="2024-25">2024-25</option>
+    <option value="2023-24">2023-24</option>
+    <option value="2022-23">2022-23</option>
+    <option value="2021-22">2021-22</option>
+    <option value="2020-21">2020-21</option>
+</select>
             <button class="btn btn-primary" onclick="refreshAll()"><i class="fas fa-sync-alt"></i> Refresh</button>
             <a href="admin-students.html" class="btn btn-outline"><i class="fas fa-users"></i> Manage Students</a>
         </div>
@@ -305,6 +313,7 @@ function applySort() {
     }
     loadStudents(currentClass, currentPage);
 }
+    
 
 function getAuthHeaders() {
     try { const token = localStorage.getItem('adminToken'); if (!token) { showPopup('invalid'); return null; } return {'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json'}; }
@@ -526,6 +535,31 @@ async function openStudentDetail(studentId) {
     try { const data = await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`); renderStudentDetail(data.data); }
     catch (error) { modalContent.innerHTML = `<div class="alert-box error">${esc(error.message)} <button onclick="openStudentDetail('${studentId}')" style="background:none;border:none;color:var(--gold);cursor:pointer;font-weight:600;">Retry</button></div>`; }
 }
+
+    // ✅ Auto-populate session dropdown (2020-21 to 2030-31)
+function populateSessionDropdown() {
+    const sel = document.getElementById('sessionFilter');
+    if (!sel) return;
+    
+    const currentYear = new Date().getFullYear();
+    const startYear = Math.min(currentYear - 5, 2020);  // 2020 se
+    const endYear = Math.max(currentYear + 5, 2030);    // 2030 tak
+    
+    let html = '<option value="">All Sessions</option>';
+    
+    // Descending order (newest first)
+    for (let y = endYear; y >= startYear; y--) {
+        const endShort = String(y + 1).slice(-2);
+        const session = `${y}-${endShort}`;
+        const selected = (y === currentYear) ? ' selected' : '';
+        html += `<option value="${session}"${selected}>${session}</option>`;
+    }
+    
+    sel.innerHTML = html;
+}
+
+// Call karo
+populateSessionDropdown();
 
 function renderStudentDetail(data) {
     const s = data.student; const marksheets = data.marksheets || [];
