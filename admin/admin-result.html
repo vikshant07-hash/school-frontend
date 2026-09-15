@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,7 +50,7 @@
         .main-container { flex: 1; max-width: 1400px; margin: 0 auto; padding: 24px 32px 40px; width: 100%; }
         .page-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; padding: 20px 28px; background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
         .page-header h1 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; } .page-header h1 i { color: var(--gold); }
-        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 
         .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); text-decoration: none; font-family: 'Inter', sans-serif; }
         .btn-primary { background: var(--gold); color: #fff; } .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
@@ -65,10 +64,6 @@
         .tab-btn { padding: 10px 24px; border: none; background: transparent; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-size: 13px; color: var(--text-secondary); transition: var(--transition); font-family: 'Inter', sans-serif; } .tab-btn:hover { background: var(--bg); } .tab-btn.active { background: var(--gold); color: #fff; }
         .tab-btn i { margin-right: 6px; }
         .tab-content { display: none; } .tab-content.active { display: block; }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .stat-card { background: var(--bg-white); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); text-align: center; box-shadow: var(--shadow); transition: var(--transition); } .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
-        .stat-card h3 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; } .stat-card .number { font-size: 28px; font-weight: 800; } .number.gold { color: var(--gold); } .number.green { color: var(--green); } .number.red { color: var(--red); } .number.blue { color: var(--blue); }
 
         .class-nav { background: var(--bg-white); padding: 20px 24px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 20px; box-shadow: var(--shadow); }
         .class-nav h3 { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 12px; } .class-nav h3 i { color: var(--gold); margin-right: 6px; }
@@ -108,7 +103,6 @@
             .main-container { padding: 16px; } 
             .page-header { padding: 16px; flex-direction: column; align-items: stretch; } 
             .student-grid { grid-template-columns: 1fr; } 
-            .stats-grid { grid-template-columns: 1fr 1fr; } 
             .student-detail-grid { grid-template-columns: 1fr; }
         }
     </style>
@@ -128,20 +122,20 @@
 
 <nav class="navbar">
     <a href="#" class="brand">
-        <div class="logo-placeholder"><img src="logo(1).png" alt="Logo" style="width:46px; height:46px; border-radius:10px; object-fit:contain; background:#fff; padding:4px;"></div>
+        <div class="logo-placeholder"><img src="logo(1).png" alt="Logo"></div>
         <div class="name">GSSS<span> SHILLA</span></div>
     </a>
     <ul class="nav-links" id="navLinks">
         <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="admin-students.html"><i class="fas fa-users"></i> Students</a></li>
         <li><a href="admin-result.html" class="active"><i class="fas fa-graduation-cap"></i> Results</a></li>
     </ul>
     <div class="nav-right">
         <div class="admin-badge">
-        <span class="avatar" id="adminAvatar">🛡️</span>
-        <span id="adminName">Admin</span>
-        <span class="online-dot"></span>
+            <span class="avatar" id="adminAvatar">🛡️</span>
+            <span id="adminName">Admin</span>
+            <span class="online-dot"></span>
         </div>
-        
         <button class="hamburger" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
     </div>
 </nav>
@@ -157,13 +151,13 @@
                 <option value="2023-24">2023-24</option>
             </select>
             <button class="btn btn-primary" onclick="refreshAll()"><i class="fas fa-sync-alt"></i> Refresh</button>
-            <button class="btn btn-success" onclick="openAddStudent()"><i class="fas fa-user-plus"></i> Add Student</button>
+            <a href="admin-students.html" class="btn btn-outline"><i class="fas fa-users"></i> Manage Students</a>
         </div>
     </div>
 
     <div class="tabs">
         <button class="tab-btn active" data-tab="students" onclick="switchTab('students')"><i class="fas fa-users"></i> Students</button>
-        <button class="tab-btn" data-tab="upload" onclick="switchTab('upload')"><i class="fas fa-upload"></i> Upload</button>
+        <button class="tab-btn" data-tab="upload" onclick="switchTab('upload')"><i class="fas fa-upload"></i> Upload Marksheet</button>
         <button class="tab-btn" data-tab="publish" onclick="switchTab('publish')"><i class="fas fa-check-circle"></i> Publish</button>
     </div>
 
@@ -204,17 +198,23 @@
     <div id="tab-upload" class="tab-content">
         <div class="class-nav">
             <h3><i class="fas fa-upload"></i> Upload Marksheet</h3>
+            <div class="alert-box info" style="margin-bottom:16px;">
+                <i class="fas fa-info-circle"></i> Students add karne ke liye <a href="admin-students.html" style="color:var(--gold);font-weight:600;">Student Management</a> me jao. Yahan sirf marksheet upload hoti hai.
+            </div>
             <form id="marksheetUploadForm" enctype="multipart/form-data" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
                 <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Student ID *</label><input type="text" id="uploadStudentId" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" placeholder="Enter Student ID" required></div>
                 <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Student Name</label><input type="text" id="uploadStudentName" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" disabled></div>
                 <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Academic Session</label><input type="text" id="uploadSession" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" disabled></div>
                 <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Class</label><input type="text" id="uploadClass" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" disabled></div>
                 <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Exam Type *</label><select id="uploadExamType" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);"><option>Annual Examination</option><option>Half Yearly Examination</option><option>Pre Board</option><option>Board Examination</option><option>Final Examination</option><option>Monthly Test</option><option>Unit Test</option></select></div>
-                <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Exam Session (When exam was held) *</label><input type="month" id="uploadExamSession" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" required></div>
+                <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Exam Session (When exam held) *</label><input type="month" id="uploadExamSession" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" required></div>
                 <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Total Obtained Marks</label><input type="text" id="uploadObtainedMarks" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" placeholder="e.g. 407"></div>
                 <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">Maximum Marks</label><input type="text" id="uploadMaxMarks" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" placeholder="e.g. 500"></div>
                 <div class="form-group"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);">PDF File * (Max 10MB)</label><input type="file" id="uploadPdf" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" accept=".pdf" required></div>
-                <div style="grid-column:1/-1;display:flex;gap:10px;"><button type="button" class="btn btn-primary" onclick="fetchStudentForUpload()"><i class="fas fa-search"></i> Fetch Student</button><button type="submit" class="btn btn-success" id="uploadSubmitBtn"><i class="fas fa-upload"></i> Upload Marksheet</button></div>
+                <div style="grid-column:1/-1;display:flex;gap:10px;">
+                    <button type="button" class="btn btn-primary" onclick="fetchStudentForUpload()"><i class="fas fa-search"></i> Fetch Student</button>
+                    <button type="submit" class="btn btn-success" id="uploadSubmitBtn"><i class="fas fa-upload"></i> Upload Marksheet</button>
+                </div>
             </form>
             <div id="uploadStatus" class="alert-box info" style="margin-top:12px;"><i class="fas fa-info-circle"></i> Enter Student ID and click Fetch</div>
         </div>
@@ -237,7 +237,21 @@
                 <label style="font-weight:600;font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:6px;">Declaration Date * <input type="date" id="publishDate" class="form-control" style="padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" required></label>
                 <button class="btn btn-success" onclick="bulkPublish()" style="margin-left:auto;"><i class="fas fa-check-double"></i> Bulk Publish</button>
             </div>
-            <div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--text-secondary);border-bottom:2px solid var(--border);width:40px;"><input type="checkbox" id="selectAllPublish" onchange="toggleAllPublish()"></th><th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--text-secondary);border-bottom:2px solid var(--border);">Student ID</th><th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--text-secondary);border-bottom:2px solid var(--border);">Name</th><th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--text-secondary);border-bottom:2px solid var(--border);">Exam Type</th><th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--text-secondary);border-bottom:2px solid var(--border);">Status</th><th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--text-secondary);border-bottom:2px solid var(--border);">Actions</th></tr></thead><tbody id="publishTableBody"><tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr></tbody></table></div>
+            <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                    <thead>
+                        <tr style="background:var(--bg);">
+                            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--text-secondary);border-bottom:2px solid var(--border);width:40px;"><input type="checkbox" id="selectAllPublish" onchange="toggleAllPublish()"></th>
+                            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--text-secondary);border-bottom:2px solid var(--border);">Student ID</th>
+                            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--text-secondary);border-bottom:2px solid var(--border);">Name</th>
+                            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--text-secondary);border-bottom:2px solid var(--border);">Exam Type</th>
+                            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--text-secondary);border-bottom:2px solid var(--border);">Status</th>
+                            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--text-secondary);border-bottom:2px solid var(--border);">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="publishTableBody"><tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -249,33 +263,6 @@
     </div>
 </div>
 
-<div class="modal-overlay" id="studentAddModal">
-    <div class="modal-content" style="max-width:550px;">
-        <div class="modal-header"><h2 id="studentModalTitle"><i class="fas fa-user-plus"></i> Add Student</h2><button class="close-btn" onclick="closeModal('studentAddModal')">&times;</button></div>
-        <form id="studentForm" onsubmit="saveStudent(event)">
-            <input type="hidden" id="editStudentId">
-            <div class="form-group" style="margin-bottom:14px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Student ID <span style="color:var(--red);">*</span></label><input type="text" id="sStudentId" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" placeholder="e.g. ST10A025" maxlength="8" required><small style="color:var(--text-muted);font-size:11px;">Format: AA99A999</small></div>
-            <div class="form-group" style="margin-bottom:14px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">APAAR ID <span style="color:var(--red);">*</span></label><input type="text" id="sApaarId" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" placeholder="Enter 11-digit APAAR ID" maxlength="11" required></div>
-            <div class="form-group" style="margin-bottom:14px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Full Name <span style="color:var(--red);">*</span></label><input type="text" id="sName" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" required placeholder="Student Name"></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                <div class="form-group" style="margin-bottom:14px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Father's Name</label><input type="text" id="sFatherName" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);"></div>
-                <div class="form-group" style="margin-bottom:14px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Mother's Name</label><input type="text" id="sMotherName" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);"></div>
-            </div>
-            <div class="form-group" style="margin-bottom:14px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Date of Birth</label><input type="date" id="sDob" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);"></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                <div class="form-group" style="margin-bottom:14px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Session <span style="color:var(--red);">*</span></label><select id="sSession" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);"><option>2025-26</option><option>2024-25</option><option>2023-24</option></select></div>
-                <div class="form-group" style="margin-bottom:14px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Class <span style="color:var(--red);">*</span></label><select id="sClass" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);"><option>6</option><option>7</option><option>8</option><option>9</option><option selected>10</option><option>11</option><option>12</option></select></div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                <div class="form-group" style="margin-bottom:14px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Section</label><input type="text" id="sSection" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);"></div>
-                <div class="form-group" style="margin-bottom:14px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Exam Roll No</label><input type="text" id="sRollNo" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);"></div>
-            </div>
-            <div class="form-group" style="margin-bottom:14px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Photo</label><input type="file" id="sPhoto" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;background:var(--bg);" accept="image/*"></div>
-            <div style="display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border);padding-top:16px;"><button type="button" class="btn btn-outline" onclick="closeModal('studentAddModal')">Cancel</button><button type="submit" class="btn btn-success" id="studentSaveBtn"><i class="fas fa-save"></i> Save</button></div>
-        </form>
-    </div>
-</div>
-
 <div class="toast-container" id="toastContainer"></div>
 <footer class="footer"><div class="footer-content"><span>&copy; 2026 Govt. Sr. Sec. School Shilla. All rights reserved.</span></div></footer>
 
@@ -284,47 +271,29 @@ const API_BASE = 'https://gsssshilla.onrender.com/api/admin/results';
 let currentClass = 10, currentPage = 1, publishClass = 10;
 const PAGE_SIZE = 20;
 
-// ================================================================
-// SORT CONFIGURATION
-// ================================================================
 let sortField = 'roll';
 let sortOrder = 'asc';
 
-// ================================================================
-// SORT STUDENTS FUNCTION
-// ================================================================
 function sortStudents(students) {
     return students.sort((a, b) => {
         let valA, valB;
-        
         if (sortField === 'roll') {
             valA = parseInt(a.exam_roll_no) || 0;
             valB = parseInt(b.exam_roll_no) || 0;
         } else if (sortField === 'name') {
             valA = (a.name || '').toLowerCase();
             valB = (b.name || '').toLowerCase();
-        } else if (sortField === 'student_id') {
+        } else {
             valA = (a.student_id || '').toUpperCase();
             valB = (b.student_id || '').toUpperCase();
-        } else {
-            valA = parseInt(a.exam_roll_no) || 0;
-            valB = parseInt(b.exam_roll_no) || 0;
         }
-        
-        if (sortOrder === 'asc') {
-            return valA > valB ? 1 : valA < valB ? -1 : 0;
-        } else {
-            return valA < valB ? 1 : valA > valB ? -1 : 0;
-        }
+        if (sortOrder === 'asc') return valA > valB ? 1 : valA < valB ? -1 : 0;
+        return valA < valB ? 1 : valA > valB ? -1 : 0;
     });
 }
 
-// ================================================================
-// APPLY SORT
-// ================================================================
 function applySort() {
     const sortValue = document.getElementById('sortSelect').value;
-    
     switch(sortValue) {
         case 'roll_asc': sortField = 'roll'; sortOrder = 'asc'; break;
         case 'roll_desc': sortField = 'roll'; sortOrder = 'desc'; break;
@@ -337,9 +306,6 @@ function applySort() {
     loadStudents(currentClass, currentPage);
 }
 
-// ================================================================
-// GET AUTH HEADERS
-// ================================================================
 function getAuthHeaders() {
     try { const token = localStorage.getItem('adminToken'); if (!token) { showPopup('invalid'); return null; } return {'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json'}; }
     catch(e) { showPopup('invalid'); return null; }
@@ -348,8 +314,17 @@ function getAuthHeaders() {
 async function checkAuth() {
     let token = null; try { token = localStorage.getItem('adminToken'); } catch(e) {}
     if (!token) { showPopup('invalid'); return false; }
-    try { const res = await fetch('https://gsssshilla.onrender.com/api/admin/verify', { headers: { Authorization: `Bearer ${token}` } }); const data = await res.json(); if (data.success) { if (data.admin?.username) { document.getElementById('adminAvatar').textContent = data.admin.username.charAt(0).toUpperCase(); document.getElementById('adminName').textContent = data.admin.username; } return true; } else { showPopup('expired'); return false; } }
-    catch(err) { showPopup('expired'); return false; }
+    try {
+        const res = await fetch('https://gsssshilla.onrender.com/api/admin/verify', { headers: { Authorization: `Bearer ${token}` } });
+        const data = await res.json();
+        if (data.success) {
+            if (data.admin?.username) {
+                document.getElementById('adminAvatar').textContent = data.admin.username.charAt(0).toUpperCase();
+                document.getElementById('adminName').textContent = data.admin.username;
+            }
+            return true;
+        } else { showPopup('expired'); return false; }
+    } catch(err) { showPopup('expired'); return false; }
 }
 
 function showPopup(type='expired') {
@@ -367,17 +342,22 @@ function showPopup(type='expired') {
 function redirectToLogin() { document.getElementById('sessionOverlay').classList.remove('active'); window.location.replace("login.html"); }
 
 function esc(v){ return v===null||v===undefined?'':String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
-
 function formatDate(v){ if(!v) return '-'; const d=new Date(v); return isNaN(d)?'-':d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
-
 function formatMonth(v){ if(!v) return '-'; const parts=v.split('-'); if(parts.length!==2) return v; const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return months[parseInt(parts[1])-1]+' '+parts[0]; }
 
 function showToast(msg, type='info'){ const c=document.getElementById('toastContainer'); const t=document.createElement('div'); t.className=`toast toast-${type}`; t.textContent=msg; c.appendChild(t); setTimeout(()=>{t.style.opacity='0'; setTimeout(()=>t.remove(),400);},4000); }
 
-async function apiCall(url, options={}) { const headers=getAuthHeaders(); if(!headers) throw new Error('Not authenticated'); let res; try { res=await fetch(url,{...options, headers:{...headers, ...(options.headers||{})}}); } catch(e){ throw new Error('Network error'); } if(res.status===401){ showPopup('expired'); throw new Error('Session expired'); } let data; try{ data=await res.json(); }catch(e){ throw new Error(`Server error ${res.status}`); } if(!res.ok) throw new Error(data.message||`Request failed ${res.status}`); return data; }
+async function apiCall(url, options={}) {
+    const headers=getAuthHeaders(); if(!headers) throw new Error('Not authenticated');
+    let res; try { res=await fetch(url,{...options, headers:{...headers, ...(options.headers||{})}}); }
+    catch(e){ throw new Error('Network error'); }
+    if(res.status===401){ showPopup('expired'); throw new Error('Session expired'); }
+    let data; try{ data=await res.json(); }catch(e){ throw new Error(`Server error ${res.status}`); }
+    if(!res.ok) throw new Error(data.message||`Request failed ${res.status}`);
+    return data;
+}
 
 function toggleNav(){ document.getElementById('navLinks').classList.toggle('open'); }
-
 function openModal(id){ document.getElementById(id).classList.add('active'); }
 function closeModal(id){ document.getElementById(id).classList.remove('active'); }
 
@@ -389,13 +369,9 @@ function switchTab(tab){
     document.getElementById(`tab-${tab}`).classList.add('active');
     document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
     if(tab==='students') loadStudents(currentClass);
-    if(tab==='upload') loadRecentUploads();
     if(tab==='publish') loadPublishableStudents(publishClass);
 }
 
-// ================================================================
-// SELECT CLASS
-// ================================================================
 function selectClass(c){ 
     currentClass=c; 
     currentPage=1; 
@@ -404,9 +380,6 @@ function selectClass(c){
     loadStudents(c); 
 }
 
-// ================================================================
-// LOAD STUDENTS - WITH SORT
-// ================================================================
 async function loadStudents(classNum, page = 1) {
     currentPage = page;
     const session = document.getElementById('sessionFilter').value;
@@ -432,148 +405,119 @@ async function loadStudents(classNum, page = 1) {
     }
 }
 
-// ================================================================
-// RENDER STUDENT CARDS
-// ================================================================
 function renderStudentCards(students){
     const container=document.getElementById('studentGridContainer');
-    if(!students||students.length===0){ container.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-users" style="font-size:40px;"></i><p>No students found</p></div>'; return; }
-    container.innerHTML=students.map(s=>{ const has=(Number(s.marksheet_count)||0)>0; return `<div class="student-card" onclick="openStudentDetail('${esc(s.student_id)}')"><div class="card-header"><div><div class="student-name">${esc(s.name)}</div><div class="student-id">ID: ${esc(s.student_id)}</div></div><span class="status-badge ${has?'uploaded':'pending'}">${has?'✅ Uploaded':'⏳ Pending'}</span></div><div class="card-body"><div class="detail"><label>Roll No</label><span>${esc(s.exam_roll_no||'-')}</span></div><div class="detail"><label>Session</label><span>${esc(s.session||'-')}</span></div><div class="detail"><label>Father</label><span>${esc(s.father_name||'-')}</span></div><div class="detail"><label>Section</label><span>${esc(s.section||'-')}</span></div></div><div class="card-footer"><span class="exam-tag">${s.marksheet_count} marksheet(s)</span><div class="action-btns"><button class="action-btn edit" onclick="event.stopPropagation();openEditStudent('${esc(s.student_id)}')"><i class="fas fa-edit"></i> Edit</button><button class="action-btn delete" onclick="event.stopPropagation();deleteStudent('${esc(s.student_id)}','${esc(s.name)}')"><i class="fas fa-trash"></i> Delete</button><button class="action-btn print" onclick="event.stopPropagation();printStudent('${esc(s.student_id)}')"><i class="fas fa-print"></i> Print</button></div></div></div>`; }).join('');
+    if(!students||students.length===0){
+        container.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-users" style="font-size:40px;"></i><p>No students found</p><p style="font-size:12px;margin-top:8px;">Add students from <a href="admin-students.html" style="color:var(--gold);">Student Management</a></p></div>';
+        return;
+    }
+    container.innerHTML=students.map(s=>{
+        const has=(Number(s.marksheet_count)||0)>0;
+        const photo = s.photo || '';
+        return `<div class="student-card" onclick="openStudentDetail('${esc(s.student_id)}')">
+            <div class="card-header">
+                <div style="display:flex;gap:12px;align-items:center;">
+                    ${photo ? `<img src="${esc(photo)}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);" onerror="this.style.display='none'">` : ''}
+                    <div>
+                        <div class="student-name">${esc(s.name)}</div>
+                        <div class="student-id">ID: ${esc(s.student_id)}</div>
+                    </div>
+                </div>
+                <span class="status-badge ${has?'uploaded':'pending'}">${has?'✅ Uploaded':'⏳ Pending'}</span>
+            </div>
+            <div class="card-body">
+                <div class="detail"><label>Roll No</label><span>${esc(s.exam_roll_no||'-')}</span></div>
+                <div class="detail"><label>Session</label><span>${esc(s.session||'-')}</span></div>
+                <div class="detail"><label>Father</label><span>${esc(s.father_name||'-')}</span></div>
+                <div class="detail"><label>Section</label><span>${esc(s.section||'-')}</span></div>
+            </div>
+            <div class="card-footer">
+                <span class="exam-tag">${s.marksheet_count} marksheet(s)</span>
+                <div class="action-btns">
+                    <button class="action-btn view" onclick="event.stopPropagation();openStudentDetail('${esc(s.student_id)}')"><i class="fas fa-eye"></i> View</button>
+                    <button class="action-btn print" onclick="event.stopPropagation();printStudent('${esc(s.student_id)}')"><i class="fas fa-print"></i> Print</button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
 }
 
-// ================================================================
-// RENDER PAGINATION
-// ================================================================
 function renderPagination(pagination, onPage){ 
     const container=document.getElementById('pagination'); 
     if(!pagination||pagination.totalPages<=1){ container.innerHTML=''; return; } 
     const {page,totalPages}=pagination; 
-    let html=`<button ${page<=1?'disabled':''} onclick="onPage(${page-1})" style="padding:6px 14px;border:1px solid var(--border);background:var(--bg-white);border-radius:var(--radius-sm);cursor:pointer;"><i class="fas fa-chevron-left"></i></button>`; 
-    for(let i=Math.max(1,page-2); i<=Math.min(totalPages,page+2); i++) html+=`<button class="${i===page?'active':''}" onclick="onPage(${i})" style="padding:6px 14px;border:1px solid var(--border);background:${i===page?'var(--gold)':'var(--bg-white)'};color:${i===page?'#fff':'var(--text-secondary)'};border-radius:var(--radius-sm);cursor:pointer;font-weight:600;">${i}</button>`; 
-    html+=`<button ${page>=totalPages?'disabled':''} onclick="onPage(${page+1})" style="padding:6px 14px;border:1px solid var(--border);background:var(--bg-white);border-radius:var(--radius-sm);cursor:pointer;"><i class="fas fa-chevron-right"></i></button>`; 
+    let html=`<button ${page<=1?'disabled':''} onclick="window._onPage(${page-1})" style="padding:6px 14px;border:1px solid var(--border);background:var(--bg-white);border-radius:var(--radius-sm);cursor:pointer;"><i class="fas fa-chevron-left"></i></button>`; 
+    for(let i=Math.max(1,page-2); i<=Math.min(totalPages,page+2); i++) html+=`<button onclick="window._onPage(${i})" style="padding:6px 14px;border:1px solid var(--border);background:${i===page?'var(--gold)':'var(--bg-white)'};color:${i===page?'#fff':'var(--text-secondary)'};border-radius:var(--radius-sm);cursor:pointer;font-weight:600;">${i}</button>`; 
+    html+=`<button ${page>=totalPages?'disabled':''} onclick="window._onPage(${page+1})" style="padding:6px 14px;border:1px solid var(--border);background:var(--bg-white);border-radius:var(--radius-sm);cursor:pointer;"><i class="fas fa-chevron-right"></i></button>`; 
     container.innerHTML=html; 
-    window.onPage=onPage; 
+    window._onPage=onPage; 
 }
 
-// ================================================================
-// EVENT LISTENER FOR SORT DROPDOWN
-// ================================================================
 document.addEventListener('DOMContentLoaded', function() {
     const sortSelect = document.getElementById('sortSelect');
     if (sortSelect) {
         sortSelect.value = 'roll_asc';
         sortSelect.addEventListener('change', applySort);
     }
-    // Set default exam session to current month
     const now = new Date();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const year = now.getFullYear();
     document.getElementById('uploadExamSession').value = `${year}-${month}`;
 });
 
-// ================================================================
-// OPEN ADD STUDENT
-// ================================================================
-function openAddStudent(){ document.getElementById('studentModalTitle').innerHTML='<i class="fas fa-user-plus"></i> Add Student'; document.getElementById('editStudentId').value=''; document.getElementById('sStudentId').disabled=false; document.getElementById('sStudentId').value=''; document.getElementById('sApaarId').value=''; document.getElementById('sName').value=''; document.getElementById('sFatherName').value=''; document.getElementById('sMotherName').value=''; document.getElementById('sDob').value=''; document.getElementById('sSession').value=document.getElementById('sessionFilter').value||'2025-26'; document.getElementById('sClass').value=currentClass; document.getElementById('sSection').value=''; document.getElementById('sRollNo').value=''; document.getElementById('sPhoto').value=''; const existingPreview=document.getElementById('photoPreview'); if(existingPreview) existingPreview.remove(); openModal('studentAddModal'); }
-
-// ================================================================
-// OPEN EDIT STUDENT
-// ================================================================
-async function openEditStudent(studentId){
-    try{ const data=await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`); const s=data.data.student; document.getElementById('studentModalTitle').innerHTML='<i class="fas fa-edit"></i> Edit Student'; document.getElementById('editStudentId').value=studentId; document.getElementById('sStudentId').value=s.student_id; document.getElementById('sStudentId').disabled=true; document.getElementById('sApaarId').value=s.apaar_id||''; document.getElementById('sName').value=s.name||''; document.getElementById('sFatherName').value=s.father_name||''; document.getElementById('sMotherName').value=s.mother_name||''; document.getElementById('sDob').value=s.dob||''; document.getElementById('sSession').value=s.session||'2025-26'; document.getElementById('sClass').value=s.class||10; document.getElementById('sSection').value=s.section||''; document.getElementById('sRollNo').value=s.exam_roll_no||''; document.getElementById('sPhoto').value=''; openModal('studentAddModal'); }
-    catch(e){ if(e.message!=='Session expired') showToast(e.message,'error'); }
+// ============================================================
+// FETCH STUDENT FOR UPLOAD (from Nstudent)
+// ============================================================
+async function fetchStudentForUpload(){
+    const studentId=document.getElementById('uploadStudentId').value.trim();
+    if(!studentId) return;
+    try{
+        const data=await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`);
+        const s=data.data.student;
+        document.getElementById('uploadStudentName').value=s.name;
+        document.getElementById('uploadSession').value=s.session;
+        document.getElementById('uploadClass').value=s.class;
+        document.getElementById('uploadStatus').className='alert-box success';
+        document.getElementById('uploadStatus').innerHTML='<i class="fas fa-check-circle"></i> Student found: '+esc(s.name);
+    }catch(e){
+        document.getElementById('uploadStatus').className='alert-box error';
+        document.getElementById('uploadStatus').innerHTML='<i class="fas fa-exclamation-circle"></i> '+esc(e.message)+' — Add student first from <a href="admin-students.html" style="color:#fff;text-decoration:underline;">Student Management</a>';
+    }
 }
 
-// ================================================================
-// DELETE STUDENT
-// ================================================================
-async function deleteStudent(studentId, name){
-    if(!confirm(`Delete student ${name} (${studentId})? This will also delete all their marksheets.`)) return;
-    try{ const res=await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`,{method:'DELETE'}); showToast(res.message||'Student deleted','success'); loadStudents(currentClass,currentPage); }
-    catch(e){ if(e.message!=='Session expired') showToast(e.message,'error'); }
-}
-
-// ================================================================
-// SAVE STUDENT
-// ================================================================
-async function saveStudent(e){
+document.getElementById('marksheetUploadForm').addEventListener('submit', async function(e){
     e.preventDefault();
-    const studentId=document.getElementById('sStudentId').value.trim(); const isEdit=document.getElementById('editStudentId').value;
-    const photoInput=document.getElementById('sPhoto');
-    let photoBase64='';
-    if(photoInput.files&&photoInput.files[0]){
-        const file=photoInput.files[0];
-        if(file.size>1*1024*1024){ showToast('Photo must be under 1MB','warning'); return; }
-        photoBase64=await compressImage(file,200,250);
-    } else if(isEdit){
-        try{ const existingData=await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`); photoBase64=existingData.data.student.photo||''; }catch(e){ photoBase64=''; }
-    }
-    const data={ student_id:studentId, apaar_id:document.getElementById('sApaarId').value.trim(), name:document.getElementById('sName').value.trim(), father_name:document.getElementById('sFatherName').value.trim(), mother_name:document.getElementById('sMotherName').value.trim(), dob:document.getElementById('sDob').value, session:document.getElementById('sSession').value, class:parseInt(document.getElementById('sClass').value), section:document.getElementById('sSection').value.trim(), exam_roll_no:document.getElementById('sRollNo').value.trim(), photo:photoBase64 };
-    if(!/^[A-Z]{2}[0-9]{2}[A-Z][0-9]{3}$/.test(studentId)){ showToast('Invalid Student ID format','error'); return; }
-    if(data.apaar_id.length!==11 || !/^\d{11}$/.test(data.apaar_id)){ showToast('APAAR ID must be 11 digits','error'); return; }
-    if(!/^[A-Z\s]+$/.test(data.name)){ showToast('Name only alphabets','error'); return; }
-    const url=isEdit?`${API_BASE}/students/${encodeURIComponent(studentId)}`:`${API_BASE}/students`; const method=isEdit?'PUT':'POST';
-    try{ const res=await apiCall(url,{method, body:JSON.stringify(data)}); showToast(res.message||'Saved','success'); closeModal('studentAddModal'); loadStudents(currentClass,currentPage); }
-    catch(e){ if(e.message!=='Session expired') showToast(e.message,'error'); }
-}
-
-// ================================================================
-// COMPRESS IMAGE
-// ================================================================
-function compressImage(file, maxWidth=200, maxHeight=250){
-    return new Promise((resolve,reject)=>{
-        const reader=new FileReader();
-        reader.onload=function(e){
-            const img=new Image();
-            img.onload=function(){
-                const canvas=document.createElement('canvas');
-                let width=img.width, height=img.height;
-                if(width>height){ if(width>maxWidth){ height*=maxWidth/width; width=maxWidth; } }
-                else { if(height>maxHeight){ width*=maxHeight/height; height=maxHeight; } }
-                canvas.width=width; canvas.height=height;
-                const ctx=canvas.getContext('2d');
-                ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,width,height);
-                ctx.drawImage(img,0,0,width,height);
-                resolve(canvas.toDataURL('image/jpeg',0.7));
-            };
-            img.onerror=function(){ reject(new Error('Invalid image')); };
-            img.src=e.target.result;
-        };
-        reader.onerror=function(){ reject(new Error('Read failed')); };
-        reader.readAsDataURL(file);
-    });
-}
-
-// ================================================================
-// PHOTO PREVIEW
-// ================================================================
-document.getElementById('sPhoto').addEventListener('change', function(e){
-    const file=e.target.files[0];
-    if(file){
-        if(file.size>1*1024*1024){ showToast('Photo must be under 1MB','warning'); this.value=''; return; }
-        const reader=new FileReader();
-        reader.onload=function(event){
-            let preview=document.getElementById('photoPreview');
-            if(!preview){ preview=document.createElement('div'); preview.id='photoPreview'; preview.style.cssText='margin-top:8px;text-align:center;'; document.getElementById('sPhoto').parentElement.appendChild(preview); }
-            preview.innerHTML=`<img src="${event.target.result}" style="width:100px;height:120px;object-fit:cover;border:2px solid #c9972b;border-radius:8px;"><p style="font-size:11px;color:#10b981;margin-top:5px;">✅ Photo selected</p>`;
-        };
-        reader.readAsDataURL(file);
-    }
+    const studentId=document.getElementById('uploadStudentId').value;
+    const pdf=document.getElementById('uploadPdf').files[0];
+    const examSession=document.getElementById('uploadExamSession').value;
+    const obtainedMarks=document.getElementById('uploadObtainedMarks').value.trim();
+    const maxMarks=document.getElementById('uploadMaxMarks').value.trim();
+    if(!studentId||!pdf||!examSession) { showToast('Student ID, Exam Session and PDF are required','warning'); return; }
+    if(pdf.size>10*1024*1024){ showToast('PDF under 10MB','warning'); return; }
+    const formData=new FormData();
+    formData.append('student_id',studentId);
+    formData.append('session',document.getElementById('uploadSession').value);
+    formData.append('class',document.getElementById('uploadClass').value);
+    formData.append('exam_type',document.getElementById('uploadExamType').value);
+    formData.append('exam_session',examSession);
+    formData.append('obtained_marks',obtainedMarks);
+    formData.append('max_marks',maxMarks);
+    formData.append('pdf',pdf);
+    try{
+        const headers=getAuthHeaders();
+        const res=await fetch(`${API_BASE}/marksheets/upload`,{method:'POST',headers:{Authorization:headers.Authorization},body:formData});
+        if(res.status===401){ showPopup('expired'); return; }
+        const result=await res.json();
+        if(!result.success) throw new Error(result.message);
+        showToast('Marksheet uploaded successfully','success');
+        document.getElementById('marksheetUploadForm').reset();
+        document.getElementById('uploadStudentName').value='';
+        document.getElementById('uploadStatus').className='alert-box info';
+        document.getElementById('uploadStatus').innerHTML='<i class="fas fa-info-circle"></i> Enter Student ID and click Fetch';
+        loadStudents(currentClass);
+    }catch(err){ showToast(err.message,'error'); }
 });
 
-// ================================================================
-// FETCH STUDENT FOR UPLOAD
-// ================================================================
-async function fetchStudentForUpload(){ const studentId=document.getElementById('uploadStudentId').value.trim(); if(!studentId) return; try{ const data=await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`); const s=data.data.student; document.getElementById('uploadStudentName').value=s.name; document.getElementById('uploadSession').value=s.session; document.getElementById('uploadClass').value=s.class; document.getElementById('uploadStatus').className='alert-box success'; document.getElementById('uploadStatus').innerHTML='<i class="fas fa-check-circle"></i> Student found'; }catch(e){ document.getElementById('uploadStatus').className='alert-box error'; document.getElementById('uploadStatus').innerHTML='<i class="fas fa-exclamation-circle"></i> '+esc(e.message); } }
-
-// ================================================================
-// UPLOAD MARKSHEET - WITH OBTAINED MARKS AND MAX MARKS
-// ================================================================
-document.getElementById('marksheetUploadForm').addEventListener('submit', async function(e){ e.preventDefault(); const studentId=document.getElementById('uploadStudentId').value; const pdf=document.getElementById('uploadPdf').files[0]; const examSession=document.getElementById('uploadExamSession').value; const obtainedMarks=document.getElementById('uploadObtainedMarks').value.trim(); const maxMarks=document.getElementById('uploadMaxMarks').value.trim(); if(!studentId||!pdf||!examSession) { showToast('Student ID, Exam Session and PDF are required','warning'); return; } if(pdf.size>10*1024*1024){ showToast('PDF under 10MB','warning'); return; } const formData=new FormData(); formData.append('student_id',studentId); formData.append('session',document.getElementById('uploadSession').value); formData.append('class',document.getElementById('uploadClass').value); formData.append('exam_type',document.getElementById('uploadExamType').value); formData.append('exam_session',examSession); formData.append('obtained_marks',obtainedMarks); formData.append('max_marks',maxMarks); formData.append('pdf',pdf); try{ const headers=getAuthHeaders(); const res=await fetch(`${API_BASE}/marksheets/upload`,{method:'POST',headers:{Authorization:headers.Authorization},body:formData}); if(res.status===401){ showPopup('expired'); return; } const result=await res.json(); if(!result.success) throw new Error(result.message); showToast('Marksheet uploaded','success'); loadStudents(currentClass); }catch(err){ showToast(err.message,'error'); } });
-
-// ================================================================
-// OPEN STUDENT DETAIL
-// ================================================================
 async function openStudentDetail(studentId) {
     const modalContent = document.getElementById('modalStudentContent');
     modalContent.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
@@ -583,94 +527,89 @@ async function openStudentDetail(studentId) {
     catch (error) { modalContent.innerHTML = `<div class="alert-box error">${esc(error.message)} <button onclick="openStudentDetail('${studentId}')" style="background:none;border:none;color:var(--gold);cursor:pointer;font-weight:600;">Retry</button></div>`; }
 }
 
-// ================================================================
-// RENDER STUDENT DETAIL - with obtained_marks and max_marks
-// ================================================================
 function renderStudentDetail(data) {
     const s = data.student; const marksheets = data.marksheets || [];
     document.getElementById('modalStudentName').innerHTML = `<i class="fas fa-user-graduate"></i> ${esc(s.name)}`;
     const modalContent = document.getElementById('modalStudentContent');
     let marksheetHtml = marksheets.length === 0 ? `<div class="alert-box info">No marksheets uploaded yet.</div>` : marksheets.map(m => `<div class="exam-item"><div class="exam-info"><span class="exam-name">${esc(m.exam_type)}</span><span class="exam-session"><i class="far fa-calendar-alt"></i> Exam: ${formatMonth(m.exam_session)}</span><span class="exam-session"><i class="fas fa-school"></i> Session: ${esc(m.session)}</span><span class="exam-session"><i class="fas fa-star"></i> Marks: ${esc(m.obtained_marks||'-')}/${esc(m.max_marks||'-')}</span><span class="badge ${m.is_published?'badge-success':'badge-warning'}">${m.is_published?' Published':' Unpublished'}</span></div><div class="action-btns"><button class="action-btn view" onclick="viewMarksheet(${m.id})"><i class="fas fa-eye"></i> View</button><button class="action-btn delete" onclick="deleteExam(${m.id})"><i class="fas fa-trash"></i> Delete</button></div></div>`).join('');
-    modalContent.innerHTML = `<div class="student-detail-grid"><div class="item"><label>Student ID</label><span>${esc(s.student_id)}</span></div><div class="item"><label>APAAR ID</label><span>${esc(s.apaar_id||'-')}</span></div><div class="item"><label>Father's Name</label><span>${esc(s.father_name||'-')}</span></div><div class="item"><label>Mother's Name</label><span>${esc(s.mother_name||'-')}</span></div><div class="item"><label>Date of Birth</label><span>${s.dob?formatDate(s.dob):'-'}</span></div><div class="item"><label>Academic Session</label><span>${esc(s.session||'-')}</span></div><div class="item"><label>Class</label><span>${esc(s.class||'-')}${s.section ? ' - ' + esc(s.section) : ''}</span></div><div class="item"><label>Roll No</label><span>${esc(s.exam_roll_no||'-')}</span></div></div><div class="exam-list"><h4 style="font-size:14px;color:var(--text-secondary);margin-bottom:10px;"><i class="fas fa-file-pdf"></i> Marksheets (${marksheets.length})</h4>${marksheetHtml}</div><div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-sm btn-primary" onclick="printStudent('${esc(s.student_id)}')"><i class="fas fa-print"></i> Print Details</button><button class="btn btn-sm btn-outline" onclick="closeModal('studentModal')"><i class="fas fa-times"></i> Close</button></div>`;
+    modalContent.innerHTML = `<div class="student-detail-grid"><div class="item"><label>Student ID</label><span>${esc(s.student_id)}</span></div><div class="item"><label>APAAR ID</label><span>${esc(s.apaar_id||'-')}</span></div><div class="item"><label>Father's Name</label><span>${esc(s.father_name||'-')}</span></div><div class="item"><label>Mother's Name</label><span>${esc(s.mother_name||'-')}</span></div><div class="item"><label>Date of Birth</label><span>${s.dob?formatDate(s.dob):'-'}</span></div><div class="item"><label>Academic Session</label><span>${esc(s.session||'-')}</span></div><div class="item"><label>Class</label><span>${esc(s.class||'-')}${s.section ? ' - ' + esc(s.section) : ''}</span></div><div class="item"><label>Roll No</label><span>${esc(s.exam_roll_no||'-')}</span></div></div><div class="exam-list"><h4 style="font-size:14px;color:var(--text-secondary);margin-bottom:10px;"><i class="fas fa-file-pdf"></i> Marksheets (${marksheets.length})</h4>${marksheetHtml}</div><div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-sm btn-primary" onclick="printStudent('${esc(s.student_id)}')"><i class="fas fa-print"></i> Print Marksheet</button><button class="btn btn-sm btn-outline" onclick="closeModal('studentModal')"><i class="fas fa-times"></i> Close</button></div>`;
 }
 
-// ================================================================
-// DELETE EXAM
-// ================================================================
-async function deleteExam(id) { if(!confirm('Delete this marksheet?')) return; try{ await apiCall(`${API_BASE}/marksheets/${id}`,{method:'DELETE'}); showToast('Marksheet deleted','success'); const sid=document.getElementById('studentModal').dataset.studentId; if(sid) openStudentDetail(sid); }catch(e){ showToast(e.message,'error'); } }
+async function deleteExam(id) {
+    if(!confirm('Delete this marksheet?')) return;
+    try{
+        await apiCall(`${API_BASE}/marksheets/${id}`,{method:'DELETE'});
+        showToast('Marksheet deleted','success');
+        const sid=document.getElementById('studentModal').dataset.studentId;
+        if(sid) openStudentDetail(sid);
+        loadStudents(currentClass);
+    }catch(e){ showToast(e.message,'error'); }
+}
 
-// ================================================================
-// VIEW MARKSHEET
-// ================================================================
-function viewMarksheet(id) { fetch(`${API_BASE}/marksheets/${id}`,{headers:getAuthHeaders()}).then(r=>r.json()).then(d=>{ if(d.success&&d.data.cloudinary_url) window.open(d.data.cloudinary_url,'_blank'); }).catch(e=>showToast('Failed to open','error')); }
+function viewMarksheet(id) {
+    fetch(`${API_BASE}/marksheets/${id}`,{headers:getAuthHeaders()})
+        .then(r=>r.json())
+        .then(d=>{
+            if(d.success&&d.data.cloudinary_url) window.open(d.data.cloudinary_url,'_blank');
+            else showToast('URL not found','error');
+        })
+        .catch(e=>showToast('Failed to open','error'));
+}
 
-// ================================================================
-// LOAD RECENT UPLOADS
-// ================================================================
-async function loadRecentUploads(){ }
-
-// ================================================================
-// SELECT PUBLISH CLASS
-// ================================================================
 function selectPublishClass(c){ publishClass=c; document.querySelectorAll('#publishClassButtons .class-btn').forEach(b=>b.classList.remove('active')); document.querySelector(`#publishClassButtons .class-btn[data-class="${c}"]`).classList.add('active'); loadPublishableStudents(c); }
 
-// ================================================================
-// LOAD PUBLISHABLE STUDENTS
-// ================================================================
-async function loadPublishableStudents(classNum){ const tbody=document.getElementById('publishTableBody'); tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr>'; try{ const session=document.getElementById('sessionFilter').value; const examFilter=document.getElementById('publishExamFilter').value; let url=`${API_BASE}/marksheets?limit=100`; if(classNum) url+=`&class=${classNum}`; if(session) url+=`&session=${session}`; if(examFilter) url+=`&exam_type=${examFilter}`; const data=await apiCall(url); tbody.innerHTML=data.data.map(m=>`<tr><td><input type="checkbox" class="publish-checkbox" data-id="${m.id}"></td><td>${esc(m.student_id)}</td><td>${esc(m.name)}</td><td>${esc(m.exam_type)}</td><td><span class="badge ${m.is_published?'badge-success':'badge-warning'}">${m.is_published?'✅ Published':'⏳ Unpublished'}</span></td><td><button class="btn btn-xs btn-success" onclick="publishSingle(${m.id})" ${m.is_published?'disabled':''}>Publish</button> <button class="btn btn-xs btn-danger" onclick="unpublishSingle(${m.id})" ${!m.is_published?'disabled':''}>Unpublish</button></td></tr>`).join(''); }catch(e){ tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--red);">${esc(e.message)}</td></tr>`; } }
+async function loadPublishableStudents(classNum){
+    const tbody=document.getElementById('publishTableBody');
+    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr>';
+    try{
+        const session=document.getElementById('sessionFilter').value;
+        const examFilter=document.getElementById('publishExamFilter').value;
+        let url=`${API_BASE}/marksheets?limit=100`;
+        if(classNum) url+=`&class=${classNum}`;
+        if(session) url+=`&session=${session}`;
+        if(examFilter) url+=`&exam_type=${encodeURIComponent(examFilter)}`;
+        const data=await apiCall(url);
+        if(!data.data || data.data.length===0){
+            tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">No marksheets found for this class</td></tr>';
+            return;
+        }
+        tbody.innerHTML=data.data.map(m=>`<tr><td><input type="checkbox" class="publish-checkbox" data-id="${m.id}"></td><td>${esc(m.student_id)}</td><td>${esc(m.name)}</td><td>${esc(m.exam_type)}</td><td><span class="badge ${m.is_published?'badge-success':'badge-warning'}">${m.is_published?'✅ Published':'⏳ Unpublished'}</span></td><td><button class="btn btn-xs btn-success" onclick="publishSingle(${m.id})" ${m.is_published?'disabled':''}>Publish</button> <button class="btn btn-xs btn-danger" onclick="unpublishSingle(${m.id})" ${!m.is_published?'disabled':''}>Unpublish</button></td></tr>`).join('');
+    }catch(e){
+        tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--red);">${esc(e.message)}</td></tr>`;
+    }
+}
 
-// ================================================================
-// TOGGLE ALL PUBLISH
-// ================================================================
 function toggleAllPublish(){ const checked=document.getElementById('selectAllPublish').checked; document.querySelectorAll('.publish-checkbox').forEach(cb=>cb.checked=checked); }
 
-// ================================================================
-// PUBLISH SINGLE
-// ================================================================
 async function publishSingle(id){ const date=document.getElementById('publishDate').value; if(!date) return showToast('Select date','warning'); try{ await apiCall(`${API_BASE}/marksheets/${id}/publish`,{method:'POST',body:JSON.stringify({declaration_date:date})}); showToast('Published','success'); loadPublishableStudents(publishClass); }catch(e){ showToast(e.message,'error'); } }
 
-// ================================================================
-// UNPUBLISH SINGLE
-// ================================================================
 async function unpublishSingle(id){ try{ await apiCall(`${API_BASE}/marksheets/${id}/unpublish`,{method:'POST'}); showToast('Unpublished','success'); loadPublishableStudents(publishClass); }catch(e){ showToast(e.message,'error'); } }
 
-// ================================================================
-// BULK PUBLISH
-// ================================================================
 async function bulkPublish(){ const date=document.getElementById('publishDate').value; if(!date) return showToast('Select date','warning'); const selected=[...document.querySelectorAll('.publish-checkbox:checked')].map(cb=>cb.dataset.id); if(selected.length===0) return showToast('Select at least one','warning'); try{ await apiCall(`${API_BASE}/marksheets/bulk-publish`,{method:'POST',body:JSON.stringify({ids:selected,declaration_date:date})}); showToast('Bulk published','success'); loadPublishableStudents(publishClass); }catch(e){ showToast(e.message,'error'); } }
 
-// ================================================================
-// REFRESH ALL
-// ================================================================
 function refreshAll(){ loadStudents(currentClass); loadPublishableStudents(publishClass); }
 
-// ================================================================
-// SESSION FILTER
-// ================================================================
 document.getElementById('sessionFilter').addEventListener('change',()=>{ currentPage=1; loadStudents(currentClass,1); loadPublishableStudents(publishClass); });
 document.getElementById('publishDate').value=new Date().toISOString().split('T')[0];
 
-// ================================================================
-// QR CODE GENERATE FUNCTION
-// ================================================================
+// ============================================================
+// QR CODE GENERATE
+// ============================================================
 function generateQRCodeBase64(url) {
     return new Promise((resolve) => {
         const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(url)}`;
-        fetch(apiUrl)
-            .then(res => res.blob())
-            .then(blob => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.onerror = () => resolve(null);
-                reader.readAsDataURL(blob);
-            })
-            .catch(() => resolve(null));
+        fetch(apiUrl).then(res => res.blob()).then(blob => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+        }).catch(() => resolve(null));
     });
 }
 
-// ================================================================
-// PRINT STUDENT - Professional Marksheet with Enhanced Quality
-// ================================================================
+// ============================================================
+// PRINT STUDENT MARKSHEET
+// ============================================================
 async function printStudent(studentId) {
     try {
         const data = await apiCall(`${API_BASE}/students/${encodeURIComponent(studentId)}`);
@@ -678,21 +617,14 @@ async function printStudent(studentId) {
         const marksheets = data.data.marksheets || [];
         const adminData = JSON.parse(localStorage.getItem('adminData') || '{}');
         const downloadedBy = adminData.name || adminData.username || localStorage.getItem('adminName') || 'Admin';
-        const studentPhoto = s.photo || s.photo_url || s.image_url || '';
+        const studentPhoto = s.photo || s.student_photo_url || '';
         
         const verificationData = {
-            student_id: s.student_id,
-            name: s.name,
-            father_name: s.father_name || '',
-            mother_name: s.mother_name || '',
-            dob: s.dob || '',
-            class: s.class || '',
-            section: s.section || '',
-            session: s.session || '',
-            exam_roll_no: s.exam_roll_no || '',
+            student_id: s.student_id, name: s.name, father_name: s.father_name || '',
+            mother_name: s.mother_name || '', dob: s.dob || '', class: s.class || '',
+            section: s.section || '', session: s.session || '', exam_roll_no: s.exam_roll_no || '',
             apaar_id: s.apaar_id || ''
         };
-        
         const verificationUrl = `https://gsssshilla07.pages.dev/verify.html?data=${encodeURIComponent(JSON.stringify(verificationData))}`;
         const verificationQRBase64 = await generateQRCodeBase64(verificationUrl);
         
@@ -711,86 +643,63 @@ async function printStudent(studentId) {
                     <td style="padding:6px 8px;border:1px solid #d1d5db;text-align:center;font-weight:700;color:#0d1b2a;font-size:12px;">${esc(m.obtained_marks||'-')}</td>
                     <td style="padding:6px 8px;border:1px solid #d1d5db;text-align:center;font-weight:700;color:#0d1b2a;font-size:12px;">${esc(m.max_marks||'-')}</td>
                     <td style="padding:6px 8px;border:1px solid #d1d5db;font-size:9px;word-break:break-all;color:#6b7280;">${esc(m.cloudinary_url||'-')}</td>
-                    <td style="text-align:center;padding:6px 8px;border:1px solid #d1d5db;">
-                        ${m.qrBase64 ? 
-                            `<img src="${m.qrBase64}" width="55" height="55" style="border:2px solid #c9972b;padding:3px;background:white;border-radius:4px;">` : 
-                            '<div style="font-size:8px;color:#94a3b8;">N/A</div>'
-                        }
-                    </td>
+                    <td style="text-align:center;padding:6px 8px;border:1px solid #d1d5db;">${m.qrBase64 ? `<img src="${m.qrBase64}" width="55" height="55" style="border:2px solid #c9972b;padding:3px;background:white;border-radius:4px;">` : '<div style="font-size:8px;color:#94a3b8;">N/A</div>'}</td>
                 </tr>`;
         });
 
         const pw = window.open('', '_blank', 'width=1000,height=800');
         pw.document.write(`<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Marksheet: ${esc(s.name)} - ${esc(s.student_id)} - ${esc(s.exam_roll_no)}</title>
+<html><head><meta charset="UTF-8"><title>Marksheet: ${esc(s.name)} - ${esc(s.student_id)}</title>
 <style>
 @page { size: A4; margin: 8mm 10mm 8mm 10mm; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { height: auto; }
-body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; background: #ffffff; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; height: auto; }
+body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; background: #ffffff; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 .page-container { width: 100%; max-width: 190mm; margin: 0 auto; padding: 6px 8px 50px; position: relative; }
 .watermark-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 9999; overflow: hidden; }
-.watermark-pattern { position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(201,151,43,0.08) 40px, rgba(201,151,43,0.08) 42px), repeating-linear-gradient(135deg, transparent, transparent 40px, rgba(201,151,43,0.06) 40px, rgba(201,151,43,0.06) 42px); background-size: 56px 56px; }
-.watermark-pattern2 { position: absolute; inset: 0; background-image: repeating-linear-gradient(-45deg, transparent, transparent 50px, rgba(74,138,244,0.07) 50px, rgba(74,138,244,0.07) 52px), repeating-linear-gradient(45deg, transparent, transparent 50px, rgba(74,138,244,0.05) 50px, rgba(74,138,244,0.05) 52px); background-size: 70px 70px; }
-.watermark-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; height: 500px; opacity: 0.10; background: url('logo(1).png') center/contain no-repeat; filter: grayscale(100%) blur(0.5px); border-radius: 50%; }
-.page-header { text-align: center; padding-bottom: 10px; border-bottom: 3px solid #c9972b; position: relative; z-index: 1; background: rgba(255,255,255,0.95); flex-shrink: 0; }
+.watermark-pattern { position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(201,151,43,0.08) 40px, rgba(201,151,43,0.08) 42px); background-size: 56px 56px; }
+.watermark-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; height: 500px; opacity: 0.10; background: url('https://gsssshilla07.pages.dev/logo(1).png') center/contain no-repeat; filter: grayscale(100%); }
+.page-header { text-align: center; padding-bottom: 10px; border-bottom: 3px solid #c9972b; position: relative; z-index: 1; background: rgba(255,255,255,0.95); }
 .page-header .logo { width: 64px; height: 64px; border-radius: 50%; border: 2px solid #c9972b; padding: 3px; background: white; margin: 0 auto 3px; display: block; }
 .page-header .school-name { font-family: 'Georgia', serif; font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: #0d1b2a; }
 .page-header .school-tagline { font-size: 8px; color: #5a6a7e; letter-spacing: 2.5px; text-transform: uppercase; }
 .page-header .heading-box { display: inline-block; background: #0d1b2a; color: #fff; padding: 4px 22px; border-radius: 25px; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: 2px solid #c9972b; margin-top: 4px; }
 .content-area { position: relative; z-index: 1; }
-.declaration-box { background: #fef8ed; border-left: 4px solid #c9972b; border-right: 4px solid #c9972b; padding: 8px 16px; margin: 20px 0 16px; border-radius: 4px; font-size: 11px; color: #1a2332; font-style: italic; text-align: center; position: relative; z-index: 1; background: rgba(254, 248, 237, 0.92); }
-.declaration-box i { color: #10b981; margin-right: 6px; font-size: 12px; }
-.declaration-box strong { color: #0d1b2a; }
 .student-info-table { width: 100%; border-collapse: collapse; margin: 12px 0; border: 2px solid #0d1b2a; position: relative; z-index: 1; }
 .student-info-table td { padding: 8px 10px; border: 1px solid #d1d5db; font-size: 11px; vertical-align: middle; }
-.student-info-table .label-cell { font-weight: 700; background: #fef8ed; color: #0d1b2a; width: 14%; letter-spacing: 0.5px; text-transform: uppercase; font-size: 9px; }
+.student-info-table .label-cell { font-weight: 700; background: #fef8ed; color: #0d1b2a; width: 14%; text-transform: uppercase; font-size: 9px; }
 .student-info-table .value-cell { font-weight: 500; color: #1a2332; width: 30%; font-size: 11px; }
-.photo-cell { width: 80px; text-align: center; vertical-align: middle; background: #f8fafc; }
+.photo-cell { width: 80px; text-align: center; background: #f8fafc; }
 .photo-box { width: 65px; height: 80px; border: 3px solid #c9972b; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; margin: 0 auto; }
 .photo-box img { width: 100%; height: 100%; object-fit: cover; }
 .photo-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #cbd5e1; }
-.marksheet-heading { font-size: 12px; font-weight: 700; margin: 10px 0 6px; padding: 5px 12px; background: #fef8ed; border-left: 4px solid #c9972b; letter-spacing: 1px; position: relative; z-index: 1; }
-.marksheet-table { width: 100%; border-collapse: collapse; margin: 4px 0; border: 2px solid #0d1b2a; position: relative; z-index: 1; }
-.marksheet-table th { background: #0d1b2a; color: #fff; padding: 6px 8px; border: 1px solid #0d1b2a; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
+.marksheet-heading { font-size: 12px; font-weight: 700; margin: 10px 0 6px; padding: 5px 12px; background: #fef8ed; border-left: 4px solid #c9972b; letter-spacing: 1px; }
+.marksheet-table { width: 100%; border-collapse: collapse; margin: 4px 0; border: 2px solid #0d1b2a; }
+.marksheet-table th { background: #0d1b2a; color: #fff; padding: 6px 8px; border: 1px solid #0d1b2a; font-size: 9px; text-transform: uppercase; text-align: center; }
 .marksheet-table td { padding: 6px 8px; border: 1px solid #d1d5db; font-size: 11px; text-align: center; }
 .marks-summary-box { border: 2px solid #c9972b; border-radius: 8px; padding: 10px 16px; margin: 10px 0 14px; background: #fef8ed; display: flex; justify-content: center; gap: 50px; flex-wrap: wrap; }
 .marks-summary-box .summary-item { text-align: center; }
-.marks-summary-box .summary-item .label { font-size: 8px; text-transform: uppercase; color: #5a6a7e; letter-spacing: 0.5px; font-weight: 600; }
+.marks-summary-box .summary-item .label { font-size: 8px; text-transform: uppercase; color: #5a6a7e; font-weight: 600; }
 .marks-summary-box .summary-item .value { font-size: 15px; font-weight: 800; color: #0d1b2a; }
 .marks-summary-box .summary-item .value.gold { color: #c9972b; }
-.verification-section { display: flex; align-items: center; gap: 16px; margin: 20px 0 15px; padding: 10px 16px; border: 2px solid #c9972b; background: #fef8ed; border-radius: 8px; position: relative; z-index: 1; }
+.declaration-box { background: #fef8ed; border-left: 4px solid #c9972b; border-right: 4px solid #c9972b; padding: 8px 16px; margin: 14px 0; border-radius: 4px; font-size: 11px; font-style: italic; text-align: center; }
+.declaration-box i { color: #10b981; margin-right: 6px; }
+.verification-section { display: flex; align-items: center; gap: 16px; margin: 20px 0 15px; padding: 10px 16px; border: 2px solid #c9972b; background: #fef8ed; border-radius: 8px; }
 .verification-qr { width: 70px; height: 70px; border: 2px solid #0d1b2a; border-radius: 6px; overflow: hidden; flex-shrink: 0; background: white; display: flex; align-items: center; justify-content: center; }
 .verification-qr img { width: 65px; height: 65px; }
-.verification-text { flex: 1; font-size: 9px; color: #0d1b2a; }
+.verification-text { flex: 1; font-size: 9px; }
 .verification-text strong { display: block; font-size: 11px; margin-bottom: 2px; color: #c9972b; }
-.verification-text .scan-label { font-size: 9px; font-weight: 700; color: #0d1b2a; letter-spacing: 1px; }
-.verification-text p { font-size: 8px; color: #5a6a7e; margin: 2px 0; }
-.signature-area { display: flex; justify-content: flex-end; margin-top: 10px; padding-top: 6px; position: relative; z-index: 1; }
+.signature-area { display: flex; justify-content: flex-end; margin-top: 10px; }
 .signature-box { text-align: center; font-size: 9px; width: 180px; }
-.signature-box .signature-img { height: 110px; max-width: 200px; object-fit: contain; display: block; margin: 0 auto 3px; }
 .signature-box .line { width: 120px; height: 1px; border-top: 1px dashed #94a3b8; margin: 14px auto 3px; }
 .footer-wrapper { position: fixed; left: 50%; transform: translateX(-50%); width: 190mm; bottom: 0; z-index: 1; }
-.security-text-line { text-align: center; font-size: 6px; color: rgba(13, 27, 42, 0.20); letter-spacing: 3px; padding: 4px 0; border-top: 1px dashed #cbd5e1; border-bottom: 1px dashed #cbd5e1; text-transform: uppercase; white-space: nowrap; position: relative; z-index: 1; background: rgba(255,255,255,0.9); }
-.page-footer { padding-top: 6px; border-top: 2px solid #c9972b; font-size: 8px; color: #64748b; display: flex; justify-content: space-between; align-items: center; page-break-inside: avoid; position: relative; z-index: 1; background: rgba(255,255,255,0.95); }
-.footer-left { text-align: left; }
-.footer-center { text-align: center; font-weight: 600; color: #0d1b2a; }
-.footer-right { text-align: right; }
-@media print { html, body { margin: 0; padding: 0; height: auto; } .page-container { max-width: 100%; } .page-footer { page-break-inside: avoid; } .watermark-container { display: block !important; } .footer-wrapper { page-break-inside: avoid; } }
-</style>
-</head>
-<body>
-<div class="watermark-container">
-    <div class="watermark-pattern"></div>
-    <div class="watermark-pattern2"></div>
-    <div class="watermark-logo"></div>
-</div>
+.page-footer { padding-top: 6px; border-top: 2px solid #c9972b; font-size: 8px; color: #64748b; display: flex; justify-content: space-between; background: rgba(255,255,255,0.95); }
+@media print { html, body { margin: 0; padding: 0; } .page-container { max-width: 100%; } }
+</style></head><body>
+<div class="watermark-container"><div class="watermark-pattern"></div><div class="watermark-logo"></div></div>
 <div class="page-container">
     <div class="page-header">
-        <img src="logo(1).png" class="logo" onerror="this.style.display='none'">
+        <img src="https://gsssshilla07.pages.dev/logo(1).png" class="logo" onerror="this.style.display='none'">
         <div class="school-name">Govt. Sr. Sec. School Shilla</div>
         <div class="school-tagline">Shilla • Nerwa • District Shimla • Himachal Pradesh - 171210</div>
         <div class="heading-box">STUDENT MARKSHEET</div>
@@ -798,140 +707,73 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
     <div class="content-area">
         <table class="student-info-table">
             <tr>
-                <td class="label-cell">Student ID</td>
-                <td class="value-cell">${esc(s.student_id)}</td>
-                <td class="label-cell">Enrollment Number</td>
-                <td class="value-cell">${esc(s.exam_roll_no||'-')}</td>
+                <td class="label-cell">Student ID</td><td class="value-cell">${esc(s.student_id)}</td>
+                <td class="label-cell">Roll No</td><td class="value-cell">${esc(s.exam_roll_no||'-')}</td>
                 <td class="photo-cell" rowspan="5">
-                    <div class="photo-box">
-                        ${studentPhoto ? `<img src="${esc(studentPhoto)}" onerror="this.parentElement.innerHTML='<div class=&quot;photo-placeholder&quot;><i class=&quot;fas fa-user&quot;></i></div>'">` : `<div class="photo-placeholder"><i class="fas fa-user"></i></div>`}
-                    </div>
+                    <div class="photo-box">${studentPhoto ? `<img src="${esc(studentPhoto)}" onerror="this.parentElement.innerHTML='<div class=&quot;photo-placeholder&quot;>👤</div>'">` : `<div class="photo-placeholder">👤</div>`}</div>
                 </td>
             </tr>
-            <tr>
-                <td class="label-cell">Student Name</td>
-                <td class="value-cell" style="font-weight:700;font-size:13px;">${esc(s.name)}</td>
-                <td class="label-cell">Father's Name</td>
-                <td class="value-cell">${esc(s.father_name||'-')}</td>
-            </tr>
-            <tr>
-                <td class="label-cell">Mother's Name</td>
-                <td class="value-cell">${esc(s.mother_name||'-')}</td>
-                <td class="label-cell">Date of Birth</td>
-                <td class="value-cell">${s.dob ? new Date(s.dob).toLocaleDateString('en-IN', {day:'2-digit', month:'2-digit', year:'numeric'}) : '-'}</td>
-            </tr>
-            <tr>
-                <td class="label-cell">Academic Session</td>
-                <td class="value-cell">${esc(s.session||'-')}</td>
-                <td class="label-cell">Class</td>
-                <td class="value-cell">${esc(s.class||'-')}${s.section ? ' - ' + esc(s.section) : ''}</td>
-            </tr>
-            <tr>
-            <td class="label-cell">APAAR ID</td>
-                <td class="value-cell">${esc(s.apaar_id||'-')}</td>
-                <td class="label-cell">RESULT</td>
-                <td class="value-cell" style="font-weight:700;color:#10b981;">PASS</td>
-            </tr>
+            <tr><td class="label-cell">Name</td><td class="value-cell" style="font-weight:700;font-size:13px;">${esc(s.name)}</td><td class="label-cell">Father</td><td class="value-cell">${esc(s.father_name||'-')}</td></tr>
+            <tr><td class="label-cell">Mother</td><td class="value-cell">${esc(s.mother_name||'-')}</td><td class="label-cell">DOB</td><td class="value-cell">${s.dob ? new Date(s.dob).toLocaleDateString('en-IN', {day:'2-digit',month:'2-digit',year:'numeric'}) : '-'}</td></tr>
+            <tr><td class="label-cell">Session</td><td class="value-cell">${esc(s.session||'-')}</td><td class="label-cell">Class</td><td class="value-cell">${esc(s.class||'-')}${s.section ? ' - ' + esc(s.section) : ''}</td></tr>
+            <tr><td class="label-cell">APAAR ID</td><td class="value-cell">${esc(s.apaar_id||'-')}</td><td class="label-cell">Result</td><td class="value-cell" style="font-weight:700;color:#10b981;">PASS</td></tr>
         </table>
-        
-        <div class="marksheet-heading"> TOTAL EXAMINATIONS (${marksheets.length})</div>
+        <div class="marksheet-heading">📄 TOTAL EXAMINATIONS (${marksheets.length})</div>
         <table class="marksheet-table">
-            <thead>
-                <tr>
-                    <th style="width:25px;">#</th>
-                    <th>Exam Type</th>
-                    <th style="width:65px;">Exam Session</th>
-                    <th style="width:55px;">Obtained</th>
-                    <th style="width:55px;">Maximum</th>
-                    <th>Marksheet URL</th>
-                    <th style="width:75px;">QR Code</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${marksheetRows || '<tr><td colspan="7" style="text-align:center;padding:12px;font-size:12px;">No marksheets available</td></tr>'}
-            </tbody>
+            <thead><tr><th style="width:25px;">#</th><th>Exam Type</th><th style="width:65px;">Session</th><th style="width:55px;">Obtained</th><th style="width:55px;">Max</th><th>URL</th><th style="width:75px;">QR</th></tr></thead>
+            <tbody>${marksheetRows || '<tr><td colspan="7" style="text-align:center;padding:12px;font-size:12px;">No marksheets available</td></tr>'}</tbody>
         </table>
-        
         <div class="marks-summary-box">
-            <div class="summary-item">
-                <div class="label">Total Obtained Marks</div>
-                <div class="value gold">${marksheets.reduce((sum, m) => sum + (parseInt(m.obtained_marks) || 0), 0)}</div>
-            </div>
-            <div class="summary-item">
-                <div class="label">Maximum Marks</div>
-                <div class="value">${marksheets.reduce((sum, m) => sum + (parseInt(m.max_marks) || 0), 0)}</div>
-            </div>
-            <div class="summary-item">
-                <div class="label">Percentage</div>
-                <div class="value gold">${(() => {
-                    const totalObtained = marksheets.reduce((sum, m) => sum + (parseInt(m.obtained_marks) || 0), 0);
-                    const totalMax = marksheets.reduce((sum, m) => sum + (parseInt(m.max_marks) || 0), 0);
-                    if (totalMax === 0) return '-';
-                    return ((totalObtained / totalMax) * 100).toFixed(2) + '%';
-                })()}</div>
-            </div>
+            <div class="summary-item"><div class="label">Total Obtained</div><div class="value gold">${marksheets.reduce((sum, m) => sum + (parseInt(m.obtained_marks) || 0), 0)}</div></div>
+            <div class="summary-item"><div class="label">Maximum Marks</div><div class="value">${marksheets.reduce((sum, m) => sum + (parseInt(m.max_marks) || 0), 0)}</div></div>
+            <div class="summary-item"><div class="label">Percentage</div><div class="value gold">${(() => { const t1 = marksheets.reduce((s, m) => s + (parseInt(m.obtained_marks) || 0), 0); const t2 = marksheets.reduce((s, m) => s + (parseInt(m.max_marks) || 0), 0); return t2 === 0 ? '-' : ((t1/t2)*100).toFixed(2) + '%'; })()}</div></div>
         </div>
-        <div class="declaration-box">
-            <i class="fas fa-check-circle"></i> 
-            This is to certify that <strong>${esc(s.name)}</strong> (Student ID: ${esc(s.student_id)}) has successfully completed the <strong>${esc(s.session||'')}</strong> academic session and is declared <strong>PASS</strong>.
-        </div>
-        <div class="signature-area">
-            <div class="signature-box">
-                <img src="../principal.png" class="signature-img" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'line\\'></div><strong>Principal</strong>'">
-                <div class="line"></div>
-                <strong>Principal</strong>
-                <div style="font-size:8px;color:#94a3b8;">Govt. Sr. Sec. School Shilla</div>
-            </div>
-        </div>
+        <div class="declaration-box"><i class="fas fa-check-circle"></i> This is to certify that <strong>${esc(s.name)}</strong> (Student ID: ${esc(s.student_id)}) has successfully completed the <strong>${esc(s.session||'')}</strong> academic session and is declared <strong>PASS</strong>.</div>
+        <div class="signature-area"><div class="signature-box"><div class="line"></div><strong>Principal</strong><div style="font-size:8px;color:#94a3b8;">Govt. Sr. Sec. School Shilla</div></div></div>
         <div class="verification-section">
-            <div class="verification-qr">
-                ${verificationQRBase64 ? `<img src="${verificationQRBase64}" alt="Verification QR">` : '<div style="font-size:8px;color:#94a3b8;text-align:center;">QR N/A</div>'}
-            </div>
-            <div class="verification-text">
-                <strong>Scan to Verify</strong>
-                <p class="scan-label">Scan this QR code to verify the authenticity of this marksheet.</p>
-                <p>This document is digitally verified and issued by Govt. Sr. Sec. School Shilla.</p>
-                <p style="font-size:8px;color:#94a3b8;margin-top:2px;">Verification ID: ${esc(s.student_id)}-${Date.now().toString().substring(8)}</p>
-            </div>
+            <div class="verification-qr">${verificationQRBase64 ? `<img src="${verificationQRBase64}" alt="QR">` : '<div style="font-size:8px;color:#94a3b8;">QR N/A</div>'}</div>
+            <div class="verification-text"><strong>Scan to Verify</strong><p>Scan to verify the authenticity of this marksheet.</p><p style="font-size:8px;color:#94a3b8;">Verification ID: ${esc(s.student_id)}-${Date.now().toString().substring(8)}</p></div>
         </div>
     </div>
     <div class="footer-wrapper">
-        <div class="security-text-line">GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT &nbsp;|&nbsp; GSSS SHILLA OFFICIAL DOCUMENT</div>
         <div class="page-footer">
-            <div class="footer-left"><strong>Print Date:</strong> ${new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})}</div>
-            <div class="footer-center"><strong>Issued by:</strong> ${esc(downloadedBy)}<br><span style="font-size:7px;color:#94a3b8;">Authorized Signatory</span></div>
-            <div class="footer-right"><strong>Page 1 of 1</strong><br><span style="font-size:7px;">GSSS Shilla - Official Document</span></div>
+            <div><strong>Print Date:</strong> ${new Date().toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'})}</div>
+            <div><strong>Issued by:</strong> ${esc(downloadedBy)}</div>
+            <div><strong>Page 1 of 1</strong></div>
         </div>
     </div>
 </div>
-</body>
-</html>`);
+</body></html>`);
         pw.document.close();
         setTimeout(() => { pw.focus(); pw.print(); }, 1500);
     } catch(e) { showToast(e.message,'error'); }
 }
 
-// ================================================================
-// PRINT CLASS STUDENTS
-// ================================================================
 async function printClassStudents() {
     try {
-        const session = document.getElementById('sessionFilter').value; const params = new URLSearchParams({limit: 100}); if (session) params.set('session', session);
-        const data = await apiCall(`${API_BASE}/class/${currentClass}/students?${params}`); const students = data.data;
+        const session = document.getElementById('sessionFilter').value;
+        const params = new URLSearchParams({limit: 100});
+        if (session) params.set('session', session);
+        const data = await apiCall(`${API_BASE}/class/${currentClass}/students?${params}`);
+        const students = data.data;
         if (!students.length) { showToast('No students to print', 'warning'); return; }
-        const adminData = JSON.parse(localStorage.getItem('adminData') || '{}'); const downloadedBy = adminData.name || adminData.username || localStorage.getItem('adminName') || 'Admin';
-        const pw = window.open('', '_blank', 'width=800,height=600'); let rows = '';
+        const adminData = JSON.parse(localStorage.getItem('adminData') || '{}');
+        const downloadedBy = adminData.name || adminData.username || localStorage.getItem('adminName') || 'Admin';
+        const pw = window.open('', '_blank', 'width=800,height=600');
+        let rows = '';
         students.forEach((s, i) => { rows += `<tr><td>${i+1}</td><td>${esc(s.student_id)}</td><td>${esc(s.name)}</td><td>${esc(s.father_name||'-')}</td><td>${esc(s.session||'-')}</td><td>${esc(s.class||'-')}</td><td>${s.marksheet_count||0}</td><td>${s.published_count||0}</td></tr>`; });
-        pw.document.write(`<html><head><title>Class ${currentClass} Students</title><style>body{font-family:'Inter',sans-serif;padding:20px}.print-header{display:flex;align-items:center;justify-content:center;gap:16px;border-bottom:3px solid #c9972b;padding-bottom:12px;margin-bottom:20px}.print-header img{width:70px;height:70px;border-radius:50%}table{width:100%;border-collapse:collapse;margin:16px 0}th,td{padding:8px 12px;border:1px solid #cbd5e1;font-size:12px}th{background:#f1f5f9}.print-footer{margin-top:30px;display:flex;justify-content:space-between;font-size:12px;color:#64748b;border-top:1px solid #cbd5e1;padding-top:10px}</style></head><body><div class="print-header"><img src="logo(1).png"><div><h1>Govt. Sr. Sec. School Shilla</h1><p>Class ${currentClass} Students List</p></div></div><table><thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Father's Name</th><th>Session</th><th>Class</th><th>Marksheets</th><th>Published</th></tr></thead><tbody>${rows}</tbody></table><div class="print-footer"><span>Print Date: ${new Date().toLocaleString('en-IN')}</span><span>Downloaded by: ${esc(downloadedBy)}</span><span>Page 1 of 1</span></div></body></html>`);
-        pw.document.close(); setTimeout(() => { pw.print(); }, 500);
+        pw.document.write(`<html><head><title>Class ${currentClass} Students</title><style>body{font-family:'Inter',sans-serif;padding:20px}.print-header{display:flex;align-items:center;justify-content:center;gap:16px;border-bottom:3px solid #c9972b;padding-bottom:12px;margin-bottom:20px}.print-header img{width:70px;height:70px;border-radius:50%}table{width:100%;border-collapse:collapse;margin:16px 0}th,td{padding:8px 12px;border:1px solid #cbd5e1;font-size:12px}th{background:#f1f5f9}.print-footer{margin-top:30px;display:flex;justify-content:space-between;font-size:12px;color:#64748b;border-top:1px solid #cbd5e1;padding-top:10px}</style></head><body><div class="print-header"><img src="https://gsssshilla07.pages.dev/logo(1).png"><div><h1>Govt. Sr. Sec. School Shilla</h1><p>Class ${currentClass} Students List</p></div></div><table><thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Father's Name</th><th>Session</th><th>Class</th><th>Marksheets</th><th>Published</th></tr></thead><tbody>${rows}</tbody></table><div class="print-footer"><span>Print Date: ${new Date().toLocaleString('en-IN')}</span><span>Downloaded by: ${esc(downloadedBy)}</span></div></body></html>`);
+        pw.document.close();
+        setTimeout(() => { pw.print(); }, 500);
     } catch(e) { showToast(e.message,'error'); }
 }
 
-// ================================================================
-// INIT
-// ================================================================
-window.addEventListener('DOMContentLoaded', async()=>{ if(await checkAuth()){ loadStudents(currentClass); loadPublishableStudents(publishClass); } });
+window.addEventListener('DOMContentLoaded', async() => {
+    if (await checkAuth()) {
+        loadStudents(currentClass);
+        loadPublishableStudents(publishClass);
+    }
+});
 </script>
 </body>
 </html>
-```
