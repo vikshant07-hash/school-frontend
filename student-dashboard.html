@@ -36,6 +36,7 @@
     --radius-sm: 12px;
     --radius-lg: 24px;
     --transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+    --sidebar-width: 260px;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -48,15 +49,17 @@ body {
         radial-gradient(circle at 100% 100%, rgba(244,63,94,0.06) 0%, transparent 40%);
     color: var(--text-primary);
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
     overflow-x: hidden;
 }
 
-/* ANIMATIONS */
+/* ==================== ANIMATIONS ==================== */
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(24px); }
     to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 @keyframes pulse-ring {
     0% { transform: scale(1); opacity: 1; }
@@ -87,120 +90,305 @@ body {
 .delay-4 { animation-delay: 0.2s; }
 .delay-5 { animation-delay: 0.25s; }
 
-/* NAVBAR */
-.navbar {
-    background: rgba(255,255,255,0.85);
-    backdrop-filter: blur(20px) saturate(180%);
-    border-bottom: 1px solid rgba(226,232,240,0.5);
-    padding: 0 32px;
-    height: 72px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
+/* ==================== SIDEBAR ==================== */
+.sidebar {
+    position: fixed;
     top: 0;
-    z-index: 100;
-    box-shadow: 0 4px 20px rgba(79,70,229,0.06);
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+    color: #fff;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: var(--transition);
+    box-shadow: 4px 0 30px rgba(30,27,75,0.15);
+    overflow-y: auto;
 }
-.navbar .brand {
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(244,63,94,0.25), transparent 65%);
+    pointer-events: none;
+}
+.sidebar::after {
+    content: '';
+    position: absolute;
+    bottom: -120px;
+    left: -80px;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,158,11,0.2), transparent 65%);
+    pointer-events: none;
+}
+
+/* Sidebar Brand */
+.sidebar-brand {
+    padding: 24px 22px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
     text-decoration: none;
+    color: inherit;
 }
-.navbar .brand .logo-placeholder {
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
+.sidebar-brand .logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     background: #fff;
+    padding: 4px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(79,70,229,0.15);
-    border: 2px solid rgba(79,70,229,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
-.navbar .brand .logo-placeholder img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
-.navbar .brand .name {
-    font-size: 17px;
+.sidebar-brand .logo img { width: 100%; height: 100%; object-fit: contain; }
+.sidebar-brand .brand-text {
+    flex: 1;
+    min-width: 0;
+}
+.sidebar-brand .brand-text .name {
+    font-size: 14.5px;
     font-weight: 800;
-    color: var(--text-primary);
-    letter-spacing: -0.3px;
+    letter-spacing: -0.2px;
+    color: #fff;
+    line-height: 1.2;
 }
-.navbar .brand .name span {
-    background: linear-gradient(135deg, var(--primary), var(--coral));
+.sidebar-brand .brand-text .name span {
+    background: linear-gradient(135deg, #fbbf24, #f43f5e);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
-.navbar .brand .name small {
-    display: block;
-    font-size: 10.5px;
-    color: var(--text-muted);
-    font-weight: 600;
+.sidebar-brand .brand-text .tagline {
+    font-size: 9.5px;
+    color: rgba(255,255,255,0.55);
     letter-spacing: 1px;
     text-transform: uppercase;
-    margin-top: 1px;
+    font-weight: 600;
+    margin-top: 2px;
 }
-.nav-right { display: flex; align-items: center; gap: 14px; }
-.student-badge {
+
+/* Sidebar Profile */
+.sidebar-profile {
+    padding: 20px 22px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 6px 16px 6px 6px;
-    background: linear-gradient(135deg, var(--primary-bg), #fff);
-    border: 1px solid rgba(79,70,229,0.15);
-    border-radius: 50px;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-primary);
+    gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    position: relative;
+    z-index: 1;
 }
-.student-badge .avatar {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--coral));
+.sidebar-profile .avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #fbbf24, #f43f5e);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 20px;
     font-weight: 800;
     color: #fff;
     overflow: hidden;
     flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(79,70,229,0.3);
+    box-shadow: 0 4px 12px rgba(244,63,94,0.35);
+    border: 2px solid rgba(255,255,255,0.2);
 }
-.student-badge .avatar img { width: 100%; height: 100%; object-fit: cover; }
-.online-dot {
-    width: 9px;
-    height: 9px;
+.sidebar-profile .avatar img { width: 100%; height: 100%; object-fit: cover; }
+.sidebar-profile .info { flex: 1; min-width: 0; }
+.sidebar-profile .info .name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.sidebar-profile .info .meta {
+    font-size: 10.5px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.sidebar-profile .info .meta .dot {
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: var(--emerald);
-    box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+    background: #10b981;
+    box-shadow: 0 0 0 2px rgba(16,185,129,0.3);
     animation: pulse-ring 2s infinite;
 }
-.logout-btn {
-    background: var(--coral-bg);
-    color: var(--coral);
-    border: 1px solid rgba(244,63,94,0.15);
-    padding: 9px 16px;
-    border-radius: 10px;
-    font-size: 12.5px;
+
+/* Sidebar Nav */
+.sidebar-nav {
+    flex: 1;
+    padding: 16px 12px;
+    position: relative;
+    z-index: 1;
+    overflow-y: auto;
+}
+.sidebar-nav .nav-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
     font-weight: 700;
+    padding: 12px 12px 6px;
+}
+.sidebar-nav .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    color: rgba(255,255,255,0.75);
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 3px;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+}
+.sidebar-nav .nav-item i {
+    width: 20px;
+    font-size: 15px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.sidebar-nav .nav-item:hover {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    transform: translateX(4px);
+}
+.sidebar-nav .nav-item.active {
+    background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(244,63,94,0.15));
+    color: #fff;
+    box-shadow: inset 3px 0 0 #fbbf24;
+}
+.sidebar-nav .nav-item .badge {
+    margin-left: auto;
+    background: #f43f5e;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 20px;
+    min-width: 20px;
+    text-align: center;
+}
+.sidebar-nav .nav-item .badge.green {
+    background: #10b981;
+}
+.sidebar-nav .nav-item .badge.hidden { display: none; }
+
+/* Sidebar Footer */
+.sidebar-footer {
+    padding: 16px 22px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    position: relative;
+    z-index: 1;
+}
+.sidebar-footer .logout-btn {
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(244,63,94,0.15);
+    color: #fb7185;
+    font-weight: 700;
+    font-size: 13px;
     cursor: pointer;
     font-family: 'Inter', sans-serif;
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 7px;
+    justify-content: center;
+    gap: 8px;
     transition: var(--transition);
+    border: 1px solid rgba(244,63,94,0.25);
 }
-.logout-btn:hover {
-    background: var(--coral);
+.sidebar-footer .logout-btn:hover {
+    background: #f43f5e;
     color: #fff;
     transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(244,63,94,0.35);
 }
 
-/* MAIN */
+/* ==================== MOBILE TOGGLE ==================== */
+.mobile-header {
+    display: none;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(20px);
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.mobile-header .menu-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--primary-bg);
+    border: none;
+    color: var(--primary);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.mobile-header .title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+.mobile-header .title span {
+    background: linear-gradient(135deg, var(--primary), var(--coral));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+}
+.sidebar-overlay.active { display: block; }
+
+/* ==================== MAIN CONTENT ==================== */
+.main-content {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 .main-container {
     flex: 1;
     max-width: 1300px;
@@ -209,7 +397,7 @@ body {
     width: 100%;
 }
 
-/* HERO */
+/* ==================== HERO ==================== */
 .hero-card {
     background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4f46e5 100%);
     color: #fff;
@@ -317,7 +505,7 @@ body {
 .hero-badge.status-passed { background: linear-gradient(135deg, #f59e0b, #d97706); }
 .hero-badge.status-promoted { background: linear-gradient(135deg, #0ea5e9, #0284c7); }
 
-/* STATS */
+/* ==================== STATS ==================== */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -335,10 +523,20 @@ body {
     position: relative;
     overflow: hidden;
 }
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--coral));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+}
+.stat-card:hover::before { transform: scaleX(1); }
 .stat-card:hover {
     transform: translateY(-6px);
     box-shadow: var(--shadow-lg);
-    border-color: rgba(79,70,229,0.2);
 }
 .stat-card .icon { font-size: 32px; margin-bottom: 10px; display: inline-block; }
 .stat-card h3 {
@@ -359,7 +557,13 @@ body {
 .stat-card .value.green { color: var(--emerald); }
 .stat-card .value.blue { color: var(--primary); }
 
-/* SECTION */
+/* ==================== SECTIONS ==================== */
+.section {
+    display: none;
+    animation: fadeInUp 0.5s ease-out;
+}
+.section.active { display: block; }
+
 .section-card {
     background: var(--bg-white);
     border-radius: var(--radius);
@@ -398,46 +602,156 @@ body {
 .section-header .subtitle { font-size: 12px; color: var(--text-muted); font-weight: 600; }
 .section-body { padding: 24px 26px; }
 
-/* INFO GRID */
-.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px 24px; }
-.info-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 12px 14px;
-    border-radius: 10px;
+/* ==================== RESULT MAIN CARD (Click to expand) ==================== */
+.result-main-card {
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow);
+    margin-bottom: 22px;
+    overflow: hidden;
     transition: var(--transition);
-    border: 1px solid transparent;
+    cursor: pointer;
+    position: relative;
 }
-.info-item:hover {
-    background: var(--primary-bg);
-    border-color: rgba(79,70,229,0.1);
-    transform: translateX(4px);
+.result-main-card:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
 }
-.info-item .lbl {
-    font-size: 10px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 800;
+.result-main-card.expanded {
+    border-color: var(--primary);
+    cursor: default;
 }
-.info-item .val { font-size: 14px; color: var(--text-primary); font-weight: 700; word-break: break-word; }
-.info-item.full { grid-column: 1 / -1; }
-
-/* ==================== MY RESULTS — MAIN ==================== */
-.result-notif-badge {
-    background: linear-gradient(135deg, var(--emerald), #059669);
-    color: #fff;
-    font-size: 10.5px;
-    font-weight: 900;
-    padding: 4px 11px;
+.result-main-card.expanded:hover {
+    transform: none;
+}
+.rmc-header {
+    padding: 26px 30px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex-wrap: wrap;
+    background: linear-gradient(135deg, #fef8ed, #ffffff);
+    position: relative;
+    overflow: hidden;
+}
+.rmc-header::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(79,70,229,0.08), transparent 65%);
+    pointer-events: none;
+}
+.rmc-icon {
+    width: 74px;
+    height: 74px;
+    background: linear-gradient(135deg, var(--primary), var(--coral));
     border-radius: 20px;
-    letter-spacing: 0.7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 8px 24px rgba(79,70,229,0.35);
+    position: relative;
+    z-index: 1;
+}
+.rmc-body { flex: 1; min-width: 200px; position: relative; z-index: 1; }
+.rmc-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary-dark);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.rmc-title .count-badge {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 800;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.5px;
+}
+.rmc-title .new-badge {
+    background: linear-gradient(135deg, #16a34a, #059669);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1px;
     animation: pulse-notif 1.8s infinite;
     text-transform: uppercase;
-    box-shadow: 0 0 12px rgba(16,185,129,0.5);
-    margin-left: 8px;
 }
+.rmc-desc {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.rmc-desc .recent-pill {
+    background: var(--emerald-bg);
+    color: var(--emerald);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+}
+.rmc-btn {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: var(--transition);
+    box-shadow: 0 8px 20px rgba(79,70,229,0.3);
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+}
+.rmc-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(79,70,229,0.4);
+}
+.result-main-card.expanded .rmc-btn {
+    background: linear-gradient(135deg, var(--coral), #dc2626);
+    box-shadow: 0 8px 20px rgba(244,63,94,0.3);
+}
+.rmc-btn i { font-size: 14px; }
+
+/* Result Body (collapsed by default) */
+.rmc-body-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.6s ease;
+    border-top: 1px solid var(--border);
+}
+.result-main-card.expanded .rmc-body-content {
+    max-height: 5000px;
+}
+.rmc-body-inner { padding: 26px 30px; background: #fafbfc; }
 
 /* New Result Alert */
 .new-result-alert {
@@ -449,7 +763,7 @@ body {
     display: flex;
     align-items: center;
     gap: 14px;
-    box-shadow: 0 8px 24px rgba(22, 163, 74, 0.3);
+    box-shadow: 0 8px 24px rgba(22,163,74,0.3);
     position: relative;
     overflow: hidden;
 }
@@ -480,11 +794,10 @@ body {
     background: #fff; color: #16a34a;
     padding: 3px 12px; border-radius: 50px;
     font-size: 10px; font-weight: 900;
-    letter-spacing: 0.5px;
 }
 .new-result-alert .nra-desc { font-size: 12.5px; opacity: 0.95; }
 
-/* Overall Status Banner */
+/* Overall Banner */
 .overall-status-banner {
     padding: 18px 24px;
     border-radius: 14px;
@@ -493,8 +806,8 @@ body {
     align-items: center;
     gap: 16px;
     flex-wrap: wrap;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
     color: #fff;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
 }
 .overall-status-banner.pass { background: linear-gradient(135deg, #16a34a, #059669); }
 .overall-status-banner.fail { background: linear-gradient(135deg, #dc2626, #b91c1c); }
@@ -520,9 +833,7 @@ body {
     letter-spacing: 0.5px; margin-bottom: 3px;
     font-family: 'Playfair Display', serif;
 }
-.overall-status-banner .osb-reason {
-    font-size: 12.5px; opacity: 0.9;
-}
+.overall-status-banner .osb-reason { font-size: 12.5px; opacity: 0.9; }
 
 /* Summary Grid */
 .results-summary-grid {
@@ -559,7 +870,7 @@ body {
 }
 .result-stat-box .rs-value.gold { color: var(--gold); }
 
-/* Individual Marksheet Card (COLLAPSIBLE) */
+/* Individual Marksheet Card */
 .result-card-item {
     background: var(--bg-white);
     border: 1.5px solid var(--border);
@@ -587,7 +898,6 @@ body {
     border-radius: 50px;
     font-size: 10px;
     font-weight: 900;
-    letter-spacing: 1px;
     animation: pulse-notif 2s infinite;
     z-index: 2;
 }
@@ -600,10 +910,7 @@ body {
     cursor: pointer;
     flex-wrap: wrap;
 }
-.rci-left {
-    display: flex; align-items: center; gap: 14px;
-    flex: 1; min-width: 200px;
-}
+.rci-left { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 200px; }
 .rci-icon {
     width: 46px; height: 46px;
     background: linear-gradient(135deg, var(--primary), var(--primary-light));
@@ -624,14 +931,9 @@ body {
     font-size: 12px; color: var(--text-muted);
     font-weight: 600;
 }
-.rci-meta span {
-    display: inline-flex; align-items: center; gap: 4px;
-}
+.rci-meta span { display: inline-flex; align-items: center; gap: 4px; }
 .rci-meta i { color: var(--primary); }
-.rci-right {
-    display: flex; align-items: center; gap: 10px;
-    flex-wrap: wrap;
-}
+.rci-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .rci-status-pill {
     padding: 5px 14px;
     border-radius: 50px;
@@ -663,8 +965,6 @@ body {
     background: var(--primary);
     color: #fff;
 }
-
-/* Expanded Details */
 .rci-details {
     max-height: 0;
     overflow: hidden;
@@ -678,8 +978,6 @@ body {
     padding: 20px;
     background: #fafbfc;
 }
-
-/* Info grid inside detail */
 .rci-info-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -704,8 +1002,6 @@ body {
     font-weight: 700;
     color: var(--text-primary);
 }
-
-/* Subjects Table */
 .subjects-table-wrap {
     margin: 14px 0;
     border-radius: 10px;
@@ -757,8 +1053,6 @@ body {
     border-top: 2px solid var(--gold);
     color: var(--primary);
 }
-
-/* Remarks */
 .rci-remarks {
     padding: 12px 16px;
     background: #dbeafe;
@@ -768,8 +1062,6 @@ body {
     color: #1e40af;
     margin: 12px 0;
 }
-
-/* Action Buttons */
 .rci-actions {
     display: flex; gap: 8px; flex-wrap: wrap;
     margin-top: 16px;
@@ -806,7 +1098,6 @@ body {
 }
 .rci-btn-print:hover { transform: translateY(-2px); }
 
-/* Empty state */
 .result-empty-msg {
     text-align: center;
     padding: 40px 20px;
@@ -825,12 +1116,7 @@ body {
     color: var(--text-secondary);
     margin-bottom: 6px;
 }
-.result-empty-msg p {
-    font-size: 12.5px;
-    font-weight: 500;
-}
-
-/* Print Button */
+.result-empty-msg p { font-size: 12.5px; font-weight: 500; }
 .print-full-btn {
     display: block;
     margin: 20px auto 0;
@@ -851,7 +1137,7 @@ body {
 }
 .print-full-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(79,70,229,0.4); }
 
-/* DOWNLOADS */
+/* ==================== DOWNLOADS ==================== */
 .download-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -882,10 +1168,13 @@ body {
     display: flex; align-items: center; justify-content: center;
     font-size: 24px;
     flex-shrink: 0;
+    transition: var(--transition);
 }
+.download-card:hover:not(.disabled) .dc-icon { transform: scale(1.1) rotate(-6deg); }
 .dc-icon.gold { background: var(--gold-bg); color: var(--gold); }
 .dc-icon.blue { background: var(--primary-bg); color: var(--primary); }
 .dc-icon.green { background: var(--emerald-bg); color: var(--emerald); }
+.dc-icon.purple { background: var(--purple-bg); color: var(--purple); }
 .dc-icon.pink { background: var(--coral-bg); color: var(--coral); }
 .download-card .dc-body { flex: 1; min-width: 0; }
 .download-card .dc-title { font-size: 14.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 5px; }
@@ -916,59 +1205,122 @@ body {
     border-radius: 12px;
     letter-spacing: 0.7px;
     text-transform: uppercase;
+    animation: pulse-notif 2s infinite;
+}
+.coming-soon {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: linear-gradient(135deg, var(--gold), var(--coral));
+    color: #fff;
+    font-size: 9px;
+    font-weight: 900;
+    padding: 4px 10px;
+    border-radius: 12px;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
 }
 
-/* DOCS */
-.doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
-.doc-tile {
-    background: var(--bg);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 18px 14px;
-    text-align: center;
+/* ==================== QUIZ CARD ==================== */
+.quiz-simple-card {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #c026d3 100%);
+    border-radius: var(--radius-lg);
+    padding: 26px 30px;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    box-shadow: 0 20px 40px rgba(79,70,229,0.3);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
     transition: var(--transition);
 }
-.doc-tile:hover {
-    border-color: var(--primary);
-    background: var(--primary-bg);
-    transform: translateY(-4px);
+.quiz-simple-card::before {
+    content: '';
+    position: absolute;
+    top: -60%; right: -10%;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.2), transparent 70%);
+    transition: var(--transition);
 }
-.doc-tile .di { font-size: 30px; margin-bottom: 10px; display: inline-block; }
-.doc-tile .dn { font-size: 12.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
-.doc-tile .ds { font-size: 10px; font-weight: 800; padding: 4px 12px; border-radius: 12px; display: inline-block; }
-.doc-tile .ds.yes { background: var(--emerald-bg); color: var(--emerald); }
-.doc-tile .ds.no { background: var(--coral-bg); color: var(--coral); }
-.doc-tile a {
-    display: inline-block;
-    margin-top: 10px;
-    color: var(--primary);
-    font-size: 11px;
-    font-weight: 800;
-    text-decoration: none;
+.quiz-simple-card:hover {
+    transform: translateY(-5px) scale(1.005);
+    box-shadow: 0 25px 60px rgba(79,70,229,0.4);
 }
-.doc-tile a:hover { color: var(--gold); }
+.quiz-simple-card:hover::before { transform: scale(1.2); }
+.quiz-simple-card .qs-icon {
+    width: 70px; height: 70px;
+    background: rgba(255,255,255,0.18);
+    border: 2px solid rgba(255,255,255,0.35);
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px; color: #fff;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+.quiz-simple-card .qs-body { flex: 1; position: relative; z-index: 1; min-width: 0; }
+.quiz-simple-card .qs-title {
+    font-size: 21px; font-weight: 900;
+    color: #fff; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 12px;
+    flex-wrap: wrap;
+}
+.quiz-simple-card .qs-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,0.88);
+    line-height: 1.5;
+}
+.quiz-simple-card .qs-btn {
+    background: #fff; color: var(--primary);
+    border: none; padding: 14px 26px;
+    border-radius: 12px;
+    font-size: 14px; font-weight: 800;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    display: inline-flex; align-items: center; gap: 9px;
+    position: relative; z-index: 1;
+    transition: var(--transition);
+    flex-shrink: 0;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+.quiz-simple-card .qs-btn:hover {
+    background: var(--gold); color: #fff;
+    transform: translateY(-2px) scale(1.03);
+}
+.quiz-notif-badge {
+    background: var(--coral); color: #fff;
+    font-size: 10.5px; font-weight: 900;
+    padding: 4px 11px; border-radius: 20px;
+    animation: pulse-notif 1.8s infinite;
+    text-transform: uppercase;
+    box-shadow: 0 0 12px rgba(244,63,94,0.6);
+}
 
-/* MODAL */
+/* ==================== MODAL ==================== */
 .modal-overlay {
     display: none;
     position: fixed;
     inset: 0;
     background: rgba(15,23,42,0.6);
     backdrop-filter: blur(8px);
-    z-index: 1000;
+    z-index: 1100;
     justify-content: center;
     align-items: center;
     padding: 20px;
+    animation: fadeIn 0.25s ease;
 }
 .modal-overlay.active { display: flex; }
 .modal-content {
     background: var(--bg-white);
     border-radius: var(--radius-lg);
-    max-width: 800px;
+    max-width: 900px;
     width: 100%;
     max-height: 92vh;
     overflow-y: auto;
     box-shadow: 0 30px 80px rgba(15,23,42,0.35);
+    animation: slideDown 0.3s ease;
 }
 .modal-header {
     padding: 22px 28px;
@@ -982,11 +1334,8 @@ body {
     z-index: 2;
 }
 .modal-header h2 {
-    font-size: 18px;
-    font-weight: 900;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    font-size: 18px; font-weight: 900;
+    display: flex; align-items: center; gap: 12px;
 }
 .modal-header h2 i {
     color: var(--primary);
@@ -998,37 +1347,192 @@ body {
 .close-btn {
     background: var(--bg);
     border: none;
-    width: 36px;
-    height: 36px;
+    width: 36px; height: 36px;
     border-radius: 10px;
     font-size: 18px;
     color: var(--text-secondary);
     cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+}
+.close-btn:hover { background: var(--coral-bg); color: var(--coral); transform: rotate(90deg); }
+
+/* Quiz Modal Tabs */
+.quiz-tabs {
+    display: flex; gap: 8px;
+    padding: 5px;
+    background: var(--bg);
+    border-radius: 14px;
+    margin-bottom: 22px;
+}
+.quiz-tab {
+    flex: 1;
+    padding: 13px 18px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 9px;
+    white-space: nowrap;
+}
+.quiz-tab.active {
+    background: var(--bg-white);
+    color: var(--primary);
+    box-shadow: 0 4px 12px rgba(79,70,229,0.12);
+}
+.quiz-tab .count {
+    background: var(--primary);
+    color: #fff;
+    font-size: 10.5px;
+    font-weight: 900;
+    padding: 3px 9px;
+    border-radius: 12px;
+    min-width: 24px;
+    text-align: center;
+}
+.quiz-tab.active .count { background: var(--gold); }
+
+/* ==================== FOOTER ==================== */
+.footer {
+    background: linear-gradient(135deg, #1e1b4b, #312e81);
+    color: rgba(255,255,255,0.75);
+    padding: 50px 32px 0;
+    margin-top: 40px;
+}
+.footer-grid {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.footer-brand .brand-row {
     display: flex;
     align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.footer-brand .brand-row img {
+    width: 50px; height: 50px;
+    border-radius: 12px;
+    border: 2px solid rgba(251,191,36,0.3);
+    background: #fff;
+    padding: 4px;
+}
+.footer-brand .brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+}
+.footer-brand p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.8;
+    max-width: 320px;
+}
+.footer-col h4 {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    font-weight: 800;
+    margin-bottom: 16px;
+    letter-spacing: 1.5px;
+    position: relative;
+}
+.footer-col h4::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 30px;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 50px;
+}
+.footer-col a {
+    display: block;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 10px;
+    text-decoration: none;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.footer-col a:hover { color: #fff; transform: translateX(6px); }
+.footer-col a i { font-size: 10px; color: var(--gold-light); }
+
+.footer-social {
+    display: flex;
     justify-content: center;
+    gap: 14px;
+    margin: 24px auto 20px;
+    flex-wrap: wrap;
 }
-.close-btn:hover { background: var(--coral-bg); color: var(--coral); }
+.footer-social a {
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    color: rgba(255,255,255,0.5);
+    font-size: 17px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: var(--transition);
+    text-decoration: none;
+}
+.footer-social a:hover {
+    transform: translateY(-4px) scale(1.05);
+    color: #fff;
+    background: var(--primary);
+}
+.footer-social a.fb:hover { background: #1877F2; }
+.footer-social a.ig:hover { background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); }
+.footer-social a.yt:hover { background: #FF0000; }
+.footer-social a.wa:hover { background: #25D366; }
 
-/* FOOTER */
-.footer {
-    background: var(--bg-white);
-    border-top: 1px solid var(--border);
-    padding: 22px 32px;
+.footer-bottom {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 18px 0;
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+}
+.footer-bottom a {
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    transition: var(--transition);
+}
+.footer-bottom a:hover { color: var(--gold-light); }
+.footer-dev {
     text-align: center;
-    font-size: 12.5px;
-    color: var(--text-muted);
-    font-weight: 600;
+    padding: 14px 0 20px;
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.3);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    max-width: 1300px;
+    margin: 0 auto;
 }
+.footer-dev b { color: var(--gold-light); }
 
-/* TOAST */
+/* ==================== TOAST ==================== */
 .toast-container {
     position: fixed;
-    top: 24px;
-    right: 24px;
+    top: 24px; right: 24px;
     z-index: 9999;
-    display: flex;
-    flex-direction: column;
+    display: flex; flex-direction: column;
     gap: 10px;
 }
 .toast {
@@ -1038,51 +1542,116 @@ body {
     font-weight: 700;
     font-size: 13px;
     box-shadow: 0 12px 32px rgba(15,23,42,0.25);
+    animation: slideDown 0.3s ease;
     min-width: 260px;
 }
 .toast-success { background: linear-gradient(135deg, var(--emerald), #059669); }
 .toast-error { background: linear-gradient(135deg, var(--coral), #dc2626); }
 .toast-info { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-    .navbar { padding: 0 16px; height: 66px; }
-    .navbar .brand .name small { display: none; }
-    .student-badge span:not(.avatar) { display: none; }
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 900px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+    .main-content { margin-left: 0; }
+    .mobile-header { display: flex; }
     .main-container { padding: 18px 16px 40px; }
     .hero-card { padding: 22px 20px; gap: 18px; }
     .hero-info h1 { font-size: 22px; }
     .hero-avatar { width: 80px; height: 80px; border-radius: 20px; }
-    .doc-grid { grid-template-columns: 1fr 1fr; }
     .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
     .rci-header { padding: 14px 16px; }
     .rci-icon { width: 40px; height: 40px; font-size: 17px; }
-    .rci-title { font-size: 14px; }
     .rci-details-inner { padding: 14px 16px; }
     .subjects-table th, .subjects-table td { padding: 8px 8px; font-size: 11.5px; }
-    .rci-btn { padding: 8px 14px; font-size: 11.5px; flex: 1; justify-content: center; }
-    .overall-status-banner { padding: 14px 18px; }
+    .rci-btn { padding: 8px 14px; font-size: 11.5px; }
+    .rmc-header { padding: 20px 22px; }
+    .rmc-icon { width: 60px; height: 60px; font-size: 26px; }
+    .rmc-title { font-size: 19px; }
+    .rmc-btn { width: 100%; justify-content: center; }
+    .rmc-body-inner { padding: 18px 20px; }
+    .quiz-simple-card { flex-direction: column; align-items: flex-start; padding: 22px; gap: 16px; }
+    .quiz-simple-card .qs-btn { width: 100%; justify-content: center; }
+    .download-grid { grid-template-columns: 1fr; }
+    .footer { padding: 30px 20px 0; }
+    .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    .footer-bottom { flex-direction: column; text-align: center; }
 }
 </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar">
-    <a href="#" class="brand">
-        <div class="logo-placeholder"><img src="logo(1).png" alt="Logo" onerror="this.style.display='none'"></div>
-        <div class="name">GSSS <span>SHILLA</span><small>Student Portal</small></div>
-    </a>
-    <div class="nav-right">
-        <div class="student-badge">
-            <span class="avatar" id="navAvatar">👤</span>
-            <span id="navName">Student</span>
-            <span class="online-dot"></span>
-        </div>
-        <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-    </div>
-</nav>
+<!-- MOBILE HEADER -->
+<div class="mobile-header">
+    <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <div class="title">GSSS <span>Shilla</span></div>
+    <div style="width:40px;"></div>
+</div>
 
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+    <a href="#" class="sidebar-brand">
+        <div class="logo"><img src="logo(1).png" alt="Logo" onerror="this.style.display='none'"></div>
+        <div class="brand-text">
+            <div class="name">GSSS <span>SHILLA</span></div>
+            <div class="tagline">Student Portal</div>
+        </div>
+    </a>
+
+    <div class="sidebar-profile">
+        <div class="avatar" id="sidebarAvatar">👤</div>
+        <div class="info">
+            <div class="name" id="sidebarName">Student</div>
+            <div class="meta">
+                <span class="dot"></span>
+                <span id="sidebarClass">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-label">Main Menu</div>
+        <button class="nav-item active" data-section="dashboard" onclick="switchSection('dashboard')">
+            <i class="fas fa-th-large"></i> Dashboard
+        </button>
+        <button class="nav-item" data-section="results" onclick="switchSection('results')">
+            <i class="fas fa-poll"></i> My Results
+            <span class="badge hidden" id="sidebarResultBadge">0</span>
+        </button>
+        <button class="nav-item" data-section="quizzes" onclick="switchSection('quizzes')">
+            <i class="fas fa-brain"></i> Quizzes
+            <span class="badge hidden" id="sidebarQuizBadge">0</span>
+        </button>
+        <button class="nav-item" data-section="downloads" onclick="switchSection('downloads')">
+            <i class="fas fa-download"></i> Downloads
+        </button>
+        <button class="nav-item" data-section="profile" onclick="switchSection('profile')">
+            <i class="fas fa-user-graduate"></i> My Profile
+        </button>
+        <button class="nav-item" data-section="documents" onclick="switchSection('documents')">
+            <i class="fas fa-file-alt"></i> Documents
+        </button>
+    </nav>
+
+    <div class="sidebar-footer">
+        <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+    </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
 <div class="main-container">
 
     <!-- HERO -->
@@ -1102,107 +1671,271 @@ body {
         <div class="hero-badge" id="heroStatus">ACTIVE</div>
     </div>
 
-    <!-- STATS -->
-    <div class="stats-grid">
-        <div class="stat-card animate-in delay-1"><div class="icon">🎓</div><h3>Class</h3><div class="value blue" id="statClass">—</div></div>
-        <div class="stat-card animate-in delay-2"><div class="icon">📖</div><h3>Stream</h3><div class="value gold" id="statStream">—</div></div>
-        <div class="stat-card animate-in delay-3"><div class="icon">🔢</div><h3>Roll Number</h3><div class="value blue" id="statRoll">—</div></div>
-        <div class="stat-card animate-in delay-4"><div class="icon">📄</div><h3>Documents</h3><div class="value green" id="statDocs">0/10</div></div>
+    <!-- ═══════════════ DASHBOARD SECTION ═══════════════ -->
+    <div class="section active" id="section-dashboard">
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card animate-in delay-1"><div class="icon">🎓</div><h3>Class</h3><div class="value blue" id="statClass">—</div></div>
+            <div class="stat-card animate-in delay-2"><div class="icon">📖</div><h3>Stream</h3><div class="value gold" id="statStream">—</div></div>
+            <div class="stat-card animate-in delay-3"><div class="icon">🔢</div><h3>Roll Number</h3><div class="value blue" id="statRoll">—</div></div>
+            <div class="stat-card animate-in delay-4"><div class="icon">📄</div><h3>Documents</h3><div class="value green" id="statDocs">0/10</div></div>
+        </div>
+
+        <!-- RESULT MAIN CARD (Click to expand) -->
+        <div class="result-main-card" id="resultMainCard" onclick="toggleResultMain(event)">
+            <div class="rmc-header">
+                <div class="rmc-icon"><i class="fas fa-poll"></i></div>
+                <div class="rmc-body">
+                    <div class="rmc-title">
+                        My Results
+                        <span class="count-badge" id="resultCountBadge">0</span>
+                        <span class="new-badge" id="resultNewBadge" style="display:none;">NEW</span>
+                    </div>
+                    <div class="rmc-desc">
+                        <span id="resultDescText">Loading results...</span>
+                        <span class="recent-pill" id="recentPill" style="display:none;"></span>
+                    </div>
+                </div>
+                <button class="rmc-btn" id="resultToggleBtn" onclick="event.stopPropagation(); toggleResultMain(event)">
+                    <i class="fas fa-eye"></i> View Results
+                </button>
+            </div>
+            <div class="rmc-body-content" onclick="event.stopPropagation()">
+                <div class="rmc-body-inner" id="resultContent">
+                    <div style="text-align:center;padding:30px;color:var(--text-muted);">
+                        <i class="fas fa-spinner fa-spin"></i> Loading results...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUIZ CARD -->
+        <div class="quiz-simple-card" onclick="switchSection('quizzes')">
+            <div class="qs-icon"><i class="fas fa-brain"></i></div>
+            <div class="qs-body">
+                <div class="qs-title">
+                    My Quizzes
+                    <span class="quiz-notif-badge" id="quizNotifBadge" style="display:none;">New</span>
+                </div>
+                <div class="qs-desc" id="quizCardDesc">Check live quizzes, upcoming events, and view your results</div>
+            </div>
+            <button class="qs-btn" onclick="event.stopPropagation(); switchSection('quizzes');">
+                <i class="fas fa-eye"></i> View Quizzes
+            </button>
+        </div>
+
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <!-- MY RESULTS — Single Card with all available marksheets      -->
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <div class="section-card animate-in delay-2" id="myResultsSection">
-        <div class="section-header">
-            <h2>
-                <i class="fas fa-poll"></i> My Results
-                <span class="result-notif-badge" id="resultNotifBadge" style="display:none;">New</span>
-            </h2>
-            <span class="subtitle" id="resultsSubtitle">Published exam results</span>
-        </div>
-        <div class="section-body">
-            <div id="resultsContent">
-                <div style="text-align:center;padding:30px;color:var(--text-muted);">
-                    <i class="fas fa-spinner fa-spin"></i> Loading results...
+    <!-- ═══════════════ RESULTS SECTION ═══════════════ -->
+    <div class="section" id="section-results">
+        <div class="section-card">
+            <div class="section-header">
+                <h2><i class="fas fa-poll"></i> My Results</h2>
+                <span class="subtitle" id="resultsSectionSubtitle">Published exam results</span>
+            </div>
+            <div class="section-body">
+                <div id="resultsSectionContent">
+                    <div style="text-align:center;padding:30px;color:var(--text-muted);">
+                        <i class="fas fa-spinner fa-spin"></i> Loading results...
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- DOWNLOADS -->
-    <div class="section-card animate-in delay-1">
-        <div class="section-header">
-            <h2><i class="fas fa-download"></i> Downloads</h2>
-            <span class="subtitle">Available documents & forms</span>
-        </div>
-        <div class="section-body">
-            <div class="download-grid">
-                <div class="download-card" onclick="downloadProfilePDF()">
-                    <div class="dc-icon gold"><i class="fas fa-id-card"></i></div>
-                    <div class="dc-body">
-                        <div class="dc-title">Student Profile PDF</div>
-                        <div class="dc-desc">Complete profile with photo, signature, documents & QR code</div>
-                        <button class="dc-btn"><i class="fas fa-download"></i> Download</button>
-                    </div>
+    <!-- ═══════════════ QUIZZES SECTION ═══════════════ -->
+    <div class="section" id="section-quizzes">
+        <div class="section-card">
+            <div class="section-header">
+                <h2><i class="fas fa-brain"></i> My Quizzes</h2>
+                <span class="subtitle" id="quizzesSectionSubtitle">Available quizzes</span>
+            </div>
+            <div class="section-body">
+                <div class="quiz-tabs" style="margin-bottom:20px;">
+                    <button class="quiz-tab active" data-tab="live" onclick="switchQuizTab('live')">
+                        <i class="fas fa-circle" style="color:var(--coral);font-size:8px;"></i> Live <span class="count" id="tabLiveCount">0</span>
+                    </button>
+                    <button class="quiz-tab" data-tab="upcoming" onclick="switchQuizTab('upcoming')">
+                        <i class="fas fa-clock" style="color:var(--gold);"></i> Upcoming <span class="count" id="tabUpcomingCount">0</span>
+                    </button>
+                    <button class="quiz-tab" data-tab="completed" onclick="switchQuizTab('completed')">
+                        <i class="fas fa-check-circle" style="color:var(--emerald);"></i> Completed <span class="count" id="tabCompletedCount">0</span>
+                    </button>
                 </div>
-                <div class="download-card" onclick="downloadProvisionalForm()">
-                    <div class="dc-icon blue"><i class="fas fa-file-alt"></i></div>
-                    <div class="dc-body">
-                        <div class="dc-title">Provisional Application Form</div>
-                        <div class="dc-desc">Application form for exam, scholarship, or admission</div>
-                        <button class="dc-btn"><i class="fas fa-download"></i> Download</button>
+                <div id="quizContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ DOWNLOADS SECTION ═══════════════ -->
+    <div class="section" id="section-downloads">
+        <div class="section-card">
+            <div class="section-header">
+                <h2><i class="fas fa-download"></i> Downloads</h2>
+                <span class="subtitle">Available documents & forms</span>
+            </div>
+            <div class="section-body">
+                <div class="download-grid">
+                    <div class="download-card" onclick="downloadProfilePDF()">
+                        <div class="dc-icon gold"><i class="fas fa-id-card"></i></div>
+                        <div class="dc-body">
+                            <div class="dc-title">Student Profile PDF</div>
+                            <div class="dc-desc">Complete profile with photo, signature & QR code</div>
+                            <button class="dc-btn"><i class="fas fa-download"></i> Download</button>
+                        </div>
+                    </div>
+
+                    <div class="download-card" onclick="downloadProvisionalForm()">
+                        <div class="dc-icon blue"><i class="fas fa-file-alt"></i></div>
+                        <div class="dc-body">
+                            <div class="dc-title">Provisional Application Form</div>
+                            <div class="dc-desc">Application form for exam, scholarship, or admission</div>
+                            <button class="dc-btn"><i class="fas fa-download"></i> Download</button>
+                        </div>
+                    </div>
+
+                    <div class="download-card" id="bonafideCard" style="display:none;" onclick="downloadBonafide()">
+                        <div class="badge-enabled">Available</div>
+                        <div class="dc-icon green"><i class="fas fa-certificate"></i></div>
+                        <div class="dc-body">
+                            <div class="dc-title">Bonafide Certificate</div>
+                            <div class="dc-desc">Official bonafide certificate issued by school</div>
+                            <button class="dc-btn"><i class="fas fa-download"></i> Download</button>
+                        </div>
+                    </div>
+
+                    <div class="download-card disabled" id="bonafideLocked">
+                        <div class="dc-icon green" style="opacity:0.6;"><i class="fas fa-lock"></i></div>
+                        <div class="dc-body">
+                            <div class="dc-title">Bonafide Certificate</div>
+                            <div class="dc-desc">Contact school office to enable this certificate</div>
+                            <button class="dc-btn" disabled><i class="fas fa-lock"></i> Not Available</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- PERSONAL INFO -->
-    <div class="section-card animate-in delay-2">
-        <div class="section-header">
-            <h2><i class="fas fa-user-graduate"></i> Personal Information</h2>
+    <!-- ═══════════════ PROFILE SECTION ═══════════════ -->
+    <div class="section" id="section-profile">
+        <div class="section-card">
+            <div class="section-header">
+                <h2><i class="fas fa-user-graduate"></i> Personal Information</h2>
+            </div>
+            <div class="section-body">
+                <div class="info-grid" id="personalInfo"></div>
+            </div>
         </div>
-        <div class="section-body">
-            <div class="info-grid" id="personalInfo"></div>
+
+        <div class="section-card">
+            <div class="section-header">
+                <h2><i class="fas fa-graduation-cap"></i> Academic Information</h2>
+            </div>
+            <div class="section-body">
+                <div class="info-grid" id="academicInfo"></div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header">
+                <h2><i class="fas fa-map-marker-alt"></i> Address</h2>
+            </div>
+            <div class="section-body">
+                <div class="info-grid" id="addressInfo"></div>
+            </div>
         </div>
     </div>
 
-    <!-- ACADEMIC INFO -->
-    <div class="section-card animate-in delay-3">
-        <div class="section-header">
-            <h2><i class="fas fa-graduation-cap"></i> Academic Information</h2>
-        </div>
-        <div class="section-body">
-            <div class="info-grid" id="academicInfo"></div>
-        </div>
-    </div>
-
-    <!-- ADDRESS -->
-    <div class="section-card animate-in delay-4">
-        <div class="section-header">
-            <h2><i class="fas fa-map-marker-alt"></i> Address</h2>
-        </div>
-        <div class="section-body">
-            <div class="info-grid" id="addressInfo"></div>
-        </div>
-    </div>
-
-    <!-- DOCUMENTS -->
-    <div class="section-card animate-in delay-5">
-        <div class="section-header">
-            <h2><i class="fas fa-file-alt"></i> My Documents</h2>
-        </div>
-        <div class="section-body">
-            <div class="doc-grid" id="documentsGrid"></div>
+    <!-- ═══════════════ DOCUMENTS SECTION ═══════════════ -->
+    <div class="section" id="section-documents">
+        <div class="section-card">
+            <div class="section-header">
+                <h2><i class="fas fa-file-alt"></i> My Documents</h2>
+            </div>
+            <div class="section-body">
+                <div class="doc-grid" id="documentsGrid"></div>
+            </div>
         </div>
     </div>
 
 </div>
 
+<!-- FOOTER -->
 <footer class="footer">
-    <span>&copy; 2026 Govt. Sr. Sec. School Shilla. All rights reserved.</span>
+    <div class="footer-grid">
+        <div class="footer-brand">
+            <div class="brand-row">
+                <img src="logo(1).png" alt="School Logo" onerror="this.style.display='none'">
+                <div class="brand-name">Govt. Sr. Sec. School Shilla</div>
+            </div>
+            <p>Empowering students with quality education, discipline and a vision for a brighter India. Affiliated to HPBOSE, recognized by Govt. of Himachal Pradesh.</p>
+        </div>
+
+        <div class="footer-col">
+            <h4>Quick Links</h4>
+            <a href="../index.html"><i class="fas fa-chevron-right"></i> Home</a>
+            <a href="pub-notif.html"><i class="fas fa-chevron-right"></i> Notifications</a>
+            <a href="result.html"><i class="fas fa-chevron-right"></i> Results</a>
+            <a href="downloads.html"><i class="fas fa-chevron-right"></i> Downloads</a>
+            <a href="contact.html"><i class="fas fa-chevron-right"></i> Contact</a>
+        </div>
+
+        <div class="footer-col">
+            <h4>Portals</h4>
+            <a href="../admin/login.html"><i class="fas fa-chevron-right"></i> Admin Panel</a>
+            <a href="student-login.html"><i class="fas fa-chevron-right"></i> Student Portal</a>
+            <a href="no.html"><i class="fas fa-chevron-right"></i> Teacher Portal</a>
+        </div>
+
+        <div class="footer-col">
+            <h4>Government</h4>
+            <a href="https://www.hpbose.org/" target="_blank"><i class="fas fa-chevron-right"></i> HPBOSE</a>
+            <a href="https://scholarships.gov.in/" target="_blank"><i class="fas fa-chevron-right"></i> NSP Scholarship</a>
+            <a href="https://www.mygov.in/" target="_blank"><i class="fas fa-chevron-right"></i> My Govt.</a>
+            <a href="https://www.education.gov.in/" target="_blank"><i class="fas fa-chevron-right"></i> Education Ministry</a>
+        </div>
+    </div>
+
+    <div class="footer-social">
+        <a href="https://www.facebook.com/share/1BgkMoxXp3/" target="_blank" class="fb"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="ig"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="yt"><i class="fab fa-youtube"></i></a>
+        <a href="#" class="wa"><i class="fab fa-whatsapp"></i></a>
+    </div>
+
+    <div class="footer-bottom">
+        <p>© 2026 Govt. Sr. Sec. School Shilla · All Rights Reserved</p>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;">
+            <a href="../school_privacy_policy.pdf"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+            <a href="#"><i class="fas fa-clock"></i> Last Update: 16 Sep 2026</a>
+        </div>
+    </div>
+
+    <div class="footer-dev">
+        Session: <b>2026-2027</b> · Made with ❤️ for GSSS Shilla
+    </div>
 </footer>
+</div>
+
+<!-- QUIZ MODAL -->
+<div class="modal-overlay" id="quizModal">
+    <div class="modal-content" style="max-width:900px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-brain"></i> My Quizzes</h2>
+            <button class="close-btn" onclick="closeQuizModal()">&times;</button>
+        </div>
+        <div style="padding:22px 28px;">
+            <div id="quizModalContent">
+                <div style="text-align:center;padding:50px;color:var(--text-muted);">
+                    <i class="fas fa-spinner fa-spin" style="font-size:48px;opacity:0.35;color:var(--primary);"></i>
+                    <p style="font-size:14px;font-weight:600;margin-top:14px;">Loading quizzes…</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="toast-container" id="toastContainer"></div>
 
@@ -1211,11 +1944,16 @@ body {
 // CONFIG
 // ============================================================
 const RESULTS_API = "https://gsssshilla.onrender.com/api/admin/results";
+const BONAFIDE_API = "https://gsssshilla.onrender.com/api/bonafide";
+const QUIZ_API = "https://gsssshilla.onrender.com/api/quiz";
 const VERIFY_BASE = "https://gsssshilla07.pages.dev/verify-student.html";
 const NEW_RESULT_DAYS = 10;
 
 let student = null;
 let myResultsData = null;
+let allQuizzes = { live: [], upcoming: [], completed: [] };
+let currentQuizTab = "live";
+let resultExpanded = false;
 
 // ============================================================
 // HELPERS
@@ -1253,12 +1991,9 @@ function isNewResult(declaredDate) {
 function getStatusClass(status) {
     if (!status) return "rci-status-absent";
     const map = {
-        "Pass": "rci-status-pass",
-        "Fail": "rci-status-fail",
-        "Compartment": "rci-status-compartment",
-        "Supply": "rci-status-supply",
-        "Absent": "rci-status-absent",
-        "Withheld": "rci-status-withheld"
+        "Pass": "rci-status-pass", "Fail": "rci-status-fail",
+        "Compartment": "rci-status-compartment", "Supply": "rci-status-supply",
+        "Absent": "rci-status-absent", "Withheld": "rci-status-withheld"
     };
     return map[status] || "rci-status-absent";
 }
@@ -1320,14 +2055,63 @@ function loadStudentFromSession() {
 }
 
 // ============================================================
+// SIDEBAR & SECTIONS
+// ============================================================
+function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("mobile-open");
+    document.getElementById("sidebarOverlay").classList.toggle("active");
+}
+
+function switchSection(sectionId) {
+    // Update sidebar active
+    document.querySelectorAll(".sidebar-nav .nav-item").forEach(item => {
+        item.classList.toggle("active", item.dataset.section === sectionId);
+    });
+
+    // Show section
+    document.querySelectorAll(".section").forEach(sec => {
+        sec.classList.toggle("active", sec.id === "section-" + sectionId);
+    });
+
+    // Close mobile sidebar
+    document.getElementById("sidebar").classList.remove("mobile-open");
+    document.getElementById("sidebarOverlay").classList.remove("active");
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    // Lazy load
+    if (sectionId === "results") renderResultsSection();
+    if (sectionId === "quizzes") renderQuizzesSection();
+}
+
+function toggleResultMain(event) {
+    if (event) event.stopPropagation();
+    const card = document.getElementById("resultMainCard");
+    const btn = document.getElementById("resultToggleBtn");
+
+    resultExpanded = !resultExpanded;
+    card.classList.toggle("expanded", resultExpanded);
+
+    if (resultExpanded) {
+        btn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Results';
+    } else {
+        btn.innerHTML = '<i class="fas fa-eye"></i> View Results';
+    }
+}
+
+// ============================================================
 // RENDER DASHBOARD
 // ============================================================
 function renderDashboard(s) {
-    document.getElementById("navName").textContent = s.name || "Student";
-    const navAvatar = document.getElementById("navAvatar");
-    if (s.student_photo_url) navAvatar.innerHTML = `<img src="${esc(s.student_photo_url)}" alt="">`;
-    else navAvatar.textContent = (s.name || "S").charAt(0).toUpperCase();
+    // Sidebar
+    document.getElementById("sidebarName").textContent = s.name || "Student";
+    document.getElementById("sidebarClass").textContent = `Class ${s.class || "—"}`;
+    const sideAvatar = document.getElementById("sidebarAvatar");
+    if (s.student_photo_url) sideAvatar.innerHTML = `<img src="${esc(s.student_photo_url)}" alt="">`;
+    else sideAvatar.textContent = (s.name || "S").charAt(0).toUpperCase();
 
+    // Hero
     document.getElementById("heroName").textContent = s.name || "Student Name";
     document.getElementById("heroStudentId").textContent = s.student_id || "—";
     document.getElementById("heroClass").textContent = s.class || "—";
@@ -1347,6 +2131,7 @@ function renderDashboard(s) {
         heroAvatar.innerHTML = `<img src="${esc(s.student_photo_url)}" alt="photo" onerror="this.parentElement.innerHTML='<div class=&quot;placeholder&quot;>👤</div>'">`;
     }
 
+    // Stats
     document.getElementById("statClass").textContent = s.class || "—";
     const isHigher = ["11","12"].includes(String(s.class));
     document.getElementById("statStream").textContent = isHigher ? (s.stream || "—") : "Non-Spec.";
@@ -1359,6 +2144,7 @@ function renderDashboard(s) {
     ].filter(Boolean).length;
     document.getElementById("statDocs").textContent = `${docCount}/10`;
 
+    // Personal Info
     const personal = [
         ["Student ID", s.student_id], ["Admission Number", s.admission_number],
         ["Admission Date", fmtDate(s.admission_date)], ["Full Name", s.name],
@@ -1371,6 +2157,7 @@ function renderDashboard(s) {
         `<div class="info-item"><span class="lbl">${esc(l)}</span><span class="val">${esc(v || "—")}</span></div>`
     ).join("");
 
+    // Academic
     const academic = [
         ["Class", s.class], ["Stream", isHigher ? (s.stream || "—") : "Non-Specialized"],
         ["Roll Number", s.roll_number], ["Session", s.session], ["Status", s.status]
@@ -1379,6 +2166,7 @@ function renderDashboard(s) {
         `<div class="info-item"><span class="lbl">${esc(l)}</span><span class="val">${esc(v || "—")}</span></div>`
     ).join("");
 
+    // Address
     const addressFields = [
         ["Village / Town", s.village], ["Post Office", s.post_office],
         ["Tehsil", s.tehsil], ["District", s.district], ["State", s.state], ["Pincode", s.pincode]
@@ -1390,6 +2178,7 @@ function renderDashboard(s) {
         `<div class="info-item"><span class="lbl">${esc(l)}</span><span class="val">${esc(v || "—")}</span></div>`
     ).join("") + `<div class="info-item full"><span class="lbl">Full Address</span><span class="val">${esc(fullAddr || s.address || "—")}</span></div>`;
 
+    // Documents
     const docs = [
         { label: "Photo", url: s.student_photo_url, icon: "👤" },
         { label: "Signature", url: s.signature_url, icon: "✍️" },
@@ -1419,9 +2208,6 @@ function renderDashboard(s) {
 async function loadMyResults() {
     if (!student || !student.student_id) return;
 
-    const container = document.getElementById("resultsContent");
-    if (!container) return;
-
     try {
         const res = await fetch(`${RESULTS_API}/student/my-results/${encodeURIComponent(student.student_id)}`);
         const data = await res.json();
@@ -1429,7 +2215,7 @@ async function loadMyResults() {
         console.log("📊 Results API:", data);
 
         if (!data.success) {
-            renderNoResults(container, data.message || "No results published yet");
+            renderNoResults(data.message || "No results published yet");
             return;
         }
 
@@ -1437,7 +2223,6 @@ async function loadMyResults() {
         const marksheets = payload.marksheets || [];
         const studentInfo = payload.student || student;
 
-        // Build summary if backend didn't
         let summary = payload.summary;
         if (!summary) {
             let totalObtained = 0, totalMax = 0;
@@ -1447,9 +2232,7 @@ async function loadMyResults() {
             });
             const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : "0.00";
             summary = {
-                totalObtained,
-                totalMax,
-                percentage,
+                totalObtained, totalMax, percentage,
                 grade: calculateGrade(percentage),
                 overall_status: payload.overall_status || null,
                 overall_status_reason: payload.overall_status_reason || null
@@ -1457,15 +2240,53 @@ async function loadMyResults() {
         }
 
         myResultsData = { student: studentInfo, marksheets, summary };
-        renderMyResults(container, myResultsData);
+
+        // Update result main card (dashboard)
+        updateResultMainCard(marksheets, summary);
+
+        // Render detail content
+        renderMyResults(marksheets, summary, studentInfo);
     } catch (err) {
         console.error("❌ Results load failed:", err.message);
-        renderNoResults(container, "Failed to load results. Please try again.");
+        renderNoResults("Failed to load results. Please try again.");
     }
 }
 
-function renderNoResults(container, msg) {
-    container.innerHTML = `
+function updateResultMainCard(marksheets, summary) {
+    const countBadge = document.getElementById("resultCountBadge");
+    const newBadge = document.getElementById("resultNewBadge");
+    const descText = document.getElementById("resultDescText");
+    const recentPill = document.getElementById("recentPill");
+
+    if (!marksheets || marksheets.length === 0) {
+        countBadge.textContent = "0";
+        descText.textContent = "No published results yet";
+        return;
+    }
+
+    const newResults = marksheets.filter(m => isNewResult(m.declaration_date));
+
+    countBadge.textContent = marksheets.length;
+    descText.textContent = `${marksheets.length} exam${marksheets.length > 1 ? "s" : ""} available`;
+
+    if (newResults.length > 0) {
+        newBadge.style.display = "inline-block";
+        newBadge.textContent = `${newResults.length} NEW`;
+        recentPill.style.display = "inline-block";
+        recentPill.textContent = `🎉 ${newResults.length} recently published`;
+    }
+
+    // Update sidebar badge
+    const sidebarBadge = document.getElementById("sidebarResultBadge");
+    if (sidebarBadge) {
+        sidebarBadge.textContent = marksheets.length;
+        sidebarBadge.classList.remove("hidden");
+        if (newResults.length > 0) sidebarBadge.classList.add("green");
+    }
+}
+
+function renderNoResults(msg) {
+    document.getElementById("resultContent").innerHTML = `
         <div class="result-empty-msg">
             <i class="fas fa-file-alt"></i>
             <h4>No Results Published Yet</h4>
@@ -1477,13 +2298,9 @@ function renderNoResults(container, msg) {
     `;
 }
 
-function renderMyResults(container, data) {
-    const marksheets = data.marksheets || [];
-    const summary = data.summary || {};
-    const studentInfo = data.student || student;
-
-    if (marksheets.length === 0) {
-        renderNoResults(container, "No published marksheets found");
+function renderMyResults(marksheets, summary, studentInfo) {
+    if (!marksheets || marksheets.length === 0) {
+        renderNoResults("No published marksheets found");
         return;
     }
 
@@ -1491,23 +2308,6 @@ function renderMyResults(container, data) {
     const overallReason = summary.overall_status_reason;
     const newResults = marksheets.filter(m => isNewResult(m.declaration_date));
 
-    // Update badge
-    const badge = document.getElementById("resultNotifBadge");
-    if (badge) {
-        if (newResults.length > 0) {
-            badge.textContent = `${newResults.length} NEW`;
-        } else {
-            badge.textContent = `${marksheets.length} Published`;
-        }
-        badge.style.display = "inline-block";
-    }
-
-    const subtitle = document.getElementById("resultsSubtitle");
-    if (subtitle) {
-        subtitle.textContent = `${marksheets.length} exam${marksheets.length > 1 ? "s" : ""} available`;
-    }
-
-    // NEW alert
     let newAlertHtml = "";
     if (newResults.length > 0) {
         const names = newResults.map(r => r.exam_type).join(", ");
@@ -1519,15 +2319,12 @@ function renderMyResults(container, data) {
                         🎉 New Result Published!
                         <span class="new-pill">NEW</span>
                     </div>
-                    <div class="nra-desc">
-                        <strong>${esc(names)}</strong> recently publish hua hai — check karo!
-                    </div>
+                    <div class="nra-desc"><strong>${esc(names)}</strong> recently publish hua hai!</div>
                 </div>
             </div>
         `;
     }
 
-    // Overall Status Banner
     let overallBannerHtml = "";
     if (overallStatus) {
         overallBannerHtml = `
@@ -1542,41 +2339,25 @@ function renderMyResults(container, data) {
         `;
     }
 
-    // Summary Cards
     const summaryHtml = `
         <div class="results-summary-grid">
-            <div class="result-stat-box">
-                <div class="rs-label">Total Obtained</div>
-                <div class="rs-value gold">${summary.totalObtained || 0}</div>
-            </div>
-            <div class="result-stat-box">
-                <div class="rs-label">Maximum Marks</div>
-                <div class="rs-value">${summary.totalMax || 0}</div>
-            </div>
-            <div class="result-stat-box">
-                <div class="rs-label">Percentage</div>
-                <div class="rs-value gold">${summary.percentage || "0.00"}%</div>
-            </div>
-            <div class="result-stat-box">
-                <div class="rs-label">Grade</div>
-                <div class="rs-value">${summary.grade || "—"}</div>
-            </div>
+            <div class="result-stat-box"><div class="rs-label">Total Obtained</div><div class="rs-value gold">${summary.totalObtained || 0}</div></div>
+            <div class="result-stat-box"><div class="rs-label">Maximum Marks</div><div class="rs-value">${summary.totalMax || 0}</div></div>
+            <div class="result-stat-box"><div class="rs-label">Percentage</div><div class="rs-value gold">${summary.percentage || "0.00"}%</div></div>
+            <div class="result-stat-box"><div class="rs-label">Grade</div><div class="rs-value">${summary.grade || "—"}</div></div>
         </div>
     `;
 
-    // Marksheet cards (collapsible with full details)
     const marksheetsHtml = marksheets.map((m) => {
         const isNew = isNewResult(m.declaration_date);
         const status = m.result_status;
 
-        // Parse subjects
         let subjects = m.subjects || [];
         if (typeof subjects === "string") {
             try { subjects = JSON.parse(subjects); } catch (e) { subjects = []; }
         }
         if (!Array.isArray(subjects)) subjects = [];
 
-        // Subjects table
         let subjectsTable = "";
         if (subjects.length > 0) {
             const totalSubObt = subjects.reduce((s, x) => s + (parseInt(x.obtained) || 0), 0);
@@ -1691,7 +2472,12 @@ function renderMyResults(container, data) {
         </div>
     `;
 
-    container.innerHTML = newAlertHtml + overallBannerHtml + summaryHtml + marksheetsHtml + printButton;
+    const content = newAlertHtml + overallBannerHtml + summaryHtml + marksheetsHtml + printButton;
+
+    // Render in both dashboard and results section
+    document.getElementById("resultContent").innerHTML = content;
+    document.getElementById("resultsSectionContent").innerHTML = content;
+    document.getElementById("resultsSectionSubtitle").textContent = `${marksheets.length} exam${marksheets.length > 1 ? "s" : ""} available`;
 }
 
 function toggleResultCard(id) {
@@ -1724,7 +2510,7 @@ function printFullResult() {
 }
 
 // ============================================================
-// PRINT GENERATOR — Complete A4 with all details
+// PRINT GENERATOR
 // ============================================================
 function generateMarksheetPrint(student, marksheets, summary) {
     const s = student;
@@ -1744,7 +2530,6 @@ function generateMarksheetPrint(student, marksheets, summary) {
     const isHigher = ["11","12"].includes(String(s.class));
     const streamDisplay = isHigher ? (s.stream || "—") : "Non-Specialized";
 
-    // Marksheet rows
     let marksheetRows = "";
     marksheets.forEach((m, i) => {
         marksheetRows += `
@@ -1759,7 +2544,6 @@ function generateMarksheetPrint(student, marksheets, summary) {
         `;
     });
 
-    // Subjects breakdown
     let subjectsBreakdown = "";
     marksheets.forEach(m => {
         let subjects = m.subjects || [];
@@ -1802,7 +2586,6 @@ function generateMarksheetPrint(student, marksheets, summary) {
                             }).join("")}
                         </tbody>
                     </table>
-                    ${m.remarks ? `<div style="margin-top:8px;padding:8px 12px;background:#dbeafe;border-left:3px solid #1a56db;border-radius:6px;font-size:10px;color:#1e40af;"><strong>Remarks:</strong> ${esc(m.remarks)}</div>` : ''}
                 </div>
             `;
         }
@@ -1922,9 +2705,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#1a2332; font-size:12px
         <thead>
             <tr><th style="width:35px;">#</th><th>Examination Type</th><th style="width:95px;">Session</th><th style="width:80px;">Obtained</th><th style="width:70px;">Maximum</th><th style="width:90px;">Status</th></tr>
         </thead>
-        <tbody>
-            ${marksheetRows || '<tr><td colspan="6" style="text-align:center;padding:14px;color:#94a3b8;font-style:italic;">No examinations found</td></tr>'}
-        </tbody>
+        <tbody>${marksheetRows || '<tr><td colspan="6" style="text-align:center;padding:14px;color:#94a3b8;font-style:italic;">No examinations found</td></tr>'}</tbody>
         ${marksheets.length > 0 ? `
             <tfoot>
                 <tr style="background:#fef8ed;">
@@ -1972,7 +2753,210 @@ function getStatusColorPrint(status) {
 }
 
 // ============================================================
-// PROFILE PDF
+// QUIZ SYSTEM
+// ============================================================
+async function loadMyQuizzes() {
+    if (!student || !student.student_id) return;
+    try {
+        const res = await fetch(`${QUIZ_API}/student/available`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                studentId: student.student_id,
+                studentClass: student.class,
+                email: student.email_id
+            })
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            allQuizzes = { live: [], upcoming: [], completed: [] };
+            updateQuizBadge();
+            return;
+        }
+
+        const events = data.events || [];
+        allQuizzes.live = events.filter(e => e.status === "Live" && !e.already_attempted);
+        allQuizzes.upcoming = events.filter(e => e.status === "Scheduled");
+        allQuizzes.completed = events.filter(e =>
+            (e.status === "Ended" && e.already_attempted) ||
+            (e.status === "Live" && e.already_attempted)
+        );
+        updateQuizBadge();
+    } catch (err) {
+        allQuizzes = { live: [], upcoming: [], completed: [] };
+        updateQuizBadge();
+    }
+}
+
+function updateQuizBadge() {
+    const totalNew = allQuizzes.live.length;
+    const badge = document.getElementById("quizNotifBadge");
+    const desc = document.getElementById("quizCardDesc");
+    const sidebarBadge = document.getElementById("sidebarQuizBadge");
+
+    if (totalNew > 0) {
+        badge.textContent = `${totalNew} New`;
+        badge.style.display = "inline-block";
+        desc.textContent = `🔴 ${totalNew} live quiz${totalNew > 1 ? "zes" : ""} available now!`;
+        if (sidebarBadge) {
+            sidebarBadge.textContent = totalNew;
+            sidebarBadge.classList.remove("hidden");
+        }
+    } else {
+        badge.style.display = "none";
+        desc.textContent = "Check live quizzes, upcoming events, and view your results";
+    }
+
+    const el1 = document.getElementById("tabLiveCount");
+    const el2 = document.getElementById("tabUpcomingCount");
+    const el3 = document.getElementById("tabCompletedCount");
+    if (el1) el1.textContent = allQuizzes.live.length;
+    if (el2) el2.textContent = allQuizzes.upcoming.length;
+    if (el3) el3.textContent = allQuizzes.completed.length;
+}
+
+function renderQuizzesSection() {
+    renderQuizContent("quizContent");
+}
+
+function renderQuizContent(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const list = allQuizzes[currentQuizTab] || [];
+    if (!list.length) {
+        const msgs = {
+            live: { icon: "fa-satellite-dish", text: "No live quizzes right now" },
+            upcoming: { icon: "fa-clock", text: "No upcoming quizzes scheduled" },
+            completed: { icon: "fa-check-circle", text: "You haven't completed any quiz yet" }
+        };
+        container.innerHTML = `
+            <div class="result-empty-msg">
+                <i class="fas ${msgs[currentQuizTab].icon}"></i>
+                <h4>${msgs[currentQuizTab].text}</h4>
+            </div>`;
+        return;
+    }
+    container.innerHTML = list.map(e => renderQuizItem(e)).join("");
+}
+
+function switchQuizTab(tab) {
+    currentQuizTab = tab;
+    document.querySelectorAll(".quiz-tab").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tab === tab);
+    });
+    renderQuizContent("quizContent");
+    renderQuizContent("quizModalContent");
+}
+
+function renderQuizItem(e) {
+    let statusClass = "", statusText = "", actions = "";
+    const colors = { live: "var(--coral)", upcoming: "var(--gold)", done: "var(--emerald)", missed: "#64748b" };
+
+    if (e.status === "Live" && !e.already_attempted) {
+        statusClass = "live"; statusText = "🔴 Live Now";
+        actions = `<a href="quiz.html?event=${e.id}" style="background:linear-gradient(135deg,var(--coral),var(--coral-light));color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter';text-decoration:none;display:inline-flex;align-items:center;gap:8px;"><i class="fas fa-play"></i> Start Quiz</a>`;
+    } else if (e.status === "Scheduled") {
+        statusClass = "upcoming"; statusText = "⏰ Upcoming";
+        actions = `<button disabled style="background:var(--bg);color:var(--text-muted);border:1px solid var(--border);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;cursor:not-allowed;font-family:'Inter';">Coming Soon</button>`;
+    } else if (e.already_attempted) {
+        statusClass = "done"; statusText = "✅ Completed";
+        const pct = Number(e.my_marks || 0) / Number(e.total_marks || 1) * 100;
+        actions = `<div style="background:var(--gold-bg);border-radius:10px;padding:8px 15px;font-size:12.5px;font-weight:700;border:1.5px solid var(--gold-light);display:inline-flex;align-items:center;gap:8px;margin-right:auto;">Score: <b>${e.my_marks || 0}/${e.total_marks || 0}</b> (${pct.toFixed(0)}%)</div>
+            <button onclick="viewMyQuizResult(${e.id})" style="background:linear-gradient(135deg,var(--emerald),#059669);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter';display:inline-flex;align-items:center;gap:8px;"><i class="fas fa-certificate"></i> Certificate</button>`;
+    } else {
+        statusClass = "missed"; statusText = "❌ Missed";
+        actions = `<button disabled style="background:#f1f5f9;color:#64748b;border:1px solid var(--border);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;cursor:not-allowed;font-family:'Inter';">Not Attempted</button>`;
+    }
+
+    return `
+        <div style="background:#fff;border:1px solid var(--border);border-left:5px solid ${colors[statusClass]};border-radius:14px;padding:18px 20px;margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+                <div style="flex:1;min-width:200px;">
+                    <div style="font-size:15.5px;font-weight:800;color:var(--text-primary);margin-bottom:4px;">${esc(e.title)}</div>
+                    <div style="font-size:12.5px;color:var(--text-secondary);margin-bottom:8px;">${esc(e.description || "No description")}</div>
+                    <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--text-muted);font-weight:600;">
+                        <span><i class="fas fa-clock" style="color:var(--primary);"></i> ${e.duration_minutes} min</span>
+                        <span><i class="fas fa-list-ol" style="color:var(--primary);"></i> ${e.total_questions} Q</span>
+                        <span><i class="fas fa-star" style="color:var(--primary);"></i> ${e.total_marks} marks</span>
+                    </div>
+                </div>
+                <div style="padding:5px 14px;border-radius:20px;font-size:11px;font-weight:900;text-transform:uppercase;background:${colors[statusClass]};color:#fff;">${statusText}</div>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;align-items:center;border-top:1px solid var(--border);padding-top:12px;flex-wrap:wrap;">${actions}</div>
+        </div>
+    `;
+}
+
+async function viewMyQuizResult(eventId) {
+    if (!student || !student.student_id) return;
+    try {
+        const res = await fetch(`${QUIZ_API}/student/${student.student_id}/history`);
+        const data = await res.json();
+        const attempt = (data.data || []).find(a => a.event_id == eventId);
+        if (attempt) window.open(`${QUIZ_API}/certificate/${attempt.id}/pdf`, "_blank");
+        else alert("No result found");
+    } catch (err) { alert("Failed to load result"); }
+}
+
+function openQuizModal() {
+    document.getElementById("quizModal").classList.add("active");
+    renderQuizContent("quizModalContent");
+}
+
+function closeQuizModal() {
+    document.getElementById("quizModal").classList.remove("active");
+}
+
+// ============================================================
+// BONAFIDE
+// ============================================================
+async function checkBonafideStatus() {
+    if (!student || !student.student_id) return;
+    try {
+        const res = await fetch(`${BONAFIDE_API}/my-status/${encodeURIComponent(student.student_id)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const isEnabled = data.success && data.enabled;
+
+        const card = document.getElementById("bonafideCard");
+        const locked = document.getElementById("bonafideLocked");
+
+        if (isEnabled) {
+            card.style.display = "flex";
+            locked.style.display = "none";
+        } else {
+            card.style.display = "none";
+            locked.style.display = "flex";
+        }
+    } catch (e) { console.warn(e.message); }
+}
+
+function downloadBonafide() {
+    if (!student || !student.student_id) return;
+    const url = `${BONAFIDE_API}/certificate/${encodeURIComponent(student.student_id)}/pdf?v=${Date.now()}`;
+    window.open(url, "_blank");
+    showToast("Opening bonafide certificate…", "info");
+}
+
+// ============================================================
+// QR GENERATOR
+// ============================================================
+function generateQRCodeBase64(url, size = 140) {
+    return new Promise((resolve) => {
+        const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(url)}`;
+        fetch(apiUrl).then(res => res.blob()).then(blob => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+        }).catch(() => resolve(null));
+    });
+}
+
+// ============================================================
+// PROFILE PDF & APPLICATION FORM (existing feature)
 // ============================================================
 async function downloadProfilePDF() {
     if (!student) return showToast("No student data", "error");
@@ -2091,9 +3075,6 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#1a2332; font-size:13px
 </body></html>`;
 }
 
-// ============================================================
-// PROVISIONAL FORM
-// ============================================================
 async function downloadProvisionalForm() {
     if (!student) return showToast("No student data", "error");
     showToast("Generating Application Form…", "info");
@@ -2109,7 +3090,6 @@ async function downloadProvisionalForm() {
 }
 
 function buildApplicationFormHTML(s, qr) {
-    const photoUrl = s.student_photo_url || "";
     const signatureUrl = s.signature_url || "";
     const isHigher = ["11","12"].includes(String(s.class));
     const streamDisplay = isHigher ? (s.stream || "—") : "Non-Specialized";
@@ -2136,7 +3116,6 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#1a2332; font-size:13px
 .declaration { border:2px solid #0d1b2a; border-radius:8px; padding:12px 16px; font-size:11.5px; line-height:1.7; margin-top:14px; background:#fafbfc; }
 .signature-area { display:flex; justify-content:space-between; margin-top:22px; padding-top:10px; align-items:flex-end; }
 .sig-box { text-align:center; width:200px; font-size:11px; }
-.sig-box .sig-img { height:55px; max-width:170px; object-fit:contain; display:block; margin:0 auto 4px; }
 .sig-box .line { border-top:1.5px dashed #475569; width:170px; margin:16px auto 4px; }
 .sig-box strong { font-size:12px; color:#0d1b2a; display:block; }
 </style></head>
@@ -2158,23 +3137,21 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#1a2332; font-size:13px
         <tr><td class="lbl">Mother's Name</td><td>${esc(s.mother_name || "-")}</td></tr>
         <tr><td class="lbl">Date of Birth</td><td>${s.dob ? new Date(s.dob).toLocaleDateString("en-IN") : "-"}</td></tr>
         <tr><td class="lbl">Category</td><td>${esc(s.category || "-")}</td></tr>
-        <tr><td class="lbl">APAAR ID</td><td>${esc(s.apaar_id || "-")}</td></tr>
         <tr><td class="lbl">Mobile</td><td>${esc(s.mobile_number || "-")}</td></tr>
-        <tr><td class="lbl">Email</td><td>${esc(s.email_id || "-")}</td></tr>
     </table>
     <div class="section-title">▸ Academic Details</div>
     <table class="form-table">
         <tr><td class="lbl">Class</td><td><b>${esc(s.class || "-")}</b></td></tr>
         <tr><td class="lbl">Stream</td><td>${esc(streamDisplay)}</td></tr>
         <tr><td class="lbl">Roll Number</td><td>${esc(s.roll_number || "-")}</td></tr>
-        <tr><td class="lbl">Academic Session</td><td><b>${esc(s.session || "-")}</b></td></tr>
+        <tr><td class="lbl">Session</td><td><b>${esc(s.session || "-")}</b></td></tr>
     </table>
     <div class="section-title">▸ Residential Address</div>
     <table class="form-table"><tr><td colspan="2" style="line-height:1.7;">${esc(fullAddress)}</td></tr></table>
     <div class="section-title">▸ Declaration</div>
     <div class="declaration">I, <strong>${esc(s.name || "_________________")}</strong>, hereby declare that the information provided above is true and correct to the best of my knowledge.</div>
     <div class="signature-area">
-        <div class="sig-box"><img src="${signatureUrl}" class="sig-img" onerror="this.style.display='none'"><div class="line"></div><strong>Signature of Student</strong></div>
+        <div class="sig-box"><div class="line"></div><strong>Signature of Student</strong></div>
         <div class="sig-box"><div class="line" style="margin-top:40px;"></div><strong>Signature of Parent/Guardian</strong></div>
     </div>
 </div>
@@ -2182,22 +3159,29 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#1a2332; font-size:13px
 }
 
 // ============================================================
-// QR GENERATOR
+// MODAL CLOSE HANDLERS
 // ============================================================
-function generateQRCodeBase64(url, size = 140) {
-    return new Promise((resolve) => {
-        const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(url)}`;
-        fetch(apiUrl)
-            .then(res => res.blob())
-            .then(blob => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.onerror = () => resolve(null);
-                reader.readAsDataURL(blob);
-            })
-            .catch(() => resolve(null));
-    });
-}
+document.addEventListener("click", (e) => {
+    if (e.target.id === "quizModal") closeQuizModal();
+});
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeQuizModal();
+});
+
+// ============================================================
+// SESSION TIMEOUT
+// ============================================================
+setInterval(() => {
+    try {
+        const loginTime = parseInt(sessionStorage.getItem("studentLoginTime") || "0");
+        const elapsed = Date.now() - loginTime;
+        if (elapsed > 30 * 60 * 1000) {
+            alert("Session expired. Please login again.");
+            logout();
+        }
+    } catch (e) {}
+}, 60000);
 
 // ============================================================
 // INIT
@@ -2207,6 +3191,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (student) {
         renderDashboard(student);
         showToast(`Welcome, ${student.name}!`, "success");
+        await checkBonafideStatus();
+        await loadMyQuizzes();
         await loadMyResults();
     }
 });
