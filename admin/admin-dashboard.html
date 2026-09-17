@@ -1073,7 +1073,7 @@
 
 
          <a class="nav-item" href="bonafide.html">
-   <span class="icon"><i class="fa-solid fa-file-certificate"></i></span> Bonafide Certificate
+  <span class="icon"><i class="fa-solid fa-certificate"></i></span> Bonafide Certificate
 </a>
       </div>
 
@@ -1541,14 +1541,45 @@
     // ============================================================
     // LOAD STATS
     // ============================================================
-    function loadStats() {
-      document.getElementById('statStudents').textContent = '100+';
-      document.getElementById('statFaculty').textContent = '13';
-      document.getElementById('cardStudents').textContent = '100+';
-      document.getElementById('cardFaculty').textContent = '13+';
-      document.getElementById('cardNotices').textContent = 'N/A';
-      document.getElementById('cardVisitors').textContent = '247';
+
+
+    // ============================================================
+// LOAD STATS
+// ============================================================
+function loadStats() {
+  document.getElementById('statStudents').textContent = '100+';
+  document.getElementById('statFaculty').textContent = '13';
+  document.getElementById('cardStudents').textContent = '100+';
+  document.getElementById('cardFaculty').textContent = '13+';
+  document.getElementById('cardNotices').textContent = 'N/A';
+  
+  // ✅ Real visitors from backend
+  loadVisitorCount();
+}
+
+// ============================================================
+// LOAD REAL VISITOR COUNT
+// ============================================================
+async function loadVisitorCount() {
+  const visitorEl = document.getElementById('cardVisitors');
+  if (!visitorEl) return;
+
+  try {
+    const res = await fetch('https://gsssshilla.onrender.com/analytics/stats');
+    const data = await res.json();
+
+    if (data && data.total !== undefined) {
+      visitorEl.textContent = Number(data.total).toLocaleString('en-IN');
+    } else {
+      visitorEl.textContent = '—';
     }
+  } catch (err) {
+    console.error('Visitor count error:', err);
+    visitorEl.textContent = '—';
+  }
+}
+
+
 
     // ============================================================
     // SIDEBAR TOGGLE
