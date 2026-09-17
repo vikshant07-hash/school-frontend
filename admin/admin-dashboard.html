@@ -4,23 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
   <title>Admin Dashboard | GSSS SHILLA</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <style>
     /* ============================================================
-       ROOT VARIABLES - CLEAN THEME
+       ROOT VARIABLES
     ============================================================ */
     :root {
-      --bg: #f5f7fb;
+      --bg: #f4f6fb;
       --bg-white: #ffffff;
       --bg-card: #ffffff;
       --bg-sidebar: #ffffff;
-      --text-primary: #1a2332;
-      --text-secondary: #5a6a7e;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
       --text-muted: #94a3b8;
       --gold: #c9972b;
       --gold-light: #e8b84b;
@@ -36,44 +34,47 @@
       --orange: #f59e0b;
       --orange-bg: #fffbeb;
       --red: #ef4444;
+      --red-bg: #fef2f2;
+      --cyan: #06b6d4;
+      --cyan-bg: #ecfeff;
       --border: #e8edf8;
-      --shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-      --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
+      --border-strong: #d8e0ef;
+      --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow: 0 2px 12px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 4px 20px rgba(15, 23, 42, 0.07);
+      --shadow-hover: 0 12px 40px rgba(15, 23, 42, 0.1);
       --radius: 16px;
       --radius-sm: 10px;
+      --radius-xs: 8px;
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-fast: all 0.15s ease;
     }
 
     /* ============================================================
        RESET
     ============================================================ */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      height: 100%;
-      overflow-x: hidden;
-    }
+    html, body { height: 100%; overflow-x: hidden; }
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg);
       color: var(--text-primary);
       display: flex;
       flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
+    a { text-decoration: none; color: inherit; }
+    button { font-family: inherit; }
+    img { max-width: 100%; display: block; }
 
     /* ============================================================
-       LAYOUT
-    ============================================================ */
-    .dashboard { display: flex; flex: 1; min-height: 100vh; }
-
-    /* ============================================================
-       SESSION TIMER BAR - TOP OF PAGE
+       SESSION TIMER BAR
     ============================================================ */
     .session-timer-bar {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
+      top: 0; left: 0; right: 0;
+      height: 3px;
       background: var(--border);
       z-index: 9997;
       overflow: hidden;
@@ -83,18 +84,17 @@
       background: linear-gradient(90deg, var(--green), var(--gold));
       width: 100%;
       transition: width 1s linear;
+      border-radius: 0 3px 3px 0;
     }
-    .session-timer-bar .fill.warning {
-      background: var(--orange);
-    }
+    .session-timer-bar .fill.warning { background: var(--orange); }
     .session-timer-bar .fill.danger {
       background: var(--red);
-      animation: blink 0.5s ease infinite;
+      animation: blink 0.8s ease infinite;
     }
 
     @keyframes blink {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+      50% { opacity: 0.35; }
     }
 
     /* ============================================================
@@ -104,25 +104,25 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(8px);
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       z-index: 9999;
       justify-content: center;
       align-items: center;
+      padding: 20px;
       animation: fadeIn 0.4s ease;
     }
     .session-overlay.active { display: flex; }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
+      from { opacity: 0; transform: scale(0.96); }
       to { opacity: 1; transform: scale(1); }
     }
-
     @keyframes pulse {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.05); }
     }
-
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
       25% { transform: translateX(-8px); }
@@ -134,16 +134,14 @@
       border-radius: 24px;
       padding: 48px 40px 40px;
       max-width: 440px;
-      width: 92%;
+      width: 100%;
       text-align: center;
-      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 25px 80px rgba(15, 23, 42, 0.35);
       animation: fadeIn 0.5s ease;
       border: 1px solid rgba(201, 151, 43, 0.15);
     }
-
     .session-popup .school-logo {
-      width: 80px;
-      height: 80px;
+      width: 80px; height: 80px;
       border-radius: 20px;
       background: var(--gold-bg);
       margin: 0 auto 16px;
@@ -154,15 +152,12 @@
       border: 2px solid var(--gold);
     }
     .session-popup .school-logo img {
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       object-fit: contain;
       border-radius: 12px;
     }
-
     .session-popup .icon-box {
-      width: 72px;
-      height: 72px;
+      width: 72px; height: 72px;
       border-radius: 50%;
       margin: 0 auto 20px;
       display: flex;
@@ -172,9 +167,12 @@
       border: 2px solid #fecaca;
       animation: pulse 2s infinite;
     }
-    .session-popup .icon-box.expired { background: #fef2f2; color: var(--red); }
-    .session-popup .icon-box.invalid { background: #fef2f2; color: var(--red); animation: shake 0.5s ease, pulse 2s infinite 0.5s; }
-
+    .session-popup .icon-box.expired { background: var(--red-bg); color: var(--red); }
+    .session-popup .icon-box.invalid {
+      background: var(--red-bg);
+      color: var(--red);
+      animation: shake 0.5s ease, pulse 2s infinite 0.5s;
+    }
     .session-popup h2 {
       font-size: 26px;
       font-weight: 800;
@@ -182,14 +180,12 @@
       margin-bottom: 6px;
     }
     .session-popup h2 span { color: var(--gold); }
-
     .session-popup .sub-text {
       font-size: 14px;
       color: var(--text-secondary);
       margin-bottom: 6px;
-      line-height: 1.5;
+      line-height: 1.6;
     }
-
     .session-popup .session-timer {
       font-size: 13px;
       color: var(--text-muted);
@@ -200,7 +196,6 @@
       margin: 8px 0 20px;
       font-weight: 500;
     }
-
     .session-popup .school-name-popup {
       font-size: 13px;
       font-weight: 600;
@@ -212,10 +207,10 @@
       border-radius: 50px;
       display: inline-block;
     }
-
     .session-popup .login-again-btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 12px;
       padding: 14px 40px;
       background: linear-gradient(135deg, var(--gold), var(--gold-light));
@@ -226,20 +221,24 @@
       font-weight: 700;
       cursor: pointer;
       transition: var(--transition);
-      font-family: 'Inter', sans-serif;
-      text-decoration: none;
-      box-shadow: 0 4px 20px rgba(201, 151, 43, 0.3);
+      box-shadow: 0 4px 20px rgba(201, 151, 43, 0.35);
+      width: 100%;
     }
     .session-popup .login-again-btn:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 35px rgba(201, 151, 43, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 35px rgba(201, 151, 43, 0.45);
     }
+
+    /* ============================================================
+       LAYOUT
+    ============================================================ */
+    .dashboard { display: flex; flex: 1; min-height: 100vh; }
 
     /* ============================================================
        SIDEBAR
     ============================================================ */
     .sidebar {
-      width: 270px;
+      width: 272px;
       height: 100vh;
       position: sticky;
       top: 0;
@@ -247,56 +246,59 @@
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      padding: 24px 16px;
+      padding: 22px 16px;
       overflow-y: auto;
       z-index: 100;
       flex-shrink: 0;
       transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .sidebar::-webkit-scrollbar { width: 4px; }
-    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 20px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 20px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 14px;
-      padding: 0 8px 24px;
-      border-bottom: 2px solid var(--border);
-      margin-bottom: 24px;
+      gap: 12px;
+      padding: 0 8px 20px;
+      border-bottom: 1.5px solid var(--border);
+      margin-bottom: 20px;
       flex-shrink: 0;
     }
     .brand-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
+      width: 46px; height: 46px;
+      border-radius: 13px;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
       flex-shrink: 0;
+      background: var(--gold-bg);
+      border: 1.5px solid rgba(201, 151, 43, 0.2);
     }
     .brand-icon img {
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       object-fit: contain;
-      border-radius: 14px;
+      padding: 4px;
     }
     .brand-text .name {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 800;
       color: var(--text-primary);
       line-height: 1.1;
+      letter-spacing: -0.3px;
     }
     .brand-text .name span { color: var(--gold); }
     .brand-text .role {
       font-size: 10px;
       color: var(--text-muted);
-      font-weight: 500;
-      letter-spacing: 0.5px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
+      margin-top: 2px;
     }
 
-    .nav-group { margin-bottom: 20px; flex-shrink: 0; }
+    .nav-group { margin-bottom: 18px; flex-shrink: 0; }
     .nav-label {
       font-size: 10px;
       font-weight: 700;
@@ -310,28 +312,26 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      text-decoration: none;
       color: var(--text-secondary);
-      padding: 10px 14px;
+      padding: 9px 12px;
       border-radius: var(--radius-sm);
       font-size: 13px;
       font-weight: 500;
       transition: var(--transition);
       cursor: pointer;
-      border: none;
+      border: 1.5px solid transparent;
       background: transparent;
       width: 100%;
       text-align: left;
       margin-bottom: 2px;
     }
     .nav-item .icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
+      width: 34px; height: 34px;
+      border-radius: 9px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 15px;
+      font-size: 14px;
       background: var(--bg);
       flex-shrink: 0;
       transition: var(--transition);
@@ -339,7 +339,7 @@
     .nav-item:hover {
       color: var(--text-primary);
       background: var(--bg);
-      transform: translateX(4px);
+      transform: translateX(3px);
     }
     .nav-item:hover .icon {
       background: var(--gold-bg);
@@ -349,36 +349,43 @@
     .nav-item.active {
       color: var(--text-primary);
       background: var(--gold-bg);
-      border: 1px solid rgba(201, 151, 43, 0.15);
+      border-color: rgba(201, 151, 43, 0.2);
+      font-weight: 600;
     }
     .nav-item.active .icon {
       background: var(--gold);
       color: #fff;
-      box-shadow: 0 4px 14px rgba(201, 151, 43, 0.3);
+      box-shadow: 0 4px 14px rgba(201, 151, 43, 0.35);
+    }
+    .nav-item .badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 50px;
+      background: var(--red);
+      color: #fff;
     }
 
     .sidebar-bottom {
       margin-top: auto;
       padding-top: 16px;
-      border-top: 2px solid var(--border);
+      border-top: 1.5px solid var(--border);
       flex-shrink: 0;
     }
     .admin-profile {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 14px;
+      padding: 10px 12px;
       border-radius: var(--radius-sm);
       background: var(--bg);
       transition: var(--transition);
       cursor: pointer;
     }
-    .admin-profile:hover {
-      background: var(--gold-bg);
-    }
+    .admin-profile:hover { background: var(--gold-bg); }
     .admin-avatar {
-      width: 40px;
-      height: 40px;
+      width: 40px; height: 40px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--gold), var(--gold-light));
       display: flex;
@@ -388,11 +395,16 @@
       font-weight: 700;
       color: #fff;
       flex-shrink: 0;
+      box-shadow: 0 3px 10px rgba(201, 151, 43, 0.3);
     }
+    .admin-info { min-width: 0; flex: 1; }
     .admin-info .aname {
       font-size: 13px;
       font-weight: 600;
       color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .admin-info .aemail {
       font-size: 11px;
@@ -404,15 +416,16 @@
     ============================================================ */
     .main {
       flex: 1;
-      padding: 28px 32px 20px;
+      padding: 26px 32px 24px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 22px;
       overflow-y: auto;
       min-height: 100vh;
+      min-width: 0;
     }
     .main::-webkit-scrollbar { width: 4px; }
-    .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 20px; }
+    .main::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 20px; }
 
     /* ============================================================
        TOPBAR
@@ -424,47 +437,78 @@
       background: var(--bg-white);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 14px 24px;
+      padding: 13px 22px;
       box-shadow: var(--shadow);
       transition: var(--transition);
     }
-    .topbar:hover { box-shadow: var(--shadow-hover); }
+    .topbar:hover { box-shadow: var(--shadow-md); }
     .menu-btn {
       display: none;
       background: var(--bg);
       color: var(--text-primary);
       border: 1px solid var(--border);
-      width: 40px;
-      height: 40px;
+      width: 40px; height: 40px;
       border-radius: var(--radius-sm);
       font-size: 18px;
       cursor: pointer;
       flex-shrink: 0;
       transition: var(--transition);
+      align-items: center;
+      justify-content: center;
     }
-    .menu-btn:hover { background: var(--border); transform: rotate(90deg); }
-    .topbar-title { flex: 1; }
+    .menu-btn:hover { background: var(--border); }
+    .topbar-title { flex: 1; min-width: 0; }
     .topbar-title h3 {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
       color: var(--text-primary);
+      letter-spacing: -0.4px;
     }
     .topbar-title h3 span { color: var(--gold); }
     .topbar-title p {
-      font-size: 13px;
+      font-size: 12.5px;
       color: var(--text-muted);
       margin-top: 2px;
+      font-weight: 500;
     }
     .topbar-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+    }
+    .icon-btn {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      position: relative;
+    }
+    .icon-btn:hover {
+      background: var(--gold-bg);
+      color: var(--gold);
+      border-color: rgba(201, 151, 43, 0.25);
+      transform: translateY(-2px);
+    }
+    .icon-btn .dot {
+      position: absolute;
+      top: 8px; right: 8px;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--red);
+      border: 2px solid var(--bg-white);
     }
     .logout-btn {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 24px;
+      padding: 10px 22px;
       background: linear-gradient(135deg, var(--gold), var(--gold-light));
       color: #fff;
       border: none;
@@ -473,71 +517,116 @@
       font-weight: 600;
       cursor: pointer;
       transition: var(--transition);
-      font-family: 'Inter', sans-serif;
+      box-shadow: 0 3px 12px rgba(201, 151, 43, 0.25);
     }
     .logout-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 28px rgba(201, 151, 43, 0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(201, 151, 43, 0.4);
     }
 
     /* ============================================================
        WELCOME BANNER
     ============================================================ */
     .welcome-banner {
-      background: linear-gradient(135deg, #fef8ed, #f5f0ff);
+      background: linear-gradient(135deg, #fef8ed 0%, #f5f0ff 60%, #eef4ff 100%);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 32px 36px;
+      padding: 30px 34px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 20px;
       box-shadow: var(--shadow);
-      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
     }
-    .welcome-banner:hover { box-shadow: var(--shadow-hover); }
+    .welcome-banner::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201, 151, 43, 0.1), transparent 70%);
+    }
+    .welcome-banner::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: 20%;
+      width: 150px; height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.08), transparent 70%);
+    }
+    .banner-text { position: relative; z-index: 1; }
+    .banner-text .badge-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .banner-text .badge-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 50px;
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .banner-text .badge-pill i { color: var(--gold); font-size: 10px; }
     .banner-text h1 {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 800;
       color: var(--text-primary);
       line-height: 1.2;
+      letter-spacing: -0.5px;
     }
-    .banner-text h1 span { color: var(--gold); }
+    .banner-text h1 span.gold { color: var(--gold); }
     .banner-text p {
       color: var(--text-secondary);
       font-size: 14px;
-      margin-top: 4px;
+      margin-top: 6px;
+      font-weight: 400;
     }
     .banner-stats {
       display: flex;
-      gap: 16px;
+      gap: 14px;
       flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
     }
     .bstat {
       background: var(--bg-white);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 14px 22px;
+      padding: 14px 20px;
       text-align: center;
-      min-width: 90px;
+      min-width: 100px;
       transition: var(--transition);
+      box-shadow: var(--shadow-xs);
     }
     .bstat:hover {
       transform: translateY(-4px);
-      box-shadow: var(--shadow-hover);
+      box-shadow: var(--shadow-md);
       border-color: var(--gold);
     }
     .bstat .val {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 800;
       color: var(--text-primary);
+      line-height: 1;
     }
     .bstat .val.gold { color: var(--gold); }
+    .bstat .val.green { color: var(--green); }
+    .bstat .val.purple { color: var(--purple); }
     .bstat .lbl {
       font-size: 11px;
       color: var(--text-muted);
-      margin-top: 2px;
+      margin-top: 4px;
+      font-weight: 500;
     }
 
     /* ============================================================
@@ -547,7 +636,7 @@
       background: var(--bg-white);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 20px 28px;
+      padding: 18px 26px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -556,25 +645,17 @@
       box-shadow: var(--shadow);
       transition: var(--transition);
     }
-    .session-box:hover {
-      box-shadow: var(--shadow-hover);
-      border-color: var(--gold);
-    }
-    .session-box .left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
+    .session-box:hover { box-shadow: var(--shadow-md); border-color: rgba(201, 151, 43, 0.3); }
+    .session-box .left { display: flex; align-items: center; gap: 16px; }
     .session-box .left .icon {
-      width: 48px;
-      height: 48px;
+      width: 46px; height: 46px;
       border-radius: var(--radius-sm);
       background: var(--gold-bg);
       color: var(--gold);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
+      font-size: 20px;
       flex-shrink: 0;
     }
     .session-box .left .info .label {
@@ -583,44 +664,32 @@
       font-weight: 500;
     }
     .session-box .left .info .time {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 800;
       color: var(--text-primary);
       font-variant-numeric: tabular-nums;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
     }
     .session-box .left .info .time.warning { color: var(--orange); }
-    .session-box .left .info .time.danger { color: var(--red); animation: blink 0.5s ease infinite; }
-    
-    .session-box .right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
+    .session-box .left .info .time.danger { color: var(--red); animation: blink 0.8s ease infinite; }
+    .session-box .right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
     .session-box .right .status {
       font-size: 12px;
       font-weight: 600;
-      padding: 4px 14px;
+      padding: 5px 14px;
       border-radius: 50px;
     }
-    .session-box .right .status.active {
-      background: var(--green-bg);
-      color: var(--green);
-    }
-    .session-box .right .status.warning {
-      background: var(--orange-bg);
-      color: var(--orange);
-    }
+    .session-box .right .status.active { background: var(--green-bg); color: var(--green); }
+    .session-box .right .status.warning { background: var(--orange-bg); color: var(--orange); }
     .session-box .right .status.danger {
-      background: #fef2f2;
+      background: var(--red-bg);
       color: var(--red);
-      animation: blink 0.5s ease infinite;
+      animation: blink 0.8s ease infinite;
     }
-    .session-box .right .progress-wrap {
-      width: 120px;
-    }
+    .session-box .right .progress-wrap { width: 140px; }
     .session-box .right .progress-wrap .bar {
-      width: 100%;
-      height: 4px;
+      width: 100%; height: 5px;
       background: var(--border);
       border-radius: 50px;
       overflow: hidden;
@@ -646,7 +715,7 @@
       background: var(--bg-white);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 24px 26px;
+      padding: 22px 24px;
       transition: var(--transition);
       box-shadow: var(--shadow);
       position: relative;
@@ -655,44 +724,57 @@
     .stat-card::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       height: 3px;
     }
     .stat-card.c1::before { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
     .stat-card.c2::before { background: linear-gradient(90deg, var(--blue), #3b7ad4); }
     .stat-card.c3::before { background: linear-gradient(90deg, var(--green), #34d399); }
     .stat-card.c4::before { background: linear-gradient(90deg, var(--purple), #a78bfa); }
-
     .stat-card:hover {
-      transform: translateY(-6px);
+      transform: translateY(-5px);
       box-shadow: var(--shadow-hover);
-      border-color: var(--gold);
+      border-color: rgba(201, 151, 43, 0.25);
+    }
+    .stat-card .stat-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
     }
     .stat-icon {
-      width: 48px;
-      height: 48px;
+      width: 46px; height: 46px;
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
-      margin-bottom: 14px;
+      font-size: 19px;
       transition: var(--transition);
     }
-    .stat-card:hover .stat-icon { transform: scale(1.1); }
+    .stat-card:hover .stat-icon { transform: scale(1.08) rotate(-4deg); }
     .c1 .stat-icon { background: var(--gold-bg); color: var(--gold); }
     .c2 .stat-icon { background: var(--blue-bg); color: var(--blue); }
     .c3 .stat-icon { background: var(--green-bg); color: var(--green); }
     .c4 .stat-icon { background: var(--purple-bg); color: var(--purple); }
-
+    .stat-trend {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 50px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .stat-trend.up { background: var(--green-bg); color: var(--green); }
+    .stat-trend.down { background: var(--red-bg); color: var(--red); }
+    .stat-trend.neutral { background: var(--bg); color: var(--text-muted); }
     .stat-val {
       font-size: 28px;
       font-weight: 800;
       color: var(--text-primary);
       line-height: 1;
       margin-bottom: 6px;
+      letter-spacing: -0.8px;
     }
     .stat-label {
       font-size: 13px;
@@ -701,9 +783,17 @@
     }
 
     /* ============================================================
-       MODULES
+       TWO COLUMN LAYOUT
     ============================================================ */
-    .main-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1.55fr 1fr;
+      gap: 20px;
+    }
+
+    /* ============================================================
+       SECTION CARDS
+    ============================================================ */
     .section-card {
       background: var(--bg-white);
       border: 1px solid var(--border);
@@ -712,81 +802,251 @@
       box-shadow: var(--shadow);
       transition: var(--transition);
     }
-    .section-card:hover { box-shadow: var(--shadow-hover); }
+    .section-card:hover { box-shadow: var(--shadow-md); }
     .section-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 20px 24px;
+      padding: 18px 22px;
       border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+    .section-header .header-left { display: flex; align-items: center; gap: 12px; }
+    .section-header .header-icon {
+      width: 38px; height: 38px;
+      border-radius: var(--radius-xs);
+      background: var(--gold-bg);
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
     }
     .section-header h4 {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--text-primary);
+      letter-spacing: -0.2px;
     }
     .section-header p {
       font-size: 12px;
       color: var(--text-muted);
-      margin-top: 2px;
+      margin-top: 1px;
     }
     .see-all {
       font-size: 12px;
       font-weight: 600;
       color: var(--gold);
-      text-decoration: none;
-      padding: 6px 14px;
+      padding: 6px 12px;
       background: var(--gold-bg);
-      border-radius: 8px;
+      border-radius: var(--radius-xs);
       transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
     }
-    .see-all:hover { background: rgba(201, 151, 43, 0.15); transform: translateX(4px); }
+    .see-all:hover { background: rgba(201, 151, 43, 0.15); }
+    .see-all i { transition: var(--transition); }
+    .see-all:hover i { transform: translateX(3px); }
 
+    /* ============================================================
+       MODULES GRID
+    ============================================================ */
     .modules-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      padding: 20px;
+      gap: 12px;
+      padding: 18px;
     }
     .module-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
-      padding: 18px 14px;
+      gap: 9px;
+      padding: 16px 12px;
       background: var(--bg);
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
       cursor: pointer;
-      text-decoration: none;
       transition: var(--transition);
       text-align: center;
     }
     .module-item:hover {
       background: var(--bg-white);
       border-color: var(--gold);
-      transform: translateY(-6px);
-      box-shadow: var(--shadow-hover);
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
     }
     .module-icon {
-      width: 48px;
-      height: 48px;
+      width: 46px; height: 46px;
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
+      font-size: 20px;
       transition: var(--transition);
     }
     .module-item:hover .module-icon { transform: scale(1.1); }
     .module-item .mtitle {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+    .module-item .msub {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    /* ============================================================
+       ACTIVITY FEED
+    ============================================================ */
+    .activity-list {
+      padding: 8px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .activity-item {
+      display: flex;
+      gap: 13px;
+      padding: 12px 4px;
+      border-bottom: 1px solid var(--border);
+      transition: var(--transition);
+      border-radius: var(--radius-xs);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-item:hover { background: var(--bg); padding-left: 10px; }
+    .activity-dot {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .activity-body { flex: 1; min-width: 0; }
+    .activity-body .atitle {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+    .activity-body .adesc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+    .activity-body .atime {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* ============================================================
+       QUICK ACTIONS
+    ============================================================ */
+    .quick-actions {
+      padding: 16px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .quick-action {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 13px 15px;
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      transition: var(--transition);
+      cursor: pointer;
+    }
+    .quick-action:hover {
+      background: var(--bg-white);
+      border-color: var(--gold);
+      transform: translateX(4px);
+      box-shadow: var(--shadow);
+    }
+    .quick-action .qa-icon {
+      width: 38px; height: 38px;
+      border-radius: var(--radius-xs);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .quick-action .qa-text { flex: 1; min-width: 0; }
+    .quick-action .qa-text .qa-title {
       font-size: 13px;
       font-weight: 600;
       color: var(--text-primary);
     }
-    .module-item .msub {
-      font-size: 10px;
+    .quick-action .qa-text .qa-sub {
+      font-size: 11px;
       color: var(--text-muted);
+      margin-top: 1px;
+    }
+    .quick-action .qa-arrow {
+      color: var(--text-muted);
+      font-size: 13px;
+      transition: var(--transition);
+    }
+    .quick-action:hover .qa-arrow {
+      color: var(--gold);
+      transform: translateX(3px);
+    }
+
+    /* ============================================================
+       PROGRESS BARS (Attendance / etc)
+    ============================================================ */
+    .progress-list {
+      padding: 16px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .progress-item .pi-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 7px;
+    }
+    .progress-item .pi-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .progress-item .pi-label .pi-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+    .progress-item .pi-val {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+    .progress-item .pi-bar {
+      width: 100%; height: 7px;
+      background: var(--bg);
+      border-radius: 50px;
+      overflow: hidden;
+    }
+    .progress-item .pi-bar .pi-fill {
+      height: 100%;
+      border-radius: 50px;
+      transition: width 1s ease;
     }
 
     /* ============================================================
@@ -796,7 +1056,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(15, 23, 42, 0.35);
       backdrop-filter: blur(4px);
       z-index: 99;
       transition: opacity 0.3s ease;
@@ -806,10 +1066,8 @@
     .sidebar-close {
       display: none;
       position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 36px;
-      height: 36px;
+      top: 12px; right: 12px;
+      width: 36px; height: 36px;
       border: none;
       border-radius: var(--radius-sm);
       background: var(--bg);
@@ -820,7 +1078,7 @@
       align-items: center;
       justify-content: center;
     }
-    .sidebar-close:hover { background: var(--border); transform: rotate(90deg); }
+    .sidebar-close:hover { background: var(--red-bg); color: var(--red); }
 
     /* ============================================================
        FOOTER
@@ -828,7 +1086,7 @@
     .footer {
       background: var(--bg-white);
       border-top: 1px solid var(--border);
-      padding: 20px 32px;
+      padding: 18px 32px;
       margin-top: auto;
     }
     .footer-content {
@@ -840,38 +1098,42 @@
       flex-wrap: wrap;
       gap: 12px;
     }
-    .footer-content span,
-    .footer-content a {
-      font-size: 13px;
+    .footer-content span, .footer-content a {
+      font-size: 12.5px;
       color: var(--text-muted);
-      text-decoration: none;
     }
     .footer-content a { font-weight: 600; transition: var(--transition); }
     .footer-content a:hover { color: var(--gold); text-decoration: underline; }
     .footer-content .gold-link { color: var(--gold); }
-
-    .footer-social {
-      display: flex;
-      gap: 12px;
-    }
+    .footer-social { display: flex; gap: 8px; }
     .footer-social a {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 36px;
-      height: 36px;
+      width: 34px; height: 34px;
       border-radius: 50%;
       background: var(--bg);
       color: var(--text-muted);
-      font-size: 15px;
+      font-size: 14px;
       transition: var(--transition);
-      text-decoration: none;
     }
     .footer-social a:hover {
       background: var(--gold-bg);
       color: var(--gold);
-      transform: translateY(-4px);
+      transform: translateY(-3px);
       box-shadow: 0 4px 16px rgba(201, 151, 43, 0.2);
+    }
+
+    /* ============================================================
+       TOAST
+    ============================================================ */
+    @keyframes slideUp {
+      from { opacity: 0; transform: translate(-50%, 30px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+    @keyframes slideDown {
+      from { opacity: 1; transform: translate(-50%, 0); }
+      to { opacity: 0; transform: translate(-50%, 30px); }
     }
 
     /* ============================================================
@@ -879,7 +1141,8 @@
     ============================================================ */
     @media (max-width: 1200px) {
       .stat-grid { grid-template-columns: repeat(2, 1fr); }
-      .modules-grid { grid-template-columns: repeat(2, 1fr); }
+      .two-col { grid-template-columns: 1fr; }
+      .modules-grid { grid-template-columns: repeat(3, 1fr); }
       .banner-stats { display: none; }
     }
 
@@ -887,22 +1150,21 @@
       .main { padding: 20px; }
       .modules-grid { grid-template-columns: repeat(2, 1fr); }
       .topbar { flex-wrap: wrap; gap: 12px; }
-      .topbar-title { width: 100%; }
+      .topbar-title { width: 100%; flex: 1 1 100%; }
+      .topbar-actions { margin-left: auto; }
       .footer-content { flex-direction: column; text-align: center; }
     }
 
     @media (max-width: 768px) {
       .sidebar {
         position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
+        top: 0; left: 0; bottom: 0;
         transform: translateX(-100%);
         z-index: 999;
-        width: 280px;
+        width: 285px;
         height: 100vh;
         overflow-y: auto;
-        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.15);
+        box-shadow: 4px 0 30px rgba(15, 23, 42, 0.15);
         border-right: none;
       }
       .sidebar.open { transform: translateX(0); }
@@ -910,9 +1172,6 @@
         display: flex !important;
         align-items: center;
         justify-content: center;
-        position: absolute;
-        top: 12px;
-        right: 12px;
         z-index: 10;
       }
       .menu-btn {
@@ -920,29 +1179,26 @@
         align-items: center;
         justify-content: center;
       }
-      .main { padding: 16px; gap: 16px; }
+      .main { padding: 14px; gap: 14px; }
       .stat-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
       .modules-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
       .welcome-banner {
         padding: 20px;
         flex-direction: column;
         align-items: flex-start;
-        gap: 16px;
+        gap: 14px;
       }
-      .banner-text h1 { font-size: 22px; }
+      .banner-text h1 { font-size: 21px; }
       .banner-stats {
         display: flex;
         width: 100%;
         gap: 10px;
       }
-      .bstat {
-        flex: 1;
-        padding: 10px;
-        min-width: auto;
-      }
-      .bstat .val { font-size: 18px; }
+      .bstat { flex: 1; padding: 10px 8px; min-width: auto; }
+      .bstat .val { font-size: 17px; }
+      .bstat .lbl { font-size: 10px; }
       .session-box {
-        padding: 16px 20px;
+        padding: 14px 18px;
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
@@ -950,32 +1206,39 @@
       .session-box .left .info .time { font-size: 22px; }
       .session-box .right .progress-wrap { width: 100%; }
       .logout-btn .lbl { display: none; }
-      .logout-btn { padding: 10px 16px; }
-      .topbar-title h3 { font-size: 18px; }
+      .logout-btn { padding: 10px 14px; }
+      .topbar-title h3 { font-size: 17px; }
+      .icon-btn { width: 36px; height: 36px; font-size: 14px; }
+      .stat-card { padding: 18px 18px; }
+      .stat-val { font-size: 24px; }
+      .stat-icon { width: 42px; height: 42px; font-size: 17px; }
+      .section-header { padding: 15px 16px; }
+      .modules-grid { padding: 14px; }
+      .footer { padding: 16px; }
     }
 
     @media (max-width: 480px) {
       .stat-grid { grid-template-columns: 1fr; }
-      .modules-grid { grid-template-columns: 1fr; }
-      .main { padding: 10px; }
+      .modules-grid { grid-template-columns: repeat(2, 1fr); }
+      .main { padding: 10px; gap: 12px; }
       .welcome-banner { padding: 16px; }
-      .banner-text h1 { font-size: 20px; }
+      .banner-text h1 { font-size: 19px; }
+      .banner-text p { font-size: 12.5px; }
       .banner-stats { flex-direction: column; }
       .bstat { width: 100%; }
-      .topbar-title h3 { font-size: 16px; }
-      .topbar { padding: 12px 16px; }
-      .footer { padding: 16px; }
+      .topbar-title h3 { font-size: 15px; }
+      .topbar-title p { font-size: 11px; }
+      .topbar { padding: 11px 14px; }
+      .footer { padding: 14px; }
       .session-box .left .info .time { font-size: 20px; }
-      
-      .session-popup {
-        padding: 32px 20px 28px;
-      }
+      .session-popup { padding: 32px 20px 28px; }
       .session-popup h2 { font-size: 22px; }
-      .session-popup .icon-box {
-        width: 60px;
-        height: 60px;
-        font-size: 28px;
-      }
+      .session-popup .icon-box { width: 60px; height: 60px; font-size: 28px; }
+      .section-header h4 { font-size: 14.5px; }
+      .module-item { padding: 13px 8px; }
+      .module-icon { width: 40px; height: 40px; font-size: 17px; }
+      .module-item .mtitle { font-size: 11.5px; }
+      .module-item .msub { font-size: 9.5px; }
     }
   </style>
 </head>
@@ -990,7 +1253,7 @@
   <div class="session-overlay" id="sessionOverlay">
     <div class="session-popup">
       <div class="school-logo">
-        <img src="logo(1).png" alt="GSSS SHILLA Logo">
+        <img src="logo(1).png" alt="GSSS SHILLA Logo" onerror="this.style.display='none'">
       </div>
       <div class="school-name-popup">
         <i class="fas fa-school" style="margin-right: 6px;"></i>
@@ -1015,18 +1278,19 @@
     </div>
   </div>
 
-  <!-- DASHBOARD -->
+  <!-- OVERLAY -->
   <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
+  <!-- DASHBOARD -->
   <div class="dashboard">
 
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
-      <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+      <button class="sidebar-close" onclick="closeSidebar()" aria-label="Close">✕</button>
 
       <div class="brand">
         <div class="brand-icon">
-          <img src="logo(1).png" alt="Logo" style="width:46px; height:46px; border-radius:12px; object-fit:contain; background:#fff; padding:4px;">
+          <img src="logo(1).png" alt="Logo" onerror="this.parentElement.innerHTML='<i class=\'fas fa-school\' style=\'color:var(--gold);font-size:20px\'></i>'">
         </div>
         <div class="brand-text">
           <div class="name">GSSS <span>SHILLA</span></div>
@@ -1046,7 +1310,7 @@
           <span class="icon"><i class="fas fa-cloud-download-alt"></i></span> Downloads
         </a>
         <a class="nav-item" href="recent.html">
-          <span class="icon"><i class="fas fa-clock"></i></span> Recent Activity
+          <span class="icon"><i class="fas fa-clock-rotate-left"></i></span> Recent Activity
         </a>
       </div>
 
@@ -1061,37 +1325,49 @@
       </div>
 
       <div class="nav-group">
+        <div class="nav-label">Students</div>
+        <a class="nav-item" href="admin-students.html">
+          <span class="icon"><i class="fa-solid fa-user-graduate"></i></span> Students Management
+        </a>
+        <a class="nav-item" href="idcard.html">
+          <span class="icon"><i class="fa-solid fa-id-card"></i></span> Student ID Cards
+        </a>
+      </div>
+
+      <div class="nav-group">
         <div class="nav-label">Academics</div>
         <a class="nav-item" href="admin-result.html">
           <span class="icon"><i class="fa-solid fa-trophy"></i></span> Result Management
         </a>
-        
-        <a class="nav-item" href="admin-students.html">
-
-           <span class="icon"><i class="fa-solid fa-paper"></i></span> Examination Management
-      </a>
         <a class="nav-item" href="admitCard.html">
+          <span class="icon"><i class="fa-solid fa-id-card-clip"></i></span> Admit Cards
+        </a>
+      </div>
 
-           <span class="icon"><i class="fa-solid fa-people"></i></span> Student Management
+      <div class="nav-group">
+        <div class="nav-label">Quiz & Activities</div>
+        <a class="nav-item" href="admin-quiz.html">
+          <span class="icon"><i class="fa-solid fa-circle-question"></i></span> Quiz
         </a>
       </div>
 
       <div class="nav-group">
         <div class="nav-label">People</div>
         <a class="nav-item" href="admin-faculity.html">
-          <span class="icon"><i class="fas fa-chalkboard-teacher"></i></span> Faculty
+          <span class="icon"><i class="fas fa-chalkboard-user"></i></span> Faculty
         </a>
         <a class="nav-item" href="admin-contact.html">
           <span class="icon"><i class="fas fa-envelope"></i></span> Contact
+          <span class="badge">3</span>
         </a>
       </div>
 
       <div class="sidebar-bottom">
         <div class="admin-profile">
-          <div class="admin-avatar" id="adminAvatar">🛡️</div>
+          <div class="admin-avatar" id="adminAvatar">A</div>
           <div class="admin-info">
             <div class="aname" id="adminName">Admin</div>
-            <div class="aemail">Logged In</div>
+            <div class="aemail">Administrator</div>
           </div>
         </div>
       </div>
@@ -1104,10 +1380,17 @@
       <div class="topbar">
         <button class="menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
         <div class="topbar-title">
-          <h3>Dashboard</h3>
+          <h3>Dashboard <span>Overview</span></h3>
           <p id="dateStr">Loading...</p>
         </div>
         <div class="topbar-actions">
+          <button class="icon-btn" title="Notifications">
+            <i class="fas fa-bell"></i>
+            <span class="dot"></span>
+          </button>
+          <button class="icon-btn" title="Messages">
+            <i class="fas fa-envelope"></i>
+          </button>
           <button class="logout-btn" onclick="logout()">
             <i class="fas fa-sign-out-alt"></i> <span class="lbl">Logout</span>
           </button>
@@ -1117,12 +1400,22 @@
       <!-- WELCOME BANNER -->
       <div class="welcome-banner">
         <div class="banner-text">
-          <h1><span id="greetingText" style="color: #000000; font-weight: 600;"></span> <span id="welcomeName">Admin</span></h1>
+          <div class="badge-row">
+            <span class="badge-pill"><i class="fas fa-circle"></i> System Online</span>
+            <span class="badge-pill"><i class="fas fa-shield-halved"></i> Secure Session</span>
+          </div>
+          <h1><span id="greetingText" style="color: var(--text-primary); font-weight: 600;">Welcome,</span> <span class="gold" id="welcomeName">Admin</span></h1>
           <p>Here's what's happening at your school today.</p>
         </div>
         <div class="banner-stats">
-          <div class="bstat"><div class="val gold" id="statStudents">—</div><div class="lbl">Students</div></div>
-          <div class="bstat"><div class="val" id="statFaculty">—</div><div class="lbl">Faculty</div></div>
+          <div class="bstat">
+            <div class="val gold" id="statStudents">100+</div>
+            <div class="lbl">Students</div>
+          </div>
+          <div class="bstat">
+            <div class="val green" id="statFaculty">13</div>
+            <div class="lbl">Faculty</div>
+          </div>
         </div>
       </div>
 
@@ -1148,42 +1441,61 @@
       <!-- STAT CARDS -->
       <div class="stat-grid">
         <div class="stat-card c1">
-          <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
+          <div class="stat-top">
+            <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
+            <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 12%</span>
+          </div>
           <div class="stat-val" id="cardStudents">100+</div>
           <div class="stat-label">Total Students</div>
         </div>
         <div class="stat-card c2">
-          <div class="stat-icon"><i class="fas fa-chalkboard-teacher"></i></div>
-          <div class="stat-val" id="cardFaculty">13+</div>
+          <div class="stat-top">
+            <div class="stat-icon"><i class="fas fa-chalkboard-user"></i></div>
+            <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 2</span>
+          </div>
+          <div class="stat-val" id="cardFaculty">13</div>
           <div class="stat-label">Faculty Members</div>
         </div>
         <div class="stat-card c3">
-          <div class="stat-icon"><i class="fas fa-bullhorn"></i></div>
+          <div class="stat-top">
+            <div class="stat-icon"><i class="fas fa-bullhorn"></i></div>
+            <span class="stat-trend neutral"><i class="fas fa-minus"></i> 0</span>
+          </div>
           <div class="stat-val" id="cardNotices">N/A</div>
           <div class="stat-label">Active Notices</div>
         </div>
         <div class="stat-card c4">
-          <div class="stat-icon"><i class="fas fa-eye"></i></div>
-          <div class="stat-val" id="cardVisitors">N/A</div>
+          <div class="stat-top">
+            <div class="stat-icon"><i class="fas fa-eye"></i></div>
+            <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 8%</span>
+          </div>
+          <div class="stat-val" id="cardVisitors">247</div>
           <div class="stat-label">Total Visitors</div>
         </div>
       </div>
 
-      <!-- MODULES -->
-      <div class="main-grid">
+      <!-- TWO COLUMN: QUICK ACCESS + ACTIVITY -->
+      <div class="two-col">
+
+        <!-- QUICK ACCESS MODULES -->
         <div class="section-card">
           <div class="section-header">
-            <div>
-              <h4>Quick Access</h4>
-              <p>Jump to any module instantly</p>
+            <div class="header-left">
+              <div class="header-icon"><i class="fas fa-bolt"></i></div>
+              <div>
+                <h4>Quick Access</h4>
+                <p>Jump to any module instantly</p>
+              </div>
             </div>
-            <a href="https://gsssshilla07.pages.dev" class="see-all">View Public Page<i class="fas fa-arrow-right"></i></a>
+            <a href="https://gsssshilla07.pages.dev" class="see-all" target="_blank">
+              Public Site <i class="fas fa-arrow-right"></i>
+            </a>
           </div>
           <div class="modules-grid">
             <a class="module-item" href="admin-notif.html">
               <div class="module-icon" style="background:var(--gold-bg); color:var(--gold);"><i class="fas fa-bell"></i></div>
               <div class="mtitle">Notices</div>
-              <div class="msub">Manage announcements</div>
+              <div class="msub">Announcements</div>
             </a>
             <a class="module-item" href="admin-downl.html">
               <div class="module-icon" style="background:var(--blue-bg); color:var(--blue);"><i class="fas fa-download"></i></div>
@@ -1193,7 +1505,7 @@
             <a class="module-item" href="add-image.html">
               <div class="module-icon" style="background:var(--gold-bg); color:var(--gold);"><i class="fas fa-sliders-h"></i></div>
               <div class="mtitle">Home Slider</div>
-              <div class="msub">Manage slider images</div>
+              <div class="msub">Slider images</div>
             </a>
             <a class="module-item" href="admin-img.html">
               <div class="module-icon" style="background:var(--purple-bg); color:var(--purple);"><i class="fas fa-images"></i></div>
@@ -1202,18 +1514,175 @@
             </a>
             <a class="module-item" href="admin-result.html">
               <div class="module-icon" style="background:var(--blue-bg); color:var(--blue);"><i class="fa-solid fa-trophy"></i></div>
-              <div class="mtitle">Result Management</div>
-              <div class="msub">Add Result & Manage Students</div>
+              <div class="mtitle">Results</div>
+              <div class="msub">Add & manage</div>
             </a>
             <a class="module-item" href="admin-faculity.html">
-              <div class="module-icon" style="background:var(--green-bg); color:var(--green);"><i class="fas fa-chalkboard-teacher"></i></div>
+              <div class="module-icon" style="background:var(--green-bg); color:var(--green);"><i class="fas fa-chalkboard-user"></i></div>
               <div class="mtitle">Faculty</div>
               <div class="msub">Staff management</div>
+            </a>
+            <a class="module-item" href="admin-quiz.html">
+              <div class="module-icon" style="background:var(--cyan-bg); color:var(--cyan);"><i class="fa-solid fa-circle-question"></i></div>
+              <div class="mtitle">Quiz</div>
+              <div class="msub">Manage quizzes</div>
             </a>
             <a class="module-item" href="admin-contact.html">
               <div class="module-icon" style="background:var(--pink-bg); color:var(--pink);"><i class="fas fa-envelope"></i></div>
               <div class="mtitle">Contact</div>
-              <div class="msub">Messages & inquiries</div>
+              <div class="msub">Messages</div>
+            </a>
+          </div>
+        </div>
+
+        <!-- ACTIVITY FEED -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="header-left">
+              <div class="header-icon" style="background:var(--blue-bg); color:var(--blue);"><i class="fas fa-wave-square"></i></div>
+              <div>
+                <h4>Recent Activity</h4>
+                <p>Latest updates</p>
+              </div>
+            </div>
+            <a href="recent.html" class="see-all">
+              View All <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--green-bg); color:var(--green);">
+                <i class="fas fa-user-plus"></i>
+              </div>
+              <div class="activity-body">
+                <div class="atitle">New student registered</div>
+                <div class="adesc">A new student was added to Class 10</div>
+                <div class="atime"><i class="fas fa-clock"></i> 5 min ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--gold-bg); color:var(--gold);">
+                <i class="fas fa-bell"></i>
+              </div>
+              <div class="activity-body">
+                <div class="atitle">Notice published</div>
+                <div class="adesc">Half-yearly exam schedule released</div>
+                <div class="atime"><i class="fas fa-clock"></i> 1 hour ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--purple-bg); color:var(--purple);">
+                <i class="fas fa-image"></i>
+              </div>
+              <div class="activity-body">
+                <div class="atitle">Gallery updated</div>
+                <div class="adesc">5 new photos added to Annual Day album</div>
+                <div class="atime"><i class="fas fa-clock"></i> 3 hours ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--blue-bg); color:var(--blue);">
+                <i class="fas fa-trophy"></i>
+              </div>
+              <div class="activity-body">
+                <div class="atitle">Results uploaded</div>
+                <div class="adesc">Class 12 Science results published</div>
+                <div class="atime"><i class="fas fa-clock"></i> Yesterday</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW: PROGRESS + QUICK ACTIONS -->
+      <div class="two-col">
+
+        <!-- CLASS ATTENDANCE PROGRESS -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="header-left">
+              <div class="header-icon" style="background:var(--green-bg); color:var(--green);"><i class="fas fa-chart-line"></i></div>
+              <div>
+                <h4>Class Overview</h4>
+                <p>Attendance & performance snapshot</p>
+              </div>
+            </div>
+          </div>
+          <div class="progress-list">
+            <div class="progress-item">
+              <div class="pi-top">
+                <div class="pi-label"><span class="pi-dot" style="background:var(--gold);"></span> Class 10</div>
+                <div class="pi-val">92%</div>
+              </div>
+              <div class="pi-bar"><div class="pi-fill" style="width:92%; background:linear-gradient(90deg, var(--gold), var(--gold-light));"></div></div>
+            </div>
+            <div class="progress-item">
+              <div class="pi-top">
+                <div class="pi-label"><span class="pi-dot" style="background:var(--blue);"></span> Class 11</div>
+                <div class="pi-val">88%</div>
+              </div>
+              <div class="pi-bar"><div class="pi-fill" style="width:88%; background:linear-gradient(90deg, var(--blue), #3b7ad4);"></div></div>
+            </div>
+            <div class="progress-item">
+              <div class="pi-top">
+                <div class="pi-label"><span class="pi-dot" style="background:var(--green);"></span> Class 12</div>
+                <div class="pi-val">95%</div>
+              </div>
+              <div class="pi-bar"><div class="pi-fill" style="width:95%; background:linear-gradient(90deg, var(--green), #34d399);"></div></div>
+            </div>
+            <div class="progress-item">
+              <div class="pi-top">
+                <div class="pi-label"><span class="pi-dot" style="background:var(--purple);"></span> Class 9</div>
+                <div class="pi-val">85%</div>
+              </div>
+              <div class="pi-bar"><div class="pi-fill" style="width:85%; background:linear-gradient(90deg, var(--purple), #a78bfa);"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="header-left">
+              <div class="header-icon" style="background:var(--pink-bg); color:var(--pink);"><i class="fas fa-rocket"></i></div>
+              <div>
+                <h4>Quick Actions</h4>
+                <p>Common tasks</p>
+              </div>
+            </div>
+          </div>
+          <div class="quick-actions">
+            <a class="quick-action" href="admin-notif.html">
+              <div class="qa-icon" style="background:var(--gold-bg); color:var(--gold);"><i class="fas fa-plus"></i></div>
+              <div class="qa-text">
+                <div class="qa-title">Add Notice</div>
+                <div class="qa-sub">Publish new announcement</div>
+              </div>
+              <i class="fas fa-chevron-right qa-arrow"></i>
+            </a>
+            <a class="quick-action" href="admin-students.html">
+              <div class="qa-icon" style="background:var(--blue-bg); color:var(--blue);"><i class="fas fa-user-plus"></i></div>
+              <div class="qa-text">
+                <div class="qa-title">Add Student</div>
+                <div class="qa-sub">Register new student</div>
+              </div>
+              <i class="fas fa-chevron-right qa-arrow"></i>
+            </a>
+            <a class="quick-action" href="admin-result.html">
+              <div class="qa-icon" style="background:var(--green-bg); color:var(--green);"><i class="fas fa-file-circle-plus"></i></div>
+              <div class="qa-text">
+                <div class="qa-title">Upload Result</div>
+                <div class="qa-sub">Publish exam results</div>
+              </div>
+              <i class="fas fa-chevron-right qa-arrow"></i>
+            </a>
+            <a class="quick-action" href="add-image.html">
+              <div class="qa-icon" style="background:var(--purple-bg); color:var(--purple);"><i class="fas fa-image"></i></div>
+              <div class="qa-text">
+                <div class="qa-title">Add Gallery Image</div>
+                <div class="qa-sub">Upload school photos</div>
+              </div>
+              <i class="fas fa-chevron-right qa-arrow"></i>
             </a>
           </div>
         </div>
@@ -1226,7 +1695,7 @@
   <footer class="footer">
     <div class="footer-content">
       <span>&copy; 2026 <a href="https://gsssshilla07.pages.dev">Govt. Sr. Sec. School Shilla</a>. All rights reserved.</span>
-      <span>Developed & Designed by <a href="#" class="gold-link">Vikshant Kralta</a></span>
+      <span>Developed by <a href="#" class="gold-link">Vikshant Kralta</a></span>
       <div class="footer-social">
         <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
         <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
@@ -1245,7 +1714,7 @@
     const API_BASE = 'https://gsssshilla.onrender.com/api/admin';
     const SESSION_DURATION = 30 * 60;
     const SESSION_START_KEY = 'sessionStartTime';
-    
+
     let sessionRemaining = SESSION_DURATION;
     let sessionTimerInterval = null;
 
@@ -1333,7 +1802,7 @@
         const minutes = Math.floor(sessionRemaining / 60);
         const seconds = sessionRemaining % 60;
         const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        
+
         const fill = document.getElementById('sessionTimerFill');
         if (fill) {
             const percentage = (sessionRemaining / SESSION_DURATION) * 100;
@@ -1343,7 +1812,7 @@
         const boxTime = document.getElementById('sessionBoxTime');
         const boxFill = document.getElementById('sessionBoxFill');
         const status = document.getElementById('sessionStatus');
-        
+
         if (boxTime) boxTime.textContent = timeStr;
         if (boxFill) {
             const percentage = (sessionRemaining / SESSION_DURATION) * 100;
@@ -1393,17 +1862,18 @@
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 16px 28px;
+            padding: 15px 26px;
             border-radius: 12px;
             color: #fff;
             font-weight: 600;
             font-size: 14px;
             z-index: 9998;
             background: ${type === 'warning' ? '#f59e0b' : '#ef4444'};
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 30px rgba(15,23,42,0.25);
             animation: slideUp 0.4s ease;
             max-width: 90%;
             text-align: center;
+            font-family: 'Inter', sans-serif;
         `;
         toast.textContent = message;
         document.body.appendChild(toast);
@@ -1451,11 +1921,11 @@
         document.body.style.position = 'fixed';
         document.body.style.width = '100%';
         document.body.style.height = '100%';
-        
+
         localStorage.removeItem('adminToken');
         localStorage.removeItem('adminData');
-        localStorage.removeItem('sessionStartKey');
-        
+        localStorage.removeItem('sessionStartTime');
+
         if (sessionTimerInterval) {
             clearInterval(sessionTimerInterval);
             sessionTimerInterval = null;
@@ -1472,7 +1942,7 @@
     }
 
     // ============================================================
-    // DATE
+    // DATE & GREETING
     // ============================================================
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -1483,9 +1953,9 @@
     function setGreeting() {
       const hour = new Date().getHours();
       let greeting;
-      if (hour >= 5 && hour < 12) greeting = "Morning,";
-      else if (hour >= 12 && hour < 17) greeting = "Afternoon,";
-      else if (hour >= 17 && hour < 21) greeting = "Good Eve,";
+      if (hour >= 5 && hour < 12) greeting = "Good Morning,";
+      else if (hour >= 12 && hour < 17) greeting = "Good Afternoon,";
+      else if (hour >= 17 && hour < 21) greeting = "Good Evening,";
       else greeting = "Good Night,";
       document.getElementById('greetingText').textContent = greeting;
     }
@@ -1497,7 +1967,7 @@
     async function loadProfile() {
       const token = localStorage.getItem('adminToken');
       if (!token) return;
-      
+
       try {
         const res = await fetch(`${API_BASE}/profile`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -1523,7 +1993,7 @@
       document.getElementById('statStudents').textContent = '100+';
       document.getElementById('statFaculty').textContent = '13';
       document.getElementById('cardStudents').textContent = '100+';
-      document.getElementById('cardFaculty').textContent = '13+';
+      document.getElementById('cardFaculty').textContent = '13';
       document.getElementById('cardNotices').textContent = 'N/A';
       document.getElementById('cardVisitors').textContent = '247';
     }
@@ -1534,14 +2004,9 @@
     function toggleSidebar() {
       var sidebar = document.getElementById('sidebar');
       var overlay = document.getElementById('overlay');
-      
+
       if (sidebar.classList.contains('open')) {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.width = '';
-        document.body.style.height = '';
+        closeSidebar();
       } else {
         sidebar.classList.add('open');
         overlay.classList.add('active');
@@ -1555,10 +2020,10 @@
     function closeSidebar() {
       var sidebar = document.getElementById('sidebar');
       var overlay = document.getElementById('overlay');
-      
+
       sidebar.classList.remove('open');
       overlay.classList.remove('active');
-      
+
       document.body.style.overflow = '';
       document.body.style.position = '';
       document.body.style.width = '';
@@ -1579,10 +2044,10 @@
     setInterval(async function() {
       const token = localStorage.getItem('adminToken');
       if (!token) return;
-      
+
       const overlay = document.getElementById('sessionOverlay');
       if (overlay.classList.contains('active')) return;
-      
+
       try {
         const res = await fetch(`${API_BASE}/verify`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -1625,7 +2090,8 @@
         confirmButtonColor: "#c9972b",
         cancelButtonColor: "#e91e63",
         confirmButtonText: "Yes, Logout",
-        cancelButtonText: "Cancel"
+        cancelButtonText: "Cancel",
+        reverseButtons: true
       }).then(function(result) {
         if (result.isConfirmed) {
           localStorage.removeItem('adminToken');
@@ -1644,11 +2110,15 @@
     // ACTIVE NAV
     // ============================================================
     document.querySelectorAll('.nav-item').forEach(function(item) {
-      item.addEventListener('click', function() {
-        document.querySelectorAll('.nav-item').forEach(function(i) {
-          i.classList.remove('active');
-        });
-        this.classList.add('active');
+      item.addEventListener('click', function(e) {
+        // Only change active state for dashboard link
+        if (this.getAttribute('href') === '#') {
+          e.preventDefault();
+          document.querySelectorAll('.nav-item').forEach(function(i) {
+            i.classList.remove('active');
+          });
+          this.classList.add('active');
+        }
       });
     });
   </script>
