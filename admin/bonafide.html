@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bonafide Manager - Admin | GSSS Shilla</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<style>
+:root {
+    --bg: #f5f7fb; --bg-white: #ffffff; --text-primary: #1a2332; --text-secondary: #5a6a7e;
+    --text-muted: #94a3b8; --gold: #c9972b; --gold-light: #e8b84b; --gold-bg: #fef8ed;
+    --blue: #4a8af4; --blue-bg: #eef4ff; --green: #10b981; --green-bg: #ecfdf5;
+    --purple: #8b5cf6; --purple-bg: #f5f0ff; --pink: #ec4899; --pink-bg: #fdf2f8;
+    --orange: #f59e0b; --orange-bg: #fffbeb; --red: #ef4444; --border: #e8edf8;
+    --shadow: 0 2px 12px rgba(0,0,0,0.04); --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --radius: 16px; --radius-sm: 10px; --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* NAVBAR */
+.navbar { background: var(--bg-white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 68px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
+.navbar .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.navbar .brand .logo-placeholder { width: 42px; height: 42px; border-radius: var(--radius-sm); background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.navbar .brand .logo-placeholder img { width: 46px; height: 46px; border-radius: 10px; object-fit: contain; background: #fff; padding: 4px; }
+.navbar .brand .name { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.navbar .brand .name span { color: var(--gold); }
+.nav-links { display: flex; gap: 8px; list-style: none; }
+.nav-links a { text-decoration: none; color: var(--text-secondary); padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; transition: var(--transition); }
+.nav-links a:hover { background: var(--bg); color: var(--text-primary); }
+.nav-links a.active { background: var(--gold-bg); color: var(--gold); }
+.nav-links a i { margin-right: 6px; }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.admin-badge { display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 10px; background: var(--bg); border-radius: 50px; font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+.online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.hamburger { display: none; background: none; border: none; font-size: 22px; cursor: pointer; }
+
+/* MAIN */
+.main-container { flex: 1; max-width: 1400px; margin: 0 auto; padding: 24px 32px 40px; width: 100%; }
+.page-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; padding: 20px 28px; background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.page-header h1 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.page-header h1 i { color: var(--gold); }
+.page-header .subtitle { font-size: 13px; color: var(--text-secondary); font-weight: 400; margin-top: 4px; }
+.header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: 'Inter', sans-serif; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-primary { background: var(--gold); color: #fff; } .btn-primary:hover:not(:disabled) { background: var(--gold-light); transform: translateY(-2px); }
+.btn-success { background: var(--green); color: #fff; } .btn-success:hover:not(:disabled) { background: #059669; transform: translateY(-2px); }
+.btn-danger { background: var(--red); color: #fff; } .btn-danger:hover:not(:disabled) { background: #dc2626; transform: translateY(-2px); }
+.btn-outline { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); } .btn-outline:hover:not(:disabled) { background: var(--border); }
+.btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 8px; }
+.btn-xs { padding: 4px 10px; font-size: 11px; border-radius: 6px; }
+
+/* STATS */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: var(--bg-white); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); text-align: center; box-shadow: var(--shadow); transition: var(--transition); }
+.stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+.stat-card h3 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.stat-card .number { font-size: 28px; font-weight: 800; }
+.number.gold { color: var(--gold); } .number.green { color: var(--green); } .number.red { color: var(--red); } .number.blue { color: var(--blue); }
+
+/* CLASS NAV */
+.class-nav { background: var(--bg-white); padding: 20px 24px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 20px; box-shadow: var(--shadow); }
+.class-nav h3 { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 12px; }
+.class-nav h3 i { color: var(--gold); margin-right: 6px; }
+.class-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.class-btn { padding: 8px 20px; border: 2px solid var(--border); background: var(--bg-white); border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--text-secondary); transition: var(--transition); font-family: 'Inter', sans-serif; }
+.class-btn:hover { border-color: var(--gold); color: var(--gold); }
+.class-btn.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+
+.action-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding-top: 14px; border-top: 1px dashed var(--border); }
+.action-row select, .action-row input {
+    padding: 9px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    font-size: 13px; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); outline: none;
+    transition: var(--transition);
+}
+.action-row select:focus, .action-row input:focus { border-color: var(--gold); background: #fff; }
+.action-row input[type="text"] { flex: 1 1 200px; min-width: 180px; }
+
+/* STUDENT GRID */
+.student-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+.student-card { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; transition: var(--transition); box-shadow: var(--shadow); position: relative; }
+.student-card:hover { box-shadow: var(--shadow-hover); border-color: var(--gold); }
+.student-card.enabled { border-color: var(--green); background: #f0fdf4; }
+.card-photo-row { padding: 14px 16px 0; display: flex; gap: 12px; align-items: center; }
+.card-photo { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold); flex-shrink: 0; background: #f1f5f9; }
+.card-photo-placeholder { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #1a2332, #2c3e50); display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; flex-shrink: 0; border: 3px solid var(--gold); }
+.card-name { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+.card-meta { font-size: 11px; color: var(--text-muted); }
+.card-meta b { color: var(--text-primary); }
+.card-status-badge { position: absolute; top: 12px; right: 12px; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; }
+.status-enabled { background: var(--green); color: #fff; }
+.status-disabled { background: var(--text-muted); color: #fff; }
+.card-body { padding: 12px 16px; font-size: 12px; color: var(--text-secondary); line-height: 1.8; }
+.card-body b { color: var(--text-primary); }
+.card-actions { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+.toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px; }
+.toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+.toggle-switch input:checked + .toggle-slider { background-color: var(--green); }
+.toggle-switch input:checked + .toggle-slider:before { transform: translateX(20px); }
+.toggle-label { font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-right: 4px; }
+
+/* STATE */
+.state-box { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 14px; background: var(--bg-white); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); }
+.state-box i { font-size: 42px; color: var(--gold); opacity: 0.4; display: block; margin-bottom: 12px; }
+
+/* PAGINATION */
+.pagination { display: flex; justify-content: center; gap: 6px; margin-top: 24px; flex-wrap: wrap; }
+.pagination button { padding: 7px 14px; border: 1px solid var(--border); background: var(--bg-white); border-radius: var(--radius-sm); cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px; color: var(--text-secondary); transition: var(--transition); }
+.pagination button:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+.pagination button.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+.pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); backdrop-filter: blur(6px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+.modal-overlay.active { display: flex; }
+.modal-content { background: var(--bg-white); border-radius: var(--radius); max-width: 520px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideUp 0.25s ease; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.modal-header { padding: 18px 24px; border-bottom: 2px solid var(--gold-bg); display: flex; justify-content: space-between; align-items: center; }
+.modal-header h2 { font-size: 16px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.modal-header h2 i { color: var(--gold); font-size: 17px; }
+.close-btn { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; transition: var(--transition); line-height: 1; }
+.close-btn:hover { color: var(--red); transform: rotate(90deg); }
+.modal-body { padding: 22px 24px; }
+.modal-body label { display: flex; flex-direction: column; gap: 8px; font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+.modal-body input, .modal-body select { padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; font-size: 14px; background: var(--bg); outline: none; transition: var(--transition); color: var(--text-primary); }
+.modal-body input:focus, .modal-body select:focus { border-color: var(--gold); background: #fff; }
+.modal-hint { font-size: 11px; color: var(--text-muted); font-weight: 400; text-transform: none; letter-spacing: 0; margin-top: 2px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+
+/* TOAST */
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { padding: 14px 24px; border-radius: var(--radius-sm); color: #fff; font-weight: 600; font-size: 13px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); min-width: 250px; animation: slideIn 0.3s ease; }
+.toast-success { background: var(--green); } .toast-error { background: var(--red); }
+.toast-warning { background: var(--orange); } .toast-info { background: var(--text-primary); }
+@keyframes slideIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+
+.footer { background: var(--bg-white); border-top: 1px solid var(--border); padding: 20px 32px; text-align: center; font-size: 13px; color: var(--text-muted); }
+.hidden { display: none !important; }
+
+@media (max-width: 768px) {
+    .navbar { padding: 0 16px; }
+    .nav-links { display: none; flex-direction: column; position: absolute; top: 68px; left: 0; right: 0; background: var(--bg-white); padding: 16px; border-bottom: 1px solid var(--border); }
+    .nav-links.open { display: flex; }
+    .hamburger { display: block; }
+    .main-container { padding: 14px; }
+    .page-header { padding: 14px; flex-direction: column; align-items: stretch; }
+    .student-grid { grid-template-columns: 1fr; }
+    .action-row select, .action-row input { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="#" class="brand">
+        <div class="logo-placeholder"><img src="logo(1).png" alt="Logo" onerror="this.style.display='none'"></div>
+        <div class="name">GSSS<span> SHILLA</span></div>
+    </a>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="admin-students.html"><i class="fas fa-users"></i> Students</a></li>
+        <li><a href="admin-admitcard.html"><i class="fas fa-id-badge"></i> Admit Cards</a></li>
+        <li><a href="admin-bonafide.html" class="active"><i class="fas fa-certificate"></i> Bonafide</a></li>
+    </ul>
+    <div class="nav-right">
+        <div class="admin-badge">
+            <span class="avatar" id="adminAvatar">🛡️</span>
+            <span id="adminName">Admin</span>
+            <span class="online-dot"></span>
+        </div>
+        <button class="hamburger" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
+    </div>
+</nav>
+
+<div class="main-container">
+    <div class="page-header">
+        <div>
+            <h1><i class="fas fa-certificate"></i> Bonafide Certificate Manager</h1>
+            <div class="subtitle">Enable bonafide certificates for students. Only enabled ones appear in their dashboard with download option.</div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-outline" onclick="loadStudents()"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card"><h3>Total Students</h3><div class="number gold" id="statTotal">0</div></div>
+        <div class="stat-card"><h3>Bonafide Enabled</h3><div class="number green" id="statEnabled">0</div></div>
+        <div class="stat-card"><h3>Disabled</h3><div class="number red" id="statDisabled">0</div></div>
+        <div class="stat-card"><h3>Current Session</h3><div class="number blue" id="statSession" style="font-size:18px;margin-top:6px;">—</div></div>
+    </div>
+
+    <div class="class-nav">
+        <h3><i class="fas fa-filter"></i> Filter & Bulk Actions</h3>
+        <div class="class-buttons" id="classButtons"></div>
+
+        <div class="action-row">
+            <input type="text" id="fSearch" placeholder="🔍 Search name, student ID, admission no...">
+            <select id="fStatus">
+                <option value="">All Status</option>
+                <option value="enabled">Enabled Only</option>
+                <option value="disabled">Disabled Only</option>
+            </select>
+            <button class="btn btn-success btn-sm" onclick="bulkEnableCurrentClass()">
+                <i class="fas fa-check-circle"></i> Enable Whole Class
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="bulkDisableCurrentClass()">
+                <i class="fas fa-times-circle"></i> Disable Whole Class
+            </button>
+        </div>
+    </div>
+
+    <div id="loadingState" class="state-box"><i class="fas fa-spinner fa-spin"></i> Loading students…</div>
+    <div id="emptyState" class="state-box hidden"><i class="fas fa-users"></i>No students found.</div>
+    <section class="student-grid" id="studentGrid"></section>
+    <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- Purpose Modal -->
+<div class="modal-overlay" id="purposeModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-certificate"></i> Enable Bonafide Certificate</h2>
+            <button class="close-btn" onclick="closePurposeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="purposeStudentInfo" style="background:var(--gold-bg);padding:12px 16px;border-radius:10px;margin-bottom:16px;font-size:13px;line-height:1.6;"></div>
+
+            <label>
+                Purpose for Bonafide Certificate
+                <select id="purposeSelect">
+                    <option value="General Purpose">General Purpose</option>
+                    <option value="Passport Application">Passport Application</option>
+                    <option value="Educational Loan">Educational Loan</option>
+                    <option value="Scholarship Application">Scholarship Application</option>
+                    <option value="Visa Processing">Visa Processing</option>
+                    <option value="Transfer Certificate">Transfer Certificate</option>
+                    <option value="Police Verification">Police Verification</option>
+                    <option value="Bank Account Opening">Bank Account Opening</option>
+                    <option value="Government Scheme">Government Scheme</option>
+                    <option value="Other">Other (specify below)</option>
+                </select>
+                <span class="modal-hint">This will appear on the certificate</span>
+            </label>
+
+            <label style="margin-top:14px;">
+                Custom Purpose (if Other)
+                <input type="text" id="purposeCustom" placeholder="Enter custom purpose..." maxlength="150">
+                <span class="modal-hint">Optional — only used if "Other" is selected above</span>
+            </label>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closePurposeModal()">Cancel</button>
+            <button class="btn btn-success" id="btnConfirmEnable">
+                <i class="fas fa-check"></i> Enable & Generate
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<footer class="footer"><span>&copy; 2026 Govt. Sr. Sec. School Shilla. All rights reserved.</span></footer>
+
+<script>
+const STUDENT_API = "https://gsssshilla.onrender.com/api/students";
+const BONAFIDE_API = "https://gsssshilla.onrender.com/api/bonafide";
+
+const state = {
+    page: 1,
+    limit: 12,
+    currentClass: "",
+    search: "",
+    statusFilter: "",
+    students: [],
+    pagination: {},
+    enabledMap: {},
+    pendingEnable: null  // { studentId, checkbox }
+};
+
+const $ = (s) => document.querySelector(s);
+
+function esc(v) {
+    return v === null || v === undefined ? "" : String(v)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function getAuthHeaders(isFormData = false) {
+    try {
+        const token = localStorage.getItem("adminToken");
+        if (!token) { showToast("Please login first", "error"); return null; }
+        const headers = { "Authorization": `Bearer ${token}` };
+        if (!isFormData) headers["Content-Type"] = "application/json";
+        return headers;
+    } catch (e) { return null; }
+}
+
+function showToast(msg, type = "info") {
+    const c = $("#toastContainer");
+    const t = document.createElement("div");
+    t.className = `toast toast-${type}`;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => { t.style.opacity = "0"; setTimeout(() => t.remove(), 400); }, 4000);
+}
+
+function toggleNav() { $("#navLinks").classList.toggle("open"); }
+
+async function apiCall(url, options = {}) {
+    const isFormData = options.body instanceof FormData;
+    const headers = getAuthHeaders(isFormData);
+    if (!headers) throw new Error("Not authenticated");
+
+    const res = await fetch(url, { ...options, headers: { ...headers, ...(options.headers || {}) } });
+    const text = await res.text();
+    let data;
+    try { data = text ? JSON.parse(text) : {}; } catch (e) { throw new Error("Invalid response"); }
+    if (!res.ok) throw new Error(data.message || `Request failed (${res.status})`);
+    return data;
+}
+
+/* ============ CLASS BUTTONS ============ */
+function renderClassButtons() {
+    const classes = ["", "Nursery","LKG","UKG","1","2","3","4","5","6","7","8","9","10","11","12"];
+    $("#classButtons").innerHTML = classes.map(c => {
+        const label = c === "" ? "All Classes" : (isNaN(c) ? c : `Class ${c}`);
+        const active = state.currentClass === c ? "active" : "";
+        return `<button class="class-btn ${active}" data-class="${c}" onclick="selectClass('${c}')">${label}</button>`;
+    }).join("");
+}
+
+function selectClass(c) {
+    state.currentClass = c;
+    state.page = 1;
+    renderClassButtons();
+    loadStudents();
+}
+
+/* ============ LOAD STUDENTS ============ */
+async function loadStudents() {
+    $("#loadingState").classList.remove("hidden");
+    $("#emptyState").classList.add("hidden");
+    $("#studentGrid").innerHTML = "";
+    $("#pagination").innerHTML = "";
+
+    try {
+        const params = new URLSearchParams();
+        params.set("page", state.page);
+        params.set("limit", state.limit);
+        if (state.currentClass) params.set("class", state.currentClass);
+        if (state.search) params.set("search", state.search);
+
+        const data = await apiCall(`${STUDENT_API}?${params.toString()}`);
+        let students = data.data || [];
+
+        await loadEnabledStatus(students.map(s => s.student_id));
+
+        if (state.statusFilter === "enabled") {
+            students = students.filter(s => state.enabledMap[s.student_id]);
+        } else if (state.statusFilter === "disabled") {
+            students = students.filter(s => !state.enabledMap[s.student_id]);
+        }
+
+        state.students = students;
+        state.pagination = data.pagination || {};
+
+        $("#loadingState").classList.add("hidden");
+
+        if (!students.length) {
+            $("#emptyState").classList.remove("hidden");
+            updateStats();
+            return;
+        }
+
+        renderStudents();
+        renderPagination();
+        updateStats();
+    } catch (err) {
+        $("#loadingState").classList.add("hidden");
+        $("#emptyState").classList.remove("hidden");
+        showToast(err.message, "error");
+    }
+}
+
+async function loadEnabledStatus(studentIds) {
+    if (!studentIds.length) return;
+    try {
+        const res = await fetch(`${BONAFIDE_API}/status-bulk`, {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ studentIds })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.map) {
+                state.enabledMap = { ...state.enabledMap, ...data.map };
+            }
+        }
+    } catch (e) {
+        console.warn("Could not load bonafide status:", e.message);
+    }
+}
+
+/* ============ RENDER ============ */
+function renderStudents() {
+    const grid = $("#studentGrid");
+    grid.innerHTML = state.students.map(s => {
+        const enabled = !!state.enabledMap[s.student_id];
+        const photo = s.student_photo_url || "";
+        const isHigher = ["11","12"].includes(String(s.class));
+
+        return `
+        <div class="student-card ${enabled ? "enabled" : ""}" data-id="${s.id}">
+            <span class="card-status-badge ${enabled ? "status-enabled" : "status-disabled"}">${enabled ? "✓ Enabled" : "Disabled"}</span>
+            <div class="card-photo-row">
+                ${photo
+                    ? `<img class="card-photo" src="${esc(photo)}" onerror="this.outerHTML='<div class=&quot;card-photo-placeholder&quot;>👤</div>'">`
+                    : `<div class="card-photo-placeholder">👤</div>`}
+                <div style="flex:1;min-width:0;">
+                    <div class="card-name">${esc(s.name)}</div>
+                    <div class="card-meta">ID: <b>${esc(s.student_id)}</b> · Adm: <b>${esc(s.admission_number || "—")}</b></div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div>👨 Father: <b>${esc(s.father_name || "—")}</b></div>
+                <div>📚 Class: <b>${esc(s.class)}</b>${isHigher ? " · " + esc(s.stream || "") : ""} · Roll: <b>${esc(s.roll_number || "—")}</b></div>
+                <div>🗓️ Session: <b>${esc(s.session || "—")}</b></div>
+            </div>
+            <div class="card-actions">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="toggle-label">Bonafide</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" ${enabled ? "checked" : ""} onchange="onToggle(this, '${esc(s.student_id)}', '${esc(s.name)}', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div style="display:flex;gap:6px;">
+                    ${enabled ? `<button class="btn btn-xs btn-primary" onclick="previewPDF('${esc(s.student_id)}')" title="Preview PDF"><i class="fas fa-eye"></i> Preview</button>` : ""}
+                </div>
+            </div>
+        </div>`;
+    }).join("");
+}
+
+/* ============ TOGGLE ============ */
+function onToggle(checkbox, studentId, studentName, checked) {
+    if (checked) {
+        // Enable — show purpose modal
+        state.pendingEnable = { studentId, studentName, checkbox };
+        $("#purposeStudentInfo").innerHTML = `
+            <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:4px;">Student</div>
+            <div style="font-weight:800;color:var(--text-primary);font-size:15px;">${esc(studentName)}</div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">ID: ${esc(studentId)}</div>
+        `;
+        $("#purposeSelect").value = "General Purpose";
+        $("#purposeCustom").value = "";
+        $("#purposeModal").classList.add("active");
+    } else {
+        // Disable directly
+        disableBonafide(studentId, checkbox);
+    }
+}
+
+function closePurposeModal() {
+    $("#purposeModal").classList.remove("active");
+    if (state.pendingEnable && state.pendingEnable.checkbox) {
+        state.pendingEnable.checkbox.checked = false;
+    }
+    state.pendingEnable = null;
+}
+
+$("#btnConfirmEnable").addEventListener("click", async () => {
+    if (!state.pendingEnable) return;
+
+    const { studentId, studentName, checkbox } = state.pendingEnable;
+    let purpose = $("#purposeSelect").value;
+    const customPurpose = $("#purposeCustom").value.trim();
+
+    if (purpose === "Other") {
+        if (!customPurpose) {
+            showToast("Please specify a custom purpose", "warning");
+            return;
+        }
+        purpose = customPurpose;
+    }
+
+    const btn = $("#btnConfirmEnable");
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enabling…';
+
+    try {
+        const res = await apiCall(`${BONAFIDE_API}/enable`, {
+            method: "POST",
+            body: JSON.stringify({ studentId, purpose })
+        });
+
+        state.enabledMap[studentId] = true;
+        showToast(res.message || `${studentName} enabled ✅`, "success");
+        closePurposeModal();
+        renderStudents();
+        updateStats();
+    } catch (err) {
+        showToast(err.message, "error");
+        if (checkbox) checkbox.checked = false;
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check"></i> Enable & Generate';
+    }
+});
+
+async function disableBonafide(studentId, checkbox) {
+    try {
+        checkbox.disabled = true;
+        const res = await apiCall(`${BONAFIDE_API}/disable`, {
+            method: "POST",
+            body: JSON.stringify({ studentId })
+        });
+        state.enabledMap[studentId] = false;
+        showToast(res.message || "Disabled ✅", "success");
+        renderStudents();
+        updateStats();
+    } catch (err) {
+        checkbox.checked = true;
+        showToast(err.message, "error");
+    } finally {
+        checkbox.disabled = false;
+    }
+}
+
+/* ============ BULK ============ */
+async function bulkEnableCurrentClass() {
+    if (!state.currentClass) return showToast("Please select a specific class first", "warning");
+    if (!confirm(`Enable bonafide certificate for ALL students in Class ${state.currentClass}?\n\nPurpose will be set to "General Purpose".`)) return;
+
+    try {
+        const res = await apiCall(`${BONAFIDE_API}/enable-class`, {
+            method: "POST",
+            body: JSON.stringify({ class: state.currentClass })
+        });
+        showToast(res.message || "Class enabled ✅", "success");
+        state.enabledMap = {};
+        loadStudents();
+    } catch (err) { showToast(err.message, "error"); }
+}
+
+async function bulkDisableCurrentClass() {
+    if (!state.currentClass) return showToast("Please select a specific class first", "warning");
+    if (!confirm(`Disable bonafide certificate for ALL students in Class ${state.currentClass}?`)) return;
+
+    try {
+        const res = await apiCall(`${BONAFIDE_API}/disable-class`, {
+            method: "POST",
+            body: JSON.stringify({ class: state.currentClass })
+        });
+        showToast(res.message || "Class disabled ✅", "success");
+        state.enabledMap = {};
+        loadStudents();
+    } catch (err) { showToast(err.message, "error"); }
+}
+
+/* ============ PREVIEW PDF ============ */
+    function previewPDF(studentId) {
+    const url = `${BONAFIDE_API}/certificate/${encodeURIComponent(studentId)}/pdf?v=${Date.now()}`;
+    window.open(url, "_blank");
+    }
+
+
+/* ============ PAGINATION ============ */
+function renderPagination() {
+    const { page = 1, pages = 0 } = state.pagination;
+    const wrap = $("#pagination");
+    wrap.innerHTML = "";
+    if (pages <= 1) return;
+
+    const mk = (label, p, disabled = false, active = false) => {
+        const b = document.createElement("button");
+        b.textContent = label;
+        b.disabled = disabled;
+        if (active) b.classList.add("active");
+        b.addEventListener("click", () => { state.page = p; loadStudents(); });
+        return b;
+    };
+
+    wrap.appendChild(mk("«", page - 1, page === 1));
+    const start = Math.max(1, page - 2);
+    const end = Math.min(pages, page + 2);
+    for (let i = start; i <= end; i++) wrap.appendChild(mk(i, i, false, i === page));
+    wrap.appendChild(mk("»", page + 1, page === pages));
+}
+
+/* ============ STATS ============ */
+function updateStats() {
+    const enabledCount = state.students.filter(s => state.enabledMap[s.student_id]).length;
+    const total = state.pagination.total || 0;
+
+    $("#statTotal").textContent = total;
+    $("#statEnabled").textContent = enabledCount;
+    $("#statDisabled").textContent = Math.max(0, state.students.length - enabledCount);
+
+    try {
+        const session = localStorage.getItem("currentSession") || "—";
+        $("#statSession").textContent = session;
+    } catch (e) {}
+}
+
+/* ============ EVENTS ============ */
+let searchTimer;
+$("#fSearch").addEventListener("input", () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        state.search = $("#fSearch").value.trim();
+        state.page = 1;
+        loadStudents();
+    }, 400);
+});
+
+$("#fStatus").addEventListener("change", () => {
+    state.statusFilter = $("#fStatus").value;
+    state.page = 1;
+    loadStudents();
+});
+
+/* Modal close handlers */
+$("#purposeModal").addEventListener("click", (e) => {
+    if (e.target.id === "purposeModal") closePurposeModal();
+});
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closePurposeModal();
+});
+
+/* ============ INIT ============ */
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const token = localStorage.getItem("adminToken");
+        if (!token) {
+            alert("Please login first");
+            window.location.href = "login.html";
+            return;
+        }
+        const res = await fetch("https://gsssshilla.onrender.com/api/admin/verify", {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.admin?.username) {
+                $("#adminAvatar").textContent = data.admin.username.charAt(0).toUpperCase();
+                $("#adminName").textContent = data.admin.username;
+            }
+        }
+    } catch (e) {}
+
+    renderClassButtons();
+    await loadStudents();
+});
+</script>
+</body>
+</html>
