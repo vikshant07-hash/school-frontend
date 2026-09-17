@@ -270,8 +270,7 @@
     </a>
     <ul class="nav-links" id="navLinks">
         <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li><a href="admin-students.html"><i class="fas fa-users"></i> Students</a></li>
-        <li><a href="admin-result.html" class="active"><i class="fas fa-graduation-cap"></i> Results</a></li>
+          <li><a href="admin-result.html" class="active"><i class="fas fa-graduation-cap"></i> Results</a></li>
     </ul>
     <div class="nav-right">
         <div class="admin-badge">
@@ -670,23 +669,80 @@ function getAuthHeaders() {
 async function checkAuth() {
     let token = null;
     try { token = localStorage.getItem("adminToken"); } catch (e) {}
-    if (!token) { showPopup("invalid"); return false; }
-
+    if (!token) { showPopup(); return false; }
+    
     try {
-        const res = await fetch(VERIFY_API, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetch("https://gsssshilla.onrender.com/api/admin/verify", { 
+            headers: { Authorization: `Bearer ${token}` } 
+        });
         const data = await res.json();
+        
         if (data.success) {
-            if (data.admin?.username) {
-                document.getElementById("adminAvatar").textContent = data.admin.username.charAt(0).toUpperCase();
-                document.getElementById("adminName").textContent = data.admin.username;
+            const admin = data.admin || {};
+            
+            // ✅ Name ko prefer karo, agar nahi hai to username
+            const displayName = admin.name || admin.fullName || admin.username || "Admin";
+            const initial = displayName.charAt(0).toUpperCase();
+            
+            $("#adminAvatar").textContent = initial;
+            $("#adminName").textContent = displayName;
+            
+            // ✅ Save for PDF "Issued by" line
+            try {
+                localStorage.setItem("adminData", JSON.stringify({
+                    id: admin.id || "",
+                    name: admin.name || "",
+                    username: admin.username || "",
+                    email: admin.email || ""
+                }));
+                localStorage.setItem("adminName", displayName);
+            } catch (e) {}
+            
+            // ✅ Agar verify mein name nahi aaya, to profile se try karo
+            if (!admin.name && !admin.fullName) {
+                fetchAdminNameFromProfile(token);
             }
+            
             return true;
+        } else { 
+            showPopup(); 
+            return false; 
         }
-        showPopup("expired");
-        return false;
-    } catch (err) {
-        showPopup("expired");
-        return false;
+    } catch (err) { 
+        return true; 
+    }
+}
+
+// ✅ Naya helper — profile se real name laayega (agar verify mein na mile)
+async function fetchAdminNameFromProfile(token) {
+    try {
+        const res = await fetch("https://gsssshilla.onrender.com/api/admin/profile", {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        // Aapke backend response ke hisaab se adjust karein
+        const admin = data.data || data.admin || data;
+        const name = admin?.name || admin?.fullName || admin?.username;
+        
+        if (name && name !== "Admin") {
+            $("#adminName").textContent = name;
+            $("#adminAvatar").textContent = name.charAt(0).toUpperCase();
+            
+            // PDF ke liye bhi save karo
+            try {
+                const existing = JSON.parse(localStorage.getItem("adminData") || "{}");
+                localStorage.setItem("adminData", JSON.stringify({
+                    ...existing,
+                    name: admin.name || existing.name || "",
+                    username: admin.username || existing.username || "",
+                    email: admin.email || existing.email || ""
+                }));
+                localStorage.setItem("adminName", name);
+            } catch (e) {}
+        }
+    } catch (e) {
+        console.warn("Could not fetch admin name from profile:", e);
     }
 }
 
