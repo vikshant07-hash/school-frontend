@@ -140,7 +140,6 @@
         .badge-warning { background: var(--orange-bg); color: var(--orange); }
         .badge-info { background: var(--blue-bg); color: var(--blue); }
 
-        /* ===== RESULT STATUS BADGES ===== */
         .status-pill {
             display: inline-flex; align-items: center; gap: 5px;
             padding: 4px 14px; border-radius: 50px;
@@ -156,7 +155,6 @@
         .status-withheld { background: #f5f0ff; color: #a855f7; border: 1.5px solid #e9d5ff; }
         .status-unset { background: #f1f5f9; color: #94a3b8; border: 1.5px solid #e2e8f0; }
 
-        /* ===== SUBJECT ROWS ===== */
         .subject-row {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 40px;
@@ -270,7 +268,7 @@
     </a>
     <ul class="nav-links" id="navLinks">
         <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-          <li><a href="admin-result.html" class="active"><i class="fas fa-graduation-cap"></i> Results</a></li>
+        <li><a href="admin-result.html" class="active"><i class="fas fa-graduation-cap"></i> Results</a></li>
     </ul>
     <div class="nav-right">
         <div class="admin-badge">
@@ -305,7 +303,7 @@
     <div id="tab-search" class="tab-content active">
         <div class="search-section">
             <h3><i class="fas fa-user-graduate"></i> Student Result Search</h3>
-            <p>Student ID daalo aur uski saari marksheets dekho. Student details Nstudent table se fetch hoti hain.</p>
+            <p>Student ID daalo aur uski saari marksheets dekho.</p>
             <div class="search-row">
                 <input type="text" class="search-input" id="searchStudentId" placeholder="Enter Student ID (e.g. GSSS2025001)" onkeypress="if(event.key==='Enter') searchStudent()">
                 <button class="btn btn-primary" onclick="searchStudent()"><i class="fas fa-search"></i> Search</button>
@@ -412,7 +410,6 @@
                         <input type="text" id="upMaxMarks" placeholder="e.g. 500">
                     </div>
 
-                    <!-- Subjects Section -->
                     <div class="form-group" style="grid-column:1/-1;">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
                             <label style="margin:0;">Subject-wise Marks (Optional)</label>
@@ -497,16 +494,14 @@
         </div>
     </div>
 
-    <!-- TAB 5: STATUS MANAGER (NEW) -->
+    <!-- TAB 5: STATUS MANAGER -->
     <div id="tab-status" class="tab-content">
         <div class="class-nav">
             <h3><i class="fas fa-clipboard-check"></i> Result Status Manager</h3>
             <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">
                 Yahan se saari marksheets ka result status (Pass/Fail/Compartment/Supply) manage karo.
-                Filters lagao aur status update karo.
             </p>
 
-            <!-- Filters -->
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
                 <div class="form-group">
                     <label>Session</label>
@@ -642,6 +637,10 @@ const VERIFY_API = window.location.hostname === "localhost"
     ? "http://localhost:5000/api/admin/verify"
     : "https://gsssshilla.onrender.com/api/admin/verify";
 
+const PROFILE_API = window.location.hostname === "localhost"
+    ? "http://localhost:5000/api/admin/profile"
+    : "https://gsssshilla.onrender.com/api/admin/profile";
+
 const PAGE_SIZE = 20;
 
 // ============================================================
@@ -656,118 +655,11 @@ let currentStudentsCache = [];
 let subjectRowCounter = 0;
 
 // ============================================================
-// AUTH
-// ============================================================
-function getAuthHeaders() {
-    try {
-        const token = localStorage.getItem("adminToken");
-        if (!token) { showPopup("invalid"); return null; }
-        return { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" };
-    } catch (e) { showPopup("invalid"); return null; }
-}
-
-async function checkAuth() {
-    let token = null;
-    try { token = localStorage.getItem("adminToken"); } catch (e) {}
-    if (!token) { showPopup(); return false; }
-    
-    try {
-        const res = await fetch("https://gsssshilla.onrender.com/api/admin/verify", { 
-            headers: { Authorization: `Bearer ${token}` } 
-        });
-        const data = await res.json();
-        
-        if (data.success) {
-            const admin = data.admin || {};
-            
-            // ✅ Name ko prefer karo, agar nahi hai to username
-            const displayName = admin.name || admin.fullName || admin.username || "Admin";
-            const initial = displayName.charAt(0).toUpperCase();
-            
-            $("#adminAvatar").textContent = initial;
-            $("#adminName").textContent = displayName;
-            
-            // ✅ Save for PDF "Issued by" line
-            try {
-                localStorage.setItem("adminData", JSON.stringify({
-                    id: admin.id || "",
-                    name: admin.name || "",
-                    username: admin.username || "",
-                    email: admin.email || ""
-                }));
-                localStorage.setItem("adminName", displayName);
-            } catch (e) {}
-            
-            // ✅ Agar verify mein name nahi aaya, to profile se try karo
-            if (!admin.name && !admin.fullName) {
-                fetchAdminNameFromProfile(token);
-            }
-            
-            return true;
-        } else { 
-            showPopup(); 
-            return false; 
-        }
-    } catch (err) { 
-        return true; 
-    }
-}
-
-// ✅ Naya helper — profile se real name laayega (agar verify mein na mile)
-async function fetchAdminNameFromProfile(token) {
-    try {
-        const res = await fetch("https://gsssshilla.onrender.com/api/admin/profile", {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        const data = await res.json();
-        
-        // Aapke backend response ke hisaab se adjust karein
-        const admin = data.data || data.admin || data;
-        const name = admin?.name || admin?.fullName || admin?.username;
-        
-        if (name && name !== "Admin") {
-            $("#adminName").textContent = name;
-            $("#adminAvatar").textContent = name.charAt(0).toUpperCase();
-            
-            // PDF ke liye bhi save karo
-            try {
-                const existing = JSON.parse(localStorage.getItem("adminData") || "{}");
-                localStorage.setItem("adminData", JSON.stringify({
-                    ...existing,
-                    name: admin.name || existing.name || "",
-                    username: admin.username || existing.username || "",
-                    email: admin.email || existing.email || ""
-                }));
-                localStorage.setItem("adminName", name);
-            } catch (e) {}
-        }
-    } catch (e) {
-        console.warn("Could not fetch admin name from profile:", e);
-    }
-}
-
-function showPopup(type = "expired") {
-    const overlay = document.getElementById("sessionOverlay");
-    document.getElementById("popupIconBox").className = "icon-box " + (type === "invalid" ? "invalid" : "expired");
-    document.getElementById("popupIcon").className = type === "invalid" ? "fas fa-lock" : "fas fa-clock";
-    document.getElementById("popupTitle").innerHTML = type === "invalid" ? 'Invalid <span>Access</span>' : 'Session <span>Expired</span>';
-    document.getElementById("popupSubText").innerHTML = type === "invalid"
-        ? "You are not authorized to access this page.<br>Please login with valid credentials."
-        : "Your session has been expired due to inactivity.<br>Please login again to continue.";
-    document.getElementById("popupStatusText").textContent = type === "invalid" ? "Access denied" : "Secure session ended";
-    document.getElementById("popupBtnText").textContent = type === "invalid" ? "Go to Login" : "Login Again";
-    overlay.classList.add("active");
-    try { localStorage.removeItem("adminToken"); } catch (e) {}
-}
-
-function redirectToLogin() {
-    document.getElementById("sessionOverlay").classList.remove("active");
-    window.location.replace("login.html");
-}
-
-// ============================================================
 // HELPERS
 // ============================================================
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
 function esc(v) {
     return v === null || v === undefined ? "" : String(v)
         .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -829,6 +721,141 @@ function showToast(msg, type = "info") {
     setTimeout(() => { t.style.opacity = "0"; setTimeout(() => t.remove(), 400); }, 4000);
 }
 
+// ============================================================
+// AUTH
+// ============================================================
+function getAuthHeaders() {
+    try {
+        const token = localStorage.getItem("adminToken");
+        if (!token) { showPopup("invalid"); return null; }
+        return { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" };
+    } catch (e) { showPopup("invalid"); return null; }
+}
+
+async function checkAuth() {
+    let token = null;
+    try { token = localStorage.getItem("adminToken"); } catch (e) {}
+    if (!token) { showPopup(); return false; }
+    
+    try {
+        const res = await fetch(VERIFY_API, { 
+            headers: { Authorization: `Bearer ${token}` } 
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            const admin = data.admin || {};
+            
+            // ✅ localStorage ka saved name PEHLE check karo
+            let savedName = "";
+            try {
+                const savedData = JSON.parse(localStorage.getItem("adminData") || "{}");
+                savedName = savedData.name || "";
+            } catch (e) {}
+            
+            // ✅ Priority: localStorage > verify response > username > default
+            const displayName = 
+                savedName || 
+                admin.name || 
+                admin.fullName || 
+                admin.username || 
+                "Admin";
+            
+            const initial = displayName.charAt(0).toUpperCase();
+            
+            const nameEl = document.getElementById("adminName");
+            const avatarEl = document.getElementById("adminAvatar");
+            if (nameEl) nameEl.textContent = displayName;
+            if (avatarEl) avatarEl.textContent = initial;
+            
+            // ✅ Save/update
+            try {
+                localStorage.setItem("adminData", JSON.stringify({
+                    id: admin.id || "",
+                    name: displayName,
+                    username: admin.username || "",
+                    email: admin.email || ""
+                }));
+                localStorage.setItem("adminName", displayName);
+            } catch (e) {}
+            
+            // ✅ Agar verify mein name nahi aaya, to profile se try karo
+            if (!admin.name && !admin.fullName && !savedName) {
+                fetchAdminNameFromProfile(token);
+            }
+            
+            return true;
+        } else { 
+            showPopup(); 
+            return false; 
+        }
+    } catch (err) { 
+        // Network error — localStorage se fallback
+        try {
+            const savedData = JSON.parse(localStorage.getItem("adminData") || "{}");
+            if (savedData.name) {
+                const nameEl = document.getElementById("adminName");
+                const avatarEl = document.getElementById("adminAvatar");
+                if (nameEl) nameEl.textContent = savedData.name;
+                if (avatarEl) avatarEl.textContent = savedData.name.charAt(0).toUpperCase();
+            }
+        } catch (e) {}
+        return true; 
+    }
+}
+
+// ✅ Helper — profile se real name laayega (agar verify mein na mile)
+async function fetchAdminNameFromProfile(token) {
+    try {
+        const res = await fetch(PROFILE_API, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        const admin = data.data || data.admin || data;
+        const name = admin?.name || admin?.fullName || admin?.username;
+        
+        if (name && name !== "Admin") {
+            const nameEl = document.getElementById("adminName");
+            const avatarEl = document.getElementById("adminAvatar");
+            if (nameEl) nameEl.textContent = name;
+            if (avatarEl) avatarEl.textContent = name.charAt(0).toUpperCase();
+            
+            try {
+                const existing = JSON.parse(localStorage.getItem("adminData") || "{}");
+                localStorage.setItem("adminData", JSON.stringify({
+                    ...existing,
+                    name: admin.name || existing.name || "",
+                    username: admin.username || existing.username || "",
+                    email: admin.email || existing.email || ""
+                }));
+                localStorage.setItem("adminName", name);
+            } catch (e) {}
+        }
+    } catch (e) {
+        console.warn("Could not fetch admin name from profile:", e);
+    }
+}
+
+function showPopup(type = "expired") {
+    const overlay = document.getElementById("sessionOverlay");
+    document.getElementById("popupIconBox").className = "icon-box " + (type === "invalid" ? "invalid" : "expired");
+    document.getElementById("popupIcon").className = type === "invalid" ? "fas fa-lock" : "fas fa-clock";
+    document.getElementById("popupTitle").innerHTML = type === "invalid" ? 'Invalid <span>Access</span>' : 'Session <span>Expired</span>';
+    document.getElementById("popupSubText").innerHTML = type === "invalid"
+        ? "You are not authorized to access this page.<br>Please login with valid credentials."
+        : "Your session has been expired due to inactivity.<br>Please login again to continue.";
+    document.getElementById("popupStatusText").textContent = type === "invalid" ? "Access denied" : "Secure session ended";
+    document.getElementById("popupBtnText").textContent = type === "invalid" ? "Go to Login" : "Login Again";
+    overlay.classList.add("active");
+    try { localStorage.removeItem("adminToken"); } catch (e) {}
+}
+
+function redirectToLogin() {
+    document.getElementById("sessionOverlay").classList.remove("active");
+    window.location.replace("login.html");
+}
+
 async function apiCall(url, options = {}) {
     const headers = getAuthHeaders();
     if (!headers) throw new Error("Not authenticated");
@@ -873,7 +900,7 @@ function switchTab(tab) {
 }
 
 // ============================================================
-// SUBJECT ROWS MANAGEMENT
+// SUBJECT ROWS
 // ============================================================
 function addSubjectRow(name = "", obtained = "", max = "") {
     subjectRowCounter++;
@@ -1364,7 +1391,6 @@ async function saveStatus(id) {
         showToast("Status updated ✅", "success");
         closeModal("statusModal");
 
-        // Refresh current view
         const sid = document.getElementById("searchStudentId").value.trim();
         if (sid) searchStudent();
         if (document.getElementById("tab-status").classList.contains("active")) loadStatusManager();
@@ -1564,7 +1590,7 @@ async function bulkPublish() {
 }
 
 // ============================================================
-// STATUS MANAGER (NEW TAB)
+// STATUS MANAGER
 // ============================================================
 async function loadStatusManager() {
     const tbody = document.getElementById("statusManagerBody");
