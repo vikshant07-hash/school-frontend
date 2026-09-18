@@ -19,6 +19,22 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
 
+/* SESSION OVERLAY */
+.session-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 9999; justify-content: center; align-items: center; }
+.session-overlay.active { display: flex; }
+.session-popup { background: var(--bg-white); border-radius: 24px; padding: 40px 32px; max-width: 440px; width: 92%; text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.3); border: 1px solid rgba(201,151,43,0.15); }
+.session-popup .school-logo { width: 80px; height: 80px; border-radius: 20px; background: var(--gold-bg); margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--gold); }
+.session-popup .school-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 12px; }
+.icon-box { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+.icon-box.expired, .icon-box.invalid { background: #fef2f2; color: var(--red); }
+.session-popup h2 { font-size: 26px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
+.session-popup h2 span { color: var(--gold); }
+.sub-text { font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; }
+.session-timer { font-size: 13px; color: var(--text-muted); background: var(--bg); padding: 8px 16px; border-radius: 50px; display: inline-block; margin: 8px 0 20px; }
+.school-name-popup { font-size: 13px; font-weight: 600; color: var(--gold); margin-bottom: 20px; }
+.login-again-btn { display: inline-flex; align-items: center; gap: 12px; padding: 14px 40px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #fff; border: none; border-radius: 50px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
+.login-again-btn:hover { transform: translateY(-4px); }
+
 .navbar { background: var(--bg-white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 68px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
 .navbar .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
 .navbar .brand .logo-placeholder { width: 42px; height: 42px; border-radius: var(--radius-sm); background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -34,6 +50,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .admin-badge { display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 10px; background: var(--bg); border-radius: 50px; font-size: 12px; font-weight: 600; color: var(--text-secondary); }
 .avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
 .online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.hamburger { display: none; background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-primary); }
 
 .main-container { flex: 1; max-width: 1400px; margin: 0 auto; padding: 24px 32px 40px; width: 100%; }
 .page-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 22px; padding: 20px 26px; background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
@@ -120,7 +137,6 @@ input[type="checkbox"].row-select { width: 18px; height: 18px; cursor: pointer; 
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
-/* DETAIL VIEW */
 .detail-panel { padding: 18px 20px; background: #fffbeb; border-left: 4px solid var(--gold); }
 .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px 22px; font-size: 13px; }
 .detail-item { display: flex; flex-direction: column; gap: 2px; }
@@ -140,6 +156,19 @@ input[type="checkbox"].row-select { width: 18px; height: 18px; cursor: pointer; 
 </head>
 <body>
 
+<!-- SESSION POPUP -->
+<div class="session-overlay" id="sessionOverlay">
+    <div class="session-popup">
+        <div class="school-logo"><img src="logo(1).png" alt="GSSS SHILLA Logo" onerror="this.style.display='none'"></div>
+        <div class="school-name-popup"><i class="fas fa-school"></i> Govt. Sr. Sec. School Shilla</div>
+        <div class="icon-box expired" id="popupIconBox"><i class="fas fa-clock" id="popupIcon"></i></div>
+        <h2 id="popupTitle">Session <span>Expired</span></h2>
+        <p class="sub-text" id="popupSubText">Your session has been expired due to inactivity.<br>Please login again to continue.</p>
+        <div class="session-timer"><i class="fas fa-shield-alt"></i> <span id="popupStatusText">Secure session ended</span></div>
+        <button class="login-again-btn" onclick="redirectToLogin()"><i class="fas fa-sign-in-alt"></i> <span id="popupBtnText">Login Again</span></button>
+    </div>
+</div>
+
 <nav class="navbar">
     <a href="#" class="brand">
         <div class="logo-placeholder"><img src="logo(1).png" alt="Logo" onerror="this.style.display='none'"></div>
@@ -148,7 +177,7 @@ input[type="checkbox"].row-select { width: 18px; height: 18px; cursor: pointer; 
     <ul class="nav-links">
         <li><a href="admin-students.html"><i class="fas fa-users"></i> Students</a></li>
         <li><a href="admin-bonafide.html"><i class="fas fa-certificate"></i> Bonafide</a></li>
-        <li><a href="admin-admitcard.html" class="active"><i class="fas fa-id-badge"></i> Admit Cards</a></li>
+        <li><a href="admin-admitcard.html" class="active"><i class="fas fa-id-card-clip"></i> Admit Cards</a></li>
     </ul>
     <div class="nav-right">
         <div class="admin-badge">
@@ -162,8 +191,8 @@ input[type="checkbox"].row-select { width: 18px; height: 18px; cursor: pointer; 
 <div class="main-container">
     <div class="page-header">
         <div>
-            <h1><i class="fas fa-id-badge"></i> Admit Card Manager</h1>
-            <div class="subtitle">Class select → Students fatch → PDF upload → Publish</div>
+            <h1><i class="fas fa-id-card-clip"></i> Admit Card Manager</h1>
+            <div class="subtitle">Class select → Students fetch → PDF upload → Publish</div>
         </div>
     </div>
 
@@ -351,7 +380,12 @@ input[type="checkbox"].row-select { width: 18px; height: 18px; cursor: pointer; 
 <footer class="footer"><span>&copy; 2026 Govt. Sr. Sec. School Shilla. All rights reserved.</span></footer>
 
 <script>
+// ============================================================
+// CONFIG
+// ============================================================
 const API = "https://gsssshilla.onrender.com/api/admit-card";
+const VERIFY_API = "https://gsssshilla.onrender.com/api/admin/verify";
+const PROFILE_API = "https://gsssshilla.onrender.com/api/admin/profile";
 
 const state = {
     fetchedStudents: [],
@@ -363,7 +397,11 @@ const state = {
 };
 
 const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
 
+// ============================================================
+// HELPERS
+// ============================================================
 function esc(v) {
     return v === null || v === undefined ? "" : String(v)
         .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -385,14 +423,131 @@ function showToast(msg, type = "info") {
     setTimeout(() => { t.style.opacity = "0"; setTimeout(() => t.remove(), 400); }, 4000);
 }
 
+function showPopup(type = "expired") {
+    const overlay = document.getElementById("sessionOverlay");
+    document.getElementById("popupIconBox").className = "icon-box " + (type === "invalid" ? "invalid" : "expired");
+    document.getElementById("popupIcon").className = type === "invalid" ? "fas fa-lock" : "fas fa-clock";
+    document.getElementById("popupTitle").innerHTML = type === "invalid" ? 'Invalid <span>Access</span>' : 'Session <span>Expired</span>';
+    document.getElementById("popupSubText").innerHTML = type === "invalid"
+        ? "You are not authorized to access this page.<br>Please login with valid credentials."
+        : "Your session has been expired due to inactivity.<br>Please login again to continue.";
+    document.getElementById("popupStatusText").textContent = type === "invalid" ? "Access denied" : "Secure session ended";
+    document.getElementById("popupBtnText").textContent = type === "invalid" ? "Go to Login" : "Login Again";
+    overlay.classList.add("active");
+    try { localStorage.removeItem("adminToken"); } catch (e) {}
+}
+
+function redirectToLogin() {
+    document.getElementById("sessionOverlay").classList.remove("active");
+    window.location.replace("login.html");
+}
+
+// ============================================================
+// AUTH
+// ============================================================
 function getAuthHeaders(isFormData = false) {
     try {
         const token = localStorage.getItem("adminToken");
-        if (!token) { alert("Please login"); window.location.href = "login.html"; return null; }
+        if (!token) { showPopup("invalid"); return null; }
         const headers = { "Authorization": `Bearer ${token}` };
         if (!isFormData) headers["Content-Type"] = "application/json";
         return headers;
-    } catch (e) { return null; }
+    } catch (e) { showPopup("invalid"); return null; }
+}
+
+async function checkAuth() {
+    let token = null;
+    try { token = localStorage.getItem("adminToken"); } catch (e) {}
+    if (!token) { showPopup(); return false; }
+    
+    try {
+        const res = await fetch(VERIFY_API, { 
+            headers: { Authorization: `Bearer ${token}` } 
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            const admin = data.admin || {};
+            
+            // ✅ localStorage ka saved name PEHLE check karo
+            let savedName = "";
+            try {
+                const savedData = JSON.parse(localStorage.getItem("adminData") || "{}");
+                savedName = savedData.name || "";
+            } catch (e) {}
+            
+            // ✅ Priority: localStorage > verify > username > default
+            const displayName = savedName || admin.name || admin.fullName || admin.username || "Admin";
+            const initial = displayName.charAt(0).toUpperCase();
+            
+            const nameEl = document.getElementById("adminName");
+            const avatarEl = document.getElementById("adminAvatar");
+            if (nameEl) nameEl.textContent = displayName;
+            if (avatarEl) avatarEl.textContent = initial;
+            
+            try {
+                localStorage.setItem("adminData", JSON.stringify({
+                    id: admin.id || "",
+                    name: displayName,
+                    username: admin.username || "",
+                    email: admin.email || ""
+                }));
+                localStorage.setItem("adminName", displayName);
+            } catch (e) {}
+            
+            if (!admin.name && !admin.fullName && !savedName) {
+                fetchAdminNameFromProfile(token);
+            }
+            
+            return true;
+        } else { 
+            showPopup(); 
+            return false; 
+        }
+    } catch (err) { 
+        try {
+            const savedData = JSON.parse(localStorage.getItem("adminData") || "{}");
+            if (savedData.name) {
+                const nameEl = document.getElementById("adminName");
+                const avatarEl = document.getElementById("adminAvatar");
+                if (nameEl) nameEl.textContent = savedData.name;
+                if (avatarEl) avatarEl.textContent = savedData.name.charAt(0).toUpperCase();
+            }
+        } catch (e) {}
+        return true; 
+    }
+}
+
+async function fetchAdminNameFromProfile(token) {
+    try {
+        const res = await fetch(PROFILE_API, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        const admin = data.data || data.admin || data;
+        const name = admin?.name || admin?.fullName || admin?.username;
+        
+        if (name && name !== "Admin") {
+            const nameEl = document.getElementById("adminName");
+            const avatarEl = document.getElementById("adminAvatar");
+            if (nameEl) nameEl.textContent = name;
+            if (avatarEl) avatarEl.textContent = name.charAt(0).toUpperCase();
+            
+            try {
+                const existing = JSON.parse(localStorage.getItem("adminData") || "{}");
+                localStorage.setItem("adminData", JSON.stringify({
+                    ...existing,
+                    name: admin.name || existing.name || "",
+                    username: admin.username || existing.username || "",
+                    email: admin.email || existing.email || ""
+                }));
+                localStorage.setItem("adminName", name);
+            } catch (e) {}
+        }
+    } catch (e) {
+        console.warn("Could not fetch admin name from profile:", e);
+    }
 }
 
 async function apiCall(url, options = {}) {
@@ -400,6 +555,7 @@ async function apiCall(url, options = {}) {
     const headers = getAuthHeaders(isFormData);
     if (!headers) throw new Error("Not authenticated");
     const res = await fetch(url, { ...options, headers: { ...headers, ...(options.headers || {}) } });
+    if (res.status === 401) { showPopup("expired"); throw new Error("Session expired"); }
     const text = await res.text();
     let data;
     try { data = text ? JSON.parse(text) : {}; } catch (e) { throw new Error("Invalid response"); }
@@ -565,7 +721,7 @@ async function loadList() {
         const data = await apiCall(`${API}/list?${params}`);
         const tbody = $("#listBody");
         if (!data.data.length) {
-            tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><i class="fas fa-id-badge"></i>No admit card records yet.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><i class="fas fa-id-card-clip"></i>No admit card records yet.</td></tr>';
             return;
         }
         tbody.innerHTML = data.data.map((p, i) => `
@@ -752,9 +908,8 @@ async function unpublishOne(studentId) {
 }
 
 /* ============ INIT ============ */
-document.addEventListener("DOMContentLoaded", () => {
-    const token = localStorage.getItem("adminToken");
-    if (!token) { alert("Please login first"); window.location.href = "login.html"; return; }
+window.addEventListener("DOMContentLoaded", async () => {
+    await checkAuth();
     onClassChange();
 });
 </script>
