@@ -13,6 +13,7 @@
   --muted: #94a3b8; --gold: #c9972b; --gold-light: #e8b84b;
   --gold-bg: #fef8ed; --green: #10b981; --green-bg: #ecfdf5;
   --red: #ef4444; --red-bg: #fef2f2; --blue: #4a8af4; --blue-bg: #eef4ff;
+  --purple: #8b5cf6; --purple-bg: #f5f0ff;
   --orange: #f59e0b; --orange-bg: #fffbeb; --border: #e8edf8;
   --shadow: 0 2px 12px rgba(0,0,0,0.04); --radius: 14px;
 }
@@ -61,12 +62,16 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
   display: flex; gap: 4px; margin-bottom: 20px; background: var(--white);
   padding: 6px; border-radius: var(--radius); border: 1px solid var(--border);
   box-shadow: var(--shadow); overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
+.tabs::-webkit-scrollbar { height: 4px; }
+.tabs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 .tab {
-  flex: 1; min-width: 140px; padding: 12px 16px; border-radius: 10px;
+  flex: 1; min-width: 110px; padding: 12px 14px; border-radius: 10px;
   border: none; cursor: pointer; font-size: 13px; font-weight: 700;
   color: var(--text-sec); background: transparent; font-family: inherit;
-  transition: all 0.2s; display: wrap; align-items: center;
+  transition: all 0.2s; display: flex; align-items: center;
   justify-content: center; gap: 8px; white-space: nowrap;
 }
 .tab:hover { background: var(--bg); color: var(--text); }
@@ -74,6 +79,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
   background: linear-gradient(135deg, var(--gold), var(--gold-light));
   color: #fff; box-shadow: 0 4px 12px rgba(201,151,43,0.3);
 }
+.tab i { font-size: 14px; }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
@@ -112,8 +118,8 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
   animation: pulse 1.5s infinite;
 }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
-.period-card.upcoming { opacity: 0.65; border-style: dashed; }
-.period-card.past { opacity: 0.55; background: #f8fafc; }
+.period-card.upcoming { opacity: 0.7; border-style: dashed; }
+.period-card.past { opacity: 0.85; }
 .period-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
 .period-num {
   display: inline-block; padding: 4px 12px; background: var(--gold-bg);
@@ -133,12 +139,12 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .period-meta span { display: flex; align-items: center; gap: 5px; }
 .period-meta i { color: var(--gold); }
 .period-actions {
-  margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
 }
 .period-btn {
-  padding: 10px; border: none; border-radius: 10px;
-  font-weight: 700; font-size: 12px; cursor: pointer; font-family: inherit;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 4px; border: none; border-radius: 10px;
+  font-weight: 700; font-size: 11px; cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
   transition: all 0.2s;
 }
 .period-btn.scan { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #fff; }
@@ -146,27 +152,129 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .period-btn.scan:disabled { opacity: 0.5; cursor: not-allowed; }
 .period-btn.manage { background: var(--blue-bg); color: var(--blue); }
 .period-btn.manage:hover { background: var(--blue); color: #fff; }
+.period-btn.history { background: var(--purple-bg); color: var(--purple); }
+.period-btn.history:hover { background: var(--purple); color: #fff; }
 
-/* MANAGE PANEL */
-.manage-panel {
+/* CLASSES */
+.classes-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+.class-card {
   background: var(--white); border-radius: var(--radius);
-  border: 1px solid var(--border); padding: 24px; margin-bottom: 20px;
-  box-shadow: var(--shadow);
+  border: 2px solid var(--border); padding: 22px;
+  cursor: pointer; transition: all 0.25s; text-align: center;
 }
-.manage-header {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  gap: 14px; margin-bottom: 20px; flex-wrap: wrap;
+.class-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+.class-card .class-num {
+  font-size: 42px; font-weight: 900;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1; margin-bottom: 6px;
 }
-.manage-header h2 { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
-.manage-header h2 i { color: var(--gold); }
-.manage-header .meta { font-size: 12px; color: var(--text-sec); margin-top: 4px; }
-.back-btn {
-  padding: 8px 14px; background: var(--bg); color: var(--text-sec);
-  border: 1px solid var(--border); border-radius: 10px;
-  font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit;
-  display: flex; align-items: center; gap: 6px;
+.class-card .class-lbl { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.class-card .class-count {
+  font-size: 12px; color: var(--text-sec); margin-top: 12px;
+  padding-top: 12px; border-top: 1px dashed var(--border);
+  display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 600;
 }
-.back-btn:hover { background: var(--border); }
+.class-card .class-count i { color: var(--gold); }
+
+/* HISTORY TAB */
+.history-controls {
+  background: var(--white); border-radius: var(--radius);
+  border: 1px solid var(--border); padding: 20px 24px;
+  margin-bottom: 20px; box-shadow: var(--shadow);
+}
+.history-controls h3 {
+  font-size: 14px; font-weight: 800; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.history-controls h3 i { color: var(--gold); }
+.history-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px; margin-bottom: 14px;
+}
+.history-row .field label {
+  display: block; font-size: 11px; font-weight: 700;
+  color: var(--text-sec); margin-bottom: 6px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.history-row .field select,
+.history-row .field input {
+  width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+  border-radius: 10px; font-size: 13px; font-family: inherit;
+  background: #fafbfd; outline: none;
+}
+.history-row .field select:focus,
+.history-row .field input:focus {
+  border-color: var(--gold); background: #fff;
+}
+.history-actions {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.history-actions .btn { flex: 1; min-width: 130px; justify-content: center; }
+
+/* REPORT */
+.report-card {
+  background: var(--white); border-radius: var(--radius);
+  border: 1px solid var(--border); box-shadow: var(--shadow);
+  padding: 22px 26px; margin-bottom: 20px;
+}
+.report-card h3 {
+  font-size: 15px; font-weight: 800; margin-bottom: 16px;
+  padding-bottom: 12px; border-bottom: 2px solid var(--gold-bg);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.report-card h3 i { color: var(--gold); }
+.report-card h3 .badge {
+  font-size: 11px; padding: 3px 10px; border-radius: 10px;
+  background: var(--blue-bg); color: var(--blue); font-weight: 700;
+  margin-left: auto;
+}
+.stat-cards {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px; margin-bottom: 16px;
+}
+.stat-card-mini {
+  background: var(--bg); padding: 16px; border-radius: 12px;
+  border: 1px solid var(--border); text-align: center;
+}
+.stat-card-mini.green { background: var(--green-bg); }
+.stat-card-mini.red { background: var(--red-bg); }
+.stat-card-mini.orange { background: var(--orange-bg); }
+.stat-card-mini.gold { background: var(--gold-bg); }
+.stat-card-mini .val { font-size: 26px; font-weight: 800; color: var(--text); }
+.stat-card-mini.green .val { color: var(--green); }
+.stat-card-mini.red .val { color: var(--red); }
+.stat-card-mini.orange .val { color: var(--orange); }
+.stat-card-mini.gold .val { color: var(--gold); }
+.stat-card-mini .lbl {
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px;
+}
+
+/* TABLE */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table thead th {
+  background: var(--bg); color: var(--text-sec);
+  padding: 12px 14px; text-align: left; font-size: 11px;
+  font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--border);
+}
+.data-table tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); }
+.data-table tbody tr:hover { background: var(--gold-bg); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.table-wrap { overflow-x: auto; }
+.pct-badge {
+  display: inline-block; padding: 4px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 800;
+}
+.pct-good { background: var(--green-bg); color: var(--green); }
+.pct-warn { background: var(--orange-bg); color: var(--orange); }
+.pct-bad { background: var(--red-bg); color: var(--red); }
 
 /* SEARCH */
 .search-box {
@@ -185,7 +293,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
   font-weight: 700; letter-spacing: 1px; background: #fff;
   outline: none; text-transform: uppercase;
 }
-.search-input-row input:focus { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(201,151,43,0.15); }
+.search-input-row input:focus { border-color: var(--gold); }
 .search-input-row button {
   padding: 13px 24px;
   background: linear-gradient(135deg, var(--gold), var(--gold-light));
@@ -193,7 +301,6 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
   font-size: 14px; font-weight: 800; cursor: pointer;
   font-family: inherit; display: flex; align-items: center; gap: 8px;
 }
-.search-input-row button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,151,43,0.3); }
 .search-input-row button:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* STUDENT PREVIEW */
@@ -205,74 +312,42 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .student-preview.success { border-color: var(--green); background: linear-gradient(135deg, var(--green-bg), #fff); }
 .student-preview.error { border-color: var(--red); background: linear-gradient(135deg, var(--red-bg), #fff); }
 .student-preview.warning { border-color: var(--orange); background: linear-gradient(135deg, var(--orange-bg), #fff); }
-
 .sp-header { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; }
 .sp-photo {
   width: 72px; height: 72px; border-radius: 50%;
   border: 3px solid var(--gold); object-fit: cover;
   background: #f1f5f9; flex-shrink: 0; overflow: hidden;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 28px;
+  display: flex; align-items: center; justify-content: center; font-size: 28px;
 }
 .sp-info { flex: 1; min-width: 0; }
 .sp-name { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
 .sp-meta { font-size: 13px; color: var(--text-sec); }
 .sp-meta b { color: var(--text); }
-
 .sp-details {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 6px 20px;
-  padding: 16px;
-  background: rgba(255,255,255,0.7);
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  margin-bottom: 14px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 6px 20px; padding: 16px; background: rgba(255,255,255,0.7);
+  border-radius: 10px; border: 1px solid var(--border); margin-bottom: 14px;
 }
 .sp-row {
   display: flex; justify-content: space-between; align-items: flex-start;
-  padding: 6px 0;
-  border-bottom: 1px dashed rgba(200,200,200,0.4);
+  padding: 6px 0; border-bottom: 1px dashed rgba(200,200,200,0.4);
   font-size: 13px; gap: 10px;
 }
 .sp-row:last-child { border-bottom: none; }
-.sp-row .label {
-  color: var(--text-sec); font-weight: 600;
-  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
-}
+.sp-row .label { color: var(--text-sec); font-weight: 600; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .sp-row .label i { color: var(--gold); font-size: 12px; width: 14px; }
-.sp-row .value {
-  font-weight: 700; color: var(--text); text-align: right;
-  word-break: break-word; flex: 1; min-width: 0;
-}
-
+.sp-row .value { font-weight: 700; color: var(--text); text-align: right; word-break: break-word; flex: 1; }
 .sp-msg {
-  padding: 12px 16px; border-radius: 10px;
-  font-size: 13px; font-weight: 600; margin-bottom: 14px;
-  display: flex; align-items: center; gap: 8px;
-  line-height: 1.5;
+  padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
 }
 .msg-success { background: var(--green-bg); color: var(--green); border-left: 4px solid var(--green); }
 .msg-error { background: var(--red-bg); color: var(--red); border-left: 4px solid var(--red); }
 .msg-warning { background: var(--orange-bg); color: var(--orange); border-left: 4px solid var(--orange); }
-
 .sp-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .sp-actions button { flex: 1; min-width: 150px; }
 
-/* STUDENTS LIST */
-.students-header {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
-}
-.students-header h3 {
-  font-size: 15px; font-weight: 800;
-  display: flex; align-items: center; gap: 8px;
-}
-.students-header h3 i { color: var(--gold); }
-.students-header .count-chip {
-  padding: 4px 12px; background: var(--blue-bg); color: var(--blue);
-  border-radius: 20px; font-size: 12px; font-weight: 800;
-}
+/* STUDENTS GRID */
 .students-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 12px;
@@ -320,15 +395,36 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .remove-btn { background: var(--red-bg); color: var(--red); }
 .remove-btn:hover { background: var(--red); color: #fff; }
 
-/* EMPTY */
-.empty {
-  text-align: center; padding: 50px 20px; color: var(--muted);
+/* MANAGE PANEL */
+.manage-panel {
   background: var(--white); border-radius: var(--radius);
-  border: 1px solid var(--border); grid-column: 1/-1;
+  border: 1px solid var(--border); padding: 24px; margin-bottom: 20px;
+  box-shadow: var(--shadow);
 }
-.empty i { font-size: 48px; color: var(--gold); opacity: 0.4; display: block; margin-bottom: 12px; }
-.empty h3 { font-size: 15px; font-weight: 700; color: var(--text-sec); margin-bottom: 6px; }
-.empty p { font-size: 13px; }
+.manage-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 14px; margin-bottom: 20px; flex-wrap: wrap;
+}
+.manage-header h2 { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+.manage-header h2 i { color: var(--gold); }
+.manage-header .meta { font-size: 12px; color: var(--text-sec); margin-top: 4px; }
+.back-btn {
+  padding: 8px 14px; background: var(--bg); color: var(--text-sec);
+  border: 1px solid var(--border); border-radius: 10px;
+  font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; gap: 6px;
+}
+.back-btn:hover { background: var(--border); }
+.students-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
+}
+.students-header h3 { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+.students-header h3 i { color: var(--gold); }
+.students-header .count-chip {
+  padding: 4px 12px; background: var(--blue-bg); color: var(--blue);
+  border-radius: 20px; font-size: 12px; font-weight: 800;
+}
 
 /* BUTTONS */
 .btn {
@@ -347,6 +443,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .btn-outline:hover { background: var(--border); }
 .btn-block { width: 100%; justify-content: center; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-sm { padding: 8px 14px; font-size: 12px; }
 
 /* MODAL */
 .modal {
@@ -360,6 +457,8 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
   box-shadow: 0 30px 80px rgba(0,0,0,0.5);
   animation: slideUp 0.3s ease; max-height: 95vh; overflow-y: auto;
 }
+.modal-content.lg { max-width: 700px; }
+.modal-content.xl { max-width: 900px; }
 @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 .modal-head {
   padding: 20px 24px 14px; border-bottom: 1px solid var(--border);
@@ -386,24 +485,20 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .scan-info.warning { background: #fffbeb; border-left-color: var(--orange); }
 .scan-info.error { background: var(--red-bg); border-left-color: var(--red); }
 .scan-info.success { background: var(--green-bg); border-left-color: var(--green); }
-
 .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
 .stat { background: var(--bg); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
 .stat .val { font-size: 20px; font-weight: 800; color: var(--gold); }
 .stat .lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; font-weight: 700; margin-top: 2px; }
 .stat.present .val { color: var(--green); }
 .stat.absent .val { color: var(--red); }
-
 .student-list-live { max-height: 300px; overflow-y: auto; margin-top: 10px; }
 .student-item {
   display: flex; align-items: center; gap: 12px; padding: 10px 12px;
   border-radius: 10px; margin-bottom: 6px; background: var(--bg);
-  animation: fadeIn 0.3s;
 }
 .student-item.absent { background: var(--red-bg); }
 .student-item.just-scanned { background: var(--green-bg); animation: flash 1s ease; }
 @keyframes flash { 0%,100% { background: var(--green-bg); } 50% { background: #a7f3d0; } }
-@keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 .student-item img, .student-item .ph2 {
   width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
   border: 2px solid var(--gold); flex-shrink: 0;
@@ -438,6 +533,16 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
   color: var(--text-sec); border: 1px solid var(--border);
 }
 
+/* EMPTY */
+.empty {
+  text-align: center; padding: 50px 20px; color: var(--muted);
+  background: var(--white); border-radius: var(--radius);
+  border: 1px solid var(--border); grid-column: 1/-1;
+}
+.empty i { font-size: 48px; color: var(--gold); opacity: 0.4; display: block; margin-bottom: 12px; }
+.empty h3 { font-size: 15px; font-weight: 700; color: var(--text-sec); margin-bottom: 6px; }
+.empty p { font-size: 13px; }
+
 /* TOAST */
 .toast-container {
   position: fixed; top: 20px; right: 20px; z-index: 99999;
@@ -448,7 +553,6 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
   font-weight: 600; font-size: 13px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
   animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 10px;
-  line-height: 1.4;
 }
 .toast i { font-size: 18px; flex-shrink: 0; }
 .toast-success { background: linear-gradient(135deg, var(--green), #059669); }
@@ -457,12 +561,40 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .toast-info { background: linear-gradient(135deg, var(--blue), #3b82f6); }
 @keyframes slideIn { from { opacity: 0; transform: translateX(60px); } to { opacity: 1; transform: translateX(0); } }
 
+/* STUDENT SELECTOR */
+.student-selector {
+  max-height: 320px; overflow-y: auto; border: 1px solid var(--border);
+  border-radius: 12px; padding: 8px; margin-bottom: 14px;
+}
+.student-check {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 8px; cursor: pointer;
+}
+.student-check:hover { background: var(--bg); }
+.student-check input[type="checkbox"] {
+  width: 18px; height: 18px; accent-color: var(--gold); cursor: pointer;
+}
+.student-check .nm { flex: 1; font-size: 13px; font-weight: 700; }
+.student-check .meta { font-size: 11px; color: var(--muted); }
+
 @media (max-width: 640px) {
-  .container { padding: 14px; }
-  .periods-grid, .students-grid { grid-template-columns: 1fr; }
-  .period-actions { grid-template-columns: 1fr; }
+  .container { padding: 12px; }
+  .navbar { padding: 0 12px; }
+  .navbar .name { font-size: 13px; }
+  .teacher-badge span:not(.avatar) { display: none; }
+  .periods-grid, .students-grid, .classes-grid { grid-template-columns: 1fr; }
+  .period-actions { grid-template-columns: 1fr 1fr; }
+  .period-btn.history { grid-column: 1/-1; }
   .sp-details { grid-template-columns: 1fr; }
-  .tab { padding: 10px 12px; font-size: 12px; }
+  .stat-cards { grid-template-columns: 1fr 1fr; }
+  .tab { padding: 10px 8px; font-size: 11px; min-width: 95px; }
+  .tab i { font-size: 13px; }
+  .history-row { grid-template-columns: 1fr 1fr; }
+  .history-actions .btn { min-width: 100px; flex: 1; font-size: 12px; }
+  .page-head { padding: 14px; }
+  .page-head h1 { font-size: 16px; }
+  .clock { font-size: 13px; padding: 6px 12px; }
+  .toast-container { left: 12px; right: 12px; max-width: none; }
 }
 </style>
 </head>
@@ -478,21 +610,27 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
       <span class="avatar" id="teacherAvatar">T</span>
       <span id="teacherName">Teacher</span>
     </div>
-    <button class="logout-btn" onclick="logout()" title="Logout">
-      <i class="fas fa-sign-out-alt"></i>
-    </button>
+    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
   </div>
 </nav>
 
 <div class="container">
 
-      <!-- Content will be filled by JS -->
-    </div>
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('periods')" data-tab="periods">
+      <i class="fas fa-calendar-day"></i> Periods
+    </button>
+    <button class="tab" onclick="switchTab('classes')" data-tab="classes">
+      <i class="fas fa-users"></i> Classes
+    </button>
+    <button class="tab" onclick="switchTab('history')" data-tab="history">
+      <i class="fas fa-chart-bar"></i> History
+    </button>
   </div>
-</div>
 
-  <!-- ════════════ VIEW: PERIODS ════════════ -->
-  <div id="periodsView">
+  <!-- ════════ PERIODS ════════ -->
+  <div class="tab-content active" id="tab-periods">
     <div class="page-head">
       <div>
         <h1><i class="fas fa-calendar-day"></i> My Periods</h1>
@@ -501,14 +639,96 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
       <div class="clock" id="liveClock">--:--:--</div>
     </div>
     <div class="periods-grid" id="periodsGrid">
+      <div class="empty"><i class="fas fa-spinner fa-spin"></i><h3>Loading periods...</h3></div>
+    </div>
+  </div>
+
+  <!-- ════════ CLASSES ════════ -->
+  <div class="tab-content" id="tab-classes">
+    <div class="page-head">
+      <div>
+        <h1><i class="fas fa-users"></i> My Classes</h1>
+        <div class="sub">Your assigned classes</div>
+      </div>
+    </div>
+    <div class="classes-grid" id="classesGrid">
+      <div class="empty"><i class="fas fa-spinner fa-spin"></i><h3>Loading classes...</h3></div>
+    </div>
+  </div>
+
+  <!-- ════════ HISTORY ════════ -->
+  <div class="tab-content" id="tab-history">
+    <div class="page-head">
+      <div>
+        <h1><i class="fas fa-chart-bar"></i> History & Reports</h1>
+        <div class="sub">View attendance history, generate PDF & Excel reports</div>
+      </div>
+    </div>
+
+    <div class="history-controls">
+      <h3><i class="fas fa-filter"></i> Report Filters</h3>
+
+      <div class="history-row">
+        <div class="field">
+          <label>Class</label>
+          <select id="h_class" onchange="onHistoryClassChange()">
+            <option value="">Select Class</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Subject / Period</label>
+          <select id="h_assignment">
+            <option value="">All Subjects</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Month</label>
+          <select id="h_month">
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Year</label>
+          <select id="h_year"></select>
+        </div>
+      </div>
+
+      <div class="history-actions">
+        <button class="btn btn-primary" onclick="loadClassReport()">
+          <i class="fas fa-search"></i> Load Report
+        </button>
+        <button class="btn btn-success" onclick="exportExcel()">
+          <i class="fas fa-file-excel"></i> Excel
+        </button>
+        <button class="btn btn-danger" onclick="exportPDF()">
+          <i class="fas fa-file-pdf"></i> PDF
+        </button>
+        <button class="btn btn-outline" onclick="openStudentSelector()">
+          <i class="fas fa-user-check"></i> Select
+        </button>
+      </div>
+    </div>
+
+    <div id="reportArea">
       <div class="empty">
-        <i class="fas fa-spinner fa-spin"></i>
-        <h3>Loading your periods...</h3>
+        <i class="fas fa-chart-bar"></i>
+        <h3>Select Class, Month, Year and click "Load Report"</h3>
       </div>
     </div>
   </div>
 
-  <!-- ════════════ VIEW: MANAGE STUDENTS (assignment-specific) ════════════ -->
+  <!-- ════════ MANAGE VIEW (hidden) ════════ -->
   <div id="manageView" style="display:none;">
     <div class="manage-panel">
       <div class="manage-header">
@@ -517,11 +737,10 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
           <div class="meta" id="manageMeta">—</div>
         </div>
         <button class="back-btn" onclick="backToPeriods()">
-          <i class="fas fa-arrow-left"></i> Back to Periods
+          <i class="fas fa-arrow-left"></i> Back
         </button>
       </div>
 
-      <!-- SEARCH STUDENT -->
       <div class="search-box">
         <h3><i class="fas fa-search"></i> Add Student by ID</h3>
         <p>Enter Student ID (e.g., STU001) to fetch and add to this period</p>
@@ -535,24 +754,19 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
         <div class="student-preview" id="studentPreview"></div>
       </div>
 
-      <!-- STUDENTS LIST -->
       <div class="students-header">
         <h3><i class="fas fa-list"></i> Added Students</h3>
         <span class="count-chip" id="addedCount">0</span>
       </div>
       <div class="students-grid" id="addedStudentsGrid">
-        <div class="empty">
-          <i class="fas fa-user-plus"></i>
-          <h3>No students added yet</h3>
-          <p>Use the search box above to add students</p>
-        </div>
+        <div class="empty"><i class="fas fa-user-plus"></i><h3>No students added yet</h3></div>
       </div>
     </div>
   </div>
 
 </div>
 
-<!-- ════════════ SCANNER MODAL ════════════ -->
+<!-- SCANNER MODAL -->
 <div class="modal" id="scannerModal">
   <div class="modal-content">
     <div class="modal-head">
@@ -563,68 +777,61 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
       <button class="close" onclick="closeScanner()"><i class="fas fa-times"></i></button>
     </div>
     <div class="modal-body">
-      <div id="scanInfo" class="scan-info">
-        <i class="fas fa-camera"></i> Point the camera at the student's QR code
-      </div>
+      <div id="scanInfo" class="scan-info"><i class="fas fa-camera"></i> Point camera at student's QR code</div>
       <div id="qr-reader"></div>
-
       <div class="stats-row">
         <div class="stat present"><div class="val" id="statPresent">0</div><div class="lbl">Present</div></div>
         <div class="stat absent"><div class="val" id="statAbsent">0</div><div class="lbl">Absent</div></div>
         <div class="stat"><div class="val" id="statTotal">0</div><div class="lbl">Total</div></div>
       </div>
-
-      <div style="font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
+      <div style="font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; margin-bottom:8px;">
         <i class="fas fa-list-check"></i> Live Attendance
       </div>
       <div class="student-list-live" id="liveList">
-        <div style="text-align:center; padding:20px; color:var(--muted); font-size:12px;">
-          No students scanned yet
-        </div>
+        <div style="text-align:center; padding:20px; color:var(--muted); font-size:12px;">No students scanned yet</div>
       </div>
-
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px;">
-        <button class="btn btn-outline btn-block" onclick="closeScanner()">
-          <i class="fas fa-times"></i> Cancel
-        </button>
-        <button class="btn btn-danger btn-block" onclick="finalizeAttendance()" id="finalizeBtn">
-          <i class="fas fa-check-double"></i> Finalize
-        </button>
+        <button class="btn btn-outline btn-block" onclick="closeScanner()"><i class="fas fa-times"></i> Cancel</button>
+        <button class="btn btn-danger btn-block" onclick="finalizeAttendance()" id="finalizeBtn"><i class="fas fa-check-double"></i> Finalize</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ════════════ QR VIEW MODAL ════════════ -->
+<!-- QR VIEW MODAL -->
 <div class="modal" id="qrViewModal">
   <div class="modal-content">
     <div class="modal-head">
       <h2 id="qrViewTitle">Student QR</h2>
       <button class="close" onclick="closeModal('qrViewModal')"><i class="fas fa-times"></i></button>
     </div>
-    <div class="modal-body" id="qrViewBody">
-      <div style="text-align:center; padding:40px;">
-        <i class="fas fa-spinner fa-spin" style="font-size:32px; color:var(--gold);"></i>
+    <div class="modal-body" id="qrViewBody"></div>
+  </div>
+</div>
+
+<!-- STUDENT SELECTOR MODAL -->
+<div class="modal" id="studentSelectorModal">
+  <div class="modal-content lg">
+    <div class="modal-head">
+      <div>
+        <h2>Select Students</h2>
+        <div style="font-size:11px; color:var(--muted); margin-top:3px;">Select specific students for the report</div>
+      </div>
+      <button class="close" onclick="closeModal('studentSelectorModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:10px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-sm btn-outline" onclick="selectAllStudents(true)">Select All</button>
+        <button class="btn btn-sm btn-outline" onclick="selectAllStudents(false)">Clear All</button>
+      </div>
+      <div class="student-selector" id="studentSelector"></div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-outline btn-block" onclick="clearStudentSelection()">Clear</button>
+        <button class="btn btn-primary btn-block" onclick="applyStudentSelection()">Apply</button>
       </div>
     </div>
   </div>
 </div>
-
-    <!-- HISTORY MODAL -->
-<div class="modal" id="historyModal">
-  <div class="modal-content" style="max-width:600px;">
-    <div class="modal-head">
-      <div>
-        <h2 id="historyTitle">Attendance History</h2>
-        <div style="font-size:11px; color:var(--muted); margin-top:3px;">
-          Past attendance records
-        </div>
-      </div>
-      <button class="close" onclick="document.getElementById('historyModal').classList.remove('active')">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="modal-body" id="historyBody">
 
 <div class="toast-container" id="toastContainer"></div>
 
@@ -638,15 +845,17 @@ const state = {
   token: localStorage.getItem('teacherToken'),
   teacher: JSON.parse(localStorage.getItem('teacherData') || '{}'),
   periods: [],
-  currentAssignment: null,  // assignment being managed
+  classes: [],
+  currentAssignment: null,
   addedStudents: [],
-  current: null,           // assignment being scanned
+  current: null,
   scanner: null,
   liveData: { data: [], absent: [], stats: { present: 0, absent: 0, total: 0 } },
   scanning: false,
   lastScanTime: 0,
   liveInterval: null,
-  lastSearchedStudent: null
+  lastSearchedStudent: null,
+  selectedStudentIds: []
 };
 
 if (!state.token) window.location.replace('teacher-login.html');
@@ -656,10 +865,9 @@ function authHeaders() {
 }
 
 function logout() {
-  if (!confirm('Logout from this device?')) return;
+  if (!confirm('Logout?')) return;
   localStorage.removeItem('teacherToken');
   localStorage.removeItem('teacherData');
-  localStorage.removeItem('todayAssignments');
   window.location.replace('teacher-login.html');
 }
 
@@ -669,12 +877,9 @@ function logout() {
 function toast(msg, type = 'info') {
   const c = document.getElementById('toastContainer');
   const t = document.createElement('div');
-  const icons = {
-    success: 'fa-check-circle', error: 'fa-exclamation-circle',
-    warning: 'fa-exclamation-triangle', info: 'fa-info-circle'
-  };
+  const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
   t.className = `toast toast-${type}`;
-  t.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span>${msg}</span>`;
+  t.innerHTML = `<i class="fas ${icons[type]}"></i><span>${msg}</span>`;
   c.appendChild(t);
   setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3500);
 }
@@ -705,17 +910,13 @@ function getStatus(a) {
 
 function esc(s) {
   if (s === null || s === undefined) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
 
 function fmtDate(d) {
   if (!d) return '—';
-  try {
-    const dt = new Date(d);
-    if (isNaN(dt)) return String(d);
-    return dt.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  } catch (e) { return String(d); }
+  try { return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
+  catch (e) { return String(d); }
 }
 
 function openModal(id) { document.getElementById(id).classList.add('active'); }
@@ -725,9 +926,8 @@ function closeModal(id) { document.getElementById(id).classList.remove('active')
 // INIT
 // ══════════════════════════════════════════════════════════════
 function initHeader() {
-  const t = state.teacher;
-  document.getElementById('teacherName').textContent = t.name || 'Teacher';
-  document.getElementById('teacherAvatar').textContent = (t.name || 'T').charAt(0).toUpperCase();
+  document.getElementById('teacherName').textContent = state.teacher.name || 'Teacher';
+  document.getElementById('teacherAvatar').textContent = (state.teacher.name || 'T').charAt(0).toUpperCase();
 }
 
 setInterval(() => {
@@ -735,37 +935,55 @@ setInterval(() => {
   if (c) c.textContent = timeNow();
 }, 1000);
 
+(function initYearDropdown() {
+  const y = new Date().getFullYear();
+  const sel = document.getElementById('h_year');
+  if (!sel) return;
+  for (let i = y; i >= y - 3; i--) {
+    const opt = document.createElement('option');
+    opt.value = i; opt.textContent = i;
+    sel.appendChild(opt);
+  }
+  document.getElementById('h_month').value = new Date().getMonth() + 1;
+  sel.value = y;
+})();
+
 // ══════════════════════════════════════════════════════════════
-// LOAD PERIODS
+// TAB SWITCH
+// ══════════════════════════════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+
+  // Hide manage view
+  document.getElementById('manageView').style.display = 'none';
+
+  if (name === 'periods') loadPeriods();
+  if (name === 'classes') loadClasses();
+  if (name === 'history') loadClassesForHistory();
+}
+
+// ══════════════════════════════════════════════════════════════
+// PERIODS
 // ══════════════════════════════════════════════════════════════
 async function loadPeriods() {
   const grid = document.getElementById('periodsGrid');
   try {
     const res = await fetch(`${API}/teacher/my-periods`, { headers: authHeaders() });
     if (res.status === 401 || res.status === 403) {
-      toast('Session expired. Login again.', 'error');
-      setTimeout(logout, 1500);
-      return;
+      toast('Session expired', 'error');
+      setTimeout(logout, 1500); return;
     }
     const data = await res.json();
     if (!data.success) throw new Error(data.message);
 
     state.periods = data.data || [];
-
-    const day = data.day || 'Today';
-    const date = data.date || '';
     document.getElementById('todayInfo').textContent =
-      `${day} · ${date} · ${state.periods.length} period(s) assigned`;
-
+      `${data.day} · ${data.date} · ${state.periods.length} period(s)`;
     renderPeriods();
   } catch (err) {
-    console.error(err);
-    grid.innerHTML = `
-      <div class="empty">
-        <i class="fas fa-exclamation-triangle"></i>
-        <h3>Could not load periods</h3>
-        <p>${esc(err.message)}</p>
-      </div>`;
+    grid.innerHTML = `<div class="empty"><i class="fas fa-exclamation-triangle"></i><h3>${esc(err.message)}</h3></div>`;
   }
 }
 
@@ -774,19 +992,14 @@ function renderPeriods() {
   const periods = [...state.periods].sort((a, b) => a.period - b.period);
 
   if (!periods.length) {
-    grid.innerHTML = `
-      <div class="empty">
-        <i class="fas fa-calendar-xmark"></i>
-        <h3>No periods assigned today</h3>
-        <p>Contact admin to assign subjects/classes</p>
-      </div>`;
+    grid.innerHTML = `<div class="empty"><i class="fas fa-calendar-xmark"></i><h3>No periods today</h3></div>`;
     return;
   }
 
   grid.innerHTML = periods.map(a => {
     const status = getStatus(a);
-    const label = status === 'live' ? 'LIVE NOW' :
-                  status === 'upcoming' ? 'UPCOMING' : 'ENDED';
+    const label = status === 'live' ? 'LIVE NOW' : status === 'upcoming' ? 'UPCOMING' : 'ENDED';
+    const aJson = JSON.stringify(a).replace(/'/g, "&#39;");
 
     return `
       <div class="period-card ${status}">
@@ -795,53 +1008,118 @@ function renderPeriods() {
           <div class="period-status status-${status}">${label}</div>
         </div>
         <div class="period-subject">${esc(a.subject_name)}</div>
-        <div class="period-class">
-          Class ${esc(a.class)}${a.section ? ' · ' + esc(a.section) : ''}
-        </div>
+        <div class="period-class">Class ${esc(a.class)}${a.section ? ' · ' + esc(a.section) : ''}</div>
         <div class="period-meta">
           <span><i class="fas fa-clock"></i> ${a.start_time} - ${a.end_time}</span>
           <span><i class="fas fa-user-graduate"></i> ${a.totalStudents} students</span>
         </div>
         <div class="period-actions">
-          <button class="period-btn manage" onclick='openManage(${JSON.stringify(a).replace(/'/g, "&#39;")})'>
-            <i class="fas fa-users-cog"></i> Manage Students
+          <button class="period-btn manage" onclick='openManage(${aJson})'><i class="fas fa-users-cog"></i> Manage</button>
+          <button class="period-btn scan" onclick='openScanner(${aJson})' ${status !== 'live' ? 'disabled' : ''}>
+            <i class="fas fa-qrcode"></i> ${status === 'live' ? 'Scan' : status === 'upcoming' ? 'Soon' : 'Ended'}
           </button>
-          <button class="period-btn scan"
-            onclick='openScanner(${JSON.stringify(a).replace(/'/g, "&#39;")})'
-            ${status !== 'live' ? 'disabled' : ''}>
-            <i class="fas fa-qrcode"></i>
-            ${status === 'live' ? 'Scan QR' :
-              status === 'upcoming' ? `Starts ${a.start_time}` : 'Ended'}
-          </button>
+          <button class="period-btn history" onclick='openHistoryForAssignment(${aJson})'><i class="fas fa-history"></i> History</button>
         </div>
       </div>`;
   }).join('');
 }
 
 // ══════════════════════════════════════════════════════════════
-// MANAGE STUDENTS VIEW
+// CLASSES
 // ══════════════════════════════════════════════════════════════
-function openManage(assignment) {
-  state.currentAssignment = assignment;
-  document.getElementById('periodsView').style.display = 'none';
-  document.getElementById('manageView').style.display = 'block';
+async function loadClasses() {
+  const grid = document.getElementById('classesGrid');
+  try {
+    const res = await fetch(`${API}/teacher/my-classes`, { headers: authHeaders() });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
 
-  document.getElementById('manageTitle').innerHTML =
-    `<i class="fas fa-users-cog"></i> Period ${assignment.period} · ${esc(assignment.subject_name)}`;
-  document.getElementById('manageMeta').innerHTML =
-    `Class ${esc(assignment.class)}${assignment.section ? ' · ' + esc(assignment.section) : ''} · ${assignment.start_time}-${assignment.end_time} · <b>${esc(assignment.days || 'All days')}</b>`;
+    state.classes = data.data || [];
 
+    if (!state.classes.length) {
+      grid.innerHTML = `<div class="empty"><i class="fas fa-school"></i><h3>No classes assigned</h3></div>`;
+      return;
+    }
+
+    grid.innerHTML = state.classes.map(c => `
+      <div class="class-card" onclick="openClass(${JSON.stringify(c).replace(/'/g, "&#39;")})">
+        <div class="class-num">${esc(c.class)}</div>
+        <div class="class-lbl">Class</div>
+        <div class="class-count"><i class="fas fa-user-graduate"></i> ${c.student_count} students</div>
+      </div>
+    `).join('');
+  } catch (err) {
+    grid.innerHTML = `<div class="empty"><i class="fas fa-exclamation-triangle"></i><h3>${esc(err.message)}</h3></div>`;
+  }
+}
+
+async function loadClassesForHistory() {
+  try {
+    const res = await fetch(`${API}/teacher/my-classes`, { headers: authHeaders() });
+    const data = await res.json();
+    if (!data.success) return;
+
+    state.classes = data.data || [];
+    const hSel = document.getElementById('h_class');
+    hSel.innerHTML = '<option value="">Select Class</option>';
+    state.classes.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.class;
+      opt.textContent = `Class ${c.class} (${c.student_count} students)`;
+      hSel.appendChild(opt);
+    });
+  } catch (err) {}
+}
+
+async function openClass(cls) {
+  // Class click → Show students
+  document.getElementById('manageTitle').textContent = `Class ${cls.class} Students`;
+  document.getElementById('manageMeta').textContent = `View students`;
   document.getElementById('studentSearchInput').value = '';
   document.getElementById('studentPreview').style.display = 'none';
 
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('manageView').style.display = 'block';
+
+  const grid = document.getElementById('addedStudentsGrid');
+  grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><i class="fas fa-spinner fa-spin"></i><h3>Loading...</h3></div>`;
+
+  try {
+    const res = await fetch(`${API}/teacher/class/${encodeURIComponent(cls.class)}/students`, { headers: authHeaders() });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+
+    document.getElementById('addedCount').textContent = data.count;
+    if (!data.data.length) {
+      grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><i class="fas fa-users-slash"></i><h3>No students</h3></div>`;
+      return;
+    }
+    grid.innerHTML = data.data.map(renderStudentCard).join('');
+  } catch (err) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><i class="fas fa-exclamation-triangle"></i><h3>${esc(err.message)}</h3></div>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// MANAGE STUDENTS
+// ══════════════════════════════════════════════════════════════
+function openManage(assignment) {
+  state.currentAssignment = assignment;
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('manageView').style.display = 'block';
+
+  document.getElementById('manageTitle').innerHTML = `<i class="fas fa-users-cog"></i> P${assignment.period} · ${esc(assignment.subject_name)}`;
+  document.getElementById('manageMeta').innerHTML = `Class ${esc(assignment.class)} · ${assignment.start_time}-${assignment.end_time}`;
+  document.getElementById('studentSearchInput').value = '';
+  document.getElementById('studentPreview').style.display = 'none';
+  state.lastSearchedStudent = null;
   loadAddedStudents();
 }
 
 function backToPeriods() {
   document.getElementById('manageView').style.display = 'none';
-  document.getElementById('periodsView').style.display = 'block';
   state.currentAssignment = null;
-  loadPeriods();
+  switchTab('periods');
 }
 
 async function loadAddedStudents() {
@@ -849,12 +1127,10 @@ async function loadAddedStudents() {
   const a = state.currentAssignment;
   if (!a) return;
 
-  grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><i class="fas fa-spinner fa-spin"></i><h3>Loading students...</h3></div>`;
+  grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><i class="fas fa-spinner fa-spin"></i><h3>Loading...</h3></div>`;
 
   try {
-    const res = await fetch(`${API}/teacher/assignment/${a.id}/students`, {
-      headers: authHeaders()
-    });
+    const res = await fetch(`${API}/teacher/assignment/${a.id}/students`, { headers: authHeaders() });
     const data = await res.json();
     if (!data.success) throw new Error(data.message);
 
@@ -862,16 +1138,10 @@ async function loadAddedStudents() {
     document.getElementById('addedCount').textContent = state.addedStudents.length;
 
     if (!state.addedStudents.length) {
-      grid.innerHTML = `
-        <div class="empty" style="grid-column:1/-1;">
-          <i class="fas fa-user-plus"></i>
-          <h3>No students added yet</h3>
-          <p>Use the search box above to add students</p>
-        </div>`;
+      grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><i class="fas fa-user-plus"></i><h3>No students added</h3><p>Search above to add</p></div>`;
       return;
     }
-
-    grid.innerHTML = state.addedStudents.map(s => renderStudentCard(s)).join('');
+    grid.innerHTML = state.addedStudents.map(renderStudentCard).join('');
   } catch (err) {
     grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><i class="fas fa-exclamation-triangle"></i><h3>${esc(err.message)}</h3></div>`;
   }
@@ -879,13 +1149,8 @@ async function loadAddedStudents() {
 
 function renderStudentCard(s) {
   const status = s.today_status || 'not-marked';
-  const statusLabel = status === 'present' ? 'Present' :
-                      status === 'late' ? 'Late' :
-                      status === 'absent' ? 'Absent' : 'Not Marked';
-
-  const photoHtml = s.photo_url
-    ? `<img src="${esc(s.photo_url)}" onerror="this.outerHTML='👤'">`
-    : `👤`;
+  const statusLabel = status === 'present' ? 'Present' : status === 'late' ? 'Late' : status === 'absent' ? 'Absent' : 'Not Marked';
+  const photoHtml = s.photo_url ? `<img src="${esc(s.photo_url)}" onerror="this.outerHTML='👤'">` : `👤`;
 
   return `
     <div class="student-card">
@@ -903,19 +1168,15 @@ function renderStudentCard(s) {
         </div>
       </div>
       <div class="actions">
-        <button class="qr-btn" onclick='showQR("${esc(s.student_id)}")'>
-          <i class="fas fa-qrcode"></i> QR
-        </button>
-        <button class="remove-btn" onclick='removeStudent("${esc(s.student_id)}","${esc(s.name)}")'>
-          <i class="fas fa-trash"></i> Remove
-        </button>
+        <button class="qr-btn" onclick='showQR("${esc(s.student_id)}")'><i class="fas fa-qrcode"></i> QR</button>
+        <button class="remove-btn" onclick='removeStudent("${esc(s.student_id)}","${esc(s.name)}")'><i class="fas fa-trash"></i></button>
       </div>
     </div>
   `;
 }
 
 // ══════════════════════════════════════════════════════════════
-// SEARCH STUDENT
+// SEARCH / ADD / REMOVE STUDENT
 // ══════════════════════════════════════════════════════════════
 async function searchStudent() {
   const input = document.getElementById('studentSearchInput');
@@ -923,11 +1184,7 @@ async function searchStudent() {
   const code = input.value.trim().toUpperCase();
   const preview = document.getElementById('studentPreview');
 
-  if (!code) {
-    toast('Enter student ID', 'warning');
-    input.focus();
-    return;
-  }
+  if (!code) { toast('Enter student ID', 'warning'); input.focus(); return; }
 
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
@@ -935,28 +1192,19 @@ async function searchStudent() {
   state.lastSearchedStudent = null;
 
   try {
-    const res = await fetch(`${API}/teacher/search-student/${encodeURIComponent(code)}`, {
-      headers: authHeaders()
-    });
+    const res = await fetch(`${API}/teacher/search-student/${encodeURIComponent(code)}`, { headers: authHeaders() });
     const data = await res.json();
-
-    if (!data.success) {
-      showSearchPreview('error', null, data.message);
-      toast(data.message, 'error');
-      return;
-    }
+    if (!data.success) { showSearchPreview('error', null, data.message); return; }
 
     state.lastSearchedStudent = data.data;
     const s = data.data;
     const a = state.currentAssignment;
 
-    // Check class match
     if (a && String(s.class) !== String(a.class)) {
-      showSearchPreview('error', s, `❌ Student belongs to Class ${s.class}, but this period is for Class ${a.class}`);
+      showSearchPreview('error', s, `❌ Student belongs to Class ${s.class}, this period is for Class ${a.class}`);
       return;
     }
 
-    // Already added?
     const already = state.addedStudents.find(x => String(x.student_id) === String(s.student_id));
     if (already) {
       showSearchPreview('warning', s, `⚠️ ${s.name} is already in this period's list`);
@@ -965,8 +1213,7 @@ async function searchStudent() {
 
     showSearchPreview('success', s, `✅ Student valid — Click "Add to Period" to confirm`);
   } catch (err) {
-    showSearchPreview('error', null, 'Network error: ' + err.message);
-    toast('Search failed', 'error');
+    showSearchPreview('error', null, 'Network error');
   } finally {
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-search"></i> Search';
@@ -979,11 +1226,7 @@ function showSearchPreview(type, student, msg) {
   preview.className = 'student-preview ' + type;
 
   if (!student) {
-    preview.innerHTML = `
-      <div class="sp-msg msg-${type}">
-        <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-        <span>${esc(msg)}</span>
-      </div>`;
+    preview.innerHTML = `<div class="sp-msg msg-${type}"><i class="fas fa-exclamation-circle"></i><span>${esc(msg)}</span></div>`;
     return;
   }
 
@@ -991,181 +1234,91 @@ function showSearchPreview(type, student, msg) {
     ? `<img class="sp-photo" src="${esc(student.photo_url)}" onerror="this.outerHTML='<div class=&quot;sp-photo&quot;>👤</div>'">`
     : `<div class="sp-photo">👤</div>`;
 
-  const msgIcon = type === 'success' ? 'check-circle' :
-                  type === 'warning' ? 'exclamation-triangle' : 'exclamation-circle';
-
   preview.innerHTML = `
     <div class="sp-header">
       ${photoHtml}
       <div class="sp-info">
         <div class="sp-name">${esc(student.name)}</div>
-        <div class="sp-meta">
-          ID: <b>${esc(student.student_id)}</b> ·
-          Class: <b>${esc(student.class)}</b>
-          ${student.section ? ' · Section: <b>' + esc(student.section) + '</b>' : ''}
-          · Roll: <b>${esc(student.roll_number || '—')}</b>
-        </div>
+        <div class="sp-meta">ID: <b>${esc(student.student_id)}</b> · Class: <b>${esc(student.class)}</b> · Roll: <b>${esc(student.roll_number || '—')}</b></div>
       </div>
     </div>
-
     <div class="sp-details">
-      <div class="sp-row">
-        <span class="label"><i class="fas fa-id-card"></i> Student ID</span>
-        <span class="value">${esc(student.student_id)}</span>
-      </div>
-      <div class="sp-row">
-        <span class="label"><i class="fas fa-user"></i> Name</span>
-        <span class="value">${esc(student.name)}</span>
-      </div>
-      <div class="sp-row">
-        <span class="label"><i class="fas fa-male"></i> Father Name</span>
-        <span class="value">${esc(student.father_name || '—')}</span>
-      </div>
-      <div class="sp-row">
-        <span class="label"><i class="fas fa-female"></i> Mother Name</span>
-        <span class="value">${esc(student.mother_name || '—')}</span>
-      </div>
-      <div class="sp-row">
-        <span class="label"><i class="fas fa-birthday-cake"></i> Date of Birth</span>
-        <span class="value">${fmtDate(student.dob)}</span>
-      </div>
-      <div class="sp-row">
-        <span class="label"><i class="fas fa-graduation-cap"></i> Class</span>
-        <span class="value">${esc(student.class)}</span>
-      </div>
-      <div class="sp-row">
-        <span class="label"><i class="fas fa-stream"></i> Stream</span>
-        <span class="value">${esc(student.stream || '—')}</span>
-      </div>
-      <div class="sp-row">
-        <span class="label"><i class="fas fa-sort-numeric-up"></i> Roll Number</span>
-        <span class="value">${esc(student.roll_number || '—')}</span>
-      </div>
-      <div class="sp-row">
-        <span class="label"><i class="fas fa-envelope"></i> Email ID</span>
-        <span class="value">${esc(student.email_id || '—')}</span>
-      </div>
-      <div class="sp-row">
-        <span class="label"><i class="fas fa-phone"></i> Phone Number</span>
-        <span class="value">${esc(student.mobile_number || '—')}</span>
-      </div>
+      <div class="sp-row"><span class="label"><i class="fas fa-id-card"></i> Student ID</span><span class="value">${esc(student.student_id)}</span></div>
+      <div class="sp-row"><span class="label"><i class="fas fa-user"></i> Name</span><span class="value">${esc(student.name)}</span></div>
+      <div class="sp-row"><span class="label"><i class="fas fa-male"></i> Father Name</span><span class="value">${esc(student.father_name || '—')}</span></div>
+      <div class="sp-row"><span class="label"><i class="fas fa-female"></i> Mother Name</span><span class="value">${esc(student.mother_name || '—')}</span></div>
+      <div class="sp-row"><span class="label"><i class="fas fa-birthday-cake"></i> Date of Birth</span><span class="value">${fmtDate(student.dob)}</span></div>
+      <div class="sp-row"><span class="label"><i class="fas fa-graduation-cap"></i> Class</span><span class="value">${esc(student.class)}</span></div>
+      <div class="sp-row"><span class="label"><i class="fas fa-stream"></i> Stream</span><span class="value">${esc(student.stream || '—')}</span></div>
+      <div class="sp-row"><span class="label"><i class="fas fa-sort-numeric-up"></i> Roll Number</span><span class="value">${esc(student.roll_number || '—')}</span></div>
+      <div class="sp-row"><span class="label"><i class="fas fa-envelope"></i> Email ID</span><span class="value">${esc(student.email_id || '—')}</span></div>
+      <div class="sp-row"><span class="label"><i class="fas fa-phone"></i> Phone Number</span><span class="value">${esc(student.mobile_number || '—')}</span></div>
     </div>
-
-    <div class="sp-msg msg-${type}">
-      <i class="fas fa-${msgIcon}"></i>
-      <span>${esc(msg)}</span>
-    </div>
-
+    <div class="sp-msg msg-${type}"><i class="fas fa-info-circle"></i><span>${esc(msg)}</span></div>
     ${type === 'success' ? `
       <div class="sp-actions">
-        <button class="btn btn-success" onclick="addSearchedStudent()">
-          <i class="fas fa-plus"></i> Add to Period
-        </button>
-        <button class="btn btn-outline" onclick="document.getElementById('studentPreview').style.display='none'">
-          <i class="fas fa-times"></i> Cancel
-        </button>
+        <button class="btn btn-success" onclick="addSearchedStudent()"><i class="fas fa-plus"></i> Add to Period</button>
+        <button class="btn btn-outline" onclick="document.getElementById('studentPreview').style.display='none'"><i class="fas fa-times"></i> Cancel</button>
       </div>
     ` : ''}
   `;
 }
 
-// ══════════════════════════════════════════════════════════════
-// ADD STUDENT
-// ══════════════════════════════════════════════════════════════
 async function addSearchedStudent() {
   const s = state.lastSearchedStudent;
   const a = state.currentAssignment;
   if (!s || !a) return;
 
-  const btns = document.querySelectorAll('#studentPreview .sp-actions button');
-  btns.forEach(b => b.disabled = true);
-
   try {
     const res = await fetch(`${API}/teacher/add-student`, {
-      method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify({
-        studentCode: s.student_id,
-        assignmentId: a.id
-      })
+      method: 'POST', headers: authHeaders(),
+      body: JSON.stringify({ studentCode: s.student_id, assignmentId: a.id })
     });
     const data = await res.json();
-
     if (data.success) {
       toast(data.message, 'success');
       document.getElementById('studentPreview').style.display = 'none';
       document.getElementById('studentSearchInput').value = '';
       state.lastSearchedStudent = null;
       await loadAddedStudents();
-    } else {
-      toast(data.message || 'Failed', 'error');
-      btns.forEach(b => b.disabled = false);
-    }
-  } catch (err) {
-    toast('Network error: ' + err.message, 'error');
-    btns.forEach(b => b.disabled = false);
-  }
+    } else toast(data.message, 'error');
+  } catch (err) { toast('Error: ' + err.message, 'error'); }
 }
 
-// ══════════════════════════════════════════════════════════════
-// REMOVE STUDENT
-// ══════════════════════════════════════════════════════════════
-async function removeStudent(studentCode, name) {
-  if (!confirm(`Remove ${name} from this period?`)) return;
+async function removeStudent(code, name) {
+  if (!confirm(`Remove ${name}?`)) return;
   const a = state.currentAssignment;
   if (!a) return;
-
   try {
-    const res = await fetch(
-      `${API}/teacher/assignment/${a.id}/student/${encodeURIComponent(studentCode)}`,
-      { method: 'DELETE', headers: authHeaders() }
-    );
-    const data = await res.json();
-    if (data.success) {
-      toast('✅ Removed', 'success');
-      await loadAddedStudents();
-    } else {
-      toast(data.message, 'error');
-    }
-  } catch (err) {
-    toast('Network error: ' + err.message, 'error');
-  }
-}
-
-// ══════════════════════════════════════════════════════════════
-// SHOW QR
-// ══════════════════════════════════════════════════════════════
-async function showQR(studentCode) {
-  openModal('qrViewModal');
-  document.getElementById('qrViewTitle').textContent = 'Loading...';
-  document.getElementById('qrViewBody').innerHTML = `
-    <div style="text-align:center; padding:40px;">
-      <i class="fas fa-spinner fa-spin" style="font-size:32px; color:var(--gold);"></i>
-    </div>`;
-
-  try {
-    const res = await fetch(`${API}/teacher/student/${encodeURIComponent(studentCode)}/qr`, {
-      headers: authHeaders()
+    const res = await fetch(`${API}/teacher/assignment/${a.id}/student/${encodeURIComponent(code)}`, {
+      method: 'DELETE', headers: authHeaders()
     });
     const data = await res.json();
-    if (!data.success) throw new Error(data.message);
+    if (data.success) { toast('✅ Removed', 'success'); await loadAddedStudents(); }
+    else toast(data.message, 'error');
+  } catch (err) { toast('Error', 'error'); }
+}
 
+async function showQR(code) {
+  openModal('qrViewModal');
+  document.getElementById('qrViewTitle').textContent = 'Loading...';
+  document.getElementById('qrViewBody').innerHTML = `<div style="text-align:center; padding:40px;"><i class="fas fa-spinner fa-spin" style="font-size:32px; color:var(--gold);"></i></div>`;
+
+  try {
+    const res = await fetch(`${API}/teacher/student/${encodeURIComponent(code)}/qr`, { headers: authHeaders() });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
     const d = data.data;
     document.getElementById('qrViewTitle').textContent = d.student_name;
     document.getElementById('qrViewBody').innerHTML = `
       <div class="qr-box">
-        <img class="qr-img" src="${d.qr_image}" alt="QR Code">
+        <img class="qr-img" src="${d.qr_image}" alt="QR">
         <h3>${esc(d.student_name)}</h3>
         <div class="sub">Class ${esc(d.class)} · ID: ${esc(d.student_id)} · Roll: ${esc(d.roll_number || '—')}</div>
         <div class="token">${esc(d.qr_token)}</div>
-      </div>
-    `;
-  } catch (err) {
-    document.getElementById('qrViewBody').innerHTML = `
-      <div style="text-align:center; padding:40px; color:var(--red);">
-        <i class="fas fa-exclamation-triangle" style="font-size:32px;"></i>
-        <p style="margin-top:12px;">${esc(err.message)}</p>
       </div>`;
+  } catch (err) {
+    document.getElementById('qrViewBody').innerHTML = `<div style="text-align:center; padding:40px; color:var(--red);"><i class="fas fa-exclamation-triangle" style="font-size:32px;"></i><p style="margin-top:12px;">${esc(err.message)}</p></div>`;
   }
 }
 
@@ -1176,10 +1329,9 @@ async function openScanner(assignment) {
   state.current = assignment;
   document.getElementById('modalTitle').textContent = `Period ${assignment.period} · ${assignment.subject_name}`;
   document.getElementById('modalSubtitle').textContent = `Class ${assignment.class} · ${assignment.start_time}-${assignment.end_time}`;
-
-  document.getElementById('scannerModal').classList.add('active');
+  openModal('scannerModal');
   document.getElementById('scanInfo').className = 'scan-info';
-  document.getElementById('scanInfo').innerHTML = '<i class="fas fa-camera"></i> Point the camera at the student\'s QR code';
+  document.getElementById('scanInfo').innerHTML = '<i class="fas fa-camera"></i> Point camera at student\'s QR code';
 
   await refreshLive();
   setTimeout(startScanner, 400);
@@ -1188,11 +1340,8 @@ async function openScanner(assignment) {
 
 function closeScanner() {
   stopScanner();
-  if (state.liveInterval) {
-    clearInterval(state.liveInterval);
-    state.liveInterval = null;
-  }
-  document.getElementById('scannerModal').classList.remove('active');
+  if (state.liveInterval) { clearInterval(state.liveInterval); state.liveInterval = null; }
+  closeModal('scannerModal');
   state.current = null;
   loadPeriods();
 }
@@ -1207,13 +1356,10 @@ function startScanner() {
       onScanSuccess,
       () => {}
     ).catch(err => {
-      console.error('Scanner start failed:', err);
-      setScanInfo('error', '<i class="fas fa-exclamation-triangle"></i> Camera access denied. Please allow camera permission.');
+      setScanInfo('error', '<i class="fas fa-exclamation-triangle"></i> Camera access denied');
       state.scanner = null;
     });
-  } catch (err) {
-    setScanInfo('error', '<i class="fas fa-exclamation-triangle"></i> Could not start camera');
-  }
+  } catch (err) { setScanInfo('error', 'Could not start camera'); }
 }
 
 function stopScanner() {
@@ -1234,7 +1380,6 @@ async function onScanSuccess(decodedText) {
   if (state.scanning || now - state.lastScanTime < 2500) return;
   state.lastScanTime = now;
   state.scanning = true;
-
   if (navigator.vibrate) navigator.vibrate(80);
 
   const a = state.current;
@@ -1242,14 +1387,8 @@ async function onScanSuccess(decodedText) {
 
   try {
     const res = await fetch(`${API}/scan`, {
-      method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify({
-        qrToken: decodedText.trim(),
-        class: a.class,
-        subjectId: a.subject_id,
-        period: a.period
-      })
+      method: 'POST', headers: authHeaders(),
+      body: JSON.stringify({ qrToken: decodedText.trim(), class: a.class, subjectId: a.subject_id, period: a.period })
     });
     const data = await res.json();
 
@@ -1258,21 +1397,16 @@ async function onScanSuccess(decodedText) {
         setScanInfo('warning', `<i class="fas fa-info-circle"></i> ${esc(data.message)}`);
         toast(data.message, 'warning');
       } else {
-        setScanInfo('success',
-          `<i class="fas fa-check-circle"></i> <b>${esc(data.student.name)}</b> marked ${data.status.toUpperCase()} · ${data.time}`);
+        setScanInfo('success', `<i class="fas fa-check-circle"></i> <b>${esc(data.student.name)}</b> marked ${data.status.toUpperCase()} · ${data.time}`);
         toast(`✅ ${data.student.name} — ${data.status.toUpperCase()}`, 'success');
       }
       await refreshLive(true);
     } else {
-      const emoji = data.code === 'OUTSIDE_WINDOW' ? '⏰' :
-                    data.code === 'CLASS_MISMATCH' ? '👥' :
-                    data.code === 'NOT_IN_LIST' ? '📋' : '❌';
-      setScanInfo('error', `<i class="fas fa-exclamation-circle"></i> ${emoji} ${esc(data.message)}`);
+      setScanInfo('error', `<i class="fas fa-exclamation-circle"></i> ${esc(data.message)}`);
       toast(data.message, 'error');
     }
   } catch (err) {
-    setScanInfo('error', '<i class="fas fa-exclamation-circle"></i> Network error');
-    toast('Scan failed: ' + err.message, 'error');
+    setScanInfo('error', 'Network error');
   } finally {
     setTimeout(() => { state.scanning = false; }, 800);
   }
@@ -1282,17 +1416,12 @@ async function refreshLive(highlightLast = false) {
   const a = state.current;
   if (!a) return;
   try {
-    const res = await fetch(
-      `${API}/live/${a.class}/${a.subject_id}/${a.period}`,
-      { headers: authHeaders() }
-    );
+    const res = await fetch(`${API}/live/${a.class}/${a.subject_id}/${a.period}`, { headers: authHeaders() });
     const data = await res.json();
     if (!data.success) return;
     state.liveData = data;
     renderLiveList(data, highlightLast);
-  } catch (err) {
-    console.error('Live refresh failed:', err);
-  }
+  } catch (err) {}
 }
 
 function renderLiveList(data, highlightLast) {
@@ -1310,16 +1439,13 @@ function renderLiveList(data, highlightLast) {
   }
 
   let html = '';
-
   if (scanned.length) {
     html += scanned.map((r, i) => {
-      const photo = r.student_photo_url;
       const isNew = highlightLast && i === scanned.length - 1;
+      const photo = r.student_photo_url;
       return `
         <div class="student-item ${isNew ? 'just-scanned' : ''}">
-          ${photo
-            ? `<img src="${esc(photo)}" onerror="this.outerHTML='<div class=&quot;ph2&quot;>👤</div>'">`
-            : `<div class="ph2">👤</div>`}
+          ${photo ? `<img src="${esc(photo)}">` : `<div class="ph2">👤</div>`}
           <div class="info">
             <div class="nm">${esc(r.student_name || r.name || '')}</div>
             <div class="sub-info">Roll ${esc(r.roll_number || '-')} · ${r.marked_time || ''}</div>
@@ -1328,46 +1454,30 @@ function renderLiveList(data, highlightLast) {
         </div>`;
     }).join('');
   }
-
   if (absent.length) {
-    html += `<div style="font-size:11px; color:var(--muted); text-transform:uppercase; font-weight:700; letter-spacing:0.5px; margin:12px 0 6px; padding:0 4px;">
-      Absent (${absent.length})
-    </div>`;
-    html += absent.map(s => {
-      const photo = s.photo_url;
-      return `
-        <div class="student-item absent">
-          ${photo
-            ? `<img src="${esc(photo)}" onerror="this.outerHTML='<div class=&quot;ph2&quot;>👤</div>'">`
-            : `<div class="ph2">👤</div>`}
-          <div class="info">
-            <div class="nm">${esc(s.name)}</div>
-            <div class="sub-info">Roll ${esc(s.roll_number || '-')}</div>
-          </div>
-          <div class="check"><i class="fas fa-times"></i></div>
-        </div>`;
-    }).join('');
+    html += `<div style="font-size:11px; color:var(--muted); text-transform:uppercase; font-weight:700; margin:12px 0 6px; padding:0 4px;">Absent (${absent.length})</div>`;
+    html += absent.map(s => `
+      <div class="student-item absent">
+        ${s.photo_url ? `<img src="${esc(s.photo_url)}">` : `<div class="ph2">👤</div>`}
+        <div class="info">
+          <div class="nm">${esc(s.name)}</div>
+          <div class="sub-info">Roll ${esc(s.roll_number || '-')}</div>
+        </div>
+        <div class="check"><i class="fas fa-times"></i></div>
+      </div>
+    `).join('');
   }
-
   list.innerHTML = html;
 }
 
 async function finalizeAttendance() {
   const a = state.current;
   if (!a) return;
-
   const absentCount = state.liveData.stats.absent;
   const total = state.liveData.stats.total;
+  if (!total) { toast('No students in list', 'warning'); return; }
 
-  if (!total) {
-    toast('No students in this period. Add students first.', 'warning');
-    return;
-  }
-
-  const msg = absentCount > 0
-    ? `${absentCount} students are absent. Mark them absent and finalize?`
-    : `All ${total} students marked present. Finalize this period?`;
-  if (!confirm(msg)) return;
+  if (!confirm(absentCount > 0 ? `${absentCount} absent. Finalize?` : `All present. Finalize?`)) return;
 
   const btn = document.getElementById('finalizeBtn');
   btn.disabled = true;
@@ -1375,28 +1485,243 @@ async function finalizeAttendance() {
 
   try {
     const res = await fetch(`${API}/finalize`, {
-      method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify({
-        class: a.class,
-        subjectId: a.subject_id,
-        period: a.period
-      })
+      method: 'POST', headers: authHeaders(),
+      body: JSON.stringify({ class: a.class, subjectId: a.subject_id, period: a.period })
     });
     const data = await res.json();
     if (data.success) {
       toast(data.message, 'success');
       await refreshLive();
       setTimeout(closeScanner, 1200);
-    } else {
-      toast(data.message || 'Finalize failed', 'error');
-    }
-  } catch (err) {
-    toast('Network error: ' + err.message, 'error');
-  } finally {
+    } else toast(data.message, 'error');
+  } catch (err) { toast('Error', 'error'); }
+  finally {
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-check-double"></i> Finalize';
   }
+}
+
+// ══════════════════════════════════════════════════════════════
+// HISTORY & REPORTS
+// ══════════════════════════════════════════════════════════════
+async function onHistoryClassChange() {
+  const cls = document.getElementById('h_class').value;
+  const sel = document.getElementById('h_assignment');
+  sel.innerHTML = '<option value="">All Subjects</option>';
+  if (!cls) return;
+
+  try {
+    const res = await fetch(`${API}/teacher/my-periods`, { headers: authHeaders() });
+    const data = await res.json();
+    if (!data.success) return;
+
+    const assignments = (data.data || []).filter(a => String(a.class) === String(cls));
+    assignments.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a.id;
+      opt.textContent = `P${a.period} · ${a.subject_name}`;
+      sel.appendChild(opt);
+    });
+  } catch (err) {}
+}
+
+async function loadClassReport() {
+  const cls = document.getElementById('h_class').value;
+  const month = document.getElementById('h_month').value;
+  const year = document.getElementById('h_year').value;
+  const assignmentId = document.getElementById('h_assignment').value;
+
+  if (!cls) { toast('Select class', 'warning'); return; }
+
+  const area = document.getElementById('reportArea');
+  area.innerHTML = `<div class="empty"><i class="fas fa-spinner fa-spin"></i><h3>Loading report...</h3></div>`;
+
+  try {
+    const qs = new URLSearchParams({ class: cls, month, year });
+    if (assignmentId) qs.append("assignmentId", assignmentId);
+    if (state.selectedStudentIds.length) qs.append("studentIds", state.selectedStudentIds.join(","));
+
+    const res = await fetch(`${API}/teacher/class-students-summary?${qs}`, { headers: authHeaders() });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+
+    renderClassReport(data, cls);
+  } catch (err) {
+    area.innerHTML = `<div class="empty"><i class="fas fa-exclamation-triangle"></i><h3>${esc(err.message)}</h3></div>`;
+  }
+}
+
+function renderClassReport(data, cls) {
+  const area = document.getElementById('reportArea');
+  const students = data.data || [];
+
+  if (!students.length) {
+    area.innerHTML = `<div class="empty"><i class="fas fa-users-slash"></i><h3>No students</h3></div>`;
+    return;
+  }
+
+  const totalPresent = students.reduce((sum, s) => sum + (s.present_count || 0), 0);
+  const totalAbsent = students.reduce((sum, s) => sum + (s.absent_count || 0), 0);
+  const totalLate = students.reduce((sum, s) => sum + (s.late_count || 0), 0);
+  const avgPct = students.length ? Math.round(students.reduce((sum, s) => sum + (s.percentage || 0), 0) / students.length) : 0;
+
+  area.innerHTML = `
+    <div class="report-card">
+      <h3>
+        <i class="fas fa-chart-bar"></i>
+        Class ${esc(cls)} — ${esc(data.monthName)} ${data.year}
+        <span class="badge">${students.length} students</span>
+      </h3>
+      <div class="stat-cards">
+        <div class="stat-card-mini green"><div class="val">${totalPresent}</div><div class="lbl">Total Present</div></div>
+        <div class="stat-card-mini red"><div class="val">${totalAbsent}</div><div class="lbl">Total Absent</div></div>
+        <div class="stat-card-mini orange"><div class="val">${totalLate}</div><div class="lbl">Total Late</div></div>
+        <div class="stat-card-mini gold"><div class="val">${avgPct}%</div><div class="lbl">Avg Attendance</div></div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>S.No</th><th>Roll</th><th>Student ID</th><th>Name</th><th>Father</th>
+              <th>Present</th><th>Absent</th><th>Late</th><th>Total</th><th>%</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${students.map((s, i) => {
+              const pctClass = s.percentage >= 75 ? 'pct-good' : s.percentage >= 50 ? 'pct-warn' : 'pct-bad';
+              return `
+                <tr>
+                  <td>${i + 1}</td>
+                  <td>${esc(s.roll_number || '-')}</td>
+                  <td>${esc(s.student_id)}</td>
+                  <td><b>${esc(s.name)}</b></td>
+                  <td>${esc(s.father_name || '-')}</td>
+                  <td style="color:var(--green); font-weight:700;">${s.present_count}</td>
+                  <td style="color:var(--red); font-weight:700;">${s.absent_count}</td>
+                  <td style="color:var(--orange); font-weight:700;">${s.late_count}</td>
+                  <td>${s.total_count}</td>
+                  <td><span class="pct-badge ${pctClass}">${s.percentage}%</span></td>
+                </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+async function exportExcel() {
+  const cls = document.getElementById('h_class').value;
+  const month = document.getElementById('h_month').value;
+  const year = document.getElementById('h_year').value;
+  const assignmentId = document.getElementById('h_assignment').value;
+  if (!cls) { toast('Select class first', 'warning'); return; }
+
+  const qs = new URLSearchParams({ class: cls, month, year });
+  if (assignmentId) qs.append("assignmentId", assignmentId);
+  if (state.selectedStudentIds.length) qs.append("studentIds", state.selectedStudentIds.join(","));
+
+  toast('Generating Excel...', 'info');
+  try {
+    const res = await fetch(`${API}/teacher/export/excel?${qs}`, { headers: { 'Authorization': `Bearer ${state.token}` } });
+    if (!res.ok) { toast('Excel export failed', 'error'); return; }
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `Attendance_Class${cls}_${month}_${year}.xlsx`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast('✅ Excel downloaded', 'success');
+  } catch (err) { toast('Error: ' + err.message, 'error'); }
+}
+
+async function exportPDF() {
+  const cls = document.getElementById('h_class').value;
+  const month = document.getElementById('h_month').value;
+  const year = document.getElementById('h_year').value;
+  const assignmentId = document.getElementById('h_assignment').value;
+  if (!cls) { toast('Select class first', 'warning'); return; }
+
+  const qs = new URLSearchParams({ class: cls, month, year });
+  if (assignmentId) qs.append("assignmentId", assignmentId);
+  if (state.selectedStudentIds.length) qs.append("studentIds", state.selectedStudentIds.join(","));
+
+  toast('Generating PDF...', 'info');
+  try {
+    const res = await fetch(`${API}/teacher/export/pdf?${qs}`, { headers: { 'Authorization': `Bearer ${state.token}` } });
+    if (!res.ok) { toast('PDF export failed', 'error'); return; }
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `Attendance_Class${cls}_${month}_${year}.pdf`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast('✅ PDF downloaded', 'success');
+  } catch (err) { toast('Error: ' + err.message, 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// STUDENT SELECTOR
+// ══════════════════════════════════════════════════════════════
+async function openStudentSelector() {
+  const cls = document.getElementById('h_class').value;
+  if (!cls) { toast('Select class first', 'warning'); return; }
+
+  openModal('studentSelectorModal');
+  const sel = document.getElementById('studentSelector');
+  sel.innerHTML = `<div style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i></div>`;
+
+  try {
+    const r2 = await fetch(`${API}/teacher/class/${encodeURIComponent(cls)}/students`, { headers: authHeaders() });
+    const d2 = await r2.json();
+    if (!d2.success) throw new Error(d2.message);
+
+    sel.innerHTML = (d2.data || []).map(s => `
+      <label class="student-check">
+        <input type="checkbox" value="${esc(s.student_id)}" ${state.selectedStudentIds.includes(s.student_id) ? 'checked' : ''}>
+        <span class="nm">${esc(s.name)}</span>
+        <span class="meta">Roll ${esc(s.roll_number || '-')} · ${esc(s.student_id)}</span>
+      </label>
+    `).join('');
+  } catch (err) {
+    sel.innerHTML = `<div style="padding:20px; text-align:center; color:var(--red);">${esc(err.message)}</div>`;
+  }
+}
+
+function selectAllStudents(checked) {
+  document.querySelectorAll('#studentSelector input[type="checkbox"]').forEach(cb => cb.checked = checked);
+}
+
+function clearStudentSelection() {
+  state.selectedStudentIds = [];
+  closeModal('studentSelectorModal');
+  toast('Selection cleared', 'info');
+}
+
+function applyStudentSelection() {
+  const checked = document.querySelectorAll('#studentSelector input[type="checkbox"]:checked');
+  state.selectedStudentIds = Array.from(checked).map(cb => cb.value);
+  closeModal('studentSelectorModal');
+  if (state.selectedStudentIds.length) {
+    toast(`✅ ${state.selectedStudentIds.length} students selected`, 'success');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// QUICK HISTORY FROM PERIOD CARD
+// ══════════════════════════════════════════════════════════════
+function openHistoryForAssignment(assignment) {
+  switchTab('history');
+  setTimeout(() => {
+    const clsSel = document.getElementById('h_class');
+    clsSel.value = assignment.class;
+    onHistoryClassChange();
+    setTimeout(() => {
+      const asgnSel = document.getElementById('h_assignment');
+      asgnSel.value = assignment.id;
+      loadClassReport();
+    }, 500);
+  }, 300);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1404,9 +1729,9 @@ async function finalizeAttendance() {
 // ══════════════════════════════════════════════════════════════
 initHeader();
 loadPeriods();
-
 setInterval(() => {
-  if (!state.scanner && !state.currentAssignment) loadPeriods();
+  const activeTab = document.querySelector('.tab.active');
+  if (activeTab && activeTab.dataset.tab === 'periods' && !state.scanner && !state.currentAssignment) loadPeriods();
 }, 30000);
 </script>
 </body>
