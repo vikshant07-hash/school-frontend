@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QR Attendance - Teacher</title>
+<title>Teacher Portal — GSSS Shilla</title>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
 :root {
   --bg: #f5f7fb; --white: #fff; --text: #1a2332; --text-sec: #5a6a7e;
-  --text-muted: #94a3b8; --gold: #c9972b; --gold-light: #e8b84b;
+  --muted: #94a3b8; --gold: #c9972b; --gold-light: #e8b84b;
   --gold-bg: #fef8ed; --green: #10b981; --green-bg: #ecfdf5;
   --red: #ef4444; --red-bg: #fef2f2; --blue: #4a8af4; --blue-bg: #eef4ff;
-  --orange: #f59e0b; --border: #e8edf8;
+  --orange: #f59e0b; --orange-bg: #fffbeb; --border: #e8edf8;
   --shadow: 0 2px 12px rgba(0,0,0,0.04);
   --radius: 14px;
 }
@@ -27,7 +27,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
   justify-content: space-between; position: sticky; top: 0; z-index: 100;
   box-shadow: var(--shadow);
 }
-.navbar .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.navbar .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 .navbar .logo {
   width: 40px; height: 40px; border-radius: 10px; background: var(--gold-bg);
   display: flex; align-items: center; justify-content: center;
@@ -36,37 +36,60 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .navbar .logo img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
 .navbar .name { font-size: 15px; font-weight: 800; color: var(--text); }
 .navbar .name span { color: var(--gold); }
-.navbar .teacher-badge {
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 14px; background: var(--bg); border-radius: 50px;
-  font-size: 12px; font-weight: 600; color: var(--text-sec);
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.teacher-badge {
+  display: flex; align-items: center; gap: 8px; padding: 6px 14px;
+  background: var(--bg); border-radius: 50px; font-size: 12px;
+  font-weight: 600; color: var(--text-sec);
 }
-.navbar .avatar {
-  width: 28px; height: 28px; border-radius: 50%;
+.avatar {
+  width: 26px; height: 26px; border-radius: 50%;
   background: linear-gradient(135deg, var(--gold), var(--gold-light));
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; color: #fff;
+  font-size: 11px; font-weight: 700; color: #fff;
 }
 .logout-btn {
   padding: 8px 14px; background: var(--red-bg); color: var(--red);
   border: none; border-radius: 8px; font-size: 12px; font-weight: 600;
-  cursor: pointer; font-family: inherit; transition: all 0.2s;
+  cursor: pointer; font-family: inherit;
 }
 .logout-btn:hover { background: var(--red); color: #fff; }
 
+/* CONTAINER */
 .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
 
-/* PAGE HEADER */
+/* TABS */
+.tabs {
+  display: flex; gap: 4px; margin-bottom: 20px; background: var(--white);
+  padding: 6px; border-radius: var(--radius); border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.tab {
+  flex: 1; padding: 12px 20px; border-radius: 10px; border: none;
+  cursor: pointer; font-size: 13px; font-weight: 700;
+  color: var(--text-sec); background: transparent; font-family: inherit;
+  transition: all 0.2s; display: flex; align-items: center;
+  justify-content: center; gap: 8px;
+}
+.tab:hover { background: var(--bg); color: var(--text); }
+.tab.active {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: #fff; box-shadow: 0 4px 12px rgba(201,151,43,0.3);
+}
+.tab i { font-size: 14px; }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* PAGE HEAD */
 .page-head {
   background: var(--white); border-radius: var(--radius);
-  border: 1px solid var(--border); padding: 22px 26px;
+  border: 1px solid var(--border); padding: 20px 24px;
   margin-bottom: 20px; box-shadow: var(--shadow);
   display: flex; justify-content: space-between; align-items: center;
   flex-wrap: wrap; gap: 14px;
 }
-.page-head h1 {
-  font-size: 20px; font-weight: 800; display: flex; align-items: center; gap: 10px;
-}
+.page-head h1 { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
 .page-head h1 i { color: var(--gold); }
 .page-head .sub { font-size: 12px; color: var(--text-sec); margin-top: 4px; }
 .clock {
@@ -75,25 +98,15 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
   border-radius: 10px; border: 1px solid rgba(201,151,43,0.2);
 }
 
-/* SECTION */
-.section { margin-bottom: 22px; }
-.section-title {
-  font-size: 14px; font-weight: 800; color: var(--text-sec);
-  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;
-  display: flex; align-items: center; gap: 8px;
-}
-.section-title i { color: var(--gold); }
-
-/* ASSIGNMENT CARDS */
+/* PERIOD CARDS */
 .periods-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 14px;
 }
 .period-card {
   background: var(--white); border-radius: var(--radius);
   border: 2px solid var(--border); padding: 20px;
-  cursor: pointer; transition: all 0.25s; position: relative;
-  overflow: hidden;
+  cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden;
 }
 .period-card:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
 .period-card.live { border-color: var(--green); background: linear-gradient(135deg, #fff, #f0fdf4); }
@@ -104,12 +117,8 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
 .period-card.upcoming { opacity: 0.65; border-style: dashed; }
-.period-card.past { opacity: 0.5; background: #f8fafc; }
-
-.period-top {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  margin-bottom: 12px;
-}
+.period-card.past { opacity: 0.55; background: #f8fafc; }
+.period-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
 .period-num {
   display: inline-block; padding: 4px 12px; background: var(--gold-bg);
   color: var(--gold); border-radius: 8px; font-size: 11px; font-weight: 800;
@@ -122,9 +131,8 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .status-live { background: var(--green-bg); color: var(--green); }
 .status-live::before { content: '● '; animation: pulse 1s infinite; }
 .status-upcoming { background: var(--blue-bg); color: var(--blue); }
-.status-past { background: #f1f5f9; color: var(--text-muted); }
-
-.period-subject { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.status-past { background: #f1f5f9; color: var(--muted); }
+.period-subject { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
 .period-class { font-size: 13px; color: var(--text-sec); margin-bottom: 12px; }
 .period-meta {
   display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px;
@@ -132,7 +140,6 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 }
 .period-meta span { display: flex; align-items: center; gap: 5px; }
 .period-meta i { color: var(--gold); }
-
 .scan-btn {
   margin-top: 14px; width: 100%; padding: 11px;
   background: linear-gradient(135deg, var(--gold), var(--gold-light));
@@ -144,100 +151,184 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .scan-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(201,151,43,0.3); }
 .scan-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
+/* CLASS CARDS */
+.classes-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+.class-card {
+  background: var(--white); border-radius: var(--radius);
+  border: 2px solid var(--border); padding: 22px;
+  cursor: pointer; transition: all 0.25s; text-align: center;
+}
+.class-card:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.08); }
+.class-card .class-num {
+  font-size: 42px; font-weight: 900;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.class-card .class-lbl { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.class-card .class-count {
+  font-size: 12px; color: var(--text-sec); margin-top: 12px;
+  padding-top: 12px; border-top: 1px dashed var(--border);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-weight: 600;
+}
+.class-card .class-count i { color: var(--gold); }
+
+/* STUDENTS LIST */
+.students-list {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+.student-card {
+  background: var(--white); border-radius: var(--radius);
+  border: 1px solid var(--border); padding: 14px;
+  display: flex; gap: 12px; align-items: center;
+  transition: all 0.2s;
+}
+.student-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); border-color: var(--gold); }
+.student-card .ph {
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 2px solid var(--gold); background: #f1f5f9;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0; overflow: hidden;
+}
+.student-card .ph img { width: 100%; height: 100%; object-fit: cover; }
+.student-card .info { flex: 1; min-width: 0; }
+.student-card .nm { font-size: 14px; font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.student-card .meta { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.student-card .status-chip {
+  display: inline-block; padding: 2px 8px; border-radius: 20px;
+  font-size: 9px; font-weight: 800; text-transform: uppercase;
+  margin-top: 4px;
+}
+.status-present { background: var(--green-bg); color: var(--green); }
+.status-absent { background: var(--red-bg); color: var(--red); }
+.status-late { background: var(--orange-bg); color: var(--orange); }
+.status-not-marked { background: #f1f5f9; color: var(--muted); }
+.student-card .qr-btn {
+  padding: 8px 12px; background: var(--gold-bg); color: var(--gold);
+  border: none; border-radius: 8px; font-size: 11px; font-weight: 700;
+  cursor: pointer; font-family: inherit; flex-shrink: 0;
+}
+.student-card .qr-btn:hover { background: var(--gold); color: #fff; }
+
+/* STUDENTS VIEW HEADER */
+.students-head {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.students-head h2 {
+  font-size: 18px; font-weight: 800;
+  display: flex; align-items: center; gap: 8px;
+}
+.students-head h2 i { color: var(--gold); }
+.students-head .count-chip {
+  padding: 4px 12px; background: var(--blue-bg); color: var(--blue);
+  border-radius: 20px; font-size: 12px; font-weight: 800;
+}
+
 /* MODAL */
 .modal {
   display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-  backdrop-filter: blur(6px); z-index: 9999; padding: 16px;
-  overflow-y: auto;
+  backdrop-filter: blur(6px); z-index: 9999; padding: 16px; overflow-y: auto;
 }
 .modal.active { display: flex; align-items: flex-start; justify-content: center; }
 .modal-content {
-  background: var(--white); border-radius: 20px; padding: 0;
+  background: var(--white); border-radius: 20px;
   max-width: 500px; width: 100%; margin: auto;
   box-shadow: 0 30px 80px rgba(0,0,0,0.5);
-  animation: slideUp 0.3s ease;
-  max-height: 95vh; overflow-y: auto;
+  animation: slideUp 0.3s ease; max-height: 95vh; overflow-y: auto;
 }
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .modal-head {
-  padding: 22px 24px 16px; border-bottom: 1px solid var(--border);
+  padding: 20px 24px 14px; border-bottom: 1px solid var(--border);
   display: flex; justify-content: space-between; align-items: center;
   position: sticky; top: 0; background: var(--white); z-index: 2;
   border-radius: 20px 20px 0 0;
 }
-.modal-head h2 { font-size: 17px; font-weight: 800; }
+.modal-head h2 { font-size: 16px; font-weight: 800; }
 .modal-head .close {
   width: 32px; height: 32px; border-radius: 50%; background: var(--bg);
-  border: none; cursor: pointer; font-size: 16px; color: var(--text-sec);
+  border: none; cursor: pointer; font-size: 15px; color: var(--text-sec);
   display: flex; align-items: center; justify-content: center;
 }
 .modal-head .close:hover { background: var(--red-bg); color: var(--red); }
-.modal-body { padding: 20px 24px; }
+.modal-body { padding: 18px 24px; }
 
 /* SCANNER */
-#qr-reader {
-  width: 100%; border-radius: 14px; overflow: hidden;
-  background: #000; margin-bottom: 16px;
-}
-#qr-reader video { border-radius: 14px; }
+#qr-reader { width: 100%; border-radius: 14px; overflow: hidden; background: #000; margin-bottom: 14px; }
 .scan-info {
   padding: 14px; background: var(--blue-bg); border-radius: 10px;
   font-size: 13px; color: var(--text); text-align: center;
   border-left: 4px solid var(--blue); margin-bottom: 14px;
+  line-height: 1.5;
 }
 .scan-info.warning { background: #fffbeb; border-left-color: var(--orange); }
 .scan-info.error { background: var(--red-bg); border-left-color: var(--red); }
 .scan-info.success { background: var(--green-bg); border-left-color: var(--green); }
 
-/* LIVE STATS */
-.stats-row {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-  margin-bottom: 18px;
-}
-.stat {
-  background: var(--bg); padding: 14px; border-radius: 12px;
-  text-align: center; border: 1px solid var(--border);
-}
-.stat .val { font-size: 22px; font-weight: 800; color: var(--gold); }
-.stat .lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-top: 2px; }
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.stat { background: var(--bg); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
+.stat .val { font-size: 20px; font-weight: 800; color: var(--gold); }
+.stat .lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-top: 2px; }
 .stat.present .val { color: var(--green); }
 .stat.absent .val { color: var(--red); }
 
-/* STUDENT LIST */
-.student-list { max-height: 320px; overflow-y: auto; margin-top: 12px; }
+.student-list-live { max-height: 300px; overflow-y: auto; margin-top: 10px; }
 .student-item {
   display: flex; align-items: center; gap: 12px; padding: 10px 12px;
   border-radius: 10px; margin-bottom: 6px; background: var(--bg);
   animation: fadeIn 0.3s;
 }
 .student-item.absent { background: var(--red-bg); }
-.student-item.just-scanned {
-  background: var(--green-bg);
-  animation: flash 1s ease;
-}
+.student-item.just-scanned { background: var(--green-bg); animation: flash 1s ease; }
 @keyframes flash { 0%,100% { background: var(--green-bg); } 50% { background: #a7f3d0; } }
 @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-.student-item img, .student-item .ph {
-  width: 38px; height: 38px; border-radius: 50%; object-fit: cover;
+.student-item img, .student-item .ph2 {
+  width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
   border: 2px solid var(--gold); flex-shrink: 0;
 }
-.student-item .ph {
+.student-item .ph2 {
   background: linear-gradient(135deg, #1a2332, #2c3e50);
   display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 16px;
+  color: #fff; font-size: 15px;
 }
 .student-item .info { flex: 1; min-width: 0; }
-.student-item .nm { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.student-item .sub-info { font-size: 11px; color: var(--text-muted); }
+.student-item .nm { font-size: 13px; font-weight: 700; }
+.student-item .sub-info { font-size: 11px; color: var(--muted); }
 .student-item .check {
   width: 24px; height: 24px; border-radius: 50%; background: var(--green);
   color: #fff; display: flex; align-items: center; justify-content: center;
-  font-size: 12px; flex-shrink: 0;
+  font-size: 11px; flex-shrink: 0;
 }
 .student-item.absent .check { background: var(--red); }
+
+/* QR VIEW */
+.qr-box {
+  text-align: center; padding: 10px;
+}
+.qr-box .qr-img {
+  width: 280px; height: 280px; border: 2px solid var(--gold);
+  border-radius: 14px; padding: 10px; background: #fff;
+  margin: 0 auto 16px; display: block;
+}
+.qr-box h3 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+.qr-box .sub { font-size: 13px; color: var(--text-sec); margin-bottom: 18px; }
+.qr-box .token {
+  font-family: monospace; font-size: 10px; word-break: break-all;
+  background: var(--bg); padding: 10px; border-radius: 8px;
+  color: var(--text-sec); margin-top: 10px;
+  border: 1px solid var(--border);
+}
 
 /* BUTTONS */
 .btn {
@@ -249,9 +340,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .btn-primary { background: var(--gold); color: #fff; }
 .btn-primary:hover { background: var(--gold-light); }
 .btn-success { background: var(--green); color: #fff; }
-.btn-success:hover { background: #059669; }
 .btn-danger { background: var(--red); color: #fff; }
-.btn-danger:hover { background: #dc2626; }
 .btn-outline { background: var(--bg); color: var(--text-sec); border: 1px solid var(--border); }
 .btn-outline:hover { background: var(--border); }
 .btn-block { width: 100%; justify-content: center; }
@@ -266,39 +355,30 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
   padding: 14px 18px; border-radius: 12px; color: #fff;
   font-weight: 600; font-size: 13px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-  animation: slideIn 0.3s ease;
-  display: flex; align-items: center; gap: 10px;
+  animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 10px;
   line-height: 1.4;
 }
 .toast i { font-size: 18px; flex-shrink: 0; }
 .toast-success { background: linear-gradient(135deg, var(--green), #059669); }
 .toast-error { background: linear-gradient(135deg, var(--red), #dc2626); }
 .toast-warning { background: linear-gradient(135deg, var(--orange), #d97706); }
-.toast-info { background: linear-gradient(135deg, #4a8af4, #3b82f6); }
+.toast-info { background: linear-gradient(135deg, var(--blue), #3b82f6); }
 @keyframes slideIn { from { opacity: 0; transform: translateX(60px); } to { opacity: 1; transform: translateX(0); } }
 
 /* EMPTY */
 .empty {
-  text-align: center; padding: 50px 20px; color: var(--text-muted);
+  text-align: center; padding: 50px 20px; color: var(--muted);
   background: var(--white); border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border); grid-column: 1/-1;
 }
-.empty i { font-size: 48px; color: var(--gold); opacity: 0.4; margin-bottom: 14px; display: block; }
+.empty i { font-size: 48px; color: var(--gold); opacity: 0.4; display: block; margin-bottom: 12px; }
 .empty h3 { font-size: 15px; font-weight: 700; color: var(--text-sec); margin-bottom: 6px; }
-.empty p { font-size: 13px; }
 
 @media (max-width: 640px) {
-  .container { padding: 16px 12px; }
-  .navbar { padding: 0 14px; }
-  .navbar .name { font-size: 13px; }
-  .page-head { padding: 16px; }
-  .page-head h1 { font-size: 17px; }
-  .clock { font-size: 13px; padding: 6px 12px; }
-  .periods-grid { grid-template-columns: 1fr; }
-  .stats-row { grid-template-columns: repeat(3, 1fr); gap: 6px; }
-  .stat { padding: 10px 6px; }
-  .stat .val { font-size: 18px; }
-  .toast-container { left: 12px; right: 12px; max-width: none; }
+  .container { padding: 14px; }
+  .periods-grid, .classes-grid, .students-list { grid-template-columns: 1fr; }
+  .tab { padding: 10px 12px; font-size: 12px; }
+  .tab span.tab-label { display: none; }
 }
 </style>
 </head>
@@ -309,42 +389,88 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
     <div class="logo"><img src="logo(1).png" alt="GSSS" onerror="this.outerHTML='🎓'"></div>
     <div class="name">GSSS<span> SHILLA</span></div>
   </a>
-  <div style="display:flex; align-items:center; gap:10px;">
+  <div class="nav-right">
     <div class="teacher-badge">
       <span class="avatar" id="teacherAvatar">T</span>
       <span id="teacherName">Teacher</span>
     </div>
-    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <button class="logout-btn" onclick="logout()" title="Logout">
+      <i class="fas fa-sign-out-alt"></i>
+    </button>
   </div>
 </nav>
 
 <div class="container">
-  <div class="page-head">
-    <div>
-      <h1><i class="fas fa-qrcode"></i> QR Attendance</h1>
-      <div class="sub" id="todayInfo">Loading...</div>
-    </div>
-    <div class="clock" id="liveClock">--:--:--</div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('periods')" data-tab="periods">
+      <i class="fas fa-calendar-day"></i> <span class="tab-label">My Periods</span>
+    </button>
+    <button class="tab" onclick="switchTab('classes')" data-tab="classes">
+      <i class="fas fa-users"></i> <span class="tab-label">My Classes</span>
+    </button>
   </div>
 
-  <div class="section">
-    <div class="section-title"><i class="fas fa-calendar-day"></i> Today's Periods</div>
+  <!-- ════════════ PERIODS TAB ════════════ -->
+  <div class="tab-content active" id="tab-periods">
+    <div class="page-head">
+      <div>
+        <h1><i class="fas fa-qrcode"></i> QR Attendance</h1>
+        <div class="sub" id="todayInfo">Loading...</div>
+      </div>
+      <div class="clock" id="liveClock">--:--:--</div>
+    </div>
     <div class="periods-grid" id="periodsGrid">
-      <div class="empty" style="grid-column: 1/-1;">
+      <div class="empty">
         <i class="fas fa-spinner fa-spin"></i>
         <h3>Loading your periods...</h3>
       </div>
     </div>
   </div>
+
+  <!-- ════════════ CLASSES TAB ════════════ -->
+  <div class="tab-content" id="tab-classes">
+
+    <!-- Class List View -->
+    <div id="classesView">
+      <div class="page-head">
+        <div>
+          <h1><i class="fas fa-users"></i> My Classes</h1>
+          <div class="sub">Your assigned classes and their students</div>
+        </div>
+      </div>
+      <div class="classes-grid" id="classesGrid">
+        <div class="empty">
+          <i class="fas fa-spinner fa-spin"></i>
+          <h3>Loading classes...</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Students List View -->
+    <div id="studentsView" style="display:none;">
+      <div class="students-head">
+        <button class="btn btn-outline" onclick="backToClasses()">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <h2 id="studentsTitle"><i class="fas fa-users"></i> Class</h2>
+        <span class="count-chip" id="studentsCount">0</span>
+      </div>
+      <div class="students-list" id="studentsList"></div>
+    </div>
+
+  </div>
+
 </div>
 
-<!-- SCANNER MODAL -->
+<!-- ════════════ SCANNER MODAL ════════════ -->
 <div class="modal" id="scannerModal">
   <div class="modal-content">
     <div class="modal-head">
       <div>
         <h2 id="modalTitle">QR Scanner</h2>
-        <div style="font-size:11px; color:var(--text-muted); margin-top:3px;" id="modalSubtitle">—</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:3px;" id="modalSubtitle">—</div>
       </div>
       <button class="close" onclick="closeScanner()"><i class="fas fa-times"></i></button>
     </div>
@@ -355,25 +481,16 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
       <div id="qr-reader"></div>
 
       <div class="stats-row">
-        <div class="stat present">
-          <div class="val" id="statPresent">0</div>
-          <div class="lbl">Present</div>
-        </div>
-        <div class="stat absent">
-          <div class="val" id="statAbsent">0</div>
-          <div class="lbl">Absent</div>
-        </div>
-        <div class="stat">
-          <div class="val" id="statTotal">0</div>
-          <div class="lbl">Total</div>
-        </div>
+        <div class="stat present"><div class="val" id="statPresent">0</div><div class="lbl">Present</div></div>
+        <div class="stat absent"><div class="val" id="statAbsent">0</div><div class="lbl">Absent</div></div>
+        <div class="stat"><div class="val" id="statTotal">0</div><div class="lbl">Total</div></div>
       </div>
 
-      <div class="section-title" style="margin-top:16px; margin-bottom:8px;">
+      <div style="font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
         <i class="fas fa-list-check"></i> Live Attendance
       </div>
-      <div class="student-list" id="liveList">
-        <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">
+      <div class="student-list-live" id="liveList">
+        <div style="text-align:center; padding:20px; color:var(--muted); font-size:12px;">
           No students scanned yet
         </div>
       </div>
@@ -390,26 +507,46 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
   </div>
 </div>
 
+<!-- ════════════ QR VIEW MODAL ════════════ -->
+<div class="modal" id="qrViewModal">
+  <div class="modal-content">
+    <div class="modal-head">
+      <h2 id="qrViewTitle">Student QR</h2>
+      <button class="close" onclick="closeModal('qrViewModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="qrViewBody">
+      <div style="text-align:center; padding:40px;">
+        <i class="fas fa-spinner fa-spin" style="font-size:32px; color:var(--gold);"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
+// ══════════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════════
 const API = 'https://gsssshilla.onrender.com/api/attendance';
 
 const state = {
   token: localStorage.getItem('teacherToken'),
   teacher: JSON.parse(localStorage.getItem('teacherData') || '{}'),
   periods: [],
-  current: null,           // active assignment
+  classes: [],
+  students: [],
+  currentClass: null,
+  current: null,
   scanner: null,
   liveData: { data: [], absent: [], stats: { present: 0, absent: 0, total: 0 } },
   scanning: false,
   lastScanTime: 0,
-  liveInterval: null
+  liveInterval: null,
+  currentTab: 'periods'
 };
 
-// ══════════════════════════════════════════════════════════
-// AUTH
-// ══════════════════════════════════════════════════════════
+// Auth check
 if (!state.token) {
   window.location.replace('teacher-login.html');
 }
@@ -429,9 +566,9 @@ function logout() {
   window.location.replace('teacher-login.html');
 }
 
-// ══════════════════════════════════════════════════════════
-// UI HELPERS
-// ══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════
 function toast(msg, type = 'info') {
   const c = document.getElementById('toastContainer');
   const t = document.createElement('div');
@@ -453,12 +590,7 @@ function timeNow() {
   return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
 }
 
-function timeHM() {
-  const d = new Date();
-  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-}
-
-function nowMinutes() {
+function nowMin() {
   const d = new Date();
   return d.getHours() * 60 + d.getMinutes();
 }
@@ -468,13 +600,8 @@ function parseHM(hm) {
   return h * 60 + m;
 }
 
-function isLive(a) {
-  const cur = nowMinutes();
-  return cur >= parseHM(a.start_time) && cur <= parseHM(a.end_time);
-}
-
 function getStatus(a) {
-  const cur = nowMinutes();
+  const cur = nowMin();
   const s = parseHM(a.start_time);
   const e = parseHM(a.end_time);
   if (cur < s) return 'upcoming';
@@ -482,15 +609,18 @@ function getStatus(a) {
   return 'live';
 }
 
-function escapeHtml(s) {
+function esc(s) {
   if (s === null || s === undefined) return '';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
 
-// ══════════════════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+// ══════════════════════════════════════════════════════════════
+// INIT HEADER
+// ══════════════════════════════════════════════════════════════
 function initHeader() {
   const t = state.teacher;
   const nameEl = document.getElementById('teacherName');
@@ -500,22 +630,33 @@ function initHeader() {
 }
 
 setInterval(() => {
-  document.getElementById('liveClock').textContent = timeNow();
+  const clock = document.getElementById('liveClock');
+  if (clock) clock.textContent = timeNow();
 }, 1000);
-document.getElementById('liveClock').textContent = timeNow();
 
-// Update period status every 30s
-setInterval(() => {
-  if (!state.scanner) renderPeriods();
-}, 30000);
+// ══════════════════════════════════════════════════════════════
+// TAB SWITCH
+// ══════════════════════════════════════════════════════════════
+function switchTab(name) {
+  state.currentTab = name;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
 
-// ══════════════════════════════════════════════════════════
-// LOAD PERIODS
-// ══════════════════════════════════════════════════════════
+  if (name === 'periods') loadPeriods();
+  if (name === 'classes') {
+    backToClasses();
+    loadMyClasses();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// PERIODS TAB
+// ══════════════════════════════════════════════════════════════
 async function loadPeriods() {
   try {
     const res = await fetch(`${API}/teacher/my-periods`, { headers: authHeaders() });
-    if (res.status === 401) {
+    if (res.status === 401 || res.status === 403) {
       toast('Session expired. Login again.', 'error');
       setTimeout(logout, 1500);
       return;
@@ -524,7 +665,6 @@ async function loadPeriods() {
     if (!data.success) throw new Error(data.message);
 
     state.periods = data.data || [];
-
     const day = data.day || 'Today';
     const date = data.date || '';
     document.getElementById('todayInfo').textContent =
@@ -533,52 +673,47 @@ async function loadPeriods() {
     renderPeriods();
   } catch (err) {
     console.error(err);
-    toast('Failed to load periods: ' + err.message, 'error');
     document.getElementById('periodsGrid').innerHTML = `
-      <div class="empty" style="grid-column:1/-1;">
+      <div class="empty">
         <i class="fas fa-exclamation-triangle"></i>
         <h3>Could not load periods</h3>
-        <p>${escapeHtml(err.message)}</p>
+        <p style="font-size:13px; margin-top:6px;">${esc(err.message)}</p>
       </div>`;
   }
 }
 
 function renderPeriods() {
   const grid = document.getElementById('periodsGrid');
-  const periods = state.periods;
+  const periods = [...state.periods].sort((a, b) => a.period - b.period);
 
   if (!periods.length) {
     grid.innerHTML = `
-      <div class="empty" style="grid-column:1/-1;">
+      <div class="empty">
         <i class="fas fa-calendar-xmark"></i>
-        <h3>No periods assigned for today</h3>
-        <p>Contact admin to assign subjects/classes</p>
+        <h3>No periods assigned today</h3>
+        <p style="font-size:13px; margin-top:6px;">Contact admin to assign subjects/classes</p>
       </div>`;
     return;
   }
 
-  // Sort by period
-  periods.sort((a, b) => a.period - b.period);
-
   grid.innerHTML = periods.map(a => {
     const status = getStatus(a);
-    const statusLabel = status === 'live' ? 'LIVE NOW' :
-                        status === 'upcoming' ? 'UPCOMING' : 'ENDED';
-    const statusClass = 'status-' + status;
+    const label = status === 'live' ? 'LIVE NOW' :
+                  status === 'upcoming' ? 'UPCOMING' : 'ENDED';
 
     return `
       <div class="period-card ${status}">
         <div class="period-top">
           <div class="period-num">Period ${a.period}</div>
-          <div class="period-status ${statusClass}">${statusLabel}</div>
+          <div class="period-status status-${status}">${label}</div>
         </div>
-        <div class="period-subject">${escapeHtml(a.subject_name)}</div>
+        <div class="period-subject">${esc(a.subject_name)}</div>
         <div class="period-class">
-          Class ${escapeHtml(a.class)}${a.section ? ' · ' + escapeHtml(a.section) : ''}
+          Class ${esc(a.class)}${a.section ? ' · ' + esc(a.section) : ''}
         </div>
         <div class="period-meta">
           <span><i class="fas fa-clock"></i> ${a.start_time} - ${a.end_time}</span>
-          <span><i class="fas fa-user-graduate"></i> ${a.markedCount}/${a.totalStudents} marked</span>
+          <span><i class="fas fa-user-graduate"></i> ${a.markedCount}/${a.totalStudents}</span>
         </div>
         <button class="scan-btn"
           onclick='openScanner(${JSON.stringify(a).replace(/'/g, "&#39;")})'
@@ -591,28 +726,157 @@ function renderPeriods() {
   }).join('');
 }
 
-// ══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+// CLASSES TAB
+// ══════════════════════════════════════════════════════════════
+async function loadMyClasses() {
+  const grid = document.getElementById('classesGrid');
+  try {
+    grid.innerHTML = `<div class="empty"><i class="fas fa-spinner fa-spin"></i><h3>Loading classes...</h3></div>`;
+    const res = await fetch(`${API}/teacher/my-classes`, { headers: authHeaders() });
+    if (res.status === 401 || res.status === 403) {
+      toast('Session expired', 'error');
+      setTimeout(logout, 1500);
+      return;
+    }
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+
+    state.classes = data.data || [];
+
+    if (!state.classes.length) {
+      grid.innerHTML = `
+        <div class="empty">
+          <i class="fas fa-school"></i>
+          <h3>No classes assigned yet</h3>
+          <p style="font-size:13px; margin-top:6px;">Contact admin to assign classes</p>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = state.classes.map(c => `
+      <div class="class-card" onclick="openClass('${esc(c.class)}')">
+        <div class="class-num">${esc(c.class)}</div>
+        <div class="class-lbl">Class</div>
+        <div class="class-count">
+          <i class="fas fa-user-graduate"></i> ${c.student_count} students
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    console.error(err);
+    grid.innerHTML = `<div class="empty"><i class="fas fa-exclamation-triangle"></i><h3>${esc(err.message)}</h3></div>`;
+  }
+}
+
+async function openClass(cls) {
+  state.currentClass = cls;
+  document.getElementById('classesView').style.display = 'none';
+  document.getElementById('studentsView').style.display = 'block';
+  document.getElementById('studentsTitle').innerHTML = `<i class="fas fa-users"></i> Class ${esc(cls)} Students`;
+  document.getElementById('studentsCount').textContent = '...';
+
+  const list = document.getElementById('studentsList');
+  list.innerHTML = `<div class="empty" style="grid-column:1/-1;"><i class="fas fa-spinner fa-spin"></i><h3>Loading students...</h3></div>`;
+
+  try {
+    const res = await fetch(`${API}/teacher/class/${encodeURIComponent(cls)}/students`, {
+      headers: authHeaders()
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+
+    state.students = data.data || [];
+    document.getElementById('studentsCount').textContent = state.students.length;
+
+    if (!state.students.length) {
+      list.innerHTML = `<div class="empty" style="grid-column:1/-1;"><i class="fas fa-users-slash"></i><h3>No students in this class</h3></div>`;
+      return;
+    }
+
+    list.innerHTML = state.students.map(s => {
+      const status = s.today_status || 'not-marked';
+      const statusLabel = status === 'present' ? 'Present' :
+                          status === 'late' ? 'Late' :
+                          status === 'absent' ? 'Absent' : 'Not Marked';
+
+      return `
+        <div class="student-card">
+          <div class="ph">
+            ${s.student_photo_url
+              ? `<img src="${esc(s.student_photo_url)}" onerror="this.outerHTML='👤'">`
+              : `👤`}
+          </div>
+          <div class="info">
+            <div class="nm">${esc(s.name)}</div>
+            <div class="meta">ID: ${esc(s.student_id)} · Roll: ${esc(s.roll_number || '—')}</div>
+            <span class="status-chip status-${status}">${statusLabel}</span>
+          </div>
+          <button class="qr-btn" onclick='showQR("${esc(s.student_id)}")' title="View QR">
+            <i class="fas fa-qrcode"></i>
+          </button>
+        </div>
+      `;
+    }).join('');
+  } catch (err) {
+    list.innerHTML = `<div class="empty" style="grid-column:1/-1;"><i class="fas fa-exclamation-triangle"></i><h3>${esc(err.message)}</h3></div>`;
+  }
+}
+
+function backToClasses() {
+  document.getElementById('classesView').style.display = 'block';
+  document.getElementById('studentsView').style.display = 'none';
+  state.currentClass = null;
+}
+
+async function showQR(studentCode) {
+  openModal('qrViewModal');
+  document.getElementById('qrViewTitle').textContent = 'Loading...';
+  document.getElementById('qrViewBody').innerHTML = `
+    <div style="text-align:center; padding:40px;">
+      <i class="fas fa-spinner fa-spin" style="font-size:32px; color:var(--gold);"></i>
+    </div>`;
+
+  try {
+    const res = await fetch(`${API}/teacher/student/${encodeURIComponent(studentCode)}/qr`, {
+      headers: authHeaders()
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+
+    const d = data.data;
+    document.getElementById('qrViewTitle').textContent = d.student_name;
+    document.getElementById('qrViewBody').innerHTML = `
+      <div class="qr-box">
+        <img class="qr-img" src="${d.qr_image}" alt="QR Code">
+        <h3>${esc(d.student_name)}</h3>
+        <div class="sub">Class ${esc(d.class)} · ID: ${esc(d.student_id)} · Roll: ${esc(d.roll_number || '—')}</div>
+        <div class="token">${esc(d.qr_token)}</div>
+      </div>
+    `;
+  } catch (err) {
+    document.getElementById('qrViewBody').innerHTML = `
+      <div style="text-align:center; padding:40px; color:var(--red);">
+        <i class="fas fa-exclamation-triangle" style="font-size:32px;"></i>
+        <p style="margin-top:12px;">${esc(err.message)}</p>
+      </div>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
 // SCANNER
-// ══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 async function openScanner(assignment) {
   state.current = assignment;
-  document.getElementById('modalTitle').textContent =
-    `Period ${assignment.period} · ${assignment.subject_name}`;
-  document.getElementById('modalSubtitle').textContent =
-    `Class ${assignment.class} · ${assignment.start_time}-${assignment.end_time}`;
+  document.getElementById('modalTitle').textContent = `Period ${assignment.period} · ${assignment.subject_name}`;
+  document.getElementById('modalSubtitle').textContent = `Class ${assignment.class} · ${assignment.start_time}-${assignment.end_time}`;
 
   document.getElementById('scannerModal').classList.add('active');
   document.getElementById('scanInfo').className = 'scan-info';
-  document.getElementById('scanInfo').innerHTML =
-    '<i class="fas fa-camera"></i> Point the camera at the student\'s QR code';
+  document.getElementById('scanInfo').innerHTML = '<i class="fas fa-camera"></i> Point the camera at the student\'s QR code';
 
-  // Load initial live
   await refreshLive();
-
-  // Start scanner after modal rendered
   setTimeout(startScanner, 400);
-
-  // Auto-refresh live list every 8s
   state.liveInterval = setInterval(refreshLive, 8000);
 }
 
@@ -624,27 +888,24 @@ function closeScanner() {
   }
   document.getElementById('scannerModal').classList.remove('active');
   state.current = null;
-  // Refresh period cards (marked count update)
-  loadPeriods();
+  if (state.currentTab === 'periods') loadPeriods();
 }
 
 function startScanner() {
   if (state.scanner) return;
-
   try {
     state.scanner = new Html5Qrcode("qr-reader");
     state.scanner.start(
       { facingMode: "environment" },
       { fps: 12, qrbox: { width: 250, height: 250 } },
       onScanSuccess,
-      () => {} // ignore scan failures
+      () => {}
     ).catch(err => {
       console.error('Scanner start failed:', err);
-      setScanInfo('error', '<i class="fas fa-exclamation-triangle"></i> Camera access denied or not available. Please allow camera permission.');
+      setScanInfo('error', '<i class="fas fa-exclamation-triangle"></i> Camera access denied. Please allow camera permission.');
       state.scanner = null;
     });
   } catch (err) {
-    console.error(err);
     setScanInfo('error', '<i class="fas fa-exclamation-triangle"></i> Could not start camera');
   }
 }
@@ -662,17 +923,12 @@ function setScanInfo(type, html) {
   el.innerHTML = html;
 }
 
-// ══════════════════════════════════════════════════════════
-// SCAN HANDLER
-// ══════════════════════════════════════════════════════════
 async function onScanSuccess(decodedText) {
-  // Debounce: 3s gap between scans
   const now = Date.now();
   if (state.scanning || now - state.lastScanTime < 2500) return;
   state.lastScanTime = now;
   state.scanning = true;
 
-  // Vibrate
   if (navigator.vibrate) navigator.vibrate(80);
 
   const a = state.current;
@@ -693,18 +949,18 @@ async function onScanSuccess(decodedText) {
 
     if (data.success) {
       if (data.alreadyMarked) {
-        setScanInfo('warning', `<i class="fas fa-info-circle"></i> ${escapeHtml(data.message)}`);
+        setScanInfo('warning', `<i class="fas fa-info-circle"></i> ${esc(data.message)}`);
         toast(data.message, 'warning');
       } else {
         setScanInfo('success',
-          `<i class="fas fa-check-circle"></i> <b>${escapeHtml(data.student.name)}</b> marked ${data.status.toUpperCase()} · ${data.time}`);
+          `<i class="fas fa-check-circle"></i> <b>${esc(data.student.name)}</b> marked ${data.status.toUpperCase()} · ${data.time}`);
         toast(`✅ ${data.student.name} — ${data.status.toUpperCase()}`, 'success');
       }
       await refreshLive(true);
     } else {
       const emoji = data.code === 'OUTSIDE_WINDOW' ? '⏰' :
                     data.code === 'CLASS_MISMATCH' ? '👥' : '❌';
-      setScanInfo('error', `<i class="fas fa-exclamation-circle"></i> ${emoji} ${escapeHtml(data.message)}`);
+      setScanInfo('error', `<i class="fas fa-exclamation-circle"></i> ${emoji} ${esc(data.message)}`);
       toast(data.message, 'error');
     }
   } catch (err) {
@@ -715,13 +971,9 @@ async function onScanSuccess(decodedText) {
   }
 }
 
-// ══════════════════════════════════════════════════════════
-// LIVE LIST
-// ══════════════════════════════════════════════════════════
 async function refreshLive(highlightLast = false) {
   const a = state.current;
   if (!a) return;
-
   try {
     const res = await fetch(
       `${API}/live/${a.class}/${a.subject_id}/${a.period}`,
@@ -729,7 +981,6 @@ async function refreshLive(highlightLast = false) {
     );
     const data = await res.json();
     if (!data.success) return;
-
     state.liveData = data;
     renderLiveList(data, highlightLast);
   } catch (err) {
@@ -747,10 +998,7 @@ function renderLiveList(data, highlightLast) {
   const absent = data.absent || [];
 
   if (!scanned.length && !absent.length) {
-    list.innerHTML = `
-      <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">
-        No students scanned yet
-      </div>`;
+    list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--muted); font-size:12px;">No students scanned yet</div>`;
     return;
   }
 
@@ -763,11 +1011,11 @@ function renderLiveList(data, highlightLast) {
       return `
         <div class="student-item ${isNew ? 'just-scanned' : ''}">
           ${photo
-            ? `<img src="${escapeHtml(photo)}" onerror="this.outerHTML='<div class=&quot;ph&quot;>👤</div>'">`
-            : `<div class="ph">👤</div>`}
+            ? `<img src="${esc(photo)}" onerror="this.outerHTML='<div class=&quot;ph2&quot;>👤</div>'">`
+            : `<div class="ph2">👤</div>`}
           <div class="info">
-            <div class="nm">${escapeHtml(r.student_name || r.name || '')}</div>
-            <div class="sub-info">Roll ${escapeHtml(r.roll_number || '-')} · ${r.marked_time || ''}</div>
+            <div class="nm">${esc(r.student_name || r.name || '')}</div>
+            <div class="sub-info">Roll ${esc(r.roll_number || '-')} · ${r.marked_time || ''}</div>
           </div>
           <div class="check"><i class="fas fa-check"></i></div>
         </div>`;
@@ -775,8 +1023,7 @@ function renderLiveList(data, highlightLast) {
   }
 
   if (absent.length) {
-    html += `<div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;
-      font-weight:700; letter-spacing:0.5px; margin:12px 0 6px; padding:0 4px;">
+    html += `<div style="font-size:11px; color:var(--muted); text-transform:uppercase; font-weight:700; letter-spacing:0.5px; margin:12px 0 6px; padding:0 4px;">
       Absent (${absent.length})
     </div>`;
     html += absent.map(s => {
@@ -784,11 +1031,11 @@ function renderLiveList(data, highlightLast) {
       return `
         <div class="student-item absent">
           ${photo
-            ? `<img src="${escapeHtml(photo)}" onerror="this.outerHTML='<div class=&quot;ph&quot;>👤</div>'">`
-            : `<div class="ph">👤</div>`}
+            ? `<img src="${esc(photo)}" onerror="this.outerHTML='<div class=&quot;ph2&quot;>👤</div>'">`
+            : `<div class="ph2">👤</div>`}
           <div class="info">
-            <div class="nm">${escapeHtml(s.name)}</div>
-            <div class="sub-info">Roll ${escapeHtml(s.roll_number || '-')}</div>
+            <div class="nm">${esc(s.name)}</div>
+            <div class="sub-info">Roll ${esc(s.roll_number || '-')}</div>
           </div>
           <div class="check"><i class="fas fa-times"></i></div>
         </div>`;
@@ -798,9 +1045,6 @@ function renderLiveList(data, highlightLast) {
   list.innerHTML = html;
 }
 
-// ══════════════════════════════════════════════════════════
-// FINALIZE
-// ══════════════════════════════════════════════════════════
 async function finalizeAttendance() {
   const a = state.current;
   if (!a) return;
@@ -809,7 +1053,6 @@ async function finalizeAttendance() {
   const msg = absentCount > 0
     ? `${absentCount} students are absent. Mark them absent and finalize?`
     : `All students marked. Finalize this period?`;
-
   if (!confirm(msg)) return;
 
   const btn = document.getElementById('finalizeBtn');
@@ -827,7 +1070,6 @@ async function finalizeAttendance() {
       })
     });
     const data = await res.json();
-
     if (data.success) {
       toast(data.message, 'success');
       await refreshLive();
@@ -843,11 +1085,16 @@ async function finalizeAttendance() {
   }
 }
 
-// ══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 // BOOT
-// ══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 initHeader();
 loadPeriods();
+
+// Refresh periods status every 30s (only if not scanning)
+setInterval(() => {
+  if (!state.scanner && state.currentTab === 'periods') loadPeriods();
+}, 30000);
 </script>
 </body>
 </html>
