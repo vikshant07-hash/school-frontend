@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Attendance - Teacher</title>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root {
+  --bg: #f5f7fb; --white: #fff; --text: #1a2332; --text-sec: #5a6a7e;
+  --text-muted: #94a3b8; --gold: #c9972b; --gold-light: #e8b84b;
+  --gold-bg: #fef8ed; --green: #10b981; --green-bg: #ecfdf5;
+  --red: #ef4444; --red-bg: #fef2f2; --blue: #4a8af4; --blue-bg: #eef4ff;
+  --orange: #f59e0b; --border: #e8edf8;
+  --shadow: 0 2px 12px rgba(0,0,0,0.04);
+  --radius: 14px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* NAVBAR */
+.navbar {
+  background: var(--white); border-bottom: 1px solid var(--border);
+  padding: 0 24px; height: 64px; display: flex; align-items: center;
+  justify-content: space-between; position: sticky; top: 0; z-index: 100;
+  box-shadow: var(--shadow);
+}
+.navbar .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.navbar .logo {
+  width: 40px; height: 40px; border-radius: 10px; background: var(--gold-bg);
+  display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--gold); overflow: hidden;
+}
+.navbar .logo img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+.navbar .name { font-size: 15px; font-weight: 800; color: var(--text); }
+.navbar .name span { color: var(--gold); }
+.navbar .teacher-badge {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 14px; background: var(--bg); border-radius: 50px;
+  font-size: 12px; font-weight: 600; color: var(--text-sec);
+}
+.navbar .avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #fff;
+}
+.logout-btn {
+  padding: 8px 14px; background: var(--red-bg); color: var(--red);
+  border: none; border-radius: 8px; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all 0.2s;
+}
+.logout-btn:hover { background: var(--red); color: #fff; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+
+/* PAGE HEADER */
+.page-head {
+  background: var(--white); border-radius: var(--radius);
+  border: 1px solid var(--border); padding: 22px 26px;
+  margin-bottom: 20px; box-shadow: var(--shadow);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 14px;
+}
+.page-head h1 {
+  font-size: 20px; font-weight: 800; display: flex; align-items: center; gap: 10px;
+}
+.page-head h1 i { color: var(--gold); }
+.page-head .sub { font-size: 12px; color: var(--text-sec); margin-top: 4px; }
+.clock {
+  font-family: 'Courier New', monospace; font-size: 15px; font-weight: 700;
+  color: var(--gold); padding: 8px 16px; background: var(--gold-bg);
+  border-radius: 10px; border: 1px solid rgba(201,151,43,0.2);
+}
+
+/* SECTION */
+.section { margin-bottom: 22px; }
+.section-title {
+  font-size: 14px; font-weight: 800; color: var(--text-sec);
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title i { color: var(--gold); }
+
+/* ASSIGNMENT CARDS */
+.periods-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+}
+.period-card {
+  background: var(--white); border-radius: var(--radius);
+  border: 2px solid var(--border); padding: 20px;
+  cursor: pointer; transition: all 0.25s; position: relative;
+  overflow: hidden;
+}
+.period-card:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+.period-card.live { border-color: var(--green); background: linear-gradient(135deg, #fff, #f0fdf4); }
+.period-card.live::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--green), #22c55e);
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+.period-card.upcoming { opacity: 0.65; border-style: dashed; }
+.period-card.past { opacity: 0.5; background: #f8fafc; }
+
+.period-top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 12px;
+}
+.period-num {
+  display: inline-block; padding: 4px 12px; background: var(--gold-bg);
+  color: var(--gold); border-radius: 8px; font-size: 11px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.period-status {
+  font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.status-live { background: var(--green-bg); color: var(--green); }
+.status-live::before { content: '● '; animation: pulse 1s infinite; }
+.status-upcoming { background: var(--blue-bg); color: var(--blue); }
+.status-past { background: #f1f5f9; color: var(--text-muted); }
+
+.period-subject { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.period-class { font-size: 13px; color: var(--text-sec); margin-bottom: 12px; }
+.period-meta {
+  display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px;
+  color: var(--text-sec); padding-top: 12px; border-top: 1px dashed var(--border);
+}
+.period-meta span { display: flex; align-items: center; gap: 5px; }
+.period-meta i { color: var(--gold); }
+
+.scan-btn {
+  margin-top: 14px; width: 100%; padding: 11px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: #fff; border: none; border-radius: 10px; font-weight: 700;
+  font-size: 13px; cursor: pointer; font-family: inherit;
+  transition: all 0.2s; display: flex; align-items: center;
+  justify-content: center; gap: 8px;
+}
+.scan-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(201,151,43,0.3); }
+.scan-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* MODAL */
+.modal {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px); z-index: 9999; padding: 16px;
+  overflow-y: auto;
+}
+.modal.active { display: flex; align-items: flex-start; justify-content: center; }
+.modal-content {
+  background: var(--white); border-radius: 20px; padding: 0;
+  max-width: 500px; width: 100%; margin: auto;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  animation: slideUp 0.3s ease;
+  max-height: 95vh; overflow-y: auto;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.modal-head {
+  padding: 22px 24px 16px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  position: sticky; top: 0; background: var(--white); z-index: 2;
+  border-radius: 20px 20px 0 0;
+}
+.modal-head h2 { font-size: 17px; font-weight: 800; }
+.modal-head .close {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--bg);
+  border: none; cursor: pointer; font-size: 16px; color: var(--text-sec);
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-head .close:hover { background: var(--red-bg); color: var(--red); }
+.modal-body { padding: 20px 24px; }
+
+/* SCANNER */
+#qr-reader {
+  width: 100%; border-radius: 14px; overflow: hidden;
+  background: #000; margin-bottom: 16px;
+}
+#qr-reader video { border-radius: 14px; }
+.scan-info {
+  padding: 14px; background: var(--blue-bg); border-radius: 10px;
+  font-size: 13px; color: var(--text); text-align: center;
+  border-left: 4px solid var(--blue); margin-bottom: 14px;
+}
+.scan-info.warning { background: #fffbeb; border-left-color: var(--orange); }
+.scan-info.error { background: var(--red-bg); border-left-color: var(--red); }
+.scan-info.success { background: var(--green-bg); border-left-color: var(--green); }
+
+/* LIVE STATS */
+.stats-row {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  margin-bottom: 18px;
+}
+.stat {
+  background: var(--bg); padding: 14px; border-radius: 12px;
+  text-align: center; border: 1px solid var(--border);
+}
+.stat .val { font-size: 22px; font-weight: 800; color: var(--gold); }
+.stat .lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-top: 2px; }
+.stat.present .val { color: var(--green); }
+.stat.absent .val { color: var(--red); }
+
+/* STUDENT LIST */
+.student-list { max-height: 320px; overflow-y: auto; margin-top: 12px; }
+.student-item {
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+  border-radius: 10px; margin-bottom: 6px; background: var(--bg);
+  animation: fadeIn 0.3s;
+}
+.student-item.absent { background: var(--red-bg); }
+.student-item.just-scanned {
+  background: var(--green-bg);
+  animation: flash 1s ease;
+}
+@keyframes flash { 0%,100% { background: var(--green-bg); } 50% { background: #a7f3d0; } }
+@keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+.student-item img, .student-item .ph {
+  width: 38px; height: 38px; border-radius: 50%; object-fit: cover;
+  border: 2px solid var(--gold); flex-shrink: 0;
+}
+.student-item .ph {
+  background: linear-gradient(135deg, #1a2332, #2c3e50);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 16px;
+}
+.student-item .info { flex: 1; min-width: 0; }
+.student-item .nm { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.student-item .sub-info { font-size: 11px; color: var(--text-muted); }
+.student-item .check {
+  width: 24px; height: 24px; border-radius: 50%; background: var(--green);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; flex-shrink: 0;
+}
+.student-item.absent .check { background: var(--red); }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 18px; border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: inherit; transition: all 0.2s;
+}
+.btn-primary { background: var(--gold); color: #fff; }
+.btn-primary:hover { background: var(--gold-light); }
+.btn-success { background: var(--green); color: #fff; }
+.btn-success:hover { background: #059669; }
+.btn-danger { background: var(--red); color: #fff; }
+.btn-danger:hover { background: #dc2626; }
+.btn-outline { background: var(--bg); color: var(--text-sec); border: 1px solid var(--border); }
+.btn-outline:hover { background: var(--border); }
+.btn-block { width: 100%; justify-content: center; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* TOAST */
+.toast-container {
+  position: fixed; top: 20px; right: 20px; z-index: 99999;
+  display: flex; flex-direction: column; gap: 10px; max-width: 360px;
+}
+.toast {
+  padding: 14px 18px; border-radius: 12px; color: #fff;
+  font-weight: 600; font-size: 13px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  animation: slideIn 0.3s ease;
+  display: flex; align-items: center; gap: 10px;
+  line-height: 1.4;
+}
+.toast i { font-size: 18px; flex-shrink: 0; }
+.toast-success { background: linear-gradient(135deg, var(--green), #059669); }
+.toast-error { background: linear-gradient(135deg, var(--red), #dc2626); }
+.toast-warning { background: linear-gradient(135deg, var(--orange), #d97706); }
+.toast-info { background: linear-gradient(135deg, #4a8af4, #3b82f6); }
+@keyframes slideIn { from { opacity: 0; transform: translateX(60px); } to { opacity: 1; transform: translateX(0); } }
+
+/* EMPTY */
+.empty {
+  text-align: center; padding: 50px 20px; color: var(--text-muted);
+  background: var(--white); border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+.empty i { font-size: 48px; color: var(--gold); opacity: 0.4; margin-bottom: 14px; display: block; }
+.empty h3 { font-size: 15px; font-weight: 700; color: var(--text-sec); margin-bottom: 6px; }
+.empty p { font-size: 13px; }
+
+@media (max-width: 640px) {
+  .container { padding: 16px 12px; }
+  .navbar { padding: 0 14px; }
+  .navbar .name { font-size: 13px; }
+  .page-head { padding: 16px; }
+  .page-head h1 { font-size: 17px; }
+  .clock { font-size: 13px; padding: 6px 12px; }
+  .periods-grid { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .stat { padding: 10px 6px; }
+  .stat .val { font-size: 18px; }
+  .toast-container { left: 12px; right: 12px; max-width: none; }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="#" class="brand">
+    <div class="logo"><img src="logo(1).png" alt="GSSS" onerror="this.outerHTML='🎓'"></div>
+    <div class="name">GSSS<span> SHILLA</span></div>
+  </a>
+  <div style="display:flex; align-items:center; gap:10px;">
+    <div class="teacher-badge">
+      <span class="avatar" id="teacherAvatar">T</span>
+      <span id="teacherName">Teacher</span>
+    </div>
+    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-head">
+    <div>
+      <h1><i class="fas fa-qrcode"></i> QR Attendance</h1>
+      <div class="sub" id="todayInfo">Loading...</div>
+    </div>
+    <div class="clock" id="liveClock">--:--:--</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="fas fa-calendar-day"></i> Today's Periods</div>
+    <div class="periods-grid" id="periodsGrid">
+      <div class="empty" style="grid-column: 1/-1;">
+        <i class="fas fa-spinner fa-spin"></i>
+        <h3>Loading your periods...</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCANNER MODAL -->
+<div class="modal" id="scannerModal">
+  <div class="modal-content">
+    <div class="modal-head">
+      <div>
+        <h2 id="modalTitle">QR Scanner</h2>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:3px;" id="modalSubtitle">—</div>
+      </div>
+      <button class="close" onclick="closeScanner()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div id="scanInfo" class="scan-info">
+        <i class="fas fa-camera"></i> Point the camera at the student's QR code
+      </div>
+      <div id="qr-reader"></div>
+
+      <div class="stats-row">
+        <div class="stat present">
+          <div class="val" id="statPresent">0</div>
+          <div class="lbl">Present</div>
+        </div>
+        <div class="stat absent">
+          <div class="val" id="statAbsent">0</div>
+          <div class="lbl">Absent</div>
+        </div>
+        <div class="stat">
+          <div class="val" id="statTotal">0</div>
+          <div class="lbl">Total</div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:16px; margin-bottom:8px;">
+        <i class="fas fa-list-check"></i> Live Attendance
+      </div>
+      <div class="student-list" id="liveList">
+        <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">
+          No students scanned yet
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px;">
+        <button class="btn btn-outline btn-block" onclick="closeScanner()">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+        <button class="btn btn-danger btn-block" onclick="finalizeAttendance()" id="finalizeBtn">
+          <i class="fas fa-check-double"></i> Finalize
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const API = 'https://gsssshilla.onrender.com/api/attendance';
+
+const state = {
+  token: localStorage.getItem('teacherToken'),
+  teacher: JSON.parse(localStorage.getItem('teacherData') || '{}'),
+  periods: [],
+  current: null,           // active assignment
+  scanner: null,
+  liveData: { data: [], absent: [], stats: { present: 0, absent: 0, total: 0 } },
+  scanning: false,
+  lastScanTime: 0,
+  liveInterval: null
+};
+
+// ══════════════════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════════════════
+if (!state.token) {
+  window.location.replace('teacher-login.html');
+}
+
+function authHeaders() {
+  return {
+    'Authorization': `Bearer ${state.token}`,
+    'Content-Type': 'application/json'
+  };
+}
+
+function logout() {
+  if (!confirm('Logout from this device?')) return;
+  localStorage.removeItem('teacherToken');
+  localStorage.removeItem('teacherData');
+  localStorage.removeItem('todayAssignments');
+  window.location.replace('teacher-login.html');
+}
+
+// ══════════════════════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════════════════════
+function toast(msg, type = 'info') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  const icons = {
+    success: 'fa-check-circle', error: 'fa-exclamation-circle',
+    warning: 'fa-exclamation-triangle', info: 'fa-info-circle'
+  };
+  t.className = `toast toast-${type}`;
+  t.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = '0';
+    setTimeout(() => t.remove(), 400);
+  }, 3500);
+}
+
+function timeNow() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+}
+
+function timeHM() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function nowMinutes() {
+  const d = new Date();
+  return d.getHours() * 60 + d.getMinutes();
+}
+
+function parseHM(hm) {
+  const [h, m] = (hm || '00:00').split(':').map(Number);
+  return h * 60 + m;
+}
+
+function isLive(a) {
+  const cur = nowMinutes();
+  return cur >= parseHM(a.start_time) && cur <= parseHM(a.end_time);
+}
+
+function getStatus(a) {
+  const cur = nowMinutes();
+  const s = parseHM(a.start_time);
+  const e = parseHM(a.end_time);
+  if (cur < s) return 'upcoming';
+  if (cur > e) return 'past';
+  return 'live';
+}
+
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+function initHeader() {
+  const t = state.teacher;
+  const nameEl = document.getElementById('teacherName');
+  const avEl = document.getElementById('teacherAvatar');
+  if (nameEl) nameEl.textContent = t.name || 'Teacher';
+  if (avEl) avEl.textContent = (t.name || 'T').charAt(0).toUpperCase();
+}
+
+setInterval(() => {
+  document.getElementById('liveClock').textContent = timeNow();
+}, 1000);
+document.getElementById('liveClock').textContent = timeNow();
+
+// Update period status every 30s
+setInterval(() => {
+  if (!state.scanner) renderPeriods();
+}, 30000);
+
+// ══════════════════════════════════════════════════════════
+// LOAD PERIODS
+// ══════════════════════════════════════════════════════════
+async function loadPeriods() {
+  try {
+    const res = await fetch(`${API}/teacher/my-periods`, { headers: authHeaders() });
+    if (res.status === 401) {
+      toast('Session expired. Login again.', 'error');
+      setTimeout(logout, 1500);
+      return;
+    }
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+
+    state.periods = data.data || [];
+
+    const day = data.day || 'Today';
+    const date = data.date || '';
+    document.getElementById('todayInfo').textContent =
+      `${day} · ${date} · ${state.periods.length} period(s) assigned`;
+
+    renderPeriods();
+  } catch (err) {
+    console.error(err);
+    toast('Failed to load periods: ' + err.message, 'error');
+    document.getElementById('periodsGrid').innerHTML = `
+      <div class="empty" style="grid-column:1/-1;">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h3>Could not load periods</h3>
+        <p>${escapeHtml(err.message)}</p>
+      </div>`;
+  }
+}
+
+function renderPeriods() {
+  const grid = document.getElementById('periodsGrid');
+  const periods = state.periods;
+
+  if (!periods.length) {
+    grid.innerHTML = `
+      <div class="empty" style="grid-column:1/-1;">
+        <i class="fas fa-calendar-xmark"></i>
+        <h3>No periods assigned for today</h3>
+        <p>Contact admin to assign subjects/classes</p>
+      </div>`;
+    return;
+  }
+
+  // Sort by period
+  periods.sort((a, b) => a.period - b.period);
+
+  grid.innerHTML = periods.map(a => {
+    const status = getStatus(a);
+    const statusLabel = status === 'live' ? 'LIVE NOW' :
+                        status === 'upcoming' ? 'UPCOMING' : 'ENDED';
+    const statusClass = 'status-' + status;
+
+    return `
+      <div class="period-card ${status}">
+        <div class="period-top">
+          <div class="period-num">Period ${a.period}</div>
+          <div class="period-status ${statusClass}">${statusLabel}</div>
+        </div>
+        <div class="period-subject">${escapeHtml(a.subject_name)}</div>
+        <div class="period-class">
+          Class ${escapeHtml(a.class)}${a.section ? ' · ' + escapeHtml(a.section) : ''}
+        </div>
+        <div class="period-meta">
+          <span><i class="fas fa-clock"></i> ${a.start_time} - ${a.end_time}</span>
+          <span><i class="fas fa-user-graduate"></i> ${a.markedCount}/${a.totalStudents} marked</span>
+        </div>
+        <button class="scan-btn"
+          onclick='openScanner(${JSON.stringify(a).replace(/'/g, "&#39;")})'
+          ${status !== 'live' ? 'disabled' : ''}>
+          <i class="fas fa-qrcode"></i>
+          ${status === 'live' ? 'Open QR Scanner' :
+            status === 'upcoming' ? `Starts at ${a.start_time}` : 'Period Ended'}
+        </button>
+      </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// SCANNER
+// ══════════════════════════════════════════════════════════
+async function openScanner(assignment) {
+  state.current = assignment;
+  document.getElementById('modalTitle').textContent =
+    `Period ${assignment.period} · ${assignment.subject_name}`;
+  document.getElementById('modalSubtitle').textContent =
+    `Class ${assignment.class} · ${assignment.start_time}-${assignment.end_time}`;
+
+  document.getElementById('scannerModal').classList.add('active');
+  document.getElementById('scanInfo').className = 'scan-info';
+  document.getElementById('scanInfo').innerHTML =
+    '<i class="fas fa-camera"></i> Point the camera at the student\'s QR code';
+
+  // Load initial live
+  await refreshLive();
+
+  // Start scanner after modal rendered
+  setTimeout(startScanner, 400);
+
+  // Auto-refresh live list every 8s
+  state.liveInterval = setInterval(refreshLive, 8000);
+}
+
+function closeScanner() {
+  stopScanner();
+  if (state.liveInterval) {
+    clearInterval(state.liveInterval);
+    state.liveInterval = null;
+  }
+  document.getElementById('scannerModal').classList.remove('active');
+  state.current = null;
+  // Refresh period cards (marked count update)
+  loadPeriods();
+}
+
+function startScanner() {
+  if (state.scanner) return;
+
+  try {
+    state.scanner = new Html5Qrcode("qr-reader");
+    state.scanner.start(
+      { facingMode: "environment" },
+      { fps: 12, qrbox: { width: 250, height: 250 } },
+      onScanSuccess,
+      () => {} // ignore scan failures
+    ).catch(err => {
+      console.error('Scanner start failed:', err);
+      setScanInfo('error', '<i class="fas fa-exclamation-triangle"></i> Camera access denied or not available. Please allow camera permission.');
+      state.scanner = null;
+    });
+  } catch (err) {
+    console.error(err);
+    setScanInfo('error', '<i class="fas fa-exclamation-triangle"></i> Could not start camera');
+  }
+}
+
+function stopScanner() {
+  if (state.scanner) {
+    try { state.scanner.stop().then(() => state.scanner.clear()).catch(() => {}); } catch (e) {}
+    state.scanner = null;
+  }
+}
+
+function setScanInfo(type, html) {
+  const el = document.getElementById('scanInfo');
+  el.className = 'scan-info' + (type ? ' ' + type : '');
+  el.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════
+// SCAN HANDLER
+// ══════════════════════════════════════════════════════════
+async function onScanSuccess(decodedText) {
+  // Debounce: 3s gap between scans
+  const now = Date.now();
+  if (state.scanning || now - state.lastScanTime < 2500) return;
+  state.lastScanTime = now;
+  state.scanning = true;
+
+  // Vibrate
+  if (navigator.vibrate) navigator.vibrate(80);
+
+  const a = state.current;
+  if (!a) { state.scanning = false; return; }
+
+  try {
+    const res = await fetch(`${API}/scan`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({
+        qrToken: decodedText.trim(),
+        class: a.class,
+        subjectId: a.subject_id,
+        period: a.period
+      })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      if (data.alreadyMarked) {
+        setScanInfo('warning', `<i class="fas fa-info-circle"></i> ${escapeHtml(data.message)}`);
+        toast(data.message, 'warning');
+      } else {
+        setScanInfo('success',
+          `<i class="fas fa-check-circle"></i> <b>${escapeHtml(data.student.name)}</b> marked ${data.status.toUpperCase()} · ${data.time}`);
+        toast(`✅ ${data.student.name} — ${data.status.toUpperCase()}`, 'success');
+      }
+      await refreshLive(true);
+    } else {
+      const emoji = data.code === 'OUTSIDE_WINDOW' ? '⏰' :
+                    data.code === 'CLASS_MISMATCH' ? '👥' : '❌';
+      setScanInfo('error', `<i class="fas fa-exclamation-circle"></i> ${emoji} ${escapeHtml(data.message)}`);
+      toast(data.message, 'error');
+    }
+  } catch (err) {
+    setScanInfo('error', '<i class="fas fa-exclamation-circle"></i> Network error');
+    toast('Scan failed: ' + err.message, 'error');
+  } finally {
+    setTimeout(() => { state.scanning = false; }, 800);
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// LIVE LIST
+// ══════════════════════════════════════════════════════════
+async function refreshLive(highlightLast = false) {
+  const a = state.current;
+  if (!a) return;
+
+  try {
+    const res = await fetch(
+      `${API}/live/${a.class}/${a.subject_id}/${a.period}`,
+      { headers: authHeaders() }
+    );
+    const data = await res.json();
+    if (!data.success) return;
+
+    state.liveData = data;
+    renderLiveList(data, highlightLast);
+  } catch (err) {
+    console.error('Live refresh failed:', err);
+  }
+}
+
+function renderLiveList(data, highlightLast) {
+  document.getElementById('statPresent').textContent = data.stats.present;
+  document.getElementById('statAbsent').textContent = data.stats.absent;
+  document.getElementById('statTotal').textContent = data.stats.total;
+
+  const list = document.getElementById('liveList');
+  const scanned = data.data || [];
+  const absent = data.absent || [];
+
+  if (!scanned.length && !absent.length) {
+    list.innerHTML = `
+      <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">
+        No students scanned yet
+      </div>`;
+    return;
+  }
+
+  let html = '';
+
+  if (scanned.length) {
+    html += scanned.map((r, i) => {
+      const photo = r.student_photo_url;
+      const isNew = highlightLast && i === scanned.length - 1;
+      return `
+        <div class="student-item ${isNew ? 'just-scanned' : ''}">
+          ${photo
+            ? `<img src="${escapeHtml(photo)}" onerror="this.outerHTML='<div class=&quot;ph&quot;>👤</div>'">`
+            : `<div class="ph">👤</div>`}
+          <div class="info">
+            <div class="nm">${escapeHtml(r.student_name || r.name || '')}</div>
+            <div class="sub-info">Roll ${escapeHtml(r.roll_number || '-')} · ${r.marked_time || ''}</div>
+          </div>
+          <div class="check"><i class="fas fa-check"></i></div>
+        </div>`;
+    }).join('');
+  }
+
+  if (absent.length) {
+    html += `<div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;
+      font-weight:700; letter-spacing:0.5px; margin:12px 0 6px; padding:0 4px;">
+      Absent (${absent.length})
+    </div>`;
+    html += absent.map(s => {
+      const photo = s.photo_url;
+      return `
+        <div class="student-item absent">
+          ${photo
+            ? `<img src="${escapeHtml(photo)}" onerror="this.outerHTML='<div class=&quot;ph&quot;>👤</div>'">`
+            : `<div class="ph">👤</div>`}
+          <div class="info">
+            <div class="nm">${escapeHtml(s.name)}</div>
+            <div class="sub-info">Roll ${escapeHtml(s.roll_number || '-')}</div>
+          </div>
+          <div class="check"><i class="fas fa-times"></i></div>
+        </div>`;
+    }).join('');
+  }
+
+  list.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════
+// FINALIZE
+// ══════════════════════════════════════════════════════════
+async function finalizeAttendance() {
+  const a = state.current;
+  if (!a) return;
+
+  const absentCount = state.liveData.stats.absent;
+  const msg = absentCount > 0
+    ? `${absentCount} students are absent. Mark them absent and finalize?`
+    : `All students marked. Finalize this period?`;
+
+  if (!confirm(msg)) return;
+
+  const btn = document.getElementById('finalizeBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finalizing...';
+
+  try {
+    const res = await fetch(`${API}/finalize`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({
+        class: a.class,
+        subjectId: a.subject_id,
+        period: a.period
+      })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      toast(data.message, 'success');
+      await refreshLive();
+      setTimeout(closeScanner, 1200);
+    } else {
+      toast(data.message || 'Finalize failed', 'error');
+    }
+  } catch (err) {
+    toast('Network error: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check-double"></i> Finalize';
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════════
+initHeader();
+loadPeriods();
+</script>
+</body>
+</html>
