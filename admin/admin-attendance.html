@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance Reports - Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root {
+  --bg: #f5f7fb; --white: #fff; --text: #1a2332; --text-sec: #5a6a7e;
+  --muted: #94a3b8; --gold: #c9972b; --gold-light: #e8b84b;
+  --gold-bg: #fef8ed; --green: #10b981; --green-bg: #ecfdf5;
+  --red: #ef4444; --red-bg: #fef2f2; --blue: #4a8af4; --blue-bg: #eef4ff;
+  --orange: #f59e0b; --orange-bg: #fffbeb; --border: #e8edf8;
+  --shadow: 0 2px 12px rgba(0,0,0,0.04);
+  --radius: 14px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+.navbar {
+  background: var(--white); border-bottom: 1px solid var(--border);
+  padding: 0 28px; height: 64px; display: flex; align-items: center;
+  justify-content: space-between; position: sticky; top: 0; z-index: 100;
+  box-shadow: var(--shadow);
+}
+.navbar .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.navbar .logo {
+  width: 40px; height: 40px; border-radius: 10px; background: var(--gold-bg);
+  display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--gold); overflow: hidden;
+}
+.navbar .logo img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+.navbar .name { font-size: 15px; font-weight: 800; }
+.navbar .name span { color: var(--gold); }
+.nav-links { display: flex; gap: 4px; list-style: none; }
+.nav-links a {
+  text-decoration: none; color: var(--text-sec); padding: 8px 14px;
+  border-radius: 8px; font-size: 13px; font-weight: 600; transition: all 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.nav-links a:hover { background: var(--bg); }
+.nav-links a.active { background: var(--gold-bg); color: var(--gold); }
+.logout-btn {
+  padding: 8px 14px; background: var(--red-bg); color: var(--red);
+  border: none; border-radius: 8px; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+.logout-btn:hover { background: var(--red); color: #fff; }
+
+.container { max-width: 1400px; margin: 0 auto; padding: 24px 28px 60px; }
+
+.page-head {
+  background: var(--white); border-radius: var(--radius);
+  border: 1px solid var(--border); padding: 22px 26px;
+  margin-bottom: 20px; box-shadow: var(--shadow);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 14px;
+}
+.page-head h1 { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+.page-head h1 i { color: var(--gold); }
+.page-head .sub { font-size: 12px; color: var(--text-sec); margin-top: 4px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 18px; border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: inherit; transition: all 0.2s;
+}
+.btn-primary { background: var(--gold); color: #fff; }
+.btn-primary:hover { background: var(--gold-light); }
+.btn-success { background: var(--green); color: #fff; }
+.btn-success:hover { background: #059669; }
+.btn-danger { background: var(--red); color: #fff; }
+.btn-danger:hover { background: #dc2626; }
+.btn-outline { background: var(--white); color: var(--text-sec); border: 1px solid var(--border); }
+.btn-outline:hover { background: var(--bg); }
+.btn-sm { padding: 7px 12px; font-size: 12px; border-radius: 8px; }
+
+/* STATS */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px; margin-bottom: 22px;
+}
+.stat-card {
+  background: var(--white); border-radius: var(--radius);
+  padding: 20px; border: 1px solid var(--border); box-shadow: var(--shadow);
+  display: flex; align-items: center; gap: 14px;
+}
+.stat-card .icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.icon-gold { background: var(--gold-bg); color: var(--gold); }
+.icon-green { background: var(--green-bg); color: var(--green); }
+.icon-red { background: var(--red-bg); color: var(--red); }
+.icon-blue { background: var(--blue-bg); color: var(--blue); }
+.icon-orange { background: var(--orange-bg); color: var(--orange); }
+.stat-card .info .val { font-size: 24px; font-weight: 800; }
+.stat-card .info .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+
+/* TOOLBAR */
+.toolbar {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 18px; align-items: center;
+  background: var(--white); padding: 14px 18px;
+  border-radius: var(--radius); border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.toolbar input, .toolbar select {
+  padding: 9px 14px; border: 1.5px solid var(--border);
+  border-radius: 10px; font-size: 13px; font-family: inherit;
+  background: var(--white); outline: none; transition: all 0.2s;
+}
+.toolbar input:focus, .toolbar select:focus {
+  border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,151,43,0.1);
+}
+
+/* PANEL */
+.panel {
+  background: var(--white); border-radius: var(--radius);
+  border: 1px solid var(--border); box-shadow: var(--shadow);
+  padding: 22px 26px; margin-bottom: 20px;
+}
+.panel h2 {
+  font-size: 16px; font-weight: 800; margin-bottom: 16px;
+  padding-bottom: 12px; border-bottom: 2px solid var(--gold-bg);
+  display: flex; align-items: center; gap: 8px;
+}
+.panel h2 i { color: var(--gold); }
+.panel h2 .badge {
+  font-size: 11px; padding: 3px 10px; border-radius: 10px;
+  background: var(--blue-bg); color: var(--blue); font-weight: 700;
+  margin-left: auto;
+}
+
+/* TABLE */
+.data-table {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+}
+.data-table thead th {
+  background: var(--bg); color: var(--text-sec);
+  padding: 12px 14px; text-align: left; font-size: 11px;
+  font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--border);
+}
+.data-table tbody td {
+  padding: 12px 14px; border-bottom: 1px solid var(--border);
+}
+.data-table tbody tr:hover { background: var(--gold-bg); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+
+.status-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 10px; font-weight: 800; text-transform: uppercase;
+}
+.status-present { background: var(--green-bg); color: var(--green); }
+.status-absent { background: var(--red-bg); color: var(--red); }
+.status-late { background: var(--orange-bg); color: var(--orange); }
+.status-excused { background: var(--blue-bg); color: var(--blue); }
+
+.student-cell {
+  display: flex; align-items: center; gap: 10px;
+}
+.student-cell img, .student-cell .ph {
+  width: 34px; height: 34px; border-radius: 50%; object-fit: cover;
+  border: 2px solid var(--gold); flex-shrink: 0;
+}
+.student-cell .ph {
+  background: linear-gradient(135deg, #1a2332, #2c3e50);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 14px;
+}
+.student-cell .nm { font-weight: 700; }
+.student-cell .sub { font-size: 11px; color: var(--muted); }
+
+.risk-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-size: 10px; font-weight: 800;
+}
+.risk-high { background: var(--red-bg); color: var(--red); }
+.risk-mid { background: var(--orange-bg); color: var(--orange); }
+.risk-low { background: var(--blue-bg); color: var(--blue); }
+
+.empty-row {
+  text-align: center; padding: 40px; color: var(--muted);
+}
+.empty-row i { font-size: 42px; opacity: 0.4; display: block; margin-bottom: 12px; }
+
+/* TOAST */
+.toast-container {
+  position: fixed; top: 20px; right: 20px; z-index: 99999;
+  display: flex; flex-direction: column; gap: 10px; max-width: 360px;
+}
+.toast {
+  padding: 14px 18px; border-radius: 12px; color: #fff;
+  font-weight: 600; font-size: 13px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  animation: slideIn 0.3s ease;
+  display: flex; align-items: center; gap: 10px;
+}
+.toast-success { background: linear-gradient(135deg, var(--green), #059669); }
+.toast-error { background: linear-gradient(135deg, var(--red), #dc2626); }
+.toast-warning { background: linear-gradient(135deg, var(--orange), #d97706); }
+.toast-info { background: linear-gradient(135deg, var(--blue), #3b82f6); }
+@keyframes slideIn { from { opacity: 0; transform: translateX(60px); } to { opacity: 1; transform: translateX(0); } }
+
+@media (max-width: 768px) {
+  .container { padding: 16px; }
+  .navbar { padding: 0 14px; }
+  .nav-links { display: none; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .toolbar input, .toolbar select { width: 100%; }
+  .data-table { font-size: 11px; }
+  .data-table thead th, .data-table tbody td { padding: 8px 6px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="admin-dashboard.html" class="brand">
+    <div class="logo"><img src="logo(1).png" alt="GSSS" onerror="this.outerHTML='🎓'"></div>
+    <div class="name">GSSS<span> SHILLA</span> Admin</div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+    <li><a href="admin-students.html"><i class="fas fa-users"></i> Students</a></li>
+    <li><a href="admin-teachers.html"><i class="fas fa-chalkboard-teacher"></i> Teachers</a></li>
+    <li><a href="admin-attendance.html" class="active"><i class="fas fa-clipboard-check"></i> Attendance</a></li>
+    <li><a href="admin-idcard.html"><i class="fas fa-id-card"></i> ID Cards</a></li>
+  </ul>
+  <div style="display:flex; align-items:center; gap:12px;">
+    <div style="display:flex; align-items:center; gap:8px; padding:6px 14px; background:var(--bg); border-radius:50px; font-size:12px; font-weight:600;">
+      <span style="width:26px; height:26px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--gold-light)); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff;" id="adminAvatar">A</span>
+      <span id="adminName">Admin</span>
+    </div>
+    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-head">
+    <div>
+      <h1><i class="fas fa-clipboard-check"></i> Attendance Dashboard</h1>
+      <div class="sub">Live stats, at-risk students, class reports</div>
+    </div>
+    <button class="btn btn-danger" onclick="runAutoDelete()">
+      <i class="fas fa-broom"></i> Run Auto-Delete (5+ days)
+    </button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid" id="statsGrid"></div>
+
+  <!-- AT-RISK STUDENTS -->
+  <div class="panel">
+    <h2>
+      <i class="fas fa-exclamation-triangle"></i> At-Risk Students
+      <span class="badge" id="riskBadge">0</span>
+    </h2>
+    <div id="riskTableWrap"></div>
+  </div>
+
+  <!-- FILTER + CLASS REPORT -->
+  <div class="panel">
+    <h2><i class="fas fa-filter"></i> Class Attendance Report</h2>
+    <div class="toolbar" style="margin-bottom:18px;">
+      <select id="rptClass">
+        <option value="">Select Class</option>
+        <option>Nursery</option><option>LKG</option><option>UKG</option>
+        <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+        <option>6</option><option>7</option><option>8</option><option>9</option>
+        <option>10</option><option>11</option><option>12</option>
+      </select>
+      <input type="date" id="rptDate">
+      <select id="rptPeriod">
+        <option value="">All Periods</option>
+        <option value="1">Period 1</option>
+        <option value="2">Period 2</option>
+        <option value="3">Period 3</option>
+        <option value="4">Period 4</option>
+        <option value="5">Period 5</option>
+        <option value="6">Period 6</option>
+        <option value="7">Period 7</option>
+        <option value="8">Period 8</option>
+      </select>
+      <button class="btn btn-primary" onclick="loadClassReport()">
+        <i class="fas fa-search"></i> Load
+      </button>
+      <button class="btn btn-outline" onclick="exportCSV()">
+        <i class="fas fa-file-csv"></i> Export CSV
+      </button>
+    </div>
+    <div id="classReportWrap">
+      <div class="empty-row">
+        <i class="fas fa-clipboard-list"></i>
+        Select class and date to view attendance
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const API = 'https://gsssshilla.onrender.com/api/attendance';
+
+const state = {
+  token: localStorage.getItem('adminToken'),
+  admin: JSON.parse(localStorage.getItem('adminData') || '{}'),
+  classReport: []
+};
+
+if (!state.token) window.location.replace('login.html');
+
+function authHeaders() {
+  return { 'Authorization': `Bearer ${state.token}`, 'Content-Type': 'application/json' };
+}
+
+function logout() {
+  if (!confirm('Logout?')) return;
+  localStorage.removeItem('adminToken');
+  localStorage.removeItem('adminData');
+  window.location.replace('login.html');
+}
+
+function toast(msg, type = 'info') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  const icons = {
+    success: 'fa-check-circle', error: 'fa-exclamation-circle',
+    warning: 'fa-exclamation-triangle', info: 'fa-info-circle'
+  };
+  t.className = `toast toast-${type}`;
+  t.innerHTML = `<i class="fas ${icons[type]}"></i><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3500);
+}
+
+function esc(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+// ══════════════════════════════════════════════════════════
+// LOAD STATS
+// ══════════════════════════════════════════════════════════
+async function loadStats() {
+  try {
+    const res = await fetch(`${API}/reports/stats`, { headers: authHeaders() });
+    if (res.status === 401) { toast('Session expired', 'error'); setTimeout(logout, 1200); return; }
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+
+    const s = data.stats;
+    const grid = document.getElementById('statsGrid');
+    grid.innerHTML = `
+      <div class="stat-card">
+        <div class="icon icon-blue"><i class="fas fa-users"></i></div>
+        <div class="info">
+          <div class="val">${s.totalStudents}</div>
+          <div class="lbl">Total Students</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="icon icon-gold"><i class="fas fa-chalkboard-teacher"></i></div>
+        <div class="info">
+          <div class="val">${s.totalTeachers}</div>
+          <div class="lbl">Active Teachers</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="icon icon-green"><i class="fas fa-user-check"></i></div>
+        <div class="info">
+          <div class="val">${s.todayPresent}</div>
+          <div class="lbl">Today Present</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="icon icon-orange"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="info">
+          <div class="val">${s.flaggedStudents}</div>
+          <div class="lbl">At Risk</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="icon icon-red"><i class="fas fa-user-slash"></i></div>
+        <div class="info">
+          <div class="val">${s.autoDeleted}</div>
+          <div class="lbl">Auto-Deleted</div>
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    toast('Stats load failed: ' + err.message, 'error');
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// AT-RISK STUDENTS
+// ══════════════════════════════════════════════════════════
+async function loadAtRisk() {
+  try {
+    const res = await fetch(`${API}/reports/at-risk`, { headers: authHeaders() });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+
+    const list = data.data || [];
+    document.getElementById('riskBadge').textContent = list.length;
+
+    const wrap = document.getElementById('riskTableWrap');
+
+    if (!list.length) {
+      wrap.innerHTML = `
+        <div class="empty-row">
+          <i class="fas fa-check-circle" style="color:var(--green); opacity:0.6;"></i>
+          No at-risk students. All good! 🎉
+        </div>`;
+      return;
+    }
+
+    wrap.innerHTML = `
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Class</th>
+              <th>Roll</th>
+              <th>Consecutive Absent</th>
+              <th>Total Absent</th>
+              <th>Last Absent</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${list.map(s => {
+              const risk = s.consecutive_absent_days >= 4 ? 'risk-high' :
+                          s.consecutive_absent_days >= 2 ? 'risk-mid' : 'risk-low';
+              const deleted = s.auto_deleted;
+              return `
+                <tr>
+                  <td>
+                    <div class="student-cell">
+                      <div class="ph">👤</div>
+                      <div>
+                        <div class="nm">${esc(s.name)}</div>
+                        <div class="sub">${esc(s.code)}${s.father_name ? ' · S/o ' + esc(s.father_name) : ''}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><b>${esc(s.class)}</b></td>
+                  <td>${esc(s.roll_number || '—')}</td>
+                  <td>
+                    <span class="risk-badge ${risk}">
+                      ${s.consecutive_absent_days} days
+                    </span>
+                  </td>
+                  <td>${s.total_absent_days || 0}</td>
+                  <td>${s.last_absent_date ? new Date(s.last_absent_date).toLocaleDateString('en-IN') : '—'}</td>
+                  <td>
+                    ${deleted
+                      ? '<span class="status-chip status-absent">Auto-Deleted</span>'
+                      : '<span class="status-chip status-late">Watching</span>'}
+                  </td>
+                  <td>
+                    ${deleted
+                      ? `<button class="btn btn-sm btn-success" onclick="recoverStudent(${s.student_id})">
+                          <i class="fas fa-undo"></i> Recover
+                        </button>`
+                      : `<a class="btn btn-sm btn-outline" href="tel:${esc(s.mobile_number || '')}">
+                          <i class="fas fa-phone"></i> Call
+                        </a>`}
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch (err) {
+    toast('At-risk load failed: ' + err.message, 'error');
+  }
+}
+
+async function recoverStudent(id) {
+  if (!confirm('Recover this student? They will become Active again.')) return;
+  try {
+    const res = await fetch(`${API}/admin/recover-student/${id}`, {
+      method: 'POST', headers: authHeaders()
+    });
+    const data = await res.json();
+    toast(data.message || (data.success ? 'Recovered' : 'Failed'),
+      data.success ? 'success' : 'error');
+    if (data.success) { loadAtRisk(); loadStats(); }
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════
+// CLASS REPORT
+// ══════════════════════════════════════════════════════════
+async function loadClassReport() {
+  const cls = document.getElementById('rptClass').value;
+  const date = document.getElementById('rptDate').value;
+  const period = document.getElementById('rptPeriod').value;
+
+  if (!cls) { toast('Please select class', 'warning'); return; }
+
+  try {
+    const qs = new URLSearchParams();
+    if (date) qs.append('date', date);
+    if (period) qs.append('period', period);
+
+    const res = await fetch(`${API}/reports/class/${cls}?${qs}`, { headers: authHeaders() });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+
+    state.classReport = data.data || [];
+    renderClassReport();
+  } catch (err) {
+    toast('Report failed: ' + err.message, 'error');
+  }
+}
+
+function renderClassReport() {
+  const wrap = document.getElementById('classReportWrap');
+  const list = state.classReport;
+
+  if (!list.length) {
+    wrap.innerHTML = `
+      <div class="empty-row">
+        <i class="fas fa-clipboard-list"></i>
+        No attendance records for this filter
+      </div>`;
+    return;
+  }
+
+  wrap.innerHTML = `
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Class</th>
+            <th>Subject</th>
+            <th>Teacher</th>
+            <th>Period</th>
+            <th>Date</th>
+            <th>Marked Time</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.map(r => `
+            <tr>
+              <td>
+                <div class="student-cell">
+                  <div class="ph">👤</div>
+                  <div>
+                    <div class="nm">${esc(r.student_name)}</div>
+                    <div class="sub">${esc(r.student_code)} · Roll ${esc(r.roll_number || '—')}</div>
+                  </div>
+                </div>
+              </td>
+              <td><b>${esc(r.class)}</b></td>
+              <td>${esc(r.subject_name || '—')}</td>
+              <td>${esc(r.teacher_name || '—')}</td>
+              <td>P${r.period}</td>
+              <td>${esc(r.date_str)}</td>
+              <td><b>${esc(r.marked_time || '—')}</b></td>
+              <td>
+                <span class="status-chip status-${r.status}">
+                  <i class="fas fa-${r.status === 'present' ? 'check' : r.status === 'absent' ? 'times' : 'clock'}"></i>
+                  ${r.status}
+                </span>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// EXPORT CSV
+// ══════════════════════════════════════════════════════════
+function exportCSV() {
+  if (!state.classReport.length) {
+    toast('No data to export', 'warning');
+    return;
+  }
+  const headers = ['Student Code', 'Name', 'Class', 'Roll', 'Subject', 'Teacher', 'Period', 'Date', 'Time', 'Status'];
+  const rows = state.classReport.map(r => [
+    r.student_code, r.student_name, r.class, r.roll_number,
+    r.subject_name, r.teacher_name, r.period,
+    r.date_str, r.marked_time, r.status
+  ]);
+
+  const csv = [headers, ...rows].map(row =>
+    row.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',')
+  ).join('\n');
+
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `attendance-${Date.now()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('✅ CSV downloaded', 'success');
+}
+
+// ══════════════════════════════════════════════════════════
+// AUTO-DELETE
+// ══════════════════════════════════════════════════════════
+async function runAutoDelete() {
+  if (!confirm('Run auto-delete now? Students with 5+ consecutive absences will be removed.')) return;
+  try {
+    const res = await fetch(`${API}/admin/run-auto-delete`, {
+      method: 'POST', headers: authHeaders()
+    });
+    const data = await res.json();
+    toast(data.message || 'Done', data.success ? 'success' : 'error');
+    if (data.success) { loadStats(); loadAtRisk(); }
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+document.getElementById('rptDate').value = new Date().toISOString().slice(0, 10);
+document.getElementById('adminName').textContent = state.admin.name || 'Admin';
+document.getElementById('adminAvatar').textContent = (state.admin.name || 'A').charAt(0).toUpperCase();
+
+loadStats();
+loadAtRisk();
+
+// Refresh stats every 30s
+setInterval(loadStats, 30000);
+</script>
+</body>
+</html>
