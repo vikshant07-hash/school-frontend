@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Login - GSSS Shilla</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root {
+  --gold: #c9972b; --gold-light: #e8b84b; --dark: #1a2332;
+  --text: #1a2332; --text-sec: #5a6a7e; --border: #e8edf8;
+  --red: #ef4444;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%);
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  position: relative; overflow-x: hidden;
+}
+body::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 20% 30%, rgba(201,151,43,0.15), transparent 50%),
+              radial-gradient(circle at 80% 70%, rgba(74,138,244,0.1), transparent 50%);
+  pointer-events: none;
+}
+.card {
+  background: #fff; border-radius: 24px; padding: 44px 40px;
+  max-width: 440px; width: 100%;
+  box-shadow: 0 30px 90px rgba(0,0,0,0.4);
+  position: relative; z-index: 1;
+  animation: slideUp 0.5s ease;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.logo-wrap {
+  width: 88px; height: 88px; border-radius: 22px;
+  background: linear-gradient(135deg, #fef8ed, #fdf2d9);
+  margin: 0 auto 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 42px;
+  border: 2px solid var(--gold);
+  box-shadow: 0 8px 24px rgba(201,151,43,0.2);
+}
+.logo-wrap img { width: 100%; height: 100%; object-fit: contain; border-radius: 20px; padding: 8px; }
+h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 6px; color: var(--text); letter-spacing: -0.5px; }
+h1 span { color: var(--gold); }
+.sub { text-align: center; color: var(--text-sec); font-size: 13px; margin-bottom: 30px; line-height: 1.5; }
+.field { margin-bottom: 18px; }
+.field label {
+  display: block; font-size: 11px; font-weight: 700;
+  color: var(--text-sec); margin-bottom: 8px;
+  text-transform: uppercase; letter-spacing: 0.8px;
+}
+.field input {
+  width: 100%; padding: 14px 16px; border: 2px solid var(--border);
+  border-radius: 12px; font-size: 14px; font-family: inherit;
+  outline: none; transition: all 0.25s;
+  background: #fafbfd;
+}
+.field input:focus {
+  border-color: var(--gold); background: #fff;
+  box-shadow: 0 0 0 4px rgba(201,151,43,0.1);
+}
+.btn {
+  width: 100%; padding: 15px; border: none; border-radius: 12px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+  font-family: inherit; margin-top: 10px; transition: all 0.25s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  box-shadow: 0 8px 20px rgba(201,151,43,0.3);
+}
+.btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(201,151,43,0.4); }
+.btn:disabled { opacity: 0.7; cursor: not-allowed; }
+.error { color: var(--red); font-size: 13px; text-align: center; margin-top: 14px; min-height: 18px; font-weight: 500; }
+.footer-note {
+  text-align: center; font-size: 12px; color: var(--text-sec);
+  margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border);
+}
+.footer-note a { color: var(--gold); text-decoration: none; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-wrap">
+    <img src="logo(1).png" alt="GSSS" onerror="this.outerHTML='🎓'">
+  </div>
+  <h1>Teacher <span>Login</span></h1>
+  <p class="sub">GSSS Shilla — QR Attendance System</p>
+
+  <form id="loginForm" autocomplete="on">
+    <div class="field">
+      <label><i class="fas fa-envelope"></i> Email Address</label>
+      <input type="email" id="email" required placeholder="teacher@gssshilla.in" autocomplete="username">
+    </div>
+    <div class="field">
+      <label><i class="fas fa-lock"></i> Password</label>
+      <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn" type="submit" id="loginBtn">
+      <i class="fas fa-sign-in-alt"></i> <span>Login</span>
+    </button>
+    <div class="error" id="error"></div>
+  </form>
+
+  <div class="footer-note">
+    <i class="fas fa-shield-alt"></i> Secure login · GSSS Shilla<br>
+    <a href="admin-login.html">Admin Login →</a>
+  </div>
+</div>
+
+<script>
+const API = 'https://gsssshilla.onrender.com/api/attendance';
+
+// Auto redirect if already logged in
+if (localStorage.getItem('teacherToken')) {
+  window.location.replace('teacher-attendance.html');
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const errEl = document.getElementById('error');
+  const email = document.getElementById('email').value.trim().toLowerCase();
+  const password = document.getElementById('password').value;
+
+  if (!email || !password) {
+    errEl.textContent = 'Please fill all fields';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Logging in...</span>';
+  errEl.textContent = '';
+
+  try {
+    const res = await fetch(`${API}/teacher/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      localStorage.setItem('teacherToken', data.token);
+      localStorage.setItem('teacherData', JSON.stringify(data.teacher));
+      localStorage.setItem('todayAssignments', JSON.stringify(data.todayAssignments || []));
+      window.location.replace('teacher-attendance.html');
+    } else {
+      errEl.textContent = data.message || 'Login failed';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>Login</span>';
+    }
+  } catch (err) {
+    errEl.textContent = 'Server error. Please try again.';
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>Login</span>';
+  }
+});
+</script>
+</body>
+</html>
