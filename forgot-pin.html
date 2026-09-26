@@ -24,7 +24,7 @@
     --ok: #2f9e7d; --warn: #d18d1c; --err: #d64a5f;
     --radius: 22px; --radius-sm: 13px;
     --ease: cubic-bezier(0.22, 1, 0.36, 1);
-    --t: 0.3s; --t-fast: 0.18s;
+    --t: 0.3s;
     --font-display: 'Space Grotesk', sans-serif;
     --font-body: 'Outfit', sans-serif;
     --shadow-card: 0 22px 55px rgba(75,88,145,0.18), 0 6px 18px rgba(91,107,192,0.1);
@@ -54,13 +54,10 @@ body {
 .blob-3 { width: clamp(260px,42vw,440px); height: clamp(260px,42vw,440px);
     background: radial-gradient(circle, rgba(61,124,168,0.5), transparent 70%);
     bottom: -16%; left: 22%; animation: drift3 26s ease-in-out infinite; }
-.blob-4 { width: clamp(220px,34vw,380px); height: clamp(220px,34vw,380px);
-    background: radial-gradient(circle, rgba(74,157,143,0.42), transparent 70%);
-    top: 8%; right: 18%; animation: drift1 30s ease-in-out infinite reverse; }
 @keyframes drift1 { 0%,100% { transform: translate(0,0) scale(1);} 50% { transform: translate(40px,50px) scale(1.1);} }
 @keyframes drift2 { 0%,100% { transform: translate(0,0) scale(1);} 50% { transform: translate(-50px,-40px) scale(1.12);} }
 @keyframes drift3 { 0%,100% { transform: translate(0,0) scale(1);} 50% { transform: translate(30px,-50px) scale(1.08);} }
-.grid { position: absolute; inset: 0;
+.grid-bg { position: absolute; inset: 0;
     background-image: linear-gradient(rgba(91,107,192,0.05) 1px, transparent 1px),
         linear-gradient(90deg, rgba(91,107,192,0.05) 1px, transparent 1px);
     background-size: 62px 62px;
@@ -193,7 +190,6 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== STEP HERO ===== */
 .step-hero {
     display: flex; align-items: flex-start; gap: 14px;
     padding: 18px; margin-bottom: 20px;
@@ -255,20 +251,26 @@ body {
     80% { transform: translateX(4px);}
 }
 
-/* ===== PIN INPUT ===== */
+/* ===== PIN & OTP INPUT ===== */
 .pin-wrap { position: relative; }
-.pin-input {
+.pin-input, .otp-input {
     letter-spacing: 12px; text-align: center;
     font-family: var(--font-display);
     font-size: 22px; font-weight: 700;
-    padding-left: 44px; padding-right: 56px;
+    padding-left: 44px; padding-right: 52px;
     color: var(--text-hi); caret-color: var(--primary-1);
 }
-.pin-input::placeholder {
+.otp-input {
+    letter-spacing: 14px; font-size: 24px;
+    padding-right: 16px;
+}
+.pin-input::placeholder, .otp-input::placeholder {
     letter-spacing: 8px; font-size: 18px;
     color: var(--text-lo); font-weight: 500;
 }
-.pin-input:focus { letter-spacing: 14px; }
+.otp-input::placeholder { letter-spacing: 10px; font-size: 20px; }
+.pin-input:focus, .otp-input:focus { letter-spacing: 14px; }
+.otp-input:focus { letter-spacing: 16px; }
 .toggle-pin {
     position: absolute; right: 12px;
     width: 36px; height: 36px; border-radius: 50%;
@@ -281,20 +283,6 @@ body {
     color: var(--primary-1);
     background: rgba(91,107,192,0.1);
 }
-
-/* ===== OTP INPUT ===== */
-.otp-input {
-    letter-spacing: 14px; text-align: center;
-    font-family: var(--font-display);
-    font-size: 24px; font-weight: 700;
-    padding-left: 44px; padding-right: 16px;
-    color: var(--text-hi); caret-color: var(--primary-1);
-}
-.otp-input::placeholder {
-    letter-spacing: 10px; font-size: 20px;
-    color: var(--text-lo); font-weight: 500;
-}
-.otp-input:focus { letter-spacing: 16px; }
 
 /* ===== BUTTONS ===== */
 .btn {
@@ -393,7 +381,6 @@ body {
     font-size: 13.5px; color: var(--text-mid);
     line-height: 1.65; margin-bottom: 22px;
 }
-.success-box .btn { margin-top: 6px; }
 
 /* ===== FOOTER ===== */
 .foot {
@@ -454,15 +441,15 @@ body {
     body { padding: 12px; }
     .card { border-radius: 20px; padding: 26px 20px 22px; }
     .blob { filter: blur(65px); }
-    .pin-input, .otp-input { font-size: 20px; letter-spacing: 10px; padding-right: 50px; }
+    .pin-input, .otp-input { font-size: 20px; letter-spacing: 10px; padding-right: 46px; }
     .pin-input:focus, .otp-input:focus { letter-spacing: 12px; }
+    .otp-input { padding-right: 12px; }
 }
 @media (max-width: 360px) {
     .card { padding: 22px 16px 18px; border-radius: 18px; }
     .tag { padding: 6px 14px; letter-spacing: 1.5px; }
     .btn { letter-spacing: 1px; }
     .pin-input, .otp-input { letter-spacing: 8px; font-size: 18px; }
-    .pin-input:focus, .otp-input:focus { letter-spacing: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
@@ -487,11 +474,10 @@ body {
 <body>
 
 <div class="bg" aria-hidden="true">
-    <div class="grid"></div>
+    <div class="grid-bg"></div>
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
-    <div class="blob blob-4"></div>
 </div>
 
 <div class="loader" id="loader" aria-hidden="true">
@@ -522,20 +508,20 @@ body {
         </div>
     </div>
 
-    <!-- ===== STEP INDICATOR ===== -->
-    <div class="steps" id="steps">
+    <!-- STEP INDICATOR -->
+    <div class="steps">
         <div class="step-dot active" id="stepDot1">1</div>
         <div class="step-line" id="stepLine1"></div>
         <div class="step-dot" id="stepDot2">2</div>
     </div>
 
-    <!-- ===== STEP 1: Request OTP ===== -->
+    <!-- STEP 1: 3-FIELD VERIFICATION -->
     <div class="form-block show" id="step1">
         <div class="step-hero">
-            <div class="step-hero-icon"><i class="fas fa-envelope-open-text"></i></div>
+            <div class="step-hero-icon"><i class="fas fa-shield-halved"></i></div>
             <div class="step-hero-body">
-                <h3>Forgot Your PIN?</h3>
-                <p>No worries! Enter your Student ID and we'll send a one-time password (OTP) to your registered email.</p>
+                <h3>Verify Your Identity</h3>
+                <p>Enter your Student ID, APAAR ID and Aadhaar Number. All 3 must match your admission record.</p>
             </div>
         </div>
 
@@ -550,29 +536,49 @@ body {
                 </div>
             </div>
 
+            <div class="group">
+                <label class="label" for="apaar1">APAAR ID</label>
+                <div class="field">
+                    <i class="fas fa-fingerprint fi"></i>
+                    <input type="text" id="apaar1" class="input"
+                           placeholder="12-digit APAAR ID" maxlength="12"
+                           inputmode="numeric" autocomplete="off" spellcheck="false">
+                </div>
+            </div>
+
+            <div class="group">
+                <label class="label" for="aadhar1">Aadhaar Number</label>
+                <div class="field">
+                    <i class="fas fa-address-card fi"></i>
+                    <input type="text" id="aadhar1" class="input"
+                           placeholder="12-digit Aadhaar Number" maxlength="12"
+                           inputmode="numeric" autocomplete="off" spellcheck="false">
+                </div>
+            </div>
+
             <button type="submit" class="btn" id="btnSendOtp">
                 <span class="spinner"></span>
                 <i class="fas fa-paper-plane btn-ic"></i>
-                <span id="btnSendOtpText">Send OTP</span>
+                <span id="btnSendOtpText">Verify & Send OTP</span>
             </button>
         </form>
 
         <div class="info-note">
-            <i class="fas fa-info-circle"></i>
+            <i class="fas fa-lock"></i>
             <div>
-                OTP will be sent to the <strong>email address</strong> registered with your student account.
-                If you don't have access, contact the <strong>school office</strong>.
+                <strong>Security:</strong> All 3 fields must match. OTP will be sent to your
+                <strong>registered email address</strong>. If you can't access it, contact the school office.
             </div>
         </div>
     </div>
 
-    <!-- ===== STEP 2: Verify OTP + Set New PIN ===== -->
+    <!-- STEP 2: OTP + NEW PIN -->
     <div class="form-block" id="step2">
         <div class="step-hero">
-            <div class="step-hero-icon"><i class="fas fa-shield-halved"></i></div>
+            <div class="step-hero-icon"><i class="fas fa-envelope-open-text"></i></div>
             <div class="step-hero-body">
                 <h3>Enter OTP & New PIN</h3>
-                <p>We sent a 6-digit OTP to <b id="maskedEmail">your email</b>. Enter it below along with your new PIN.</p>
+                <p>OTP sent to <b id="maskedEmail">your email</b>. Enter it below with your new 6-digit PIN.</p>
             </div>
         </div>
 
@@ -628,13 +634,13 @@ body {
         <div class="info-note">
             <i class="fas fa-clock"></i>
             <div>
-                OTP valid for <strong>10 minutes</strong>. If you don't receive it, check your spam folder
-                or click <strong>Resend OTP</strong>.
+                OTP valid for <strong>10 minutes</strong>. If expired, tap <strong>Resend OTP</strong>.
+                Max <strong>5 wrong OTP attempts</strong> allowed.
             </div>
         </div>
     </div>
 
-    <!-- ===== STEP 3: Success ===== -->
+    <!-- STEP 3: SUCCESS -->
     <div class="form-block" id="step3">
         <div class="success-box show">
             <div class="success-icon"><i class="fas fa-check"></i></div>
@@ -660,11 +666,11 @@ body {
     const API = "https://gsssshilla.onrender.com/api/students";
 
     const $ = (id) => document.getElementById(id);
-    const alertBox   = $('alert');
-    const alertIcon  = $('alertIcon');
+    const alertBox = $('alert');
+    const alertIcon = $('alertIcon');
     const alertTitle = $('alertTitle');
-    const alertText  = $('alertText');
-    const loader     = $('loader');
+    const alertText = $('alertText');
+    const loader = $('loader');
     const loaderText = $('loaderText');
 
     const step1 = $('step1'), step2 = $('step2'), step3 = $('step3');
@@ -672,7 +678,10 @@ body {
 
     const formStep1 = $('formStep1');
     const formStep2 = $('formStep2');
+
     const sid1 = $('sid1');
+    const apaar1 = $('apaar1');
+    const aadhar1 = $('aadhar1');
     const otp = $('otp');
     const newPin = $('newPin');
     const confirmPin = $('confirmPin');
@@ -689,6 +698,8 @@ body {
 
     let alertTimer = null;
     let currentStudentId = '';
+    let resendCooldown = 0;
+    let resendTimer = null;
 
     /* ================== ALERTS ================== */
     const ALERT_ICONS = {
@@ -744,6 +755,14 @@ body {
         this.value = this.value.replace(/^\s+/, '');
         this.classList.remove('invalid');
     });
+    apaar1.addEventListener('input', function () {
+        this.value = this.value.replace(/\D/g, '').slice(0, 12);
+        this.classList.remove('invalid');
+    });
+    aadhar1.addEventListener('input', function () {
+        this.value = this.value.replace(/\D/g, '').slice(0, 12);
+        this.classList.remove('invalid');
+    });
     otp.addEventListener('input', function () {
         this.value = this.value.replace(/\D/g, '').slice(0, 6);
         this.classList.remove('invalid');
@@ -757,7 +776,7 @@ body {
         this.classList.remove('invalid');
     });
 
-    /* ================== TOGGLE PIN VISIBILITY ================== */
+    /* ================== TOGGLE PIN ================== */
     function bindToggle(btn, input) {
         btn.addEventListener('click', () => {
             const show = input.type === 'password';
@@ -780,12 +799,38 @@ body {
         return null;
     }
 
-    /* ================== STEP 1: REQUEST OTP ================== */
+    /* ================== RESEND COOLDOWN ================== */
+    function startResendCooldown(seconds) {
+        resendCooldown = seconds;
+        btnResendOtp.disabled = true;
+        clearInterval(resendTimer);
+        updateResendButton();
+        resendTimer = setInterval(() => {
+            resendCooldown--;
+            if (resendCooldown <= 0) {
+                clearInterval(resendTimer);
+                resendCooldown = 0;
+                btnResendOtp.disabled = false;
+                btnResendOtp.innerHTML = '<i class="fas fa-rotate"></i> <span>Resend OTP</span>';
+            } else {
+                updateResendButton();
+            }
+        }, 1000);
+    }
+    function updateResendButton() {
+        btnResendOtp.innerHTML = `<i class="fas fa-clock"></i> <span>Wait ${resendCooldown}s</span>`;
+    }
+
+    /* ================== STEP 1: VERIFY & REQUEST OTP ================== */
     formStep1.addEventListener('submit', async (e) => {
         e.preventDefault();
         hideAlert();
 
         const sidVal = sid1.value.trim();
+        const apaarVal = apaar1.value.trim();
+        const aadharVal = aadhar1.value.trim();
+
+        // ---- Client-side validation ----
         if (!sidVal) {
             markInvalid(sid1);
             showAlert('err', 'Student ID Required', 'Please enter your Student ID.');
@@ -796,13 +841,23 @@ body {
             showAlert('err', 'Invalid Student ID', 'Student ID must be at least 3 characters.');
             return;
         }
+        if (!/^\d{12}$/.test(apaarVal)) {
+            markInvalid(apaar1);
+            showAlert('err', 'Invalid APAAR ID', 'APAAR ID must be exactly 12 digits.');
+            return;
+        }
+        if (!/^\d{12}$/.test(aadharVal)) {
+            markInvalid(aadhar1);
+            showAlert('err', 'Invalid Aadhaar', 'Aadhaar Number must be exactly 12 digits.');
+            return;
+        }
 
         currentStudentId = sidVal;
 
         btnSendOtp.disabled = true;
         btnSendOtp.classList.add('loading');
-        btnSendOtpText.textContent = 'Sending…';
-        showLoader('Sending OTP…');
+        btnSendOtpText.textContent = 'Verifying…';
+        showLoader('Verifying identity…');
 
         try {
             const ctrl = new AbortController();
@@ -811,7 +866,11 @@ body {
             const res = await fetch(`${API}/pin/forgot/request-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ studentId: sidVal }),
+                body: JSON.stringify({
+                    studentId: sidVal,
+                    apaarId: apaarVal,
+                    aadharNumber: aadharVal
+                }),
                 signal: ctrl.signal
             });
             clearTimeout(t);
@@ -822,39 +881,50 @@ body {
             catch (x) { throw new Error('Unexpected server response.'); }
 
             if (!res.ok || !data.success) {
-                throw new Error(data.message || 'Failed to send OTP. Please try again.');
+                throw new Error(data.message || 'Verification failed.');
             }
 
             maskedEmail.textContent = data.maskedEmail || 'your registered email';
             goStep(2);
-            showAlert('ok', 'OTP Sent ✅',
-                `A 6-digit OTP has been sent to ${data.maskedEmail || 'your email'}. It's valid for 10 minutes.`);
+            showAlert('ok', 'Identity Verified ✅',
+                `OTP sent to ${data.maskedEmail || 'your email'}. Valid for 10 minutes.`);
+
+            // Disable resend for 30s initially
+            startResendCooldown(30);
 
         } catch (err) {
-            let title = 'Failed';
+            let title = 'Verification Failed';
             let msg = err.message;
+
             if (err.name === 'AbortError') {
                 title = 'Connection Timeout';
                 msg = 'Server took too long. Please try again.';
             } else if (/failed to fetch|networkerror/i.test(msg)) {
                 title = 'Network Error';
                 msg = 'Unable to reach the server. Check your internet.';
-            } else if (/not found/i.test(msg)) {
-                title = 'Student Not Found';
-                msg = 'No student found with this ID. Please verify.';
+            } else if (/do not match/i.test(msg)) {
+                title = 'Details Do Not Match';
+                msg = 'The details you entered do not match our records. Please check Student ID, APAAR ID and Aadhaar Number.';
             } else if (/no pin set/i.test(msg)) {
                 title = 'PIN Not Set';
                 msg = 'You have not created a PIN yet. Please contact the school office.';
             } else if (/no email/i.test(msg)) {
                 title = 'No Email Registered';
                 msg = 'No email is registered for this student. Please contact the school office.';
+            } else if (/locked/i.test(msg)) {
+                title = 'Account Locked';
+                msg = msg;
+            } else if (/wait \d+ second/i.test(msg)) {
+                title = 'Please Wait';
+                msg = msg;
             }
+
             showAlert('err', title, msg);
         } finally {
             hideLoader();
             btnSendOtp.disabled = false;
             btnSendOtp.classList.remove('loading');
-            btnSendOtpText.textContent = 'Send OTP';
+            btnSendOtpText.textContent = 'Verify & Send OTP';
         }
     });
 
@@ -920,13 +990,14 @@ body {
         } catch (err) {
             let title = 'Reset Failed';
             let msg = err.message;
+
             if (err.name === 'AbortError') {
                 title = 'Connection Timeout';
                 msg = 'Server took too long. Please try again.';
             } else if (/failed to fetch|networkerror/i.test(msg)) {
                 title = 'Network Error';
                 msg = 'Unable to reach the server. Check your internet.';
-            } else if (/otp.*incorrect|incorrect otp/i.test(msg)) {
+            } else if (/incorrect otp/i.test(msg)) {
                 title = 'Incorrect OTP';
                 msg = msg;
             } else if (/expired/i.test(msg)) {
@@ -936,6 +1007,7 @@ body {
                 title = 'Monthly Limit Reached';
                 msg = 'You have used all 3 PIN changes this month. Contact the school office.';
             }
+
             showAlert('err', title, msg);
         } finally {
             hideLoader();
@@ -947,6 +1019,8 @@ body {
 
     /* ================== RESEND OTP ================== */
     btnResendOtp.addEventListener('click', async () => {
+        if (resendCooldown > 0) return;
+
         if (!currentStudentId) {
             goStep(1);
             return;
@@ -961,32 +1035,42 @@ body {
             const res = await fetch(`${API}/pin/forgot/request-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ studentId: currentStudentId })
+                body: JSON.stringify({
+                    studentId: sid1.value.trim(),
+                    apaarId: apaar1.value.trim(),
+                    aadharNumber: aadhar1.value.trim()
+                })
             });
             const data = await res.json();
             if (!res.ok || !data.success) throw new Error(data.message || 'Failed to resend OTP');
 
             showAlert('ok', 'OTP Resent ✅', `New OTP sent to ${data.maskedEmail || 'your email'}.`);
             otp.value = '';
+            otp.focus();
+            startResendCooldown(30);
         } catch (err) {
             showAlert('err', 'Failed', err.message);
-        } finally {
-            hideLoader();
             btnResendOtp.disabled = false;
             btnResendOtp.innerHTML = '<i class="fas fa-rotate"></i> <span>Resend OTP</span>';
+        } finally {
+            hideLoader();
         }
     });
 
     /* ================== INIT ================== */
     goStep(1);
 
-    // Auto-fill student ID if passed via URL query
+    // Auto-fill from URL if provided
     try {
         const params = new URLSearchParams(window.location.search);
         const sidParam = params.get('sid');
         if (sidParam) sid1.value = sidParam;
     } catch (e) {}
 
+    // Enter key on OTP moves to newPin
+    otp.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); newPin.focus(); }
+    });
 })();
 </script>
 </body>
