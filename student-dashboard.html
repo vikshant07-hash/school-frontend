@@ -209,13 +209,29 @@ body {
   transform: scale(1.15) rotate(-6deg);
 }
 .sb-nav .nv.active {
-  color: var(--indigo-d);
-  box-shadow: var(--inset-lg),
-              inset 0 0 24px rgba(99, 102, 241, 0.15),
-              0 8px 24px rgba(99, 102, 241, 0.15);
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.05));
+  color: #fff;
+  transform: translateY(0);
+  background: var(--grad-primary);
+  box-shadow: inset 3px 3px 8px rgba(79, 70, 229, 0.55),
+              inset -3px -3px 8px rgba(168, 85, 247, 0.35),
+              0 6px 18px rgba(99, 102, 241, 0.35);
 }
-.sb-nav .nv.active i { color: var(--indigo-d); }
+.sb-nav .nv.active::before {
+  content: '';
+  position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 4px; height: 62%;
+  border-radius: 0 4px 4px 0;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+.sb-nav .nv.active i { color: #fff; }
+.sb-nav .nv.active:hover {
+  transform: translateY(0);
+  box-shadow: inset 3px 3px 8px rgba(79, 70, 229, 0.55),
+              inset -3px -3px 8px rgba(168, 85, 247, 0.35),
+              0 6px 18px rgba(99, 102, 241, 0.35);
+}
+.sb-nav .nv.active:hover i { transform: none; color: #fff; }
 .sb-nav .nv .bdg {
   margin-left: auto;
   background: var(--grad-danger); color: #fff;
@@ -224,6 +240,10 @@ body {
   min-width: 20px; text-align: center;
   box-shadow: inset 1px 1px 2px rgba(190, 18, 60, 0.5),
               0 0 12px rgba(244, 63, 94, 0.5);
+}
+.sb-nav .nv.active .bdg {
+  background: #fff; color: var(--rose);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
 }
 .sb-nav .nv .bdg.green {
   background: var(--grad-success);
@@ -608,7 +628,16 @@ body {
 }
 .rmc.expanded .rmc-btn {
   background: var(--grad-danger);
-  box-shadow: var(--inset-sm), 0 0 28px rgba(244, 63, 94, 0.4);
+  transform: translateY(0);
+  box-shadow: inset 3px 3px 9px rgba(190, 18, 60, 0.55),
+              inset -3px -3px 9px rgba(251, 113, 133, 0.35),
+              0 4px 16px rgba(244, 63, 94, 0.3);
+}
+.rmc.expanded .rmc-btn:hover {
+  transform: translateY(0);
+  box-shadow: inset 4px 4px 11px rgba(190, 18, 60, 0.6),
+              inset -4px -4px 11px rgba(251, 113, 133, 0.4),
+              0 4px 16px rgba(244, 63, 94, 0.32);
 }
 
 .rmc-bdc {
@@ -1138,9 +1167,10 @@ body {
 }
 .quiz-tab:hover { color: var(--indigo-d); }
 .quiz-tab.active {
-  background: var(--bg);
-  color: var(--indigo-d);
-  box-shadow: var(--inset-sm);
+  color: #fff;
+  background: var(--grad-primary);
+  box-shadow: inset 2px 2px 6px rgba(79, 70, 229, 0.5),
+              inset -2px -2px 6px rgba(168, 85, 247, 0.3);
 }
 .quiz-tab .cnt {
   padding: 3px 9px;
@@ -1152,7 +1182,7 @@ body {
   text-align: center;
   box-shadow: var(--inset-xs);
 }
-.quiz-tab.active .cnt { background: var(--grad-danger); }
+.quiz-tab.active .cnt { background: rgba(255,255,255,0.25); box-shadow: none; }
 
 /* QUIZ ITEM */
 .qz-item {
@@ -3003,7 +3033,7 @@ function printFullResult() {
   generateMarksheetPrint(myResultsData.student, myResultsData.marksheets || [], myResultsData.summary);
 }
 
-function generateMarksheetPrint(student, marksheets, summary) {
+async function generateMarksheetPrint(student, marksheets, summary) {
   const s = student;
   let totalObtained = 0, totalMax = 0;
   marksheets.forEach(m => {
@@ -3015,6 +3045,14 @@ function generateMarksheetPrint(student, marksheets, summary) {
   const overallStatus = summary?.overall_status || (parseFloat(percentage) >= 33 ? "Pass" : "Fail");
   const isHigher = ["11","12"].includes(String(s.class));
   const streamDisplay = isHigher ? (s.stream || "—") : "Non-Specialized";
+
+  const verificationData = {
+    student_id: s.student_id, name: s.name, class: s.class || "", session: s.session || "",
+    exams: marksheets.map(m => m.exam_type).join(", ")
+  };
+  const verificationUrl = `${VERIFY_BASE}?data=${encodeURIComponent(JSON.stringify(verificationData))}`;
+  const qr = await generateQRCodeBase64(verificationUrl, 130);
+  const docId = `GSSS-${s.student_id}-${Date.now().toString(36).toUpperCase()}`;
 
   const pw = window.open("", "_blank", "width=1100,height=850");
   if (!pw) return showToast("Popup blocked! Please allow popups.", "error");
@@ -3031,75 +3069,101 @@ function generateMarksheetPrint(student, marksheets, summary) {
   pw.document.write(`<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>Marksheet - ${esc(s.name)}</title>
 <style>
-@page { size: A4; margin: 10mm; }
+@page { size: A4; margin: 9mm 11mm; }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: 'Segoe UI', Arial, sans-serif; color:#0a0f1c; font-size:12px; background:#fff; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
-.page { max-width:190mm; margin:0 auto; padding:6px; position:relative; }
-.watermark { position: fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:520px; height:520px; opacity:0.045; background:url('logo(1).png') center/contain no-repeat; pointer-events:none; z-index:0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; color:#0b1220; font-size:12px; background:#f1f5f9; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+.sheet { max-width:190mm; margin:8px auto; background:#fff; position:relative; border:1px solid #cbd5e1; box-shadow:0 4px 24px rgba(15,23,42,0.08); }
+.border-frame { position:absolute; inset:5mm; border:2.5px solid #4f46e5; pointer-events:none; z-index:2; }
+.border-frame::before { content:''; position:absolute; inset:3px; border:1px solid #a855f7; }
+.page { position:relative; padding:11mm 12mm; z-index:1; }
+.watermark { position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:460px; height:460px; opacity:0.05; background:url('logo(1).png') center/contain no-repeat; pointer-events:none; z-index:0; }
 .content { position: relative; z-index:1; }
-.header { text-align:center; padding-bottom:14px; border-bottom:4px solid #6366f1; margin-bottom:14px; }
-.header .logo { width:85px; height:85px; border-radius:50%; border:3px solid #a855f7; padding:5px; background:#fff; margin:0 auto 8px; display:block; }
-.school-name { font-family:Georgia,serif; font-size:23px; font-weight:900; text-transform:uppercase; letter-spacing:2.5px; color:#4f46e5; }
-.school-tagline { font-size:11px; color:#64748b; letter-spacing:2px; text-transform:uppercase; margin-top:4px; font-weight:600; }
-.title-box { display:inline-block; background:#4f46e5; color:#fff; padding:8px 34px; border-radius:30px; font-size:15px; font-weight:700; letter-spacing:3px; text-transform:uppercase; border:3px solid #a855f7; margin-top:10px; }
-.info-strip { display:flex; justify-content:space-between; gap:10px; margin-bottom:12px; padding:10px 14px; background:#eef2ff; border-radius:8px; border-left:4px solid #6366f1; flex-wrap:wrap; }
+.header { display:flex; align-items:center; gap:16px; padding-bottom:12px; border-bottom:3px solid #4f46e5; margin-bottom:12px; }
+.header .logo { width:74px; height:74px; border-radius:50%; border:3px solid #a855f7; padding:4px; background:#fff; flex-shrink:0; }
+.header .htxt { flex:1; text-align:center; }
+.school-name { font-family:Georgia,serif; font-size:22px; font-weight:900; text-transform:uppercase; letter-spacing:2px; color:#3730a3; }
+.school-tagline { font-size:10.5px; color:#64748b; letter-spacing:1.6px; text-transform:uppercase; margin-top:3px; font-weight:600; }
+.udise { font-size:9.5px; color:#94a3b8; margin-top:2px; letter-spacing:0.5px; }
+.title-strip { text-align:center; margin:10px 0 14px; }
+.title-box { display:inline-block; background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; padding:7px 30px; border-radius:4px; font-size:14px; font-weight:800; letter-spacing:3.5px; text-transform:uppercase; }
+.doc-id-strip { display:flex; justify-content:space-between; font-size:9px; color:#64748b; margin-bottom:10px; letter-spacing:0.3px; }
+.info-strip { display:flex; justify-content:space-between; gap:8px; margin-bottom:12px; padding:9px 14px; background:#eef2ff; border-radius:6px; border:1px solid #c7d2fe; flex-wrap:wrap; }
 .info-strip .item { font-size:11px; }
-.info-strip .item .lbl { color:#64748b; text-transform:uppercase; font-weight:700; font-size:9px; letter-spacing:0.5px; display:block; }
-.info-strip .item .val { color:#0a0f1c; font-weight:800; font-size:12.5px; }
-.info-table { width:100%; border-collapse:collapse; margin:10px 0; border:2px solid #4f46e5; }
-.info-table td { padding:8px 12px; border:1px solid #cbd5e1; font-size:11.5px; }
-.info-table .lbl { background:#eef2ff; font-weight:800; width:16%; color:#4f46e5; text-transform:uppercase; font-size:10px; }
-.summary-box { border:3px solid #a855f7; border-radius:10px; padding:12px 18px; margin:12px 0; background:#faf5ff; display:flex; justify-content:space-around; gap:16px; flex-wrap:wrap; }
+.info-strip .item .lbl { color:#64748b; text-transform:uppercase; font-weight:700; font-size:8.5px; letter-spacing:0.5px; display:block; }
+.info-strip .item .val { color:#0b1220; font-weight:800; font-size:12px; }
+.info-table { width:100%; border-collapse:collapse; margin:10px 0; border:1.5px solid #4f46e5; }
+.info-table td { padding:7px 12px; border:1px solid #cbd5e1; font-size:11.5px; }
+.info-table .lbl { background:#eef2ff; font-weight:800; width:16%; color:#3730a3; text-transform:uppercase; font-size:9.5px; }
+.summary-box { border:1.5px solid #a855f7; border-radius:8px; padding:11px 18px; margin:12px 0; background:#faf5ff; display:flex; justify-content:space-around; gap:14px; flex-wrap:wrap; }
 .summary-item { text-align:center; }
-.summary-item .lbl { font-size:9px; text-transform:uppercase; color:#64748b; font-weight:700; letter-spacing:0.6px; margin-bottom:3px; }
-.summary-item .value { font-size:20px; font-weight:900; color:#4f46e5; font-family:Georgia,serif; }
-.summary-item .value.co { color:#a855f7; }
-.summary-item .value.am { color:#d97706; }
-.marks-table { width:100%; border-collapse:collapse; margin:8px 0; border:2px solid #4f46e5; }
-.marks-table th { background:#4f46e5; color:#fff; padding:9px 8px; font-size:10px; text-transform:uppercase; letter-spacing:0.6px; text-align:center; font-weight:800; }
-.marks-table th:first-child { width:38px; }
-.marks-table td { padding:8px 10px; border:1px solid #cbd5e1; font-size:11.5px; }
+.summary-item .lbl { font-size:8.5px; text-transform:uppercase; color:#64748b; font-weight:700; letter-spacing:0.6px; margin-bottom:3px; }
+.summary-item .value { font-size:19px; font-weight:900; color:#3730a3; font-family:Georgia,serif; }
+.summary-item .value.co { color:#7c3aed; }
+.summary-item .value.am { color:#b45309; }
+.marks-table { width:100%; border-collapse:collapse; margin:8px 0; border:1.5px solid #4f46e5; }
+.marks-table th { background:#3730a3; color:#fff; padding:8px 8px; font-size:9.5px; text-transform:uppercase; letter-spacing:0.5px; text-align:center; font-weight:800; }
+.marks-table th:first-child { width:32px; }
+.marks-table td { padding:7px 10px; border:1px solid #cbd5e1; font-size:11px; }
 .marks-table td:nth-child(n+3) { text-align:center; font-weight:700; }
-.marks-table .subj-name { font-weight:600; color:#0a0f1c; }
-.marks-table .pass { color:#16a34a; font-weight:800; }
-.marks-table .fail { color:#dc2626; font-weight:800; }
-.marks-table tfoot td { background:#eef2ff; font-weight:900; font-size:12.5px; padding:10px; border-top:2px solid #6366f1; color:#4f46e5; }
-.overall-box { padding:14px 20px; border-radius:10px; margin:12px 0; color:#fff; display:flex; align-items:center; gap:14px; box-shadow:0 8px 20px rgba(0,0,0,0.12); }
-.overall-box.pass { background:linear-gradient(135deg, #16a34a, #22c55e); }
-.overall-box.fail { background:linear-gradient(135deg, #dc2626, #ef4444); }
-.overall-box.compartment { background:linear-gradient(135deg, #d97706, #f59e0b); }
-.overall-box .ob-icon { width:50px; height:50px; background:rgba(255,255,255,0.22); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+.marks-table .subj-name { font-weight:600; color:#0b1220; }
+.marks-table .pass { color:#15803d; font-weight:800; }
+.marks-table .fail { color:#b91c1c; font-weight:800; }
+.marks-table tfoot td { background:#eef2ff; font-weight:900; font-size:11.5px; padding:8px 10px; border-top:2px solid #4f46e5; color:#3730a3; }
+.overall-box { padding:12px 20px; border-radius:8px; margin:12px 0; color:#fff; display:flex; align-items:center; gap:14px; }
+.overall-box.pass { background:linear-gradient(135deg, #15803d, #16a34a); }
+.overall-box.fail { background:linear-gradient(135deg, #b91c1c, #dc2626); }
+.overall-box.compartment { background:linear-gradient(135deg, #b45309, #d97706); }
+.overall-box .ob-icon { width:42px; height:42px; background:rgba(255,255,255,0.22); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
 .overall-box .ob-body { flex:1; }
-.overall-box .ob-label { font-size:10px; opacity:0.9; text-transform:uppercase; letter-spacing:1px; font-weight:700; }
-.overall-box .ob-status { font-size:20px; font-weight:900; font-family:Georgia,serif; letter-spacing:0.5px; }
-.remarks-box { background:#eff6ff; border-left:4px solid #3b82f6; border-radius:8px; padding:12px 16px; margin:12px 0; font-size:11.5px; color:#1e40af; }
-.exam-section { margin:16px 0; padding:14px 16px; background:#f8fafc; border-radius:10px; border-left:4px solid #6366f1; page-break-inside:avoid; }
-.exam-section-title { font-size:13px; font-weight:900; color:#4f46e5; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:10px; padding-bottom:6px; border-bottom:1px dashed #cbd5e1; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
-.exam-section-title .exam-pill { background:#4f46e5; color:#fff; padding:4px 14px; border-radius:20px; font-size:10px; font-weight:800; letter-spacing:0.5px; }
-.exam-section-title .status-pill { padding:4px 14px; border-radius:20px; font-size:10px; font-weight:900; letter-spacing:0.5px; text-transform:uppercase; }
-.exam-section-title .status-pill.pass { background:#dcfce7; color:#16a34a; }
-.exam-section-title .status-pill.fail { background:#fee2e2; color:#dc2626; }
-.exam-section-title .status-pill.compartment { background:#fef3c7; color:#d97706; }
-.sub-total-row { background:#eef2ff; font-weight:900; font-size:12px; padding:9px 10px; border-top:2px solid #6366f1; color:#4f46e5; }
-.signature-area { display:flex; justify-content:space-between; margin-top:44px; padding-top:16px; border-top:2px dashed #cbd5e1; flex-wrap:wrap; gap:16px; }
-.sig-box { text-align:center; font-size:10.5px; width:200px; }
-.sig-box .sig-line { width:150px; border-bottom:2px solid #4f46e5; margin:0 auto 6px; height:36px; }
-.sig-box strong { display:block; color:#4f46e5; font-size:12px; font-weight:800; }
-.sig-box small { display:block; color:#64748b; font-size:10px; margin-top:2px; }
-.footer-note { text-align:center; padding-top:10px; border-top:2px solid #a855f7; font-size:9px; color:#64748b; margin-top:16px; letter-spacing:0.5px; }
+.overall-box .ob-label { font-size:9px; opacity:0.9; text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+.overall-box .ob-status { font-size:18px; font-weight:900; font-family:Georgia,serif; letter-spacing:0.5px; }
+.remarks-box { background:#eff6ff; border-left:3px solid #3b82f6; border-radius:6px; padding:10px 14px; margin:12px 0; font-size:11px; color:#1e40af; }
+.exam-section { margin:14px 0; padding:12px 14px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0; border-left:3px solid #4f46e5; page-break-inside:avoid; }
+.exam-section-title { font-size:12px; font-weight:900; color:#3730a3; text-transform:uppercase; letter-spacing:1.2px; margin-bottom:9px; padding-bottom:6px; border-bottom:1px dashed #cbd5e1; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:7px; }
+.exam-section-title .exam-pill { background:#4f46e5; color:#fff; padding:3px 12px; border-radius:20px; font-size:9px; font-weight:800; letter-spacing:0.5px; }
+.exam-section-title .status-pill { padding:3px 12px; border-radius:20px; font-size:9px; font-weight:900; letter-spacing:0.5px; text-transform:uppercase; }
+.exam-section-title .status-pill.pass { background:#dcfce7; color:#15803d; }
+.exam-section-title .status-pill.fail { background:#fee2e2; color:#b91c1c; }
+.exam-section-title .status-pill.compartment { background:#fef3c7; color:#b45309; }
+.sub-total-row { background:#eef2ff; font-weight:900; font-size:11px; padding:8px 10px; border-top:2px solid #4f46e5; color:#3730a3; }
+.verify-strip { display:flex; align-items:center; gap:14px; margin:14px 0 4px; padding:10px 16px; border:1px solid #c7d2fe; background:#f8fafc; border-radius:8px; }
+.verify-strip .qr { width:66px; height:66px; flex-shrink:0; border:1px solid #c7d2fe; border-radius:4px; background:#fff; padding:3px; }
+.verify-strip .qr img { width:100%; height:100%; }
+.verify-strip .vt { flex:1; font-size:10px; color:#475569; line-height:1.6; }
+.verify-strip .vt strong { color:#3730a3; font-size:11.5px; display:block; margin-bottom:2px; }
+.signature-area { display:flex; justify-content:space-between; margin-top:30px; padding-top:14px; border-top:1.5px dashed #cbd5e1; flex-wrap:wrap; gap:14px; }
+.sig-box { text-align:center; font-size:10px; width:190px; }
+.sig-box .sig-line { width:150px; border-bottom:1.5px solid #3730a3; margin:0 auto 6px; height:32px; }
+.sig-box strong { display:block; color:#3730a3; font-size:11.5px; font-weight:800; }
+.sig-box small { display:block; color:#64748b; font-size:9.5px; margin-top:2px; }
+.footer-note { text-align:center; padding-top:9px; border-top:1px solid #c7d2fe; font-size:8.5px; color:#94a3b8; margin-top:14px; letter-spacing:0.4px; }
 @media print {
+  body { background:#fff; }
+  .sheet { border:none; box-shadow:none; margin:0; }
   .watermark { display:block !important; }
   .exam-section { page-break-inside:avoid; }
 }
 </style></head>
 <body>
+<div class="sheet">
+<div class="border-frame"></div>
+<div class="page">
 <div class="watermark"></div>
-<div class="page"><div class="content">
+<div class="content">
   <div class="header">
     <img src="logo(1).png" class="logo" onerror="this.style.display='none'">
-    <div class="school-name">Govt. Sr. Sec. School Shilla</div>
-    <div class="school-tagline">Shilla • Nerwa • District Shimla • Himachal Pradesh - 171210</div>
-    <div class="title-box">Official Marksheet</div>
+    <div class="htxt">
+      <div class="school-name">Govt. Sr. Sec. School Shilla</div>
+      <div class="school-tagline">Shilla • Nerwa • District Shimla • Himachal Pradesh - 171210</div>
+      <div class="udise">Affiliated to HP Board of School Education, Dharamshala</div>
+    </div>
+    <img src="logo(1).png" class="logo" style="opacity:0;visibility:hidden;" aria-hidden="true">
+  </div>
+
+  <div class="title-strip"><span class="title-box">Statement of Marks</span></div>
+  <div class="doc-id-strip">
+    <span>Document ID: <strong>${esc(docId)}</strong></span>
+    <span>Issued: ${new Date().toLocaleDateString("en-IN", {day:"2-digit",month:"short",year:"numeric"})}</span>
   </div>
 
   <div class="info-strip">
@@ -3223,15 +3287,25 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#0a0f1c; font-size:12px
     </div>
   ` : ''}
 
+  <div class="verify-strip">
+    <div class="qr">${qr ? `<img src="${qr}">` : ''}</div>
+    <div class="vt">
+      <strong>Scan to verify authenticity</strong>
+      This document is issued by Govt. Sr. Sec. School Shilla and can be verified online using the QR code above. Any unauthorized alteration renders this document invalid.
+    </div>
+  </div>
+
   <div class="signature-area">
     <div class="sig-box"><div class="sig-line"></div><strong>Class Teacher</strong><small>Authorized Signatory</small></div>
     <div class="sig-box"><div class="sig-line"></div><strong>Principal</strong><small>Govt. Sr. Sec. School Shilla</small></div>
   </div>
 
   <div class="footer-note">
-    This is a computer-generated document · Printed on ${new Date().toLocaleDateString("en-IN", {day:"2-digit",month:"short",year:"numeric"})} · Document ID: GSSS-${esc(s.student_id)}-${Date.now().toString(36).toUpperCase()}
+    This is a computer-generated document and does not require a physical signature to be considered valid when issued digitally · Document ID: ${esc(docId)}
   </div>
-</div></div>
+</div>
+</div>
+</div>
 <script>window.onload = function() { setTimeout(function() { window.print(); }, 800); };<\/script>
 </body></html>`);
   pw.document.close();
