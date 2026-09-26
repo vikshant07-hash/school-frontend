@@ -1424,7 +1424,8 @@ body {
   .rci-act { flex-direction: column; }
   .rci-btn { width: 100%; justify-content: center; }
 }
-  /* ==================== SECURITY PIN SECTION ==================== */
+
+/* ==================== SECURITY PIN SECTION ==================== */
 .pin-hero {
   display: flex; align-items: flex-start; gap: 18px;
   padding: 22px; margin-bottom: 22px;
@@ -1449,8 +1450,6 @@ body {
   font-size: 13px; color: var(--text-secondary);
   line-height: 1.65;
 }
-
-/* Alerts */
 .pin-alert {
   display: flex; align-items: flex-start; gap: 14px;
   padding: 16px 20px;
@@ -1478,8 +1477,6 @@ body {
   color: #fca5a5;
 }
 .pin-alert-err i { color: var(--danger); }
-
-/* Meta grid */
 .pin-meta-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -1502,8 +1499,6 @@ body {
   color: var(--cyan-light);
 }
 .pin-val-ok { color: var(--success); }
-
-/* Form */
 .pin-form-wrap {
   background: var(--bg-elevated);
   border: 1.5px solid var(--border);
@@ -1571,7 +1566,6 @@ body {
   transition: all 0.2s var(--ease);
 }
 .pin-toggle:hover { color: var(--cyan-light); background: rgba(6,182,212,0.1); }
-
 .pin-btn {
   padding: 15px 26px;
   border: none; border-radius: 13px;
@@ -1599,7 +1593,6 @@ body {
   border: 1.5px solid var(--border);
 }
 .pin-btn-secondary:hover { background: var(--bg-glass); color: var(--cyan-light); }
-
 .pin-note {
   display: flex; align-items: flex-start; gap: 10px;
   padding: 14px 16px;
@@ -1673,8 +1666,8 @@ body {
       <i class="fas fa-file-alt"></i> Documents
     </button>
     <button class="nv" data-section="pin" onclick="switchSection('pin')">
-  <i class="fas fa-lock"></i> Security PIN
-  <span class="bdg hidden" id="sidebarPinBadge">!</span>
+      <i class="fas fa-lock"></i> Security PIN
+      <span class="bdg hidden" id="sidebarPinBadge">!</span>
     </button>
   </nav>
 
@@ -1892,20 +1885,21 @@ body {
       <div class="sec-bd"><div class="doc-grid" id="documentsGrid"></div></div>
     </div>
   </div>
+
   <!-- SECURITY PIN -->
-<div class="sec" id="section-pin">
-  <div class="sec-card">
-    <div class="sec-hd">
-      <h2><i class="fas fa-lock"></i> Security PIN</h2>
-      <span class="sb" id="pinStatusSubtitle">Manage your 6-digit login PIN</span>
-    </div>
-    <div class="sec-bd" id="pinSectionContent">
-      <div style="text-align:center;padding:32px;color:var(--text-muted);">
-        <i class="fas fa-spinner fa-spin"></i> Loading PIN status…
+  <div class="sec" id="section-pin">
+    <div class="sec-card">
+      <div class="sec-hd">
+        <h2><i class="fas fa-lock"></i> Security PIN</h2>
+        <span class="sb" id="pinStatusSubtitle">Manage your 6-digit login PIN</span>
+      </div>
+      <div class="sec-bd" id="pinSectionContent">
+        <div style="text-align:center;padding:32px;color:var(--text-muted);">
+          <i class="fas fa-spinner fa-spin"></i> Loading PIN status…
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 </div>
 
@@ -2018,6 +2012,7 @@ let resultExpanded = false;
 // DEMO DATA
 // ============================================================
 const DEMO_STUDENT = {
+  id: 1,
   student_id: "GSSS2026001",
   name: "Aarav Sharma",
   father_name: "Rajesh Sharma",
@@ -2245,6 +2240,7 @@ function switchSection(sectionId) {
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (sectionId === "results") renderResultsSection();
   if (sectionId === "quizzes") renderQuizzesSection();
+  if (sectionId === "pin") loadPinStatus();
 }
 
 function toggleResultMain(event) {
@@ -2661,7 +2657,6 @@ function generateMarksheetPrint(student, marksheets, summary) {
   const pw = window.open("", "_blank", "width=1100,height=850");
   if (!pw) return alert("Popup blocked! Please allow popups.");
 
-  // Har marksheet ka subject-wise table alag
   const marksheetsWithSubjects = marksheets.map(m => {
     let subjects = m.subjects || [];
     if (typeof subjects === "string") {
@@ -2781,7 +2776,6 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#0a0f1c; font-size:12px
     const subjList = m.subjects || [];
 
     if (subjList.length === 0) {
-      // Agar subjects nahi hain to simple row
       return `
         <div class="exam-section">
           <div class="exam-section-title">
@@ -2807,7 +2801,6 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#0a0f1c; font-size:12px
       `;
     }
 
-    // Subject-wise detailed table
     const totalSubObt = subjList.reduce((s, x) => s + (parseInt(x.obtained) || 0), 0);
     const totalSubMax = subjList.reduce((s, x) => s + (parseInt(x.max) || 0), 0);
     const subTotalPct = totalSubMax > 0 ? ((totalSubObt / totalSubMax) * 100).toFixed(2) : "0.00";
@@ -3320,59 +3313,49 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#0a0f1c; font-size:13px
 }
 
 // ============================================================
-// MODAL CLOSE
-// ============================================================
-document.addEventListener("click", (e) => {
-  if (e.target.id === "quizModal") closeQuizModal();
-});
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") { closeQuizModal(); closeLogoutModal(); }
-});
-
-// ============================================================
-// SESSION TIMEOUT
-// ============================================================
-setInterval(() => {
-  try {
-    const loginTime = parseInt(sessionStorage.getItem("studentLoginTime") || "0");
-    const elapsed = Date.now() - loginTime;
-    if (elapsed > 30 * 60 * 1000) {
-      alert("Session expired. Please login again.");
-      confirmLogout();
-    }
-  } catch (e) {}
-}, 60000);
-
-
-  // ============================================================
 // SECURITY PIN SECTION
 // ============================================================
 const PIN_API = "https://gsssshilla.onrender.com/api/students";
 let pinStatus = null;
 
 async function loadPinStatus() {
-  if (!student || !student.id) {
+  // ✅ FIX: use id or student_id
+  const sid = student?.id || student?.student_id;
+
+  if (!sid) {
     document.getElementById("pinSectionContent").innerHTML =
       `<div class="empty-msg">
          <i class="fas fa-exclamation-triangle"></i>
          <h4>Student ID Missing</h4>
-         <p>Cannot load PIN status without student ID.</p>
+         <p>Session invalid. Please <a href="student-login.html" style="color:var(--cyan-light);">login again</a>.</p>
        </div>`;
     return;
   }
+
+  document.getElementById("pinSectionContent").innerHTML =
+    `<div style="text-align:center;padding:32px;color:var(--text-muted);">
+       <i class="fas fa-spinner fa-spin"></i> Loading PIN status…
+     </div>`;
+
   try {
-    const res = await fetch(`${PIN_API}/pin/status/${student.id}`);
+    const res = await fetch(`${PIN_API}/pin/status/${encodeURIComponent(sid)}`);
     const data = await res.json();
-    if (!data.success) throw new Error(data.message || "Failed to load PIN");
+
+    if (!data.success) {
+      throw new Error(data.message || "Failed to load PIN status");
+    }
+
     pinStatus = data;
     renderPinSection(data);
   } catch (err) {
+    console.error("PIN load error:", err);
     document.getElementById("pinSectionContent").innerHTML =
       `<div class="empty-msg">
          <i class="fas fa-exclamation-triangle"></i>
          <h4>Unable to Load PIN Status</h4>
-         <p>${esc(err.message)}</p>
-         <button class="rci-btn rci-btn-v" style="margin-top:14px;" onclick="loadPinStatus()">
+         <p style="margin-bottom:14px;">${esc(err.message)}</p>
+         <button class="pin-btn pin-btn-secondary" onclick="loadPinStatus()"
+                 style="max-width:220px;margin:0 auto;">
            <i class="fas fa-rotate"></i> Retry
          </button>
        </div>`;
@@ -3384,7 +3367,6 @@ function renderPinSection(p) {
   const container = document.getElementById("pinSectionContent");
   const sidebarBadge = document.getElementById("sidebarPinBadge");
 
-  // ---- Update subtitle + sidebar badge ----
   if (!p.hasPin) {
     subtitle.textContent = "No PIN set — create one to secure your account";
     if (sidebarBadge) {
@@ -3408,7 +3390,6 @@ function renderPinSection(p) {
     if (sidebarBadge) sidebarBadge.classList.add("hidden");
   }
 
-  // ---- CASE 1: No PIN → show CREATE form ----
   if (!p.hasPin) {
     container.innerHTML = `
       <div class="pin-hero">
@@ -3452,7 +3433,6 @@ function renderPinSection(p) {
     return;
   }
 
-  // ---- CASE 2: Locked ----
   if (p.locked) {
     const mins = Math.ceil((new Date(p.lockedUntil) - new Date()) / 60000);
     container.innerHTML = `
@@ -3470,7 +3450,6 @@ function renderPinSection(p) {
     return;
   }
 
-  // ---- CASE 3: Has PIN → show CHANGE form ----
   const lastChanged = p.lastChangedAt ? new Date(p.lastChangedAt).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" }) : "—";
   const needsBanner = p.needsChange ? `
     <div class="pin-alert pin-alert-warn">
@@ -3596,11 +3575,14 @@ async function createPin() {
   const btn = document.querySelector("#pinSectionContent .pin-btn-primary");
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating…'; }
 
+  // ✅ FIX: id or student_id
+  const sid = student?.id || student?.student_id;
+
   try {
     const res = await fetch(`${PIN_API}/pin/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ studentId: student.id, pin: newPin, confirmPin })
+      body: JSON.stringify({ studentId: sid, pin: newPin, confirmPin })
     });
     const data = await res.json();
     if (!res.ok || !data.success) throw new Error(data.message || "Failed to create PIN");
@@ -3625,11 +3607,14 @@ async function changePin() {
   const btn = document.getElementById("changePinBtn");
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating…'; }
 
+  // ✅ FIX: id or student_id
+  const sid = student?.id || student?.student_id;
+
   try {
     const res = await fetch(`${PIN_API}/pin/change`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ studentId: student.id, oldPin, newPin, confirmPin })
+      body: JSON.stringify({ studentId: sid, oldPin, newPin, confirmPin })
     });
     const data = await res.json();
     if (!res.ok || !data.success) throw new Error(data.message || "Failed to change PIN");
@@ -3640,6 +3625,30 @@ async function changePin() {
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-rotate"></i> Change PIN'; }
   }
 }
+
+// ============================================================
+// MODAL CLOSE
+// ============================================================
+document.addEventListener("click", (e) => {
+  if (e.target.id === "quizModal") closeQuizModal();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") { closeQuizModal(); closeLogoutModal(); }
+});
+
+// ============================================================
+// SESSION TIMEOUT
+// ============================================================
+setInterval(() => {
+  try {
+    const loginTime = parseInt(sessionStorage.getItem("studentLoginTime") || "0");
+    const elapsed = Date.now() - loginTime;
+    if (elapsed > 30 * 60 * 1000) {
+      alert("Session expired. Please login again.");
+      confirmLogout();
+    }
+  } catch (e) {}
+}, 60000);
 
 // ============================================================
 // INIT
@@ -3669,6 +3678,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   ]);
   await loadMyQuizzes();
   await loadMyResults();
+  await loadPinStatus(); // ✅ ADDED
 });
 </script>
 </body>
