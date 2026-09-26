@@ -9,8 +9,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
-
 <style>
 :root {
     --primary-1: #5b6bc0;
@@ -277,7 +275,6 @@ body {
     80% { transform: translateX(4px);}
 }
 
-/* ===== CAPTCHA BOX ===== */
 .cap-row { display: flex; gap: clamp(10px, 2vw, 12px); }
 
 .cap-box {
@@ -338,18 +335,6 @@ body {
     margin-top: 10px; text-transform: uppercase;
     letter-spacing: clamp(4px, 1.2vw, 6px); font-weight: 700; text-align: center;
     font-size: 16px; padding-left: 16px; font-family: var(--font-display);
-}
-
-/* ===== reCAPTCHA wrapper ===== */
-.recap-wrap {
-    display: flex; justify-content: center; align-items: center;
-    padding: 6px 0 2px;
-    margin-bottom: clamp(10px, 2vw, 14px);
-    transform-origin: center;
-}
-
-@media (max-width: 400px) {
-    .recap-wrap { transform: scale(0.88); }
 }
 
 .btn {
@@ -577,9 +562,6 @@ body {
                    inputmode="text">
         </div>
 
-        <!-- ===== GOOGLE reCAPTCHA ===== -->
-        
-
         <button type="submit" class="btn" id="btn">
             <span class="spinner"></span>
             <i class="fas fa-arrow-right-to-bracket btn-ic"></i>
@@ -733,8 +715,8 @@ body {
             return false;
         }
 
-        /* Google reCAPTCHA check */
-        
+        return true;
+    }
 
     function setLoading(on) {
         btn.disabled = on;
@@ -753,9 +735,7 @@ body {
 
         const payload = {
             email:     email.value.trim(),
-            studentId: sid.value.trim(),
-            recaptchaToken: (typeof grecaptcha !== 'undefined')
-                ? grecaptcha.getResponse() : ''
+            studentId: sid.value.trim()
         };
 
         try {
@@ -793,7 +773,6 @@ body {
             hideLoader();
             setLoading(false);
             refreshCap(true);
-            if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
 
             let title = 'Login Failed';
             let msg = err.message;
