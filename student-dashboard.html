@@ -3417,44 +3417,100 @@ function closeQuizModal() { document.getElementById("quizModal").classList.remov
 // ============================================================
 // ADMIT CARD & BONAFIDE
 // ============================================================
+
 async function checkAdmitCardStatus() {
-  if (!student || !student.student_id) return;
+  if (!student || !student.student_id) {
+    console.warn("❌ Admit card: student_id missing");
+    document.getElementById("admitCardCard").style.display = "none";
+    document.getElementById("admitCardLocked").style.display = "flex";
+    return;
+  }
+
   const card = document.getElementById("admitCardCard");
   const locked = document.getElementById("admitCardLocked");
 
   try {
-    const res = await fetch(`${ADMITCARD_API}/student/${encodeURIComponent(student.student_id)}`);
-    const data = await res.json();
+    const url = `${ADMITCARD_API}/student/${encodeURIComponent(student.student_id)}/list`;
+    console.log("🔍 Checking admit cards:", url);
 
-    // Handle multiple response shapes
-    let isEnabled = false;
-    if (data) {
-      if (data.success && data.data && data.data.is_enabled) isEnabled = true;
-      else if (data.success && data.is_enabled) isEnabled = true;
-      else if (data.is_enabled) isEnabled = true;
-      else if (data.enabled) isEnabled = true;
-      else if (data.data && data.data.enabled) isEnabled = true;
-    }
+    const res = await fetch(url);
+    const data = await res.json();
+    console.log("📦 Admit card response:", data);
+
+    const list = Array.isArray(data?.data) ? data.data : [];
+    const isEnabled = data?.success === true && list.length > 0;
+
+    console.log("✅ Admit cards available:", list.length);
 
     if (isEnabled) {
       card.style.display = "flex";
       locked.style.display = "none";
+
+      card.dataset.publishId = list[0].publish_id;
+      card.dataset.count = list.length;
+
+      const titleEl = card.querySelector(".dl-tt");
+      if (titleEl) {
+        titleEl.textContent = list.length > 1
+          ? `Admit Cards (${list.length})`
+          : `Admit Card — ${list[0].examination_type}`;
+      }
+      const descEl = card.querySelector(".dl-ds");
+      if (descEl) {
+        descEl.textContent = `${list[0].examination_type} · ${list[0].exam_session || ""}`;
+      }
     } else {
       card.style.display = "none";
       locked.style.display = "flex";
     }
   } catch (e) {
-    console.warn("Admit card check failed:", e.message);
+    console.error("❌ Admit card check failed:", e);
     card.style.display = "none";
     locked.style.display = "flex";
   }
 }
 
-function downloadAdmitCard() {
-  if (!student || !student.student_id) return;
-  const url = `${ADMITCARD_API}/student/${encodeURIComponent(student.student_id)}/pdf?v=${Date.now()}`;
-  window.open(url, "_blank");
-  showToast("Opening admit card…", "info");
+
+  
+
+
+async function downloadAdmitCard() {
+  if (!student || !student.student_id) {
+    return showToast("Student ID missing", "error");
+  }
+
+  try {
+    const res = await fetch(
+      `${ADMITCARD_API}/student/${encodeURIComponent(student.student_id)}/list`
+    );
+    const data = await res.json();
+    const list = Array.isArray(data?.data) ? data.data : [];
+
+    if (!list.length) {
+      return showToast("No admit card available", "error");
+    }
+
+    if (list.length === 1) {
+      const url = `${ADMITCARD_API}/student/${student.student_id}/pdf/${list[0].publish_id}?v=${Date.now()}`;
+      window.open(url, "_blank");
+      showToast("Opening admit card…", "info");
+      return;
+    }
+
+    const choice = prompt(
+      "Multiple admit cards available. Enter number:\n\n" +
+      list.map((a, i) => `${i + 1}. ${a.examination_type} (${a.exam_session})`).join("\n")
+    );
+    const idx = parseInt(choice) - 1;
+    if (isNaN(idx) || !list[idx]) return;
+
+    const url = `${ADMITCARD_API}/student/${student.student_id}/pdf/${list[idx].publish_id}?v=${Date.now()}`;
+    window.open(url, "_blank");
+    showToast("Opening admit card…", "info");
+  } catch (err) {
+    console.error("Download error:", err);
+    showToast("Failed to open admit card", "error");
+  }
 }
 
 async function checkBonafideStatus() {
