@@ -1,1438 +1,1877 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Exam Results - GSSS Shilla</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <style>
-        :root {
-            --primary: #0d1b2a; --primary-light: #1b3a5c; --secondary: #2d5a8a;
-            --accent: #e8b84b; --accent-light: #f5d78a; --accent-dark: #c9972b;
-            --white: #ffffff; --off-white: #f0f4f8; --gray-light: #e2e8f0;
-            --gray: #94a3b8; --text: #1a2332; --text-light: #5a6a7e;
-            --success: #16a34a; --success-light: #dcfce7;
-            --danger: #dc2626; --danger-light: #fee2e2;
-            --warning: #f59e0b; --warning-light: #fef3c7;
-            --info: #1a56db; --info-light: #dbeafe;
-            --shadow-sm: 0 4px 20px rgba(0,0,0,0.04);
-            --shadow-md: 0 8px 40px rgba(0,0,0,0.08);
-            --shadow-lg: 0 20px 60px rgba(0,0,0,0.12);
-            --radius: 20px; --radius-sm: 12px;
-            --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Inter', sans-serif; background: var(--off-white); color: var(--text);
-            overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
-            padding-top: 70px;
-        }
-        a { text-decoration: none; color: inherit; }
-        ul { list-style: none; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Exam Results - GSSS Shilla</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="shortcut icon" href="logo.png" type="image/x-icon">
+<style>
+/* ============================================================
+   LIGHT MODE (DEFAULT) — Cream + Deep Maroon + Neumorphic
+============================================================ */
+:root,
+[data-theme="light"] {
+  --bg: #ede8e1;
+  --bg-2: #f1ece6;
+  --surface: #f6f2ec;
 
-        /* ===== NAVBAR ===== */
-        .navbar {
-            position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 60px; height: 70px; background: var(--white);
-            border-bottom: 1px solid var(--gray-light); transition: var(--transition);
-        }
-        .navbar.scrolled { box-shadow: var(--shadow-sm); }
-        .logo { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-        .logo img { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; padding: 2px; background: var(--white); }
-        .logo-text .school-name { display: block; font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 800; color: var(--primary); line-height: 1.15; }
-        .logo-text .school-name span { color: var(--accent-dark); }
-        .logo-text .school-tagline { display: block; font-size: 9px; color: var(--gray); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; }
-        .nav-links { display: flex; align-items: center; gap: 4px; }
-        .nav-links > li > a { color: var(--text-light); font-size: 14px; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: var(--transition); display: flex; align-items: center; gap: 4px; }
-        .nav-links > li > a:hover { color: var(--primary); background: var(--off-white); }
-        .nav-links > li > a.active { color: var(--accent-dark); background: #fef8ed; }
-        .nav-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-        .login-btn { display: flex; align-items: center; gap: 8px; padding: 8px 20px; border: none; border-radius: 50px; background: var(--accent); color: var(--white); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: 'Inter', sans-serif; }
-        .login-btn:hover { background: var(--accent-dark); transform: translateY(-2px); }
-        .login-dropdown { position: relative; }
-        .login-dropdown-menu { position: absolute; top: calc(100% + 10px); right: 0; width: 200px; background: var(--white); border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow-lg); border: 1px solid var(--gray-light); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: var(--transition); }
-        .login-dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
-        .login-dropdown-menu a { display: flex; align-items: center; gap: 10px; padding: 12px 18px; font-size: 13px; font-weight: 500; color: var(--text); border-bottom: 1px solid var(--gray-light); transition: var(--transition); }
-        .login-dropdown-menu a:last-child { border-bottom: none; }
-        .login-dropdown-menu a:hover { background: var(--off-white); color: var(--accent-dark); }
-        .menu-toggle { display: none; flex-direction: column; gap: 5px; width: 40px; height: 40px; background: none; border: none; cursor: pointer; padding: 8px; }
-        .menu-toggle .bar { display: block; width: 22px; height: 2px; background: var(--primary); transition: var(--transition); border-radius: 50px; }
+  --t-hi: #1f0a0a;
+  --t-mid: #5c4646;
+  --t-lo: #9a8484;
 
-        /* ===== PAGE HEADER ===== */
-        .page-header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); padding: 50px 20px 40px; text-align: center; border-bottom: 3px solid var(--accent); position: relative; overflow: hidden; }
-        .page-header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 50%, rgba(232, 184, 75, 0.05), transparent 60%); }
-        .page-header h1 { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 800; color: var(--white); position: relative; z-index: 1; }
-        .page-header h1 i { color: var(--accent-light); }
-        .page-header p { color: rgba(255, 255, 255, 0.5); margin-top: 8px; font-size: 15px; position: relative; z-index: 1; }
+  --primary: #6b1414;
+  --primary-d: #4a0d0d;
+  --primary-l: #8b1a1a;
+  --primary-xl: #b83232;
 
-        /* ===== CONTAINER ===== */
-        .container { max-width: 1100px; margin: 0 auto; padding: 30px 20px 60px; flex: 1; width: 100%; }
+  --accent: #8b1a1a;
+  --accent-d: #6b1414;
+  --accent-l: #a83232;
+  --accent-xl: #d16b6b;
+  --accent-light: #c96060;
 
-        /* ===== NEW RESULT NOTIFICATION ===== */
-        .new-result-notification {
-            background: linear-gradient(135deg, #16a34a, #059669);
-            color: #fff;
-            padding: 18px 24px;
-            border-radius: var(--radius-sm);
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            box-shadow: 0 8px 30px rgba(22, 163, 74, 0.3);
-            animation: slideDown 0.5s ease, pulse 2s ease infinite;
-            position: relative;
-            overflow: hidden;
-        }
-        .new-result-notification::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            animation: shimmer 2.5s infinite;
-        }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 8px 30px rgba(22, 163, 74, 0.3); }
-            50% { box-shadow: 0 8px 40px rgba(22, 163, 74, 0.5); }
-        }
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        .new-result-notification .nr-icon {
-            width: 50px; height: 50px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px;
-            flex-shrink: 0;
-            animation: shake 1.5s infinite;
-        }
-        @keyframes shake {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-10deg); }
-            75% { transform: rotate(10deg); }
-        }
-        .new-result-notification .nr-body { flex: 1; position: relative; z-index: 1; }
-        .new-result-notification .nr-title {
-            font-size: 16px; font-weight: 800;
-            margin-bottom: 4px;
-            display: flex; align-items: center; gap: 8px;
-            flex-wrap: wrap;
-        }
-        .new-result-notification .nr-title .new-pill {
-            background: #fff; color: #16a34a;
-            padding: 3px 12px; border-radius: 50px;
-            font-size: 10.5px; font-weight: 900;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-        .new-result-notification .nr-desc { font-size: 13px; opacity: 0.9; }
-        .new-result-notification .nr-btn {
-            background: #fff; color: #16a34a;
-            padding: 10px 20px;
-            border: none; border-radius: 10px;
-            font-weight: 700; font-size: 13px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            display: inline-flex; align-items: center; gap: 6px;
-            transition: var(--transition);
-            position: relative; z-index: 1;
-            flex-shrink: 0;
-        }
-        .new-result-notification .nr-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+  --success: #16a34a;
+  --success-light: #dcfce7;
+  --danger: #dc2626;
+  --danger-light: #fee2e2;
+  --warning: #d97706;
+  --warning-light: #fef3c7;
+  --info: #1a56db;
+  --info-light: #dbeafe;
 
-        /* ===== MAIN RESULT CARD (Collapsible) ===== */
-        .main-result-card {
-            background: var(--white);
-            border: 2px solid var(--gray-light);
-            border-radius: var(--radius);
-            padding: 0;
-            margin-bottom: 28px;
-            box-shadow: var(--shadow-sm);
-            overflow: hidden;
-            transition: var(--transition);
-        }
-        .main-result-card:hover { border-color: var(--accent); box-shadow: var(--shadow-md); }
-        .main-result-card.open { border-color: var(--accent); }
-        .mrc-header {
-            padding: 28px 32px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            cursor: pointer;
-            background: linear-gradient(135deg, #fef8ed, #ffffff);
-            transition: var(--transition);
-        }
-        .mrc-header:hover { background: linear-gradient(135deg, #fdf2e0, #fef8ed); }
-        .mrc-icon {
-            width: 68px; height: 68px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-            border-radius: 18px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 32px;
-            color: #fff;
-            flex-shrink: 0;
-            box-shadow: 0 6px 20px rgba(201, 151, 43, 0.35);
-        }
-        .mrc-body { flex: 1; min-width: 0; }
-        .mrc-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 6px;
-            display: flex; align-items: center; gap: 10px;
-            flex-wrap: wrap;
-        }
-        .mrc-title .count-badge {
-            background: var(--accent-light);
-            color: var(--accent-dark);
-            padding: 3px 14px;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 800;
-            font-family: 'Inter', sans-serif;
-        }
-        .mrc-desc { font-size: 14px; color: var(--text-light); line-height: 1.5; }
-        .mrc-arrow {
-            width: 44px; height: 44px;
-            border-radius: 50%;
-            background: var(--accent);
-            color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px;
-            transition: var(--transition);
-            flex-shrink: 0;
-        }
-        .main-result-card.open .mrc-arrow { transform: rotate(180deg); background: var(--accent-dark); }
+  --white: #ffffff;
+  --off-white: #ede8e1;
+  --gray-light: #d5ccc2;
+  --gray: #9a8484;
+  --text: #1f0a0a;
+  --text-light: #5c4646;
 
-        /* ===== EXPANDABLE BODY ===== */
-        .mrc-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            background: var(--off-white);
-        }
-        .main-result-card.open .mrc-content { max-height: 2000px; }
-        .mrc-content-inner { padding: 24px 32px 32px; }
+  --sd: #c8bdb5;
+  --sl: #ffffff;
+  --sd-soft: #d2c8c0;
+  --sl-soft: #fbf7f2;
 
-        /* ===== RESULT CARD (Individual) ===== */
-        .result-card {
-            background: var(--white);
-            border: 1.5px solid var(--gray-light);
-            border-radius: var(--radius-sm);
-            margin-bottom: 16px;
-            overflow: hidden;
-            transition: var(--transition);
-            box-shadow: var(--shadow-sm);
-            position: relative;
-        }
-        .result-card:hover { border-color: var(--accent); box-shadow: var(--shadow-md); transform: translateY(-2px); }
-        .result-card.is-new::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--success), #059669);
-        }
-        .result-card.new-badge::after {
-            content: 'NEW';
-            position: absolute;
-            top: 12px; right: 12px;
-            background: linear-gradient(135deg, #16a34a, #059669);
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 50px;
-            font-size: 10px;
-            font-weight: 900;
-            letter-spacing: 1px;
-            animation: pulse 2s infinite;
-        }
-        .rc-header {
-            padding: 20px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            cursor: pointer;
-            flex-wrap: wrap;
-        }
-        .rc-left {
-            display: flex; align-items: center; gap: 16px;
-            flex: 1; min-width: 200px;
-        }
-        .rc-icon {
-            width: 52px; height: 52px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 22px; color: #fff;
-            flex-shrink: 0;
-        }
-        .rc-title {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 4px;
-        }
-        .rc-meta {
-            display: flex; gap: 12px; flex-wrap: wrap;
-            font-size: 12.5px; color: var(--text-light);
-        }
-        .rc-meta span {
-            display: inline-flex; align-items: center; gap: 5px;
-        }
-        .rc-meta span i { color: var(--accent-dark); }
-        .rc-right {
-            display: flex; align-items: center; gap: 10px;
-            flex-wrap: wrap;
-        }
-        .rc-status-pill {
-            padding: 6px 16px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            display: inline-flex; align-items: center; gap: 5px;
-        }
-        .rc-status-pass { background: #dcfce7; color: #16a34a; border: 1.5px solid #86efac; }
-        .rc-status-fail { background: #fee2e2; color: #dc2626; border: 1.5px solid #fecaca; }
-        .rc-status-compartment { background: #fffbeb; color: #d97706; border: 1.5px solid #fde68a; }
-        .rc-status-supply { background: #fefce8; color: #ca8a04; border: 1.5px solid #fde047; }
-        .rc-status-absent { background: #f1f5f9; color: #64748b; border: 1.5px solid #cbd5e1; }
-        .rc-status-withheld { background: #f5f0ff; color: #a855f7; border: 1.5px solid #e9d5ff; }
-        .rc-chevron {
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            background: var(--off-white);
-            display: flex; align-items: center; justify-content: center;
-            color: var(--text-light);
-            transition: var(--transition);
-            flex-shrink: 0;
-        }
-        .result-card.expanded .rc-chevron { transform: rotate(180deg); background: var(--accent); color: #fff; }
+  --press-xs: inset 2px 2px 5px var(--sd-soft), inset -2px -2px 5px var(--sl-soft);
+  --press-sm: inset 4px 4px 9px var(--sd), inset -4px -4px 9px var(--sl);
+  --press: inset 6px 6px 13px var(--sd), inset -6px -6px 13px var(--sl);
+  --press-lg: inset 9px 9px 20px var(--sd), inset -9px -9px 20px var(--sl);
 
-        /* ===== RESULT CARD DETAILS ===== */
-        .rc-details {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease;
-            border-top: 1px solid var(--gray-light);
-        }
-        .result-card.expanded .rc-details { max-height: 3000px; }
-        .rc-details-inner { padding: 20px 24px; background: var(--off-white); }
+  --raise-xs: 2px 2px 5px var(--sd-soft), -2px -2px 5px var(--sl-soft);
+  --raise-sm: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl);
+  --raise: 6px 6px 13px var(--sd), -6px -6px 13px var(--sl);
+  --raise-lg: 10px 10px 22px var(--sd), -10px -10px 22px var(--sl);
 
-        /* Info Grid */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px 20px;
-            margin-bottom: 18px;
-            padding: 16px;
-            background: var(--white);
-            border-radius: 10px;
-            border: 1px solid var(--gray-light);
-        }
-        .info-item label {
-            font-size: 10px;
-            text-transform: uppercase;
-            color: var(--gray);
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            display: block;
-            margin-bottom: 3px;
-        }
-        .info-item span {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text);
-        }
+  --grad-maroon: linear-gradient(135deg, #a83232 0%, #6b1414 55%, #4a0d0d 100%);
+  --grad-maroon-soft: linear-gradient(135deg, #c96060 0%, #8b1a1a 100%);
 
-        /* Subjects Table */
-        .subjects-table-wrap {
-            margin: 16px 0;
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1.5px solid var(--gray-light);
-            background: var(--white);
-        }
-        .subjects-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-        .subjects-table thead {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-        }
-        .subjects-table th {
-            padding: 12px 14px;
-            text-align: left;
-            color: #fff;
-            font-weight: 700;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .subjects-table th:first-child { width: 50px; text-align: center; }
-        .subjects-table th:nth-child(n+3) { text-align: center; width: 90px; }
-        .subjects-table td {
-            padding: 11px 14px;
-            border-bottom: 1px solid var(--gray-light);
-            color: var(--text);
-        }
-        .subjects-table td:first-child {
-            text-align: center;
-            font-weight: 700;
-            color: var(--text-light);
-            font-size: 12px;
-        }
-        .subjects-table td:nth-child(n+3) { text-align: center; font-weight: 700; }
-        .subjects-table tbody tr:last-child td { border-bottom: none; }
-        .subjects-table tbody tr:hover { background: #fef8ed; }
-        .subjects-table .pass-mark { color: #16a34a; }
-        .subjects-table .fail-mark { color: #dc2626; }
-        .subjects-table .pct-cell { color: var(--accent-dark); font-weight: 800; }
-        .subjects-table tfoot td {
-            background: #fef8ed;
-            font-weight: 800;
-            font-size: 14px;
-            padding: 14px;
-            border-top: 2px solid var(--accent);
-            color: var(--primary);
-        }
+  --radius: 20px;
+  --radius-sm: 12px;
+  --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-        /* Summary Box */
-        .marks-summary-box {
-            border: 2px solid var(--accent);
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin: 16px 0;
-            background: linear-gradient(135deg, #fef8ed, #fdf2e0);
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            flex-wrap: wrap;
-        }
-        .marks-summary-box .summary-item { text-align: center; min-width: 100px; }
-        .marks-summary-box .summary-item .label {
-            font-size: 10px;
-            text-transform: uppercase;
-            color: var(--text-light);
-            letter-spacing: 0.5px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-        .marks-summary-box .summary-item .value {
-            font-size: 22px;
-            font-weight: 900;
-            color: var(--primary);
-            font-family: 'Playfair Display', serif;
-        }
-        .marks-summary-box .summary-item .value.gold { color: var(--accent-dark); }
-        .marks-summary-box .summary-item .value.pass { color: #16a34a; }
-        .marks-summary-box .summary-item .value.fail { color: #dc2626; }
+[data-theme="dark"] {
+  --bg: #1c1c1e;
+  --bg-2: #242426;
+  --surface: #2a2a2c;
 
-        /* Remarks */
-        .remarks-box {
-            padding: 12px 16px;
-            background: #dbeafe;
-            border-left: 4px solid var(--info);
-            border-radius: 8px;
-            font-size: 13px;
-            color: #1e40af;
-            margin: 12px 0;
-            display: flex; align-items: flex-start; gap: 10px;
-        }
-        .remarks-box i { margin-top: 2px; }
+  --t-hi: #f0f0f0;
+  --t-mid: #a0a0a4;
+  --t-lo: #6b6b70;
 
-        /* Action Buttons */
-        .rc-actions {
-            display: flex; gap: 10px; flex-wrap: wrap;
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px dashed var(--gray-light);
-        }
-        .rc-btn {
-            padding: 12px 22px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 13.5px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            display: inline-flex; align-items: center; gap: 8px;
-            transition: var(--transition);
-        }
-        .rc-btn-view {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(13, 27, 42, 0.2);
-        }
-        .rc-btn-view:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(13, 27, 42, 0.3); }
-        .rc-btn-download {
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(201, 151, 43, 0.3);
-        }
-        .rc-btn-download:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(201, 151, 43, 0.4); }
-        .rc-btn-print {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
-        }
-        .rc-btn-print:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4); }
+  --primary: #b8935e;
+  --primary-d: #8b6b4a;
+  --primary-l: #d4af7a;
+  --primary-xl: #e8c890;
 
-        /* ===== SEARCH SECTION ===== */
-        .search-section { background: var(--white); border-radius: var(--radius); padding: 32px 34px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-light); display: none; animation: fadeInUp 0.5s ease; margin-bottom: 24px; }
-        .search-section.active { display: block; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-        .form-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid var(--gray-light); }
-        .form-header h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--primary); }
-        .form-header h3 i { color: var(--accent-dark); }
-        .form-status { font-size: 13px; color: var(--text-light); }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; }
-        .form-group { display: flex; flex-direction: column; gap: 5px; }
-        .form-group label { font-size: 13px; font-weight: 600; color: var(--text); }
-        .form-group label .required { color: #dc2626; margin-left: 2px; }
-        .form-group label i { color: var(--accent-dark); margin-right: 6px; width: 16px; }
-        .form-group input, .form-group select { padding: 12px 16px; border: 1px solid var(--gray-light); border-radius: var(--radius-sm); font-size: 14px; transition: var(--transition); background: var(--white); font-family: 'Inter', sans-serif; width: 100%; }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232, 184, 75, 0.15); }
-        .form-group input:disabled, .form-group select:disabled { background: #f1f5f9; cursor: not-allowed; }
-        .form-actions { display: flex; gap: 14px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
-        .btn-primary { padding: 14px 36px; background: var(--accent); color: var(--white); border: none; border-radius: var(--radius-sm); font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 8px; font-family: 'Inter', sans-serif; }
-        .btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: var(--shadow-md); }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-secondary { padding: 14px 28px; background: var(--off-white); color: var(--text-light); border: 1px solid var(--gray-light); border-radius: var(--radius-sm); font-weight: 500; font-size: 14px; cursor: pointer; transition: var(--transition); font-family: 'Inter', sans-serif; }
-        .btn-secondary:hover { background: var(--gray-light); color: var(--text); }
-        .btn-back { background: transparent; color: var(--accent-dark); border: 2px solid var(--accent); padding: 12px 24px; border-radius: 50px; font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 8px; font-family: 'Inter', sans-serif; }
-        .btn-back:hover { background: var(--accent); color: var(--white); transform: translateY(-2px); }
+  --accent: #b8935e;
+  --accent-d: #8b6b4a;
+  --accent-l: #d4af7a;
+  --accent-xl: #c9a86e;
+  --accent-light: #c9a86e;
 
-        /* ===== ALERTS ===== */
-        .alert { padding: 14px 18px; border-radius: var(--radius-sm); margin-top: 12px; display: flex; align-items: center; gap: 10px; }
-        .alert-error { background: var(--danger-light); color: var(--danger); border: 1px solid #fecaca; }
-        .alert-success { background: var(--success-light); color: var(--success); border: 1px solid #bbf7d0; }
-        .alert-warning { background: var(--warning-light); color: #92400e; border: 1px solid #fde68a; }
-        .alert-info { background: var(--info-light); color: var(--info); border: 1px solid #bfdbfe; }
+  --white: #ffffff;
+  --off-white: #242426;
+  --gray-light: #35353a;
+  --gray: #6b6b70;
+  --text: #f0f0f0;
+  --text-light: #a0a0a4;
 
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: var(--gray);
-        }
-        .empty-state i { font-size: 56px; opacity: 0.3; margin-bottom: 16px; display: block; color: var(--accent-dark); }
-        .empty-state h3 { font-family: 'Playfair Display', serif; color: var(--text); margin-bottom: 8px; font-size: 20px; }
-        .empty-state p { font-size: 14px; color: var(--text-light); }
+  --sd: #0e0e10;
+  --sl: #2a2a2c;
+  --sd-soft: #141416;
+  --sl-soft: #232325;
 
-        /* ===== TOAST ===== */
-        .toast-container { position: fixed; top: 90px; right: 20px; z-index: 99999; }
-        .toast { padding: 14px 24px; border-radius: var(--radius-sm); color: white; font-weight: 500; margin-bottom: 10px; box-shadow: var(--shadow-lg); animation: slideIn 0.35s ease; min-width: 240px; }
-        .toast-success { background: var(--success); }
-        .toast-error { background: var(--danger); }
-        .toast-warning { background: var(--warning); }
-        .toast-info { background: var(--info); }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  --press-xs: inset 2px 2px 5px var(--sd-soft), inset -2px -2px 5px var(--sl-soft);
+  --press-sm: inset 4px 4px 9px var(--sd), inset -4px -4px 9px var(--sl);
+  --press: inset 6px 6px 13px var(--sd), inset -6px -6px 13px var(--sl);
+  --press-lg: inset 9px 9px 20px var(--sd), inset -9px -9px 20px var(--sl);
 
-        /* ===== FOOTER ===== */
-        .footer { background: var(--primary); color: var(--white); padding: 50px 20px 0; margin-top: auto; }
-        .footer-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 36px; padding-bottom: 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
-        .footer-brand .brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-        .footer-brand .brand-row img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid rgba(232, 184, 75, 0.2); background: var(--white); object-fit: cover; padding: 2px; }
-        .footer-brand .brand-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; }
-        .footer-brand p { font-size: 13px; color: rgba(255, 255, 255, 0.4); line-height: 1.8; max-width: 280px; }
-        .footer-col h4 { font-size: 11px; text-transform: uppercase; color: var(--accent-light); font-weight: 700; margin-bottom: 14px; position: relative; }
-        .footer-col h4::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 25px; height: 2px; background: var(--accent); border-radius: 50px; }
-        .footer-col a { display: block; font-size: 13px; color: rgba(255, 255, 255, 0.35); margin-bottom: 8px; transition: var(--transition); }
-        .footer-col a:hover { color: var(--white); padding-left: 6px; }
-        .social-links { display: flex; justify-content: center; gap: 14px; margin: 24px auto 20px; flex-wrap: wrap; }
-        .social-icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: rgba(255, 255, 255, 0.4); font-size: 18px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); transition: var(--transition); }
-        .social-icon:hover { transform: translateY(-4px) scale(1.05); color: var(--white); }
-        .facebook:hover { background: #1877F2; } .instagram:hover { background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); } .youtube:hover { background: #FF0000; } .twitter:hover { background: #000; } .whatsapp:hover { background: #25D366; }
-        .footer-bottom { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 16px 0; }
-        .footer-bottom p, .footer-bottom a { font-size: 12px; color: rgba(255, 255, 255, 0.25); }
-        .footer-bottom a:hover { color: var(--accent-light); }
-        .dev { font-size: 12px; color: rgba(255, 255, 255, 0.25); text-align: center; padding: 12px 0 16px; }
-        .dev b { color: var(--accent-light); }
+  --raise-xs: 2px 2px 5px var(--sd-soft), -2px -2px 5px var(--sl-soft);
+  --raise-sm: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl);
+  --raise: 6px 6px 13px var(--sd), -6px -6px 13px var(--sl);
+  --raise-lg: 10px 10px 22px var(--sd), -10px -10px 22px var(--sl);
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 900px) {
-            .navbar { padding: 0 20px; height: 64px; }
-            body { padding-top: 64px; }
-            .nav-links { position: fixed; top: 0; right: -100%; width: 280px; height: 100vh; background: var(--white); flex-direction: column; padding: 20px; gap: 2px; transition: right 0.3s ease; box-shadow: -8px 0 40px rgba(0, 0, 0, 0.1); z-index: 10000; overflow-y: auto; }
-            .nav-links.active { right: 0; }
-            .menu-toggle { display: flex; }
-            .desktop-login { display: none !important; }
-        }
-        @media (max-width: 992px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
-        @media (max-width: 768px) {
-            .page-header { padding: 40px 20px 30px; }
-            .page-header h1 { font-size: 26px; }
-            .form-grid { grid-template-columns: 1fr; }
-            .search-section { padding: 20px; }
-            .form-actions { flex-direction: column; }
-            .btn-primary, .btn-secondary, .btn-back { width: 100%; justify-content: center; }
-            .marks-summary-box { gap: 20px; }
-            .marks-summary-box .summary-item .value { font-size: 18px; }
-            .mrc-header { padding: 20px 20px; }
-            .mrc-title { font-size: 19px; }
-            .mrc-icon { width: 56px; height: 56px; font-size: 26px; }
-            .mrc-content-inner { padding: 16px 20px 24px; }
-            .rc-header { padding: 16px 18px; }
-            .rc-title { font-size: 16px; }
-            .rc-icon { width: 44px; height: 44px; font-size: 18px; }
-            .rc-details-inner { padding: 16px 18px; }
-            .subjects-table th, .subjects-table td { padding: 9px 8px; font-size: 12px; }
-            .rc-btn { padding: 10px 16px; font-size: 12.5px; flex: 1; justify-content: center; }
-            .new-result-notification { flex-direction: column; align-items: flex-start; text-align: left; }
-            .new-result-notification .nr-btn { width: 100%; justify-content: center; }
-        }
-        @media (max-width: 540px) { .footer-grid { grid-template-columns: 1fr; } }
+  --grad-maroon: linear-gradient(135deg, #d4af7a 0%, #b8935e 55%, #8b6b4a 100%);
+  --grad-maroon-soft: linear-gradient(135deg, #e8c890 0%, #d4af7a 100%);
+}
 
-        /* ===== PRINT ===== */
-        @media print {
-            .navbar, .page-header, .footer, .btn-primary, .btn-secondary, .btn-back, .form-actions, .toast-container, .new-result-notification, .rc-actions, .rc-chevron { display: none !important; }
-            body { padding-top: 0 !important; background: white !important; }
-            .container { padding: 0 !important; max-width: 100% !important; }
-            .mrc-content { max-height: none !important; }
-            .rc-details { max-height: none !important; }
-            .result-card { page-break-inside: avoid; }
-        }
-    </style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+*:focus, *:focus-visible { outline: none; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  transition: background-color .5s var(--transition), color .5s var(--transition);
+  padding-top: 76px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+img { max-width: 100%; height: auto; }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--grad-maroon); border-radius: 50px; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes footerBorder { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%, 100% { box-shadow: 0 8px 30px rgba(22, 163, 74, 0.3); } 50% { box-shadow: 0 8px 40px rgba(22, 163, 74, 0.5); } }
+@keyframes shimmer { 0% { left: -100%; } 100% { left: 100%; } }
+@keyframes shake { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* ============================================================
+   NAVBAR
+============================================================ */
+.navbar {
+  position: fixed;
+  top: 0; left: 0; width: 100%;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  gap: 14px;
+  height: 76px;
+  background: var(--bg);
+  box-shadow: 0 4px 14px var(--sd);
+  transition: var(--transition);
+}
+[data-theme="dark"] .navbar { box-shadow: 0 4px 14px rgba(0,0,0,0.5); }
+.navbar.scrolled { box-shadow: 0 8px 24px var(--sd); }
+
+.logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding: 6px 12px; border-radius: 14px; background: var(--bg); box-shadow: var(--press-sm); min-width: 0; }
+.logo img { width: 42px; height: 42px; border-radius: 12px; padding: 3px; background: var(--bg); box-shadow: var(--press-sm); object-fit: cover; flex-shrink: 0; }
+.logo-text { min-width: 0; }
+.logo-text .school-name { display: block; font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 800; color: var(--t-hi); line-height: 1.15; white-space: nowrap; }
+.logo-text .school-name span { background: var(--grad-maroon); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.logo-text .school-tagline { display: block; font-size: 8px; color: var(--t-lo); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; margin-top: 2px; }
+
+.nav-links { display: flex; align-items: center; gap: 6px; margin: 0; padding: 0; flex: 1 1 auto; justify-content: center; list-style: none; min-width: 0; flex-wrap: nowrap; }
+.nav-links > li { position: relative; flex-shrink: 0; }
+.nav-links > li > a {
+  color: var(--t-mid); font-size: 12px; font-weight: 600; padding: 9px 14px; border-radius: 11px;
+  background: var(--bg); box-shadow: var(--press-sm); transition: var(--transition);
+  display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.4px;
+  white-space: nowrap; cursor: pointer;
+}
+.nav-links > li > a i { color: var(--primary-d); font-size: 11px; }
+[data-theme="dark"] .nav-links > li > a i { color: var(--primary-l); }
+.nav-links > li > a:hover { color: var(--t-hi); box-shadow: var(--press); }
+.nav-links > li > a.active { color: var(--primary-d); box-shadow: var(--press); }
+[data-theme="dark"] .nav-links > li > a.active { color: var(--primary-l); }
+
+.nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+.theme-btn {
+  width: 42px; height: 42px; border-radius: 12px; border: none; background: var(--bg);
+  color: var(--primary-d); font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--press-sm); transition: var(--transition); flex-shrink: 0;
+}
+[data-theme="dark"] .theme-btn { color: var(--primary-l); }
+.theme-btn:hover { box-shadow: var(--press); transform: translateY(-2px); }
+.theme-btn i { display: block; transition: transform .5s var(--transition); }
+.theme-btn.spin i { animation: spin 0.6s var(--transition); }
+
+.login-btn {
+  display: flex; align-items: center; gap: 7px; padding: 10px 20px; border: none; border-radius: 12px;
+  background: var(--grad-maroon); color: #ffffff; font-size: 11.5px; font-weight: 800;
+  letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; transition: var(--transition);
+  font-family: 'Inter', sans-serif; white-space: nowrap; flex-shrink: 0;
+  box-shadow:
+    inset 2px 2px 5px rgba(40, 5, 5, 0.4),
+    inset -2px -2px 5px rgba(200, 120, 120, 0.4),
+    4px 4px 12px var(--sd),
+    -4px -4px 12px var(--sl);
+}
+[data-theme="dark"] .login-btn { color: #1c1c1e; }
+.login-btn:hover { transform: translateY(-2px); }
+
+.login-dropdown { position: relative; flex-shrink: 0; }
+.login-dropdown-menu {
+  position: absolute; top: calc(100% + 10px); right: 0; width: 210px;
+  background: var(--bg); border-radius: 14px; overflow: hidden;
+  box-shadow: var(--raise-lg); opacity: 0; visibility: hidden;
+  transform: translateY(-8px); transition: all 0.25s var(--transition);
+  padding: 6px; z-index: 200;
+}
+.login-dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
+.login-dropdown-menu a {
+  display: flex; align-items: center; gap: 10px; padding: 11px 14px;
+  font-size: 12.5px; font-weight: 600; color: var(--t-mid); border-radius: 9px;
+  transition: var(--transition);
+}
+.login-dropdown-menu a:hover { background: var(--bg); box-shadow: var(--press-sm); color: var(--primary-d); }
+[data-theme="dark"] .login-dropdown-menu a:hover { color: var(--primary-l); }
+.login-dropdown-menu a i { color: var(--primary-d); font-size: 13px; width: 16px; }
+[data-theme="dark"] .login-dropdown-menu a i { color: var(--primary-l); }
+
+.menu-toggle {
+  display: none; flex-direction: column; gap: 5px; width: 44px; height: 44px;
+  background: var(--bg); border: none; border-radius: 12px; cursor: pointer;
+  padding: 12px; box-shadow: var(--press-sm); transition: var(--transition);
+}
+.menu-toggle:hover { box-shadow: var(--press); }
+.menu-toggle .bar { display: block; width: 20px; height: 2px; background: var(--primary-d); transition: var(--transition); border-radius: 50px; margin: 0 auto; }
+[data-theme="dark"] .menu-toggle .bar { background: var(--primary-l); }
+.menu-toggle.active .bar:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.menu-toggle.active .bar:nth-child(2) { opacity: 0; }
+.menu-toggle.active .bar:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+@media (max-width: 1200px) {
+  .navbar { padding: 0 20px; gap: 12px; }
+  .nav-links { gap: 5px; }
+  .nav-links > li > a { padding: 8px 12px; font-size: 11.5px; letter-spacing: 0.3px; }
+  .logo-text .school-name { font-size: 14px; }
+  .logo img { width: 40px; height: 40px; }
+}
+@media (max-width: 1080px) {
+  .navbar { padding: 0 16px; gap: 10px; }
+  .nav-links { gap: 4px; }
+  .nav-links > li > a { padding: 8px 10px; font-size: 11px; letter-spacing: 0; gap: 4px; }
+  .nav-links > li > a i { font-size: 10px; }
+  .logo-text .school-name { font-size: 13px; }
+  .logo img { width: 38px; height: 38px; }
+  .login-btn { padding: 9px 16px; font-size: 11px; }
+  .theme-btn { width: 40px; height: 40px; }
+}
+@media (max-width: 980px) {
+  .navbar { padding: 0 14px; gap: 8px; }
+  .nav-links > li > a { padding: 7px 8px; font-size: 10.5px; }
+  .nav-links > li > a i { font-size: 9px; }
+  .logo-text .school-name { font-size: 12px; }
+  .logo-text .school-tagline { font-size: 7px; }
+  .logo img { width: 36px; height: 36px; }
+  .login-btn span { display: none; }
+  .login-btn { padding: 9px 12px; }
+}
+
+@media (max-width: 900px) {
+  body { padding-top: 66px; }
+  .navbar { padding: 0 16px; height: 66px; gap: 10px; }
+  .nav-links {
+    position: fixed; top: 0; right: -100%; width: 300px; height: 100vh;
+    background: var(--bg); flex-direction: column; padding: 22px 20px;
+    gap: 8px; transition: right 0.35s ease; box-shadow: -10px 0 40px var(--sd);
+    z-index: 10000; overflow-y: auto; align-items: stretch; justify-content: flex-start;
+    flex: none;
+  }
+  .nav-links.active { right: 0; }
+  .mobile-menu-header {
+    display: flex !important; justify-content: space-between; align-items: center;
+    padding-bottom: 16px; margin-bottom: 14px; border-bottom: 1px solid var(--sd-soft);
+  }
+  .mobile-menu-header .mobile-brand { display: flex; align-items: center; gap: 10px; }
+  .mobile-menu-header .mobile-brand img {
+    width: 38px; height: 38px; border-radius: 12px; padding: 3px;
+    background: var(--bg); box-shadow: var(--press-sm); object-fit: cover;
+  }
+  .mobile-menu-header .mobile-brand span { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: var(--t-hi); }
+  .mobile-close-btn {
+    display: flex !important; width: 38px; height: 38px; border: none;
+    background: var(--bg); border-radius: 12px; color: var(--t-hi);
+    font-size: 16px; cursor: pointer; align-items: center; justify-content: center;
+    box-shadow: var(--press-sm);
+  }
+  .nav-links > li > a {
+    width: 100%; padding: 12px 16px; border-radius: 12px;
+    font-size: 13.5px; justify-content: space-between;
+  }
+  .mobile-login-item { display: block !important; width: 100%; margin-top: 8px; padding-top: 14px; border-top: 1px solid var(--sd-soft); }
+  .mobile-login-item .login-btn { width: 100%; justify-content: center; padding: 13px; }
+  .desktop-login { display: none !important; }
+  .menu-toggle { display: flex; }
+}
+.mobile-close-btn { display: none; }
+.mobile-menu-header { display: none; }
+.mobile-login-item { display: none; }
+
+@media (max-width: 480px) {
+  body { padding-top: 62px; }
+  .navbar { padding: 0 12px; height: 62px; gap: 8px; }
+  .logo img { width: 40px; height: 40px; }
+  .logo-text .school-name { font-size: 13px; }
+  .theme-btn { width: 40px; height: 40px; font-size: 14px; }
+  .login-btn { padding: 10px 16px; font-size: 11px; }
+  .menu-toggle { width: 40px; height: 40px; padding: 10px; }
+  .nav-links { width: 84vw; }
+}
+
+/* ============================================================
+   PAGE HEADER
+============================================================ */
+.page-header {
+  background: var(--grad-maroon);
+  padding: 50px 20px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 30px var(--sd);
+}
+[data-theme="dark"] .page-header { box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+.page-header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 50%, rgba(255, 255, 255, 0.05), transparent 60%); }
+.page-header h1 { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 800; color: #ffffff; position: relative; z-index: 1; }
+[data-theme="dark"] .page-header h1 { color: #1c1c1e; }
+.page-header h1 i { opacity: 0.85; }
+.page-header p { color: rgba(255, 255, 255, 0.75); margin-top: 8px; font-size: 15px; position: relative; z-index: 1; }
+[data-theme="dark"] .page-header p { color: rgba(28, 28, 30, 0.75); }
+
+/* ============================================================
+   CONTAINER
+============================================================ */
+.container { max-width: 1100px; margin: 0 auto; padding: 30px 20px 60px; flex: 1; width: 100%; }
+
+/* ============================================================
+   NEW RESULT NOTIFICATION
+============================================================ */
+.new-result-notification {
+  background: linear-gradient(135deg, #16a34a, #059669);
+  color: #fff;
+  padding: 18px 24px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 8px 30px rgba(22, 163, 74, 0.3);
+  animation: slideDown 0.5s ease, pulse 2s ease infinite;
+  position: relative;
+  overflow: hidden;
+}
+.new-result-notification::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 2.5s infinite;
+}
+.new-result-notification .nr-icon {
+  width: 50px; height: 50px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+  animation: shake 1.5s infinite;
+}
+.new-result-notification .nr-body { flex: 1; position: relative; z-index: 1; }
+.new-result-notification .nr-title {
+  font-size: 16px; font-weight: 800;
+  margin-bottom: 4px;
+  display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap;
+}
+.new-result-notification .nr-title .new-pill {
+  background: #fff; color: #16a34a;
+  padding: 3px 12px; border-radius: 50px;
+  font-size: 10.5px; font-weight: 900;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.new-result-notification .nr-desc { font-size: 13px; opacity: 0.9; }
+.new-result-notification .nr-btn {
+  background: #fff; color: #16a34a;
+  padding: 10px 20px;
+  border: none; border-radius: 10px;
+  font-weight: 700; font-size: 13px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: var(--transition);
+  position: relative; z-index: 1;
+  flex-shrink: 0;
+}
+.new-result-notification .nr-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+
+/* ============================================================
+   MAIN RESULT CARD
+============================================================ */
+.main-result-card {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 0;
+  margin-bottom: 28px;
+  box-shadow: var(--raise);
+  overflow: hidden;
+  transition: var(--transition);
+}
+.main-result-card:hover { box-shadow: var(--raise-lg); }
+.main-result-card.open { box-shadow: var(--raise-lg); }
+.mrc-header {
+  padding: 28px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  cursor: pointer;
+  background: var(--bg);
+  transition: var(--transition);
+}
+.mrc-header:hover { box-shadow: inset 0 0 0 2px var(--primary-l); }
+.mrc-icon {
+  width: 68px; height: 68px;
+  background: var(--grad-maroon);
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px;
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow:
+    inset 2px 2px 5px rgba(40, 5, 5, 0.4),
+    inset -2px -2px 5px rgba(200, 120, 120, 0.4),
+    4px 4px 12px var(--sd),
+    -4px -4px 12px var(--sl);
+}
+[data-theme="dark"] .mrc-icon { color: #1c1c1e; }
+.mrc-body { flex: 1; min-width: 0; }
+.mrc-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--t-hi);
+  margin-bottom: 6px;
+  display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap;
+}
+.mrc-title .count-badge {
+  background: var(--bg);
+  color: var(--primary-d);
+  padding: 4px 14px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 800;
+  font-family: 'Inter', sans-serif;
+  box-shadow: var(--press-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+[data-theme="dark"] .mrc-title .count-badge { color: var(--primary-l); }
+.mrc-desc { font-size: 14px; color: var(--t-mid); line-height: 1.5; }
+.mrc-arrow {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--primary-d);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  transition: var(--transition);
+  flex-shrink: 0;
+  box-shadow: var(--press-sm);
+}
+[data-theme="dark"] .mrc-arrow { color: var(--primary-l); }
+.main-result-card.open .mrc-arrow { transform: rotate(180deg); box-shadow: var(--press); }
+
+.mrc-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--bg);
+}
+.main-result-card.open .mrc-content { max-height: 2000px; }
+.mrc-content-inner { padding: 20px 32px 32px; }
+
+/* ============================================================
+   RESULT CARD (Individual Class)
+============================================================ */
+.result-card {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: var(--transition);
+  box-shadow: var(--press);
+  position: relative;
+}
+.result-card:hover { box-shadow: var(--press-lg); }
+.result-card.is-new::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--success), #059669);
+  z-index: 1;
+}
+.result-card.new-badge::after {
+  content: 'NEW';
+  position: absolute;
+  top: 12px; right: 12px;
+  background: linear-gradient(135deg, #16a34a, #059669);
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  animation: pulse 2s infinite;
+  z-index: 2;
+}
+.rc-header {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  flex-wrap: wrap;
+}
+.rc-left { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 200px; }
+.rc-icon {
+  width: 52px; height: 52px;
+  background: var(--grad-maroon);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: #ffffff;
+  flex-shrink: 0;
+  box-shadow:
+    inset 2px 2px 5px rgba(40, 5, 5, 0.4),
+    inset -2px -2px 5px rgba(200, 120, 120, 0.4);
+}
+[data-theme="dark"] .rc-icon { color: #1c1c1e; }
+.rc-title { font-size: 18px; font-weight: 800; color: var(--t-hi); margin-bottom: 4px; }
+.rc-meta { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12.5px; color: var(--t-mid); }
+.rc-meta span { display: inline-flex; align-items: center; gap: 5px; }
+.rc-meta span i { color: var(--primary-d); }
+[data-theme="dark"] .rc-meta span i { color: var(--primary-l); }
+.rc-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.rc-status-pill {
+  padding: 7px 16px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 5px;
+  box-shadow: var(--press-xs);
+  background: var(--bg);
+}
+.rc-status-pass { color: var(--success); }
+.rc-status-fail { color: var(--danger); }
+.rc-status-compartment { color: #d97706; }
+.rc-status-supply { color: #ca8a04; }
+.rc-status-absent { color: var(--t-lo); }
+.rc-status-withheld { color: #a855f7; }
+.rc-chevron {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--t-mid);
+  transition: var(--transition);
+  flex-shrink: 0;
+  box-shadow: var(--press-sm);
+}
+.result-card.expanded .rc-chevron { transform: rotate(180deg); background: var(--grad-maroon); color: #ffffff; box-shadow: var(--press); }
+[data-theme="dark"] .result-card.expanded .rc-chevron { color: #1c1c1e; }
+
+.rc-details { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; box-shadow: inset 0 1px 0 var(--sd-soft); }
+.result-card.expanded .rc-details { max-height: 3000px; }
+.rc-details-inner { padding: 20px 24px; background: var(--bg); }
+
+/* Info Grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px 20px;
+  margin-bottom: 18px;
+  padding: 18px;
+  background: var(--bg);
+  border-radius: 12px;
+  box-shadow: var(--press-sm);
+}
+.info-item label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--t-lo);
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 3px;
+}
+.info-item span { font-size: 14px; font-weight: 700; color: var(--t-hi); }
+
+/* Subjects Table */
+.subjects-table-wrap {
+  margin: 16px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--press-sm);
+  background: var(--bg);
+}
+.subjects-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.subjects-table thead { background: var(--grad-maroon); }
+.subjects-table th {
+  padding: 12px 14px;
+  text-align: left;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+[data-theme="dark"] .subjects-table th { color: #1c1c1e; }
+.subjects-table th:first-child { width: 50px; text-align: center; }
+.subjects-table th:nth-child(n+3) { text-align: center; width: 90px; }
+.subjects-table td { padding: 11px 14px; box-shadow: inset 0 -1px 0 var(--sd-soft); color: var(--t-hi); }
+.subjects-table td:first-child { text-align: center; font-weight: 700; color: var(--t-lo); font-size: 12px; }
+.subjects-table td:nth-child(n+3) { text-align: center; font-weight: 700; }
+.subjects-table tbody tr:last-child td { box-shadow: none; }
+.subjects-table tbody tr:hover { background: var(--bg-2); }
+.subjects-table .pass-mark { color: var(--success); }
+.subjects-table .fail-mark { color: var(--danger); }
+.subjects-table .pct-cell { color: var(--primary-d); font-weight: 800; }
+[data-theme="dark"] .subjects-table .pct-cell { color: var(--primary-l); }
+.subjects-table tfoot td {
+  background: var(--bg-2);
+  font-weight: 900;
+  font-size: 13.5px;
+  padding: 14px;
+  color: var(--primary-d);
+  box-shadow: inset 0 2px 0 var(--primary-l);
+}
+[data-theme="dark"] .subjects-table tfoot td { color: var(--primary-l); }
+
+/* Summary Box */
+.marks-summary-box {
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 18px 0;
+  background: var(--bg);
+  box-shadow: var(--press);
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.marks-summary-box .summary-item { text-align: center; min-width: 100px; }
+.marks-summary-box .summary-item .label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--t-lo);
+  letter-spacing: 0.5px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.marks-summary-box .summary-item .value {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--t-hi);
+  font-family: 'Playfair Display', serif;
+}
+.marks-summary-box .summary-item .value.gold { color: var(--primary-d); }
+[data-theme="dark"] .marks-summary-box .summary-item .value.gold { color: var(--primary-l); }
+.marks-summary-box .summary-item .value.pass { color: var(--success); }
+.marks-summary-box .summary-item .value.fail { color: var(--danger); }
+
+/* Remarks */
+.remarks-box {
+  padding: 14px 18px;
+  background: var(--info-light);
+  border-left: 4px solid var(--info);
+  border-radius: 10px;
+  font-size: 13px;
+  color: #1e40af;
+  margin: 12px 0;
+  display: flex; align-items: flex-start; gap: 10px;
+}
+[data-theme="dark"] .remarks-box { background: rgba(59, 130, 246, 0.15); color: #93c5fd; }
+.remarks-box i { margin-top: 2px; }
+
+/* Action Buttons */
+.rc-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; padding-top: 16px; box-shadow: inset 0 1px 0 var(--sd-soft); }
+.rc-btn {
+  padding: 12px 22px;
+  border: none;
+  border-radius: 11px;
+  font-weight: 800;
+  font-size: 11.5px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.rc-btn-view {
+  background: var(--grad-maroon);
+  color: #ffffff;
+  box-shadow:
+    inset 2px 2px 5px rgba(40, 5, 5, 0.4),
+    inset -2px -2px 5px rgba(200, 120, 120, 0.4),
+    4px 4px 12px var(--sd),
+    -4px -4px 12px var(--sl);
+}
+[data-theme="dark"] .rc-btn-view { color: #1c1c1e; }
+.rc-btn-download {
+  background: var(--bg);
+  color: var(--primary-d);
+  box-shadow: var(--press-sm);
+}
+[data-theme="dark"] .rc-btn-download { color: var(--primary-l); }
+.rc-btn-print {
+  background: var(--bg);
+  color: var(--primary-d);
+  box-shadow: var(--press-sm);
+}
+[data-theme="dark"] .rc-btn-print { color: var(--primary-l); }
+.rc-btn-view:hover, .rc-btn-download:hover, .rc-btn-print:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--press);
+}
+
+/* ============================================================
+   SEARCH SECTION
+============================================================ */
+.search-section {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 32px 34px;
+  box-shadow: var(--raise);
+  display: none;
+  animation: fadeInUp 0.5s ease;
+  margin-bottom: 24px;
+}
+.search-section.active { display: block; }
+.form-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 22px; padding-bottom: 16px; box-shadow: inset 0 -2px 0 var(--sd-soft); }
+.form-header h3 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--t-hi); font-weight: 800; }
+.form-header h3 i { color: var(--primary-d); }
+[data-theme="dark"] .form-header h3 i { color: var(--primary-l); }
+.form-status { font-size: 13px; color: var(--t-mid); font-weight: 700; padding: 6px 14px; border-radius: 50px; background: var(--bg); box-shadow: var(--press-xs); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 12px; font-weight: 800; color: var(--t-hi); text-transform: uppercase; letter-spacing: 0.5px; }
+.form-group label .required { color: var(--danger); margin-left: 3px; }
+.form-group label i { color: var(--primary-d); margin-right: 6px; }
+[data-theme="dark"] .form-group label i { color: var(--primary-l); }
+.form-group input,
+.form-group select {
+  padding: 14px 18px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  transition: var(--transition);
+  background: var(--bg);
+  color: var(--t-hi);
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+  box-shadow: var(--press-sm);
+  font-weight: 600;
+}
+.form-group input:focus,
+.form-group select:focus { box-shadow: var(--press); }
+.form-group input::placeholder { color: var(--t-lo); }
+.form-group input:disabled,
+.form-group select:disabled { cursor: not-allowed; color: var(--t-lo); }
+
+.form-actions { display: flex; gap: 14px; margin-top: 20px; flex-wrap: wrap; align-items: center; }
+
+.btn-primary {
+  padding: 14px 32px;
+  background: var(--grad-maroon);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Inter', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow:
+    inset 2px 2px 5px rgba(40, 5, 5, 0.4),
+    inset -2px -2px 5px rgba(200, 120, 120, 0.4),
+    4px 4px 12px var(--sd),
+    -4px -4px 12px var(--sl);
+}
+[data-theme="dark"] .btn-primary { color: #1c1c1e; }
+.btn-primary:hover { transform: translateY(-2px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-secondary {
+  padding: 14px 26px;
+  background: var(--bg);
+  color: var(--t-mid);
+  border: none;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: 'Inter', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: var(--press-sm);
+}
+.btn-secondary:hover { box-shadow: var(--press); color: var(--t-hi); }
+
+.btn-back {
+  background: var(--bg);
+  color: var(--primary-d);
+  border: none;
+  padding: 14px 26px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Inter', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: var(--press-sm);
+}
+[data-theme="dark"] .btn-back { color: var(--primary-l); }
+.btn-back:hover { box-shadow: var(--press); transform: translateY(-2px); }
+
+/* ============================================================
+   ALERTS
+============================================================ */
+.alert { padding: 14px 18px; border-radius: var(--radius-sm); margin-top: 12px; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 13px; }
+.alert-error { background: var(--danger-light); color: var(--danger); box-shadow: var(--press-xs); }
+.alert-success { background: var(--success-light); color: var(--success); box-shadow: var(--press-xs); }
+.alert-warning { background: var(--warning-light); color: #92400e; box-shadow: var(--press-xs); }
+.alert-info { background: var(--info-light); color: var(--info); box-shadow: var(--press-xs); }
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+.empty-state { text-align: center; padding: 50px 20px; color: var(--t-mid); }
+.empty-state i { font-size: 56px; opacity: 0.4; margin-bottom: 16px; display: block; color: var(--primary-d); }
+[data-theme="dark"] .empty-state i { color: var(--primary-l); }
+.empty-state h3 { font-family: 'Playfair Display', serif; color: var(--t-hi); margin-bottom: 8px; font-size: 20px; font-weight: 800; }
+.empty-state p { font-size: 14px; color: var(--t-mid); }
+
+/* ============================================================
+   TOAST
+============================================================ */
+.toast-container { position: fixed; top: 90px; right: 20px; z-index: 99999; }
+.toast {
+  padding: 14px 24px;
+  border-radius: var(--radius-sm);
+  color: white;
+  font-weight: 700;
+  margin-bottom: 10px;
+  box-shadow: var(--raise-lg);
+  animation: slideIn 0.35s ease;
+  min-width: 240px;
+  font-size: 13px;
+}
+.toast-success { background: linear-gradient(135deg, #16a34a, #059669); }
+.toast-error { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+.toast-warning { background: linear-gradient(135deg, #d97706, #b45309); }
+.toast-info { background: var(--grad-maroon); color: #fff; }
+[data-theme="dark"] .toast-info { color: #1c1c1e; }
+
+/* ============================================================
+   FOOTER
+============================================================ */
+.footer {
+  position: relative;
+  background: var(--bg-2);
+  color: var(--t-hi);
+  padding: 70px 20px 0;
+  box-shadow: 0 -6px 24px var(--sd);
+  overflow: hidden;
+  margin-top: auto;
+}
+[data-theme="dark"] .footer { box-shadow: 0 -6px 24px rgba(0,0,0,0.5); }
+
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    transparent 0%, var(--primary-d) 12%, var(--accent-xl) 32%,
+    var(--primary-l) 50%, var(--accent-xl) 68%,
+    var(--primary-d) 88%, transparent 100%);
+  background-size: 200% 100%;
+  animation: footerBorder 6s linear infinite;
+}
+[data-theme="dark"] .footer::before {
+  background: linear-gradient(90deg,
+    transparent 0%, var(--primary-l) 12%, var(--primary-xl) 32%,
+    var(--primary-l) 50%, var(--primary-xl) 68%,
+    var(--primary-l) 88%, transparent 100%);
+  background-size: 200% 100%;
+}
+.footer::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 10%; right: 10%;
+  height: 36px;
+  background: radial-gradient(ellipse at top, rgba(139, 26, 26, 0.15), transparent 70%);
+  pointer-events: none;
+}
+[data-theme="dark"] .footer::after { background: radial-gradient(ellipse at top, rgba(184, 147, 94, 0.18), transparent 70%); }
+
+.footer-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 40px;
+  padding-bottom: 40px;
+  box-shadow: 0 1px 0 var(--sd-soft);
+}
+.footer-brand { text-align: left; }
+.footer-brand .brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.footer-brand .brand-row img {
+  width: 52px; height: 52px; border-radius: 14px; padding: 3px;
+  background: var(--bg); box-shadow: var(--press-sm); object-fit: cover;
+}
+.footer-brand .brand-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 800; color: var(--t-hi); line-height: 1.25; }
+.footer-brand p { font-size: 13px; color: var(--t-mid); line-height: 1.8; max-width: 280px; }
+
+.footer-col h4 {
+  font-size: 11px; text-transform: uppercase; color: var(--primary-d);
+  font-weight: 800; margin-bottom: 16px; letter-spacing: 1.2px;
+  position: relative; padding-bottom: 8px; display: inline-block;
+}
+[data-theme="dark"] .footer-col h4 { color: var(--primary-l); }
+.footer-col h4::after {
+  content: ''; position: absolute; bottom: 0; left: 0;
+  width: 26px; height: 2px; background: var(--grad-maroon); border-radius: 50px;
+}
+.footer-col a {
+  display: flex; align-items: center; gap: 8px; font-size: 12.5px;
+  color: var(--t-mid); margin-bottom: 10px; transition: var(--transition); font-weight: 600;
+}
+.footer-col a i { color: var(--primary-d); font-size: 9px; transition: var(--transition); }
+[data-theme="dark"] .footer-col a i { color: var(--primary-l); }
+.footer-col a:hover { color: var(--primary-d); padding-left: 6px; }
+[data-theme="dark"] .footer-col a:hover { color: var(--primary-l); }
+
+.social-links { display: flex; justify-content: center; gap: 14px; margin: 24px auto 20px; flex-wrap: wrap; }
+.social-icon {
+  width: 46px; height: 46px; display: flex; align-items: center; justify-content: center;
+  border-radius: 14px; color: var(--t-mid); font-size: 17px;
+  background: var(--bg); box-shadow: var(--press-sm); transition: var(--transition);
+}
+.social-icon:hover { transform: translateY(-4px) scale(1.05); box-shadow: var(--press); color: #ffffff; }
+.social-icon.facebook:hover { background: #1877F2; }
+.social-icon.instagram:hover { background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); }
+.social-icon.youtube:hover { background: #FF0000; }
+.social-icon.twitter:hover { background: #000; }
+.social-icon.whatsapp:hover { background: #25D366; }
+
+.footer-bottom {
+  max-width: 1100px; margin: 0 auto; display: flex; align-items: center;
+  justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 18px 0;
+}
+.footer-bottom p, .footer-bottom a { font-size: 12px; color: var(--t-lo); font-weight: 600; }
+.footer-bottom a:hover { color: var(--primary-d); }
+[data-theme="dark"] .footer-bottom a:hover { color: var(--primary-l); }
+.dev { font-size: 12px; color: var(--t-lo); text-align: center; padding: 14px 0 18px; font-weight: 600; }
+.dev b { color: var(--primary-d); font-weight: 800; }
+[data-theme="dark"] .dev b { color: var(--primary-l); }
+
+@media (max-width: 992px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; } }
+@media (max-width: 640px) {
+  .footer { padding: 54px 16px 0; }
+  .footer-grid { grid-template-columns: 1fr; gap: 26px; padding-bottom: 30px; }
+  .footer-brand { text-align: center; }
+  .footer-brand .brand-row { justify-content: center; }
+  .footer-brand p { margin: 0 auto; }
+  .footer-bottom { flex-direction: column; text-align: center; gap: 8px; }
+  .social-icon { width: 42px; height: 42px; font-size: 15px; }
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 768px) {
+  .page-header { padding: 40px 20px 30px; }
+  .page-header h1 { font-size: 26px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .search-section { padding: 22px; }
+  .form-actions { flex-direction: column; }
+  .btn-primary, .btn-secondary, .btn-back { width: 100%; justify-content: center; }
+  .marks-summary-box { gap: 20px; }
+  .marks-summary-box .summary-item .value { font-size: 20px; }
+  .mrc-header { padding: 20px 20px; }
+  .mrc-title { font-size: 19px; }
+  .mrc-icon { width: 56px; height: 56px; font-size: 26px; }
+  .mrc-content-inner { padding: 16px 20px 24px; }
+  .rc-header { padding: 16px 18px; }
+  .rc-title { font-size: 16px; }
+  .rc-icon { width: 44px; height: 44px; font-size: 18px; }
+  .rc-details-inner { padding: 16px 18px; }
+  .subjects-table th, .subjects-table td { padding: 9px 8px; font-size: 12px; }
+  .rc-btn { padding: 10px 16px; font-size: 11px; flex: 1; justify-content: center; }
+  .new-result-notification { flex-direction: column; align-items: flex-start; text-align: left; }
+  .new-result-notification .nr-btn { width: 100%; justify-content: center; }
+}
+
+/* ============================================================
+   PRINT
+============================================================ */
+@media print {
+  .navbar, .page-header, .footer, .btn-primary, .btn-secondary, .btn-back, .form-actions, .toast-container, .new-result-notification, .rc-actions, .rc-chevron { display: none !important; }
+  body { padding-top: 0 !important; background: white !important; }
+  .container { padding: 0 !important; max-width: 100% !important; }
+  .mrc-content { max-height: none !important; }
+  .rc-details { max-height: none !important; }
+  .result-card { page-break-inside: avoid; }
+}
+</style>
 </head>
 <body>
 
-    <!-- NAVBAR -->
-    <header class="navbar" id="navbar">
-        <div class="logo">
-            <img src="logo.png" alt="School Logo" onerror="this.style.display='none'">
-            <div class="logo-text">
-                <span class="school-name">Govt. Sr. Sec. <span>School</span> Shilla</span>
-                <span class="school-tagline">Est. Himachal Pradesh</span>
-            </div>
-        </div>
-        <ul class="nav-links" id="navLinks">
-            <li><a href="../index.html"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="pub-notif.html"><i class="fas fa-bell"></i> Notifications</a></li>
-            <li><a href="result.html" class="active"><i class="fas fa-file-alt"></i> Results</a></li>
-            <li><a href="downloads.html"><i class="fas fa-download"></i> Downloads</a></li>
-            <li><a href="about.html"><i class="fas fa-info-circle"></i> About</a></li>
-            <li><a href="contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
-        </ul>
-        <div class="nav-actions">
-            <div class="login-dropdown desktop-login">
-                <button class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
-                <div class="login-dropdown-menu" id="loginDropdown">
-                    <a href="../admin/login.html"><i class="fas fa-user-shield"></i> Admin Panel</a>
-                    <a href="student-login.html"><i class="fas fa-user-graduate"></i> Student Portal</a>
-                    <a href="no.html"><i class="fas fa-chalkboard-teacher"></i> Teacher Portal</a>
-                </div>
-            </div>
-            <button class="menu-toggle" id="menuToggle">
-                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-            </button>
-        </div>
-    </header>
+<div class="mobile-overlay" id="mobileOverlay"></div>
 
-    <!-- PAGE HEADER -->
-    <div class="page-header">
-        <h1><i class="fas fa-file-alt"></i> Exam Results</h1>
-        <p>Check your academic performance and download marksheets</p>
+<!-- NAVBAR -->
+<header class="navbar" id="navbar">
+  <div class="logo">
+    <img src="logo.png" alt="School Logo" onerror="this.style.display='none'">
+    <div class="logo-text">
+      <span class="school-name">Govt. Sr. Sec. <span>School</span> Shilla</span>
+      <span class="school-tagline">Est. Himachal Pradesh</span>
+    </div>
+  </div>
+
+  <ul class="nav-links" id="navLinks">
+    <div class="mobile-menu-header">
+      <div class="mobile-brand">
+        <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
+        <span>GSSS <small>Shilla</small></span>
+      </div>
+      <button class="mobile-close-btn" id="mobileCloseBtn"><i class="fas fa-times"></i></button>
     </div>
 
-    <!-- CONTAINER -->
-    <div class="container">
+    <li><a href="../index.html"><i class="fas fa-home"></i> Home</a></li>
+    <li><a href="pub-notif.html"><i class="fas fa-bullhorn"></i> Notifications</a></li>
+    <li><a href="result.html" class="active"><i class="fas fa-chart-bar"></i> Results</a></li>
+    <li><a href="downloads.html"><i class="fas fa-download"></i> Downloads</a></li>
 
-        <!-- NEW RESULT NOTIFICATION -->
-        <div id="newResultNotification" style="display:none;"></div>
+    <li>
+      <a href="#" class="dropdown-toggle" onclick="toggleNavDropdown(event)">
+        <span><i class="fas fa-info-circle"></i> More</span>
+        <i class="fas fa-chevron-down dropdown-arrow"></i>
+      </a>
+      <div class="dropdown-menu-nav">
+        <a href="about.html"><i class="fas fa-circle-info"></i> About Us</a>
+        <a href="contact.html"><i class="fas fa-phone"></i> Contact Us</a>
+      </div>
+    </li>
 
-        <!-- SEARCH SECTION (Initially hidden) -->
-        <div class="search-section" id="searchSection">
-            <div class="form-header">
-                <h3><i class="fas fa-search"></i> Check Your Result</h3>
-                <span class="form-status" id="formStatus">Fill the details below</span>
-            </div>
-            <form id="resultSearchForm" onsubmit="searchResult(event)">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label><i class="fas fa-calendar-alt"></i> Session <span class="required">*</span></label>
-                        <input type="text" id="formSession" disabled placeholder="Auto-filled">
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-school"></i> Class <span class="required">*</span></label>
-                        <input type="text" id="formClass" disabled placeholder="Auto-filled">
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-id-card"></i> Student ID <span class="required">*</span></label>
-                        <input type="text" id="studentIdInput" placeholder="Enter Student ID" required>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-calendar-day"></i> Date of Birth <span class="required">*</span></label>
-                        <input type="text" id="dobInput" placeholder="DD/MM/YYYY" maxlength="10" required>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn-primary" id="searchBtn"><i class="fas fa-search"></i> View Result</button>
-                    <button type="button" class="btn-secondary" onclick="clearForm()"><i class="fas fa-undo"></i> Clear</button>
-                    <button type="button" class="btn-back" onclick="goBackToCards()"><i class="fas fa-arrow-left"></i> Back to Results</button>
-                </div>
-            </form>
-            <div id="resultDisplay"></div>
+    <li class="mobile-login-item">
+      <div class="login-dropdown">
+        <button class="login-btn" id="loginBtnMobile"><i class="fas fa-sign-in-alt"></i> Login</button>
+        <div class="login-dropdown-menu" id="loginDropdownMobile">
+          <a href="../admin/login.html"><i class="fas fa-user-shield"></i> Admin Panel</a>
+          <a href="student-login.html"><i class="fas fa-user-graduate"></i> Student Portal</a>
+          <a href="no.html"><i class="fas fa-chalkboard-user"></i> Teacher Portal</a>
         </div>
+      </div>
+    </li>
+  </ul>
 
-        <!-- MAIN RESULT CARD (Collapsible) -->
-        <div class="main-result-card" id="mainResultCard">
-            <div class="mrc-header" onclick="toggleMainCard()">
-                <div class="mrc-icon">
-                    <i class="fas fa-poll"></i>
-                </div>
-                <div class="mrc-body">
-                    <div class="mrc-title">
-                        Available Results
-                        <span class="count-badge" id="classesCountBadge">Loading...</span>
-                    </div>
-                    <div class="mrc-desc">Click to view all published class-wise results</div>
-                </div>
-                <div class="mrc-arrow">
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-            </div>
-            <div class="mrc-content">
-                <div class="mrc-content-inner" id="classesContainer">
-                    <div style="text-align:center;padding:30px;color:var(--gray);">
-                        <i class="fas fa-spinner fa-spin"></i> Loading classes...
-                    </div>
-                </div>
-            </div>
+  <div class="nav-actions">
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">
+      <i class="fas fa-moon" id="themeIcon"></i>
+    </button>
+    <div class="login-dropdown desktop-login">
+      <button class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> <span>Login</span></button>
+      <div class="login-dropdown-menu" id="loginDropdown">
+        <a href="../admin/login.html"><i class="fas fa-user-shield"></i> Admin Panel</a>
+        <a href="student-login.html"><i class="fas fa-user-graduate"></i> Student Portal</a>
+        <a href="no.html"><i class="fas fa-chalkboard-user"></i> Teacher Portal</a>
+      </div>
+    </div>
+    <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+  </div>
+</header>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1><i class="fas fa-file-alt"></i> Exam Results</h1>
+  <p>Check your academic performance and download marksheets</p>
+</div>
+
+<!-- CONTAINER -->
+<div class="container">
+
+  <div id="newResultNotification" style="display:none;"></div>
+
+  <!-- SEARCH SECTION -->
+  <div class="search-section" id="searchSection">
+    <div class="form-header">
+      <h3><i class="fas fa-search"></i> Check Your Result</h3>
+      <span class="form-status" id="formStatus">Fill the details below</span>
+    </div>
+    <form id="resultSearchForm" onsubmit="searchResult(event)">
+      <div class="form-grid">
+        <div class="form-group">
+          <label><i class="fas fa-calendar-alt"></i> Session <span class="required">*</span></label>
+          <input type="text" id="formSession" disabled placeholder="Auto-filled">
         </div>
+        <div class="form-group">
+          <label><i class="fas fa-school"></i> Class <span class="required">*</span></label>
+          <input type="text" id="formClass" disabled placeholder="Auto-filled">
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-id-card"></i> Student ID <span class="required">*</span></label>
+          <input type="text" id="studentIdInput" placeholder="Enter Student ID" required>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-calendar-day"></i> Date of Birth <span class="required">*</span></label>
+          <input type="text" id="dobInput" placeholder="DD/MM/YYYY" maxlength="10" required>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" id="searchBtn"><i class="fas fa-search"></i> View Result</button>
+        <button type="button" class="btn-secondary" onclick="clearForm()"><i class="fas fa-undo"></i> Clear</button>
+        <button type="button" class="btn-back" onclick="goBackToCards()"><i class="fas fa-arrow-left"></i> Back to Results</button>
+      </div>
+    </form>
+    <div id="resultDisplay"></div>
+  </div>
 
+  <!-- MAIN RESULT CARD -->
+  <div class="main-result-card" id="mainResultCard">
+    <div class="mrc-header" onclick="toggleMainCard()">
+      <div class="mrc-icon">
+        <i class="fas fa-poll"></i>
+      </div>
+      <div class="mrc-body">
+        <div class="mrc-title">
+          Available Results
+          <span class="count-badge" id="classesCountBadge">Loading...</span>
+        </div>
+        <div class="mrc-desc">Click to view all published class-wise results</div>
+      </div>
+      <div class="mrc-arrow">
+        <i class="fas fa-chevron-down"></i>
+      </div>
+    </div>
+    <div class="mrc-content">
+      <div class="mrc-content-inner" id="classesContainer">
+        <div style="text-align:center;padding:30px;color:var(--t-mid);">
+          <i class="fas fa-spinner fa-spin"></i> Loading classes...
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="brand-row">
+        <img src="logo.png" alt="School Logo" onerror="this.style.display='none'">
+        <div class="brand-name">Govt. Sr. Sec. School Shilla</div>
+      </div>
+      <p>Empowering students with quality education, discipline and a vision for a brighter India.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <a href="../index.html"><i class="fas fa-chevron-right"></i> Home</a>
+      <a href="pub-notif.html"><i class="fas fa-chevron-right"></i> Notices</a>
+      <a href="result.html"><i class="fas fa-chevron-right"></i> Results</a>
+      <a href="downloads.html"><i class="fas fa-chevron-right"></i> Downloads</a>
+      <a href="contact.html"><i class="fas fa-chevron-right"></i> Contact</a>
+    </div>
+    <div class="footer-col">
+      <h4>Portals</h4>
+      <a href="../admin/login.html"><i class="fas fa-chevron-right"></i> Admin</a>
+      <a href="student-login.html"><i class="fas fa-chevron-right"></i> Student</a>
+      <a href="no.html"><i class="fas fa-chevron-right"></i> Teacher</a>
+    </div>
+    <div class="footer-col">
+      <h4>Government</h4>
+      <a href="https://www.hpbose.org/" target="_blank"><i class="fas fa-chevron-right"></i> HPBOSE</a>
+      <a href="https://scholarships.gov.in/" target="_blank"><i class="fas fa-chevron-right"></i> NSP Scholarship</a>
+      <a href="https://www.mygov.in/" target="_blank"><i class="fas fa-chevron-right"></i> My Govt.</a>
+      <a href="https://www.education.gov.in/" target="_blank"><i class="fas fa-chevron-right"></i> Edu Ministry</a>
+    </div>
+  </div>
+  <div class="social-links">
+    <a href="https://www.facebook.com/share/1BgkMoxXp3/" target="_blank" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
+    <a href="#" class="social-icon instagram"><i class="fab fa-instagram"></i></a>
+    <a href="#" class="social-icon youtube"><i class="fab fa-youtube"></i></a>
+    <a href="#" class="social-icon twitter"><i class="fab fa-x-twitter"></i></a>
+    <a href="#" class="social-icon whatsapp"><i class="fab fa-whatsapp"></i></a>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Govt. Sr. Sec. School Shilla · All Rights Reserved</p>
+    <a href="../school_privacy_policy.pdf"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+    <a href="#"><i class="fas fa-clock"></i> Last Update: 08 Aug, 2026</a>
+  </div>
+  <div class="dev">Session: 2026-2027 &nbsp; | &nbsp; Developer: <b>Vikshant Kralta</b></div>
+</footer>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ============================================================
+// THEME TOGGLE
+// ============================================================
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const icon = document.getElementById('themeIcon');
+  const btn = document.getElementById('themeBtn');
+  if (icon) icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+  if (btn) { btn.classList.add('spin'); setTimeout(() => btn.classList.remove('spin'), 600); }
+  try { localStorage.setItem('theme', theme); } catch (e) {}
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  setTheme(current === 'dark' ? 'light' : 'dark');
+}
+try {
+  const saved = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.addEventListener('DOMContentLoaded', () => {
+    const i = document.getElementById('themeIcon');
+    if (i) i.className = saved === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+  });
+} catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
+
+// ============================================================
+// NAV DROPDOWN (click-based)
+// ============================================================
+function toggleNavDropdown(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const parent = e.currentTarget.parentElement;
+  if (document.getElementById('navLinks').classList.contains('active')) {
+    const dropdown = parent.querySelector('.dropdown-menu-nav');
+    const arrow = e.currentTarget.querySelector('.dropdown-arrow');
+    if (dropdown) dropdown.classList.toggle('show-mobile');
+    if (arrow) arrow.classList.toggle('rotated');
+    return;
+  }
+  document.querySelectorAll('.nav-links > li.open').forEach(li => {
+    if (li !== parent) li.classList.remove('open');
+  });
+  parent.classList.toggle('open');
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.nav-links > li')) {
+    document.querySelectorAll('.nav-links > li.open').forEach(li => li.classList.remove('open'));
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.nav-links > li.open').forEach(li => li.classList.remove('open'));
+    document.getElementById('loginDropdown')?.classList.remove('show');
+    document.getElementById('loginDropdownMobile')?.classList.remove('show');
+  }
+});
+
+// ============================================================
+// NAVBAR, MOBILE MENU, LOGIN DROPDOWN
+// ============================================================
+const navbar = document.getElementById("navbar");
+window.addEventListener("scroll", function() {
+  if (window.scrollY > 50) navbar.classList.add("scrolled");
+  else navbar.classList.remove("scrolled");
+});
+
+const menuToggle = document.getElementById("menuToggle");
+const navLinks = document.getElementById("navLinks");
+const mobileOverlay = document.getElementById("mobileOverlay");
+const mobileCloseBtn = document.getElementById("mobileCloseBtn");
+
+function openMobileMenu() {
+  navLinks.classList.add("active");
+  mobileOverlay.classList.add("active");
+  menuToggle.classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+function closeMobileMenu() {
+  navLinks.classList.remove("active");
+  mobileOverlay.classList.remove("active");
+  menuToggle.classList.remove("active");
+  document.body.style.overflow = "";
+}
+menuToggle.addEventListener("click", function(e) {
+  e.stopPropagation();
+  if (navLinks.classList.contains("active")) closeMobileMenu();
+  else openMobileMenu();
+});
+mobileCloseBtn.addEventListener("click", closeMobileMenu);
+mobileOverlay.addEventListener("click", closeMobileMenu);
+navLinks.querySelectorAll("a:not(.dropdown-toggle)").forEach(function(link) {
+  link.addEventListener("click", function() { closeMobileMenu(); });
+});
+
+function setupDropdown(btnId, menuId) {
+  const btn = document.getElementById(btnId);
+  const menu = document.getElementById(menuId);
+  if (!btn || !menu) return;
+  btn.addEventListener("click", function(e) {
+    e.stopPropagation();
+    menu.classList.toggle("show");
+  });
+  document.addEventListener("click", function(e) {
+    if (!menu.contains(e.target) && !btn.contains(e.target)) {
+      menu.classList.remove("show");
+    }
+  });
+}
+setupDropdown("loginBtn", "loginDropdown");
+setupDropdown("loginBtnMobile", "loginDropdownMobile");
+
+// ============================================================
+// CONFIG
+// ============================================================
+const API_BASE = window.location.hostname === "localhost"
+  ? "http://localhost:5000/api/admin/results"
+  : "https://gsssshilla.onrender.com/api/admin/results";
+
+const NEW_RESULT_DAYS = 10;
+
+let selectedClass = null;
+let selectedSession = null;
+let selectedExamType = null;
+let currentStudentData = null;
+let allClassesData = [];
+
+// ============================================================
+// HELPERS
+// ============================================================
+function esc(v) {
+  return v === null || v === undefined ? "" : String(v)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+function showToast(msg, type) {
+  const c = document.getElementById("toastContainer");
+  const t = document.createElement("div");
+  t.className = "toast toast-" + type;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = "0";
+    t.style.transform = "translateX(100%)";
+    setTimeout(() => t.remove(), 400);
+  }, 4000);
+}
+function formatDate(v) {
+  if (!v) return "—";
+  const d = new Date(v);
+  return isNaN(d) ? "—" : d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+}
+function formatMonth(v) {
+  if (!v) return "—";
+  const parts = String(v).split("-");
+  if (parts.length !== 2) return v;
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return months[parseInt(parts[1]) - 1] + " " + parts[0];
+}
+function daysBetween(dateStr) {
+  if (!dateStr) return 999;
+  const diff = (Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24);
+  return Math.floor(diff);
+}
+function isNewResult(declaredDate) { return daysBetween(declaredDate) <= NEW_RESULT_DAYS; }
+function getStatusClass(status) {
+  if (!status) return "rc-status-absent";
+  const map = {
+    "Pass": "rc-status-pass", "Fail": "rc-status-fail",
+    "Compartment": "rc-status-compartment", "Supply": "rc-status-supply",
+    "Absent": "rc-status-absent", "Withheld": "rc-status-withheld"
+  };
+  return map[status] || "rc-status-absent";
+}
+function getStatusIcon(status) {
+  const map = {
+    "Pass": "✅", "Fail": "❌", "Compartment": "🟠",
+    "Supply": "🟡", "Absent": "⚫", "Withheld": "🟣"
+  };
+  return map[status] || "⬜";
+}
+
+// DOB format
+document.getElementById("dobInput").addEventListener("input", function() {
+  let val = this.value.replace(/\D/g, "");
+  if (val.length > 8) val = val.substring(0, 8);
+  let result = "";
+  if (val.length > 4) result = val.substring(0, 2) + "/" + val.substring(2, 4) + "/" + val.substring(4);
+  else if (val.length > 2) result = val.substring(0, 2) + "/" + val.substring(2);
+  else result = val;
+  this.value = result;
+});
+document.getElementById("studentIdInput").addEventListener("input", function() {
+  this.value = this.value.toUpperCase();
+});
+
+// ============================================================
+// TOGGLE MAIN CARD
+// ============================================================
+function toggleMainCard() {
+  const card = document.getElementById("mainResultCard");
+  card.classList.toggle("open");
+}
+
+// ============================================================
+// LOAD CLASSES
+// ============================================================
+async function loadAvailableClasses() {
+  const badge = document.getElementById("classesCountBadge");
+  const container = document.getElementById("classesContainer");
+
+  try {
+    const res = await fetch(`${API_BASE}/public/classes`);
+    const data = await res.json();
+
+    if (data.success && data.data.length > 0) {
+      allClassesData = data.data;
+      badge.textContent = data.data.length + " Classes";
+
+      const newResults = data.data.filter(c => {
+        const days = daysBetween(c.declared_date_raw || c.declared_date);
+        return days <= NEW_RESULT_DAYS;
+      });
+      renderNewResultNotification(newResults);
+
+      container.innerHTML = data.data.map(c => {
+        const isNew = isNewResult(c.declared_date_raw || c.declared_date);
+        const sessionSafe = (c.session || "").replace(/'/g, "\\'");
+        const examSafe = (c.exam_type || "").replace(/'/g, "\\'");
+        return `
+          <div class="result-card ${isNew ? 'is-new new-badge' : ''}" onclick="selectClass('${c.class}', '${sessionSafe}', '${examSafe}')">
+            <div class="rc-header" style="cursor:pointer;">
+              <div class="rc-left">
+                <div class="rc-icon"><i class="fas fa-school"></i></div>
+                <div>
+                  <div class="rc-title">Class ${esc(c.class)}</div>
+                  <div class="rc-meta">
+                    <span><i class="fas fa-calendar-alt"></i> ${esc(c.session || "—")}</span>
+                    <span><i class="fas fa-file-alt"></i> ${esc(c.exam_type || "Various")}</span>
+                    <span><i class="fas fa-clock"></i> ${esc(c.declared_date || "Available")}</span>
+                    <span><i class="fas fa-file-pdf"></i> ${c.total_published} published</span>
+                  </div>
+                </div>
+              </div>
+              <div class="rc-right">
+                <span class="rc-status-pill rc-status-pass">✅ Published</span>
+                <div class="rc-chevron"><i class="fas fa-arrow-right"></i></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    } else {
+      badge.textContent = "0 Classes";
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-inbox"></i>
+          <h3>No Published Results</h3>
+          <p>Results will appear here once published by the school.</p>
+        </div>
+      `;
+    }
+  } catch (e) {
+    badge.textContent = "Error";
+    container.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-exclamation-circle" style="color:var(--danger);"></i>
+        <h3>Failed to load</h3>
+        <p>Please check your connection and try again.</p>
+        <button onclick="loadAvailableClasses()" class="btn-primary" style="margin-top:16px;">
+          <i class="fas fa-sync-alt"></i> Retry
+        </button>
+      </div>
+    `;
+  }
+}
+
+function renderNewResultNotification(newResults) {
+  const notifDiv = document.getElementById("newResultNotification");
+  if (!newResults || newResults.length === 0) {
+    notifDiv.style.display = "none";
+    notifDiv.innerHTML = "";
+    return;
+  }
+  notifDiv.style.display = "block";
+  const classNames = newResults.map(r => `Class ${r.class}`).join(", ");
+  const totalNew = newResults.reduce((sum, r) => sum + (r.total_published || 0), 0);
+  notifDiv.innerHTML = `
+    <div class="new-result-notification">
+      <div class="nr-icon"><i class="fas fa-bell"></i></div>
+      <div class="nr-body">
+        <div class="nr-title">
+          🎉 New Results Published!
+          <span class="new-pill">NEW</span>
+        </div>
+        <div class="nr-desc">
+          <strong>${classNames}</strong> ke results recently publish hue hain (${totalNew} marksheet${totalNew > 1 ? 's' : ''}) — last 10 days me!
+        </div>
+      </div>
+      <button class="nr-btn" onclick="scrollToResults()">
+        <i class="fas fa-arrow-down"></i> View Results
+      </button>
+    </div>
+  `;
+}
+function scrollToResults() {
+  const card = document.getElementById("mainResultCard");
+  card.classList.add("open");
+  card.scrollIntoView({ behavior: "smooth", block: "start" });
+  showToast("Opening results...", "success");
+}
+
+function selectClass(classNum, session, examType) {
+  selectedClass = String(classNum);
+  selectedSession = session || "";
+  selectedExamType = examType || "";
+  const searchSection = document.getElementById("searchSection");
+  searchSection.classList.add("active");
+  document.getElementById("formSession").value = selectedSession || "—";
+  document.getElementById("formClass").value = "Class " + selectedClass;
+  const formStatus = document.getElementById("formStatus");
+  formStatus.textContent = `Class ${selectedClass} selected. Enter your details.`;
+  formStatus.style.color = "var(--success)";
+  searchSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  setTimeout(() => document.getElementById("studentIdInput").focus(), 400);
+  showToast("Class " + selectedClass + " selected", "success");
+}
+
+function goBackToCards() {
+  document.getElementById("searchSection").classList.remove("active");
+  selectedClass = null;
+  selectedSession = null;
+  document.getElementById("studentIdInput").value = "";
+  document.getElementById("dobInput").value = "";
+  document.getElementById("resultDisplay").innerHTML = "";
+  currentStudentData = null;
+  document.getElementById("mainResultCard").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function clearForm() {
+  document.getElementById("studentIdInput").value = "";
+  document.getElementById("dobInput").value = "";
+  document.getElementById("resultDisplay").innerHTML = "";
+  currentStudentData = null;
+  if (selectedClass) {
+    const formStatus = document.getElementById("formStatus");
+    formStatus.textContent = "Class selected. Enter your details.";
+    formStatus.style.color = "var(--success)";
+  }
+  showToast("Form cleared", "info");
+}
+
+async function searchResult(e) {
+  e.preventDefault();
+  const studentId = document.getElementById("studentIdInput").value.trim().toUpperCase();
+  const dobRaw = document.getElementById("dobInput").value.trim();
+  if (!studentId || !dobRaw) return showToast("Enter Student ID and DOB", "warning");
+  if (!selectedClass) return showToast("Select a class first", "warning");
+  const dobParts = dobRaw.split("/");
+  if (dobParts.length !== 3 || dobParts[2].length !== 4) return showToast("Invalid DOB format. Use DD/MM/YYYY", "error");
+  const dob = `${dobParts[2]}-${dobParts[1]}-${dobParts[0]}`;
+  const searchBtn = document.getElementById("searchBtn");
+  searchBtn.disabled = true;
+  searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+  const resultDisplay = document.getElementById("resultDisplay");
+  resultDisplay.innerHTML = '<div style="text-align:center;padding:30px;"><i class="fas fa-spinner fa-spin"></i> Searching for result...</div>';
+
+  try {
+    const res = await fetch(`${API_BASE}/public/search`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        student_id: studentId,
+        dob: dob,
+        class: selectedClass,
+        session: selectedSession || undefined
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      currentStudentData = data.data;
+      const formStatus = document.getElementById("formStatus");
+      formStatus.textContent = "Result Found!";
+      formStatus.style.color = "var(--success)";
+      renderResult(data.data);
+      showToast("Result found successfully!", "success");
+    } else {
+      document.getElementById("formStatus").textContent = data.message || "No result found";
+      document.getElementById("formStatus").style.color = "var(--danger)";
+      resultDisplay.innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${esc(data.message || "No result found")}</div>`;
+      showToast(data.message || "No result found", "error");
+    }
+  } catch (e) {
+    document.getElementById("formStatus").textContent = "Search failed";
+    document.getElementById("formStatus").style.color = "var(--danger)";
+    resultDisplay.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Network error. Please try again.</div>';
+    showToast("Network error", "error");
+  }
+  searchBtn.disabled = false;
+  searchBtn.innerHTML = '<i class="fas fa-search"></i> View Result';
+}
+
+function renderResult(data) {
+  const s = data.student;
+  const marksheets = data.marksheets || [];
+  const overallStatus = data.overall_status;
+  const overallReason = data.overall_status_reason;
+
+  let totalObtained = 0, totalMax = 0;
+  marksheets.forEach(m => {
+    totalObtained += parseInt(m.obtained_marks) || 0;
+    totalMax += parseInt(m.max_marks) || 0;
+  });
+  const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) + "%" : "—";
+  const grade = calculateGrade(percentage);
+
+  const marksheetCards = marksheets.length === 0
+    ? '<div class="alert alert-warning"><i class="fas fa-info-circle"></i> No published marksheets available.</div>'
+    : marksheets.map((m, idx) => renderMarksheetCard(m, idx, s)).join("");
+
+  document.getElementById("resultDisplay").innerHTML = `
+    ${overallStatus ? `
+      <div class="new-result-notification" style="background:linear-gradient(135deg,#1a56db,#3b82f6);">
+        <div class="nr-icon" style="background:rgba(255,255,255,0.2);animation:none;">
+          <i class="fas fa-award"></i>
+        </div>
+        <div class="nr-body">
+          <div class="nr-title">Overall Result: ${getStatusIcon(overallStatus)} ${overallStatus}</div>
+          <div class="nr-desc">${esc(overallReason || "Based on all published exams")}</div>
+        </div>
+      </div>
+    ` : ''}
+
+    <div class="result-card expanded" style="cursor:default;">
+      <div class="rc-header" style="cursor:default;">
+        <div class="rc-left">
+          <div class="rc-icon"><i class="fas fa-user-graduate"></i></div>
+          <div>
+            <div class="rc-title">${esc(s.name)}</div>
+            <div class="rc-meta">
+              <span><i class="fas fa-id-card"></i> ${esc(s.student_id)}</span>
+              <span><i class="fas fa-school"></i> Class ${esc(s.class || "—")}</span>
+              <span><i class="fas fa-calendar"></i> ${esc(s.session || "—")}</span>
+            </div>
+          </div>
+        </div>
+        <div class="rc-right">
+          ${overallStatus ? `<span class="rc-status-pill ${getStatusClass(overallStatus)}">${getStatusIcon(overallStatus)} ${overallStatus}</span>` : ''}
+        </div>
+      </div>
+      <div class="rc-details" style="max-height:none;">
+        <div class="rc-details-inner">
+          <div class="info-grid">
+            <div class="info-item"><label>Student ID</label><span>${esc(s.student_id)}</span></div>
+            <div class="info-item"><label>Full Name</label><span>${esc(s.name)}</span></div>
+            <div class="info-item"><label>Father's Name</label><span>${esc(s.father_name || "—")}</span></div>
+            <div class="info-item"><label>Mother's Name</label><span>${esc(s.mother_name || "—")}</span></div>
+            <div class="info-item"><label>Date of Birth</label><span>${s.dob ? formatDate(s.dob) : "—"}</span></div>
+            <div class="info-item"><label>Class</label><span>${esc(s.class || "—")}</span></div>
+            <div class="info-item"><label>Roll No</label><span>${esc(s.roll_number || s.exam_roll_no || "—")}</span></div>
+            <div class="info-item"><label>Session</label><span>${esc(s.session || "—")}</span></div>
+          </div>
+          <div class="marks-summary-box">
+            <div class="summary-item"><div class="label">Total Obtained</div><div class="value gold">${totalObtained}</div></div>
+            <div class="summary-item"><div class="label">Total Maximum</div><div class="value">${totalMax}</div></div>
+            <div class="summary-item"><div class="label">Percentage</div><div class="value gold">${percentage}</div></div>
+            <div class="summary-item"><div class="label">Grade</div><div class="value">${grade}</div></div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-        <div class="footer-grid">
-            <div class="footer-brand">
-                <div class="brand-row"><img src="logo.png" alt="School Logo" onerror="this.style.display='none'"><div class="brand-name">Govt. Sr. Sec. School Shilla</div></div>
-                <p>Empowering students with quality education, discipline and a vision for a brighter India.</p>
+    <h3 style="font-family:'Playfair Display',serif;font-size:20px;color:var(--t-hi);margin:24px 0 14px;display:flex;align-items:center;gap:10px;font-weight:800;">
+      <i class="fas fa-file-pdf" style="color:var(--primary-d);"></i>
+      Published Marksheets (${marksheets.length})
+    </h3>
+    ${marksheetCards}
+
+    <div style="text-align:center;margin-top:24px;">
+      <button class="btn-primary" onclick="printFullResult()" style="padding:16px 40px;">
+        <i class="fas fa-print"></i> Print Complete Result
+      </button>
+    </div>
+  `;
+  document.getElementById("resultDisplay").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderMarksheetCard(m, idx, student) {
+  const isNew = isNewResult(m.declaration_date);
+  const subjects = m.subjects || [];
+  const status = m.result_status;
+
+  let subjectsTable = "";
+  if (subjects.length > 0) {
+    const totalSubObtained = subjects.reduce((s, x) => s + (parseInt(x.obtained) || 0), 0);
+    const totalSubMax = subjects.reduce((s, x) => s + (parseInt(x.max) || 0), 0);
+
+    subjectsTable = `
+      <div class="subjects-table-wrap">
+        <table class="subjects-table">
+          <thead>
+            <tr><th>#</th><th>Subject</th><th>Obtained</th><th>Max</th><th>Percentage</th></tr>
+          </thead>
+          <tbody>
+            ${subjects.map((sub, i) => {
+              const pct = sub.max > 0 ? ((sub.obtained / sub.max) * 100) : 0;
+              const isFail = pct < 33;
+              return `
+                <tr>
+                  <td>${i + 1}</td>
+                  <td style="font-weight:600;">${esc(sub.name)}</td>
+                  <td class="${isFail ? 'fail-mark' : 'pass-mark'}">${sub.obtained}</td>
+                  <td>${sub.max}</td>
+                  <td class="pct-cell">${pct.toFixed(1)}%</td>
+                </tr>
+              `;
+            }).join("")}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2" style="text-align:right;">TOTAL</td>
+              <td>${totalSubObtained}</td>
+              <td>${totalSubMax}</td>
+              <td>${totalSubMax > 0 ? ((totalSubObtained/totalSubMax)*100).toFixed(1) : 0}%</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="result-card ${isNew ? 'is-new new-badge' : ''}" id="rc-${m.id}">
+      <div class="rc-header" onclick="toggleResultCard(${m.id})">
+        <div class="rc-left">
+          <div class="rc-icon"><i class="fas fa-scroll"></i></div>
+          <div>
+            <div class="rc-title">${esc(m.exam_type)}</div>
+            <div class="rc-meta">
+              <span><i class="far fa-calendar-alt"></i> ${formatMonth(m.exam_session || m.session)}</span>
+              ${m.obtained_marks ? `<span><i class="fas fa-star"></i> ${esc(m.obtained_marks)}/${esc(m.max_marks || "—")}</span>` : ''}
+              ${m.declaration_date ? `<span><i class="fas fa-bullhorn"></i> ${formatDate(m.declaration_date)}</span>` : ''}
             </div>
-            <div class="footer-col">
-                <h4>Quick Links</h4>
-                <a href="../index.html"><i class="fas fa-chevron-right"></i> Home</a>
-                <a href="pub-notif.html"><i class="fas fa-chevron-right"></i> Notices</a>
-                <a href="result.html"><i class="fas fa-chevron-right"></i> Results</a>
-                <a href="downloads.html"><i class="fas fa-chevron-right"></i> Downloads</a>
-                <a href="contact.html"><i class="fas fa-chevron-right"></i> Contact</a>
-            </div>
-            <div class="footer-col">
-                <h4>Portals</h4>
-                <a href="../admin/login.html"><i class="fas fa-chevron-right"></i> Admin</a>
-                <a href="student-login.html"><i class="fas fa-chevron-right"></i> Student</a>
-                <a href="no.html"><i class="fas fa-chevron-right"></i> Teacher</a>
-            </div>
-            <div class="footer-col">
-                <h4>Government</h4>
-                <a href="https://www.hpbose.org/" target="_blank"><i class="fas fa-chevron-right"></i> HPBOSE</a>
-                <a href="https://scholarships.gov.in/" target="_blank"><i class="fas fa-chevron-right"></i> NSP Scholarship</a>
-                <a href="https://www.mygov.in/" target="_blank"><i class="fas fa-chevron-right"></i> My Govt.</a>
-                <a href="https://www.education.gov.in/" target="_blank"><i class="fas fa-chevron-right"></i> Edu Ministry</a>
-            </div>
+          </div>
         </div>
-        <div class="social-links">
-            <a href="https://www.facebook.com/share/1BgkMoxXp3/" target="_blank" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" class="social-icon instagram"><i class="fab fa-instagram"></i></a>
-            <a href="#" class="social-icon youtube"><i class="fab fa-youtube"></i></a>
-            <a href="#" class="social-icon twitter"><i class="fab fa-x-twitter"></i></a>
-            <a href="#" class="social-icon whatsapp"><i class="fab fa-whatsapp"></i></a>
+        <div class="rc-right">
+          ${status ? `<span class="rc-status-pill ${getStatusClass(status)}">${getStatusIcon(status)} ${esc(status)}</span>` : ''}
+          <div class="rc-chevron"><i class="fas fa-chevron-down"></i></div>
         </div>
-        <div class="footer-bottom">
-            <p>© 2026 Govt. Sr. Sec. School Shilla · All Rights Reserved</p>
-            <a href="../school_privacy_policy.pdf"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
-            <a href="#"><i class="fas fa-clock"></i> Last Update: 08 Aug, 2026</a>
+      </div>
+      <div class="rc-details">
+        <div class="rc-details-inner">
+          <div class="info-grid">
+            <div class="info-item"><label>Exam Type</label><span>${esc(m.exam_type)}</span></div>
+            <div class="info-item"><label>Exam Session</label><span>${formatMonth(m.exam_session || m.session)}</span></div>
+            <div class="info-item"><label>Class</label><span>${esc(m.class || student.class || "—")}</span></div>
+            <div class="info-item"><label>Result Status</label><span>${status ? `${getStatusIcon(status)} ${esc(status)}` : "—"}</span></div>
+            <div class="info-item"><label>Obtained Marks</label><span>${esc(m.obtained_marks || "—")}</span></div>
+            <div class="info-item"><label>Maximum Marks</label><span>${esc(m.max_marks || "—")}</span></div>
+            <div class="info-item"><label>Percentage</label><span>${m.obtained_marks && m.max_marks ? ((parseInt(m.obtained_marks) / parseInt(m.max_marks)) * 100).toFixed(2) + "%" : "—"}</span></div>
+            <div class="info-item"><label>Declared On</label><span>${m.declaration_date ? formatDate(m.declaration_date) : "—"}</span></div>
+          </div>
+          ${subjectsTable}
+          ${m.remarks ? `<div class="remarks-box"><i class="fas fa-info-circle"></i><div><strong>Remarks:</strong> ${esc(m.remarks)}</div></div>` : ''}
+          <div class="rc-actions">
+            <button class="rc-btn rc-btn-view" onclick="viewMarksheet(${m.id})"><i class="fas fa-eye"></i> View PDF</button>
+            <button class="rc-btn rc-btn-download" onclick="downloadMarksheet(${m.id})"><i class="fas fa-download"></i> Download</button>
+            <button class="rc-btn rc-btn-print" onclick="printSingleMarksheet(${m.id})"><i class="fas fa-print"></i> Print</button>
+          </div>
         </div>
-        <div class="dev">Session: 2026-2027</div>
-    </footer>
-
-    <div class="toast-container" id="toastContainer"></div>
-
-    <script>
-        // ============================================================
-        // CONFIG
-        // ============================================================
-        const API_BASE = window.location.hostname === "localhost"
-            ? "http://localhost:5000/api/admin/results"
-            : "https://gsssshilla.onrender.com/api/admin/results";
-
-        const NEW_RESULT_DAYS = 10; // 10 din ke andar publish hue results NEW honge
-
-        let selectedClass = null;
-        let selectedSession = null;
-        let selectedExamType = null;
-        let currentStudentData = null;
-        let allClassesData = [];
-
-        // ============================================================
-        // NAVBAR
-        // ============================================================
-        const navbar = document.getElementById("navbar");
-        window.addEventListener("scroll", function() {
-            if (window.scrollY > 50) navbar.classList.add("scrolled");
-            else navbar.classList.remove("scrolled");
-        });
-
-        const menuToggle = document.getElementById("menuToggle");
-        const navLinks = document.getElementById("navLinks");
-        menuToggle.addEventListener("click", function() {
-            navLinks.classList.toggle("active");
-            menuToggle.classList.toggle("active");
-        });
-
-        const loginBtn = document.getElementById("loginBtn");
-        const loginDropdown = document.getElementById("loginDropdown");
-        if (loginBtn) {
-            loginBtn.addEventListener("click", function(e) {
-                e.stopPropagation();
-                loginDropdown.classList.toggle("show");
-            });
-            document.addEventListener("click", function(e) {
-                if (!loginDropdown.contains(e.target) && !loginBtn.contains(e.target)) {
-                    loginDropdown.classList.remove("show");
-                }
-            });
-        }
-
-        // ============================================================
-        // HELPERS
-        // ============================================================
-        function esc(v) {
-            return v === null || v === undefined ? "" : String(v)
-                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
-
-        function showToast(msg, type) {
-            const c = document.getElementById("toastContainer");
-            const t = document.createElement("div");
-            t.className = "toast toast-" + type;
-            t.textContent = msg;
-            c.appendChild(t);
-            setTimeout(() => {
-                t.style.opacity = "0";
-                t.style.transform = "translateX(100%)";
-                setTimeout(() => t.remove(), 400);
-            }, 4000);
-        }
-
-        function formatDate(v) {
-            if (!v) return "—";
-            const d = new Date(v);
-            return isNaN(d) ? "—" : d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
-        }
-
-        function formatMonth(v) {
-            if (!v) return "—";
-            const parts = String(v).split("-");
-            if (parts.length !== 2) return v;
-            const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-            return months[parseInt(parts[1]) - 1] + " " + parts[0];
-        }
-
-        function daysBetween(dateStr) {
-            if (!dateStr) return 999;
-            const diff = (Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24);
-            return Math.floor(diff);
-        }
-
-        function isNewResult(declaredDate) {
-            return daysBetween(declaredDate) <= NEW_RESULT_DAYS;
-        }
-
-        function getStatusClass(status) {
-            if (!status) return "rc-status-absent";
-            const map = {
-                "Pass": "rc-status-pass",
-                "Fail": "rc-status-fail",
-                "Compartment": "rc-status-compartment",
-                "Supply": "rc-status-supply",
-                "Absent": "rc-status-absent",
-                "Withheld": "rc-status-withheld"
-            };
-            return map[status] || "rc-status-absent";
-        }
-
-        function getStatusIcon(status) {
-            const map = {
-                "Pass": "✅", "Fail": "❌", "Compartment": "🟠",
-                "Supply": "🟡", "Absent": "⚫", "Withheld": "🟣"
-            };
-            return map[status] || "⬜";
-        }
-
-        // ============================================================
-        // DOB FORMAT
-        // ============================================================
-        document.getElementById("dobInput").addEventListener("input", function() {
-            let val = this.value.replace(/\D/g, "");
-            if (val.length > 8) val = val.substring(0, 8);
-            let result = "";
-            if (val.length > 4) result = val.substring(0, 2) + "/" + val.substring(2, 4) + "/" + val.substring(4);
-            else if (val.length > 2) result = val.substring(0, 2) + "/" + val.substring(2);
-            else result = val;
-            this.value = result;
-        });
-
-        document.getElementById("studentIdInput").addEventListener("input", function() {
-            this.value = this.value.toUpperCase();
-        });
-
-        // ============================================================
-        // TOGGLE MAIN CARD
-        // ============================================================
-        function toggleMainCard() {
-            const card = document.getElementById("mainResultCard");
-            card.classList.toggle("open");
-        }
-
-        // ============================================================
-        // LOAD AVAILABLE CLASSES + NEW RESULT NOTIFICATION
-        // ============================================================
-        async function loadAvailableClasses() {
-            const badge = document.getElementById("classesCountBadge");
-            const container = document.getElementById("classesContainer");
-
-            try {
-                const res = await fetch(`${API_BASE}/public/classes`);
-                const data = await res.json();
-
-                if (data.success && data.data.length > 0) {
-                    allClassesData = data.data;
-                    badge.textContent = data.data.length + " Classes";
-
-                    // 🔔 Check for NEW results (within 10 days)
-                    const newResults = data.data.filter(c => {
-                        const days = daysBetween(c.declared_date_raw || c.declared_date);
-                        return days <= NEW_RESULT_DAYS;
-                    });
-
-                    // Show notification
-                    renderNewResultNotification(newResults);
-
-                    // Render class cards
-                    container.innerHTML = data.data.map(c => {
-                        const isNew = isNewResult(c.declared_date_raw || c.declared_date);
-                        const sessionSafe = (c.session || "").replace(/'/g, "\\'");
-                        const examSafe = (c.exam_type || "").replace(/'/g, "\\'");
-                        return `
-                            <div class="result-card ${isNew ? 'is-new new-badge' : ''}" onclick="selectClass('${c.class}', '${sessionSafe}', '${examSafe}')">
-                                <div class="rc-header" style="cursor:pointer;">
-                                    <div class="rc-left">
-                                        <div class="rc-icon"><i class="fas fa-school"></i></div>
-                                        <div>
-                                            <div class="rc-title">Class ${esc(c.class)}</div>
-                                            <div class="rc-meta">
-                                                <span><i class="fas fa-calendar-alt"></i> ${esc(c.session || "—")}</span>
-                                                <span><i class="fas fa-file-alt"></i> ${esc(c.exam_type || "Various")}</span>
-                                                <span><i class="fas fa-clock"></i> ${esc(c.declared_date || "Available")}</span>
-                                                <span><i class="fas fa-file-pdf"></i> ${c.total_published} published</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="rc-right">
-                                        <span class="rc-status-pill rc-status-pass">✅ Published</span>
-                                        <div class="rc-chevron"><i class="fas fa-arrow-right"></i></div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }).join("");
-                } else {
-                    badge.textContent = "0 Classes";
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-inbox"></i>
-                            <h3>No Published Results</h3>
-                            <p>Results will appear here once published by the school.</p>
-                        </div>
-                    `;
-                }
-            } catch (e) {
-                badge.textContent = "Error";
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-circle" style="color:var(--danger);"></i>
-                        <h3>Failed to load</h3>
-                        <p>Please check your connection and try again.</p>
-                        <button onclick="loadAvailableClasses()" class="btn-primary" style="margin-top:16px;">
-                            <i class="fas fa-sync-alt"></i> Retry
-                        </button>
-                    </div>
-                `;
-            }
-        }
-
-        // ============================================================
-        // NEW RESULT NOTIFICATION
-        // ============================================================
-        function renderNewResultNotification(newResults) {
-            const notifDiv = document.getElementById("newResultNotification");
-
-            if (!newResults || newResults.length === 0) {
-                notifDiv.style.display = "none";
-                notifDiv.innerHTML = "";
-                return;
-            }
-
-            notifDiv.style.display = "block";
-
-            const classNames = newResults.map(r => `Class ${r.class}`).join(", ");
-            const totalNew = newResults.reduce((sum, r) => sum + (r.total_published || 0), 0);
-
-            notifDiv.innerHTML = `
-                <div class="new-result-notification">
-                    <div class="nr-icon">
-                        <i class="fas fa-bell"></i>
-                    </div>
-                    <div class="nr-body">
-                        <div class="nr-title">
-                            🎉 New Results Published!
-                            <span class="new-pill">NEW</span>
-                        </div>
-                        <div class="nr-desc">
-                            <strong>${classNames}</strong> ke results recently publish hue hain (${totalNew} marksheet${totalNew > 1 ? 's' : ''}) — last 10 days me!
-                        </div>
-                    </div>
-                    <button class="nr-btn" onclick="scrollToResults()">
-                        <i class="fas fa-arrow-down"></i> View Results
-                    </button>
-                </div>
-            `;
-        }
-
-        function scrollToResults() {
-            const card = document.getElementById("mainResultCard");
-            card.classList.add("open");
-            card.scrollIntoView({ behavior: "smooth", block: "start" });
-            showToast("Opening results...", "success");
-        }
-
-        // ============================================================
-        // SELECT CLASS → SHOW SEARCH SECTION
-        // ============================================================
-        function selectClass(classNum, session, examType) {
-            selectedClass = String(classNum);
-            selectedSession = session || "";
-            selectedExamType = examType || "";
-
-            const searchSection = document.getElementById("searchSection");
-            searchSection.classList.add("active");
-
-            document.getElementById("formSession").value = selectedSession || "—";
-            document.getElementById("formClass").value = "Class " + selectedClass;
-
-            const formStatus = document.getElementById("formStatus");
-            formStatus.textContent = `Class ${selectedClass} selected. Enter your details.`;
-            formStatus.style.color = "var(--success)";
-
-            searchSection.scrollIntoView({ behavior: "smooth", block: "start" });
-            setTimeout(() => document.getElementById("studentIdInput").focus(), 400);
-            showToast("Class " + selectedClass + " selected", "success");
-        }
-
-        // ============================================================
-        // GO BACK / CLEAR
-        // ============================================================
-        function goBackToCards() {
-            document.getElementById("searchSection").classList.remove("active");
-            selectedClass = null;
-            selectedSession = null;
-            document.getElementById("studentIdInput").value = "";
-            document.getElementById("dobInput").value = "";
-            document.getElementById("resultDisplay").innerHTML = "";
-            currentStudentData = null;
-            document.getElementById("mainResultCard").scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-
-        function clearForm() {
-            document.getElementById("studentIdInput").value = "";
-            document.getElementById("dobInput").value = "";
-            document.getElementById("resultDisplay").innerHTML = "";
-            currentStudentData = null;
-            if (selectedClass) {
-                const formStatus = document.getElementById("formStatus");
-                formStatus.textContent = "Class selected. Enter your details.";
-                formStatus.style.color = "var(--success)";
-            }
-            showToast("Form cleared", "info");
-        }
-
-        // ============================================================
-        // SEARCH RESULT
-        // ============================================================
-        async function searchResult(e) {
-            e.preventDefault();
-
-            const studentId = document.getElementById("studentIdInput").value.trim().toUpperCase();
-            const dobRaw = document.getElementById("dobInput").value.trim();
-
-            if (!studentId || !dobRaw) return showToast("Enter Student ID and DOB", "warning");
-            if (!selectedClass) return showToast("Select a class first", "warning");
-
-            const dobParts = dobRaw.split("/");
-            if (dobParts.length !== 3 || dobParts[2].length !== 4) {
-                return showToast("Invalid DOB format. Use DD/MM/YYYY", "error");
-            }
-            const dob = `${dobParts[2]}-${dobParts[1]}-${dobParts[0]}`;
-
-            const searchBtn = document.getElementById("searchBtn");
-            searchBtn.disabled = true;
-            searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
-
-            const resultDisplay = document.getElementById("resultDisplay");
-            resultDisplay.innerHTML = '<div style="text-align:center;padding:30px;"><i class="fas fa-spinner fa-spin"></i> Searching for result...</div>';
-
-            try {
-                const res = await fetch(`${API_BASE}/public/search`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        student_id: studentId,
-                        dob: dob,
-                        class: selectedClass,
-                        session: selectedSession || undefined
-                    })
-                });
-
-                const data = await res.json();
-
-                if (data.success) {
-                    currentStudentData = data.data;
-                    const formStatus = document.getElementById("formStatus");
-                    formStatus.textContent = "Result Found!";
-                    formStatus.style.color = "var(--success)";
-                    renderResult(data.data);
-                    showToast("Result found successfully!", "success");
-                } else {
-                    document.getElementById("formStatus").textContent = data.message || "No result found";
-                    document.getElementById("formStatus").style.color = "var(--danger)";
-                    resultDisplay.innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${esc(data.message || "No result found")}</div>`;
-                    showToast(data.message || "No result found", "error");
-                }
-            } catch (e) {
-                document.getElementById("formStatus").textContent = "Search failed";
-                document.getElementById("formStatus").style.color = "var(--danger)";
-                resultDisplay.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Network error. Please try again.</div>';
-                showToast("Network error", "error");
-            }
-
-            searchBtn.disabled = false;
-            searchBtn.innerHTML = '<i class="fas fa-search"></i> View Result';
-        }
-
-        // ============================================================
-        // RENDER RESULT (Individual marksheet cards)
-        // ============================================================
-        function renderResult(data) {
-            const s = data.student;
-            const marksheets = data.marksheets || [];
-            const overallStatus = data.overall_status;
-            const overallReason = data.overall_status_reason;
-
-            let totalObtained = 0, totalMax = 0;
-            marksheets.forEach(m => {
-                totalObtained += parseInt(m.obtained_marks) || 0;
-                totalMax += parseInt(m.max_marks) || 0;
-            });
-            const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) + "%" : "—";
-            const grade = calculateGrade(percentage);
-
-            const marksheetCards = marksheets.length === 0
-                ? '<div class="alert alert-warning"><i class="fas fa-info-circle"></i> No published marksheets available.</div>'
-                : marksheets.map((m, idx) => renderMarksheetCard(m, idx, s)).join("");
-
-            document.getElementById("resultDisplay").innerHTML = `
-                <!-- Overall Status Banner -->
-                ${overallStatus ? `
-                    <div class="new-result-notification" style="background:linear-gradient(135deg,#1a56db,#3b82f6);">
-                        <div class="nr-icon" style="background:rgba(255,255,255,0.2);animation:none;">
-                            <i class="fas fa-award"></i>
-                        </div>
-                        <div class="nr-body">
-                            <div class="nr-title">
-                                Overall Result: ${getStatusIcon(overallStatus)} ${overallStatus}
-                            </div>
-                            <div class="nr-desc">${esc(overallReason || "Based on all published exams")}</div>
-                        </div>
-                    </div>
-                ` : ''}
-
-                <!-- Student Info Card -->
-                <div class="result-card expanded" style="cursor:default;">
-                    <div class="rc-header" style="cursor:default;">
-                        <div class="rc-left">
-                            <div class="rc-icon" style="background:linear-gradient(135deg,#c9972b,#e8b84b);">
-                                <i class="fas fa-user-graduate"></i>
-                            </div>
-                            <div>
-                                <div class="rc-title">${esc(s.name)}</div>
-                                <div class="rc-meta">
-                                    <span><i class="fas fa-id-card"></i> ${esc(s.student_id)}</span>
-                                    <span><i class="fas fa-school"></i> Class ${esc(s.class || "—")}</span>
-                                    <span><i class="fas fa-calendar"></i> ${esc(s.session || "—")}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="rc-right">
-                            ${overallStatus ? `<span class="rc-status-pill ${getStatusClass(overallStatus)}">${getStatusIcon(overallStatus)} ${overallStatus}</span>` : ''}
-                        </div>
-                    </div>
-                    <div class="rc-details" style="max-height:none;">
-                        <div class="rc-details-inner">
-                            <div class="info-grid">
-                                <div class="info-item"><label>Student ID</label><span>${esc(s.student_id)}</span></div>
-                                <div class="info-item"><label>Full Name</label><span>${esc(s.name)}</span></div>
-                                <div class="info-item"><label>Father's Name</label><span>${esc(s.father_name || "—")}</span></div>
-                                <div class="info-item"><label>Mother's Name</label><span>${esc(s.mother_name || "—")}</span></div>
-                                <div class="info-item"><label>Date of Birth</label><span>${s.dob ? formatDate(s.dob) : "—"}</span></div>
-                                <div class="info-item"><label>Class</label><span>${esc(s.class || "—")}</span></div>
-                                <div class="info-item"><label>Roll No</label><span>${esc(s.roll_number || s.exam_roll_no || "—")}</span></div>
-                                <div class="info-item"><label>Session</label><span>${esc(s.session || "—")}</span></div>
-                            </div>
-
-                            <!-- Overall Summary -->
-                            <div class="marks-summary-box">
-                                <div class="summary-item">
-                                    <div class="label">Total Obtained</div>
-                                    <div class="value gold">${totalObtained}</div>
-                                </div>
-                                <div class="summary-item">
-                                    <div class="label">Total Maximum</div>
-                                    <div class="value">${totalMax}</div>
-                                </div>
-                                <div class="summary-item">
-                                    <div class="label">Percentage</div>
-                                    <div class="value gold">${percentage}</div>
-                                </div>
-                                <div class="summary-item">
-                                    <div class="label">Grade</div>
-                                    <div class="value">${grade}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Marksheets -->
-                <h3 style="font-family:'Playfair Display',serif;font-size:20px;color:var(--primary);margin:24px 0 14px;display:flex;align-items:center;gap:10px;">
-                    <i class="fas fa-file-pdf" style="color:var(--accent-dark);"></i>
-                    Published Marksheets (${marksheets.length})
-                </h3>
-                ${marksheetCards}
-
-                <!-- Print Button -->
-                <div style="text-align:center;margin-top:24px;">
-                    <button class="btn-primary" onclick="printFullResult()" style="padding:16px 40px;">
-                        <i class="fas fa-print"></i> Print Complete Result
-                    </button>
-                </div>
-            `;
-
-            document.getElementById("resultDisplay").scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-
-        // ============================================================
-        // RENDER MARKSHEET CARD (with subjects)
-        // ============================================================
-        function renderMarksheetCard(m, idx, student) {
-            const isNew = isNewResult(m.declaration_date);
-            const subjects = m.subjects || [];
-            const status = m.result_status;
-
-            // Subjects table
-            let subjectsTable = "";
-            if (subjects.length > 0) {
-                const totalSubObtained = subjects.reduce((s, x) => s + (parseInt(x.obtained) || 0), 0);
-                const totalSubMax = subjects.reduce((s, x) => s + (parseInt(x.max) || 0), 0);
-
-                subjectsTable = `
-                    <div class="subjects-table-wrap">
-                        <table class="subjects-table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Subject</th>
-                                    <th>Obtained</th>
-                                    <th>Max</th>
-                                    <th>Percentage</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${subjects.map((sub, i) => {
-                                    const pct = sub.max > 0 ? ((sub.obtained / sub.max) * 100) : 0;
-                                    const isFail = pct < 33;
-                                    return `
-                                        <tr>
-                                            <td>${i + 1}</td>
-                                            <td style="font-weight:600;">${esc(sub.name)}</td>
-                                            <td class="${isFail ? 'fail-mark' : 'pass-mark'}">${sub.obtained}</td>
-                                            <td>${sub.max}</td>
-                                            <td class="pct-cell">${pct.toFixed(1)}%</td>
-                                        </tr>
-                                    `;
-                                }).join("")}
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="2" style="text-align:right;">TOTAL</td>
-                                    <td style="color:#c9972b;">${totalSubObtained}</td>
-                                    <td style="color:#c9972b;">${totalSubMax}</td>
-                                    <td style="color:#c9972b;">${totalSubMax > 0 ? ((totalSubObtained/totalSubMax)*100).toFixed(1) : 0}%</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                `;
-            }
-
-            return `
-                <div class="result-card ${isNew ? 'is-new new-badge' : ''}" id="rc-${m.id}">
-                    <div class="rc-header" onclick="toggleResultCard(${m.id})">
-                        <div class="rc-left">
-                            <div class="rc-icon">
-                                <i class="fas fa-scroll"></i>
-                            </div>
-                            <div>
-                                <div class="rc-title">${esc(m.exam_type)}</div>
-                                <div class="rc-meta">
-                                    <span><i class="far fa-calendar-alt"></i> ${formatMonth(m.exam_session || m.session)}</span>
-                                    ${m.obtained_marks ? `<span><i class="fas fa-star"></i> ${esc(m.obtained_marks)}/${esc(m.max_marks || "—")}</span>` : ''}
-                                    ${m.declaration_date ? `<span><i class="fas fa-bullhorn"></i> ${formatDate(m.declaration_date)}</span>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="rc-right">
-                            ${status ? `<span class="rc-status-pill ${getStatusClass(status)}">${getStatusIcon(status)} ${esc(status)}</span>` : ''}
-                            <div class="rc-chevron"><i class="fas fa-chevron-down"></i></div>
-                        </div>
-                    </div>
-                    <div class="rc-details">
-                        <div class="rc-details-inner">
-                            <div class="info-grid">
-                                <div class="info-item"><label>Exam Type</label><span>${esc(m.exam_type)}</span></div>
-                                <div class="info-item"><label>Exam Session</label><span>${formatMonth(m.exam_session || m.session)}</span></div>
-                                <div class="info-item"><label>Class</label><span>${esc(m.class || student.class || "—")}</span></div>
-                                <div class="info-item"><label>Result Status</label><span>${status ? `${getStatusIcon(status)} ${esc(status)}` : "—"}</span></div>
-                                <div class="info-item"><label>Obtained Marks</label><span>${esc(m.obtained_marks || "—")}</span></div>
-                                <div class="info-item"><label>Maximum Marks</label><span>${esc(m.max_marks || "—")}</span></div>
-                                <div class="info-item"><label>Percentage</label><span>${m.obtained_marks && m.max_marks ? ((parseInt(m.obtained_marks) / parseInt(m.max_marks)) * 100).toFixed(2) + "%" : "—"}</span></div>
-                                <div class="info-item"><label>Declared On</label><span>${m.declaration_date ? formatDate(m.declaration_date) : "—"}</span></div>
-                            </div>
-
-                            ${subjectsTable}
-
-                            ${m.remarks ? `
-                                <div class="remarks-box">
-                                    <i class="fas fa-info-circle"></i>
-                                    <div><strong>Remarks:</strong> ${esc(m.remarks)}</div>
-                                </div>
-                            ` : ''}
-
-                            <div class="rc-actions">
-                                <button class="rc-btn rc-btn-view" onclick="viewMarksheet(${m.id})">
-                                    <i class="fas fa-eye"></i> View PDF
-                                </button>
-                                <button class="rc-btn rc-btn-download" onclick="downloadMarksheet(${m.id})">
-                                    <i class="fas fa-download"></i> Download
-                                </button>
-                                <button class="rc-btn rc-btn-print" onclick="printSingleMarksheet(${m.id})">
-                                    <i class="fas fa-print"></i> Print
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function toggleResultCard(id) {
-            const card = document.getElementById("rc-" + id);
-            if (card) card.classList.toggle("expanded");
-        }
-
-        function calculateGrade(percentage) {
-            const p = parseFloat(percentage) || 0;
-            if (p >= 90) return "A+";
-            if (p >= 80) return "A";
-            if (p >= 70) return "B+";
-            if (p >= 60) return "B";
-            if (p >= 50) return "C";
-            if (p >= 40) return "D";
-            if (p >= 33) return "E";
-            return "F";
-        }
-
-        // ============================================================
-        // VIEW / DOWNLOAD / PRINT MARKSHEET
-        // ============================================================
-        function viewMarksheet(id) {
-            window.open(`${API_BASE}/public/marksheet/${id}`, "_blank");
-            showToast("Opening marksheet...", "info");
-        }
-
-        function downloadMarksheet(id) {
-            window.location.href = `${API_BASE}/public/marksheet/${id}/download`;
-            showToast("Downloading marksheet...", "success");
-        }
-
-        function printSingleMarksheet(id) {
-            const m = (currentStudentData?.marksheets || []).find(x => x.id === id);
-            if (!m) return showToast("Marksheet data not found", "error");
-            const s = currentStudentData.student;
-            generatePrintHTML(s, [m]);
-        }
-
-        function printFullResult() {
-            if (!currentStudentData) return showToast("No data available", "error");
-            generatePrintHTML(currentStudentData.student, currentStudentData.marksheets || []);
-        }
-
-        // ============================================================
-        // PRINT GENERATOR (A4 Professional Marksheet)
-        // ============================================================
-        function generatePrintHTML(student, marksheets) {
-            const s = student;
-            let totalObtained = 0, totalMax = 0;
-            marksheets.forEach(m => {
-                totalObtained += parseInt(m.obtained_marks) || 0;
-                totalMax += parseInt(m.max_marks) || 0;
-            });
-            const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : "0.00";
-            const grade = calculateGrade(percentage);
-            const result = percentage >= 33 ? "PASS" : "FAIL";
-
-            let marksheetRows = "";
-            marksheets.forEach((m, i) => {
-                marksheetRows += `
-                    <tr>
-                        <td style="text-align:center;">${i + 1}</td>
-                        <td style="font-weight:600;">${esc(m.exam_type)}</td>
-                        <td style="text-align:center;">${formatMonth(m.exam_session || m.session)}</td>
-                        <td style="text-align:center;font-weight:700;">${esc(m.obtained_marks || "—")}</td>
-                        <td style="text-align:center;font-weight:700;">${esc(m.max_marks || "—")}</td>
-                        <td style="text-align:center;font-weight:700;color:#c9972b;">${esc(m.result_status || "—")}</td>
-                    </tr>
-                `;
-            });
-
-            const pw = window.open("", "_blank", "width=1000,height=800");
-            pw.document.write(`<!DOCTYPE html>
+      </div>
+    </div>
+  `;
+}
+
+function toggleResultCard(id) {
+  const card = document.getElementById("rc-" + id);
+  if (card) card.classList.toggle("expanded");
+}
+function calculateGrade(percentage) {
+  const p = parseFloat(percentage) || 0;
+  if (p >= 90) return "A+";
+  if (p >= 80) return "A";
+  if (p >= 70) return "B+";
+  if (p >= 60) return "B";
+  if (p >= 50) return "C";
+  if (p >= 40) return "D";
+  if (p >= 33) return "E";
+  return "F";
+}
+function viewMarksheet(id) {
+  window.open(`${API_BASE}/public/marksheet/${id}`, "_blank");
+  showToast("Opening marksheet...", "info");
+}
+function downloadMarksheet(id) {
+  window.location.href = `${API_BASE}/public/marksheet/${id}/download`;
+  showToast("Downloading marksheet...", "success");
+}
+function printSingleMarksheet(id) {
+  const m = (currentStudentData?.marksheets || []).find(x => x.id === id);
+  if (!m) return showToast("Marksheet data not found", "error");
+  generatePrintHTML(currentStudentData.student, [m]);
+}
+function printFullResult() {
+  if (!currentStudentData) return showToast("No data available", "error");
+  generatePrintHTML(currentStudentData.student, currentStudentData.marksheets || []);
+}
+
+function generatePrintHTML(student, marksheets) {
+  const s = student;
+  let totalObtained = 0, totalMax = 0;
+  marksheets.forEach(m => {
+    totalObtained += parseInt(m.obtained_marks) || 0;
+    totalMax += parseInt(m.max_marks) || 0;
+  });
+  const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : "0.00";
+  const grade = calculateGrade(percentage);
+  const result = percentage >= 33 ? "PASS" : "FAIL";
+
+  let marksheetRows = "";
+  marksheets.forEach((m, i) => {
+    marksheetRows += `
+      <tr>
+        <td style="text-align:center;">${i + 1}</td>
+        <td style="font-weight:600;">${esc(m.exam_type)}</td>
+        <td style="text-align:center;">${formatMonth(m.exam_session || m.session)}</td>
+        <td style="text-align:center;font-weight:700;">${esc(m.obtained_marks || "—")}</td>
+        <td style="text-align:center;font-weight:700;">${esc(m.max_marks || "—")}</td>
+        <td style="text-align:center;font-weight:700;color:#c9972b;">${esc(m.result_status || "—")}</td>
+      </tr>
+    `;
+  });
+
+  const pw = window.open("", "_blank", "width=1000,height=800");
+  pw.document.write(`<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>Result - ${esc(s.name)}</title>
 <style>
 @page { size: A4; margin: 10mm 12mm; }
@@ -1441,28 +1880,28 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#1a2332; -webkit-print-
 .page { max-width:100%; padding:6px 8px 30px; position:relative; }
 .watermark { position:fixed; inset:0; pointer-events:none; z-index:0; display:flex; align-items:center; justify-content:center; }
 .watermark-text { font-size:110px; font-weight:900; color:rgba(201,151,43,0.06); letter-spacing:20px; transform:rotate(-35deg); }
-.header { text-align:center; padding-bottom:12px; border-bottom:3px double #c9972b; margin-bottom:14px; position:relative; z-index:1; }
-.header img { width:65px; height:65px; border-radius:50%; border:2px solid #c9972b; padding:3px; background:#fff; }
-.school-name { font-family:Georgia,serif; font-size:20px; font-weight:900; text-transform:uppercase; letter-spacing:2px; color:#0d1b2a; margin-top:6px; }
+.header { text-align:center; padding-bottom:12px; border-bottom:3px double #6b1414; margin-bottom:14px; position:relative; z-index:1; }
+.header img { width:65px; height:65px; border-radius:50%; border:2px solid #6b1414; padding:3px; background:#fff; }
+.school-name { font-family:Georgia,serif; font-size:20px; font-weight:900; text-transform:uppercase; letter-spacing:2px; color:#4a0d0d; margin-top:6px; }
 .school-addr { font-size:10px; color:#5a6a7e; letter-spacing:2px; margin-top:3px; }
-.title-box { display:inline-block; background:#0d1b2a; color:#fff; padding:6px 28px; border-radius:30px; font-size:12px; font-weight:700; letter-spacing:2px; border:2px solid #c9972b; margin-top:8px; }
-.info-table { width:100%; border-collapse:collapse; margin:14px 0; border:2px solid #0d1b2a; }
+.title-box { display:inline-block; background:#6b1414; color:#fff; padding:6px 28px; border-radius:30px; font-size:12px; font-weight:700; letter-spacing:2px; border:2px solid #a83232; margin-top:8px; }
+.info-table { width:100%; border-collapse:collapse; margin:14px 0; border:2px solid #4a0d0d; }
 .info-table td { padding:8px 12px; border:1px solid #cbd5e1; font-size:11px; }
-.info-table .lbl { background:#fef8ed; font-weight:700; width:16%; text-transform:uppercase; font-size:10px; }
-.marks-table { width:100%; border-collapse:collapse; margin:10px 0; border:2px solid #0d1b2a; }
-.marks-table th { background:#0d1b2a; color:#fff; padding:8px; border:1px solid #0d1b2a; font-size:10px; text-transform:uppercase; }
+.info-table .lbl { background:#fdf2f5; font-weight:700; width:16%; text-transform:uppercase; font-size:10px; }
+.marks-table { width:100%; border-collapse:collapse; margin:10px 0; border:2px solid #4a0d0d; }
+.marks-table th { background:#6b1414; color:#fff; padding:8px; border:1px solid #4a0d0d; font-size:10px; text-transform:uppercase; }
 .marks-table td { padding:8px; border:1px solid #cbd5e1; font-size:11px; }
-.summary { border:2px solid #c9972b; border-radius:10px; padding:14px 20px; margin:14px 0; background:#fef8ed; display:flex; justify-content:center; gap:40px; flex-wrap:wrap; }
+.summary { border:2px solid #a83232; border-radius:10px; padding:14px 20px; margin:14px 0; background:#fdf2f5; display:flex; justify-content:center; gap:40px; flex-wrap:wrap; }
 .summary .item { text-align:center; }
 .summary .label { font-size:9px; text-transform:uppercase; color:#5a6a7e; font-weight:700; }
-.summary .value { font-size:20px; font-weight:900; color:#0d1b2a; font-family:Georgia,serif; }
-.summary .value.gold { color:#c9972b; }
-.declaration { background:#f0f9ff; border:2px solid #0284c7; border-radius:10px; padding:12px 18px; margin:16px 0; font-size:11px; line-height:1.7; color:#0c4a6e; }
+.summary .value { font-size:20px; font-weight:900; color:#4a0d0d; font-family:Georgia,serif; }
+.summary .value.gold { color:#8b1a1a; }
+.declaration { background:#fdf2f5; border:2px solid #8b1a1a; border-radius:10px; padding:12px 18px; margin:16px 0; font-size:11px; line-height:1.7; color:#4a0d0d; }
 .signature { display:flex; justify-content:space-between; margin-top:40px; padding-top:20px; border-top:2px dashed #cbd5e1; }
 .sig-box { text-align:center; font-size:10px; min-width:160px; }
-.sig-line { width:140px; border-bottom:2px solid #0d1b2a; margin:0 auto 6px; height:30px; }
-.sig-name { font-weight:800; color:#0d1b2a; font-size:11px; }
-.footer { margin-top:14px; padding-top:8px; border-top:2px solid #c9972b; display:flex; justify-content:space-between; font-size:9px; color:#64748b; }
+.sig-line { width:140px; border-bottom:2px solid #4a0d0d; margin:0 auto 6px; height:30px; }
+.sig-name { font-weight:800; color:#4a0d0d; font-size:11px; }
+.footer { margin-top:14px; padding-top:8px; border-top:2px solid #a83232; display:flex; justify-content:space-between; font-size:9px; color:#64748b; }
 </style></head><body>
 <div class="watermark"><div class="watermark-text">GSSS SHILLA</div></div>
 <div class="page">
@@ -1472,34 +1911,17 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#1a2332; -webkit-print-
         <div class="school-addr">Shilla • Teh. Nerwa • Distt. Shimla • Himachal Pradesh — 171210</div>
         <div class="title-box">📜 Official Marksheet</div>
     </div>
-
     <table class="info-table">
-        <tr>
-            <td class="lbl">Student ID</td><td>${esc(s.student_id)}</td>
-            <td class="lbl">Full Name</td><td style="font-weight:800;">${esc(s.name)}</td>
-        </tr>
-        <tr>
-            <td class="lbl">Father's Name</td><td>${esc(s.father_name || "—")}</td>
-            <td class="lbl">Mother's Name</td><td>${esc(s.mother_name || "—")}</td>
-        </tr>
-        <tr>
-            <td class="lbl">Class</td><td>${esc(s.class || "—")}</td>
-            <td class="lbl">Roll No</td><td>${esc(s.roll_number || s.exam_roll_no || "—")}</td>
-        </tr>
-        <tr>
-            <td class="lbl">Session</td><td>${esc(s.session || "—")}</td>
-            <td class="lbl">Date of Birth</td><td>${s.dob ? formatDate(s.dob) : "—"}</td>
-        </tr>
+        <tr><td class="lbl">Student ID</td><td>${esc(s.student_id)}</td><td class="lbl">Full Name</td><td style="font-weight:800;">${esc(s.name)}</td></tr>
+        <tr><td class="lbl">Father's Name</td><td>${esc(s.father_name || "—")}</td><td class="lbl">Mother's Name</td><td>${esc(s.mother_name || "—")}</td></tr>
+        <tr><td class="lbl">Class</td><td>${esc(s.class || "—")}</td><td class="lbl">Roll No</td><td>${esc(s.roll_number || s.exam_roll_no || "—")}</td></tr>
+        <tr><td class="lbl">Session</td><td>${esc(s.session || "—")}</td><td class="lbl">Date of Birth</td><td>${s.dob ? formatDate(s.dob) : "—"}</td></tr>
     </table>
-
     <h4 style="font-size:12px;margin:12px 0 6px;">Examination Performance (${marksheets.length} exams)</h4>
     <table class="marks-table">
-        <thead>
-            <tr><th>#</th><th>Exam Type</th><th>Session</th><th>Obtained</th><th>Max</th><th>Status</th></tr>
-        </thead>
+        <thead><tr><th>#</th><th>Exam Type</th><th>Session</th><th>Obtained</th><th>Max</th><th>Status</th></tr></thead>
         <tbody>${marksheetRows || '<tr><td colspan="6" style="text-align:center;padding:12px;">No marksheets</td></tr>'}</tbody>
     </table>
-
     <div class="summary">
         <div class="item"><div class="label">Total Obtained</div><div class="value gold">${totalObtained}</div></div>
         <div class="item"><div class="label">Total Maximum</div><div class="value">${totalMax}</div></div>
@@ -1507,18 +1929,15 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#1a2332; -webkit-print-
         <div class="item"><div class="label">Grade</div><div class="value">${grade}</div></div>
         <div class="item"><div class="label">Result</div><div class="value" style="color:${result === "PASS" ? "#16a34a" : "#dc2626"};">${result}</div></div>
     </div>
-
     <div class="declaration">
         <strong>DECLARATION:</strong> This is to certify that <strong>${esc(s.name)}</strong> (ID: <strong>${esc(s.student_id)}</strong>) 
         has appeared in the examinations mentioned above for the academic session <strong>${esc(s.session || "—")}</strong> 
         and is declared <strong style="color:${result === "PASS" ? "#16a34a" : "#dc2626"};">${result}</strong>.
     </div>
-
     <div class="signature">
         <div class="sig-box"><div class="sig-line"></div><div class="sig-name">Class Teacher</div><div style="font-size:9px;color:#64748b;">Verified By</div></div>
         <div class="sig-box"><div class="sig-line"></div><div class="sig-name">Principal</div><div style="font-size:9px;color:#64748b;">Govt. Sr. Sec. School Shilla</div></div>
     </div>
-
     <div class="footer">
         <span>📅 Print Date: <strong>${new Date().toLocaleDateString("en-IN")}</strong></span>
         <span>🆔 ${esc(s.student_id)}-${Date.now().toString(36).toUpperCase()}</span>
@@ -1527,15 +1946,12 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#1a2332; -webkit-print-
 </div>
 <script>window.onload = function() { setTimeout(function() { window.print(); }, 800); };<\/script>
 </body></html>`);
-            pw.document.close();
-        }
+  pw.document.close();
+}
 
-        // ============================================================
-        // INIT
-        // ============================================================
-        window.addEventListener("DOMContentLoaded", function() {
-            loadAvailableClasses();
-        });
-    </script>
+window.addEventListener("DOMContentLoaded", function() {
+  loadAvailableClasses();
+});
+</script>
 </body>
 </html>
