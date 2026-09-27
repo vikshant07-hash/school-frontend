@@ -178,6 +178,7 @@ img { max-width: 100%; height: auto; }
 
 .nav-links { display: flex; align-items: center; gap: 6px; margin: 0; padding: 0; flex: 1 1 auto; justify-content: center; list-style: none; min-width: 0; flex-wrap: nowrap; }
 .nav-links > li { position: relative; flex-shrink: 0; }
+
 .nav-links > li > a {
   color: var(--t-mid); font-size: 12px; font-weight: 600; padding: 9px 14px; border-radius: 11px;
   background: var(--bg); box-shadow: var(--press-sm); transition: var(--transition);
@@ -186,9 +187,61 @@ img { max-width: 100%; height: auto; }
 }
 .nav-links > li > a i { color: var(--primary-d); font-size: 11px; }
 [data-theme="dark"] .nav-links > li > a i { color: var(--primary-l); }
-.nav-links > li > a:hover { color: var(--t-hi); box-shadow: var(--press); }
+.nav-links > li > a:hover,
+.nav-links > li.open > a { color: var(--t-hi); box-shadow: var(--press); }
 .nav-links > li > a.active { color: var(--primary-d); box-shadow: var(--press); }
 [data-theme="dark"] .nav-links > li > a.active { color: var(--primary-l); }
+.nav-links > li > a .dropdown-arrow {
+  font-size: 9px;
+  opacity: 0.6;
+  color: var(--t-mid) !important;
+  margin-left: 2px;
+  transition: transform 0.3s var(--transition);
+}
+.nav-links > li.open > a .dropdown-arrow { transform: rotate(180deg); }
+
+/* ============================================================
+   NAV DROPDOWN (More) — Desktop + Mobile
+============================================================ */
+.dropdown-menu-nav {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  width: 190px;
+  background: var(--bg);
+  border-radius: 14px;
+  box-shadow: var(--raise-lg);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s var(--transition);
+  padding: 8px;
+  z-index: 200;
+}
+.nav-links > li.open .dropdown-menu-nav {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+.dropdown-menu-nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--t-mid);
+  border-radius: 9px;
+  transition: var(--transition);
+}
+.dropdown-menu-nav a:hover {
+  background: var(--bg);
+  box-shadow: var(--press-sm);
+  color: var(--primary-d);
+}
+[data-theme="dark"] .dropdown-menu-nav a:hover { color: var(--primary-l); }
+.dropdown-menu-nav a i { width: 16px; color: var(--primary-d); font-size: 12px; }
+[data-theme="dark"] .dropdown-menu-nav a i { color: var(--primary-l); }
 
 .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 
@@ -307,6 +360,40 @@ img { max-width: 100%; height: auto; }
     width: 100%; padding: 12px 16px; border-radius: 12px;
     font-size: 13.5px; justify-content: space-between;
   }
+  .nav-links > li > a i { font-size: 12px; }
+
+  /* Mobile dropdown — accordion */
+  .dropdown-menu-nav {
+    position: static;
+    width: 100%;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    display: none;
+    background: transparent;
+    left: auto;
+    margin-top: 6px;
+  }
+  .dropdown-menu-nav.show-mobile { display: block; }
+  .dropdown-menu-nav a {
+    padding: 11px 16px;
+    margin-left: 12px;
+    margin-bottom: 6px;
+    border-radius: 10px;
+    background: var(--bg);
+    box-shadow: var(--press-sm);
+    font-size: 12.5px;
+    color: var(--t-mid);
+  }
+  .dropdown-menu-nav a:hover {
+    box-shadow: var(--press);
+    color: var(--primary-d);
+  }
+  [data-theme="dark"] .dropdown-menu-nav a:hover { color: var(--primary-l); }
+
   .mobile-login-item { display: block !important; width: 100%; margin-top: 8px; padding-top: 14px; border-top: 1px solid var(--sd-soft); }
   .mobile-login-item .login-btn { width: 100%; justify-content: center; padding: 13px; }
   .desktop-login { display: none !important; }
@@ -327,6 +414,15 @@ img { max-width: 100%; height: auto; }
   .nav-links { width: 84vw; }
 }
 
+.mobile-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9998;
+}
+.mobile-overlay.active { display: block; }
+
 /* ============================================================
    PAGE HEADER
 ============================================================ */
@@ -346,9 +442,6 @@ img { max-width: 100%; height: auto; }
 .page-header p { color: rgba(255, 255, 255, 0.75); margin-top: 8px; font-size: 15px; position: relative; z-index: 1; }
 [data-theme="dark"] .page-header p { color: rgba(28, 28, 30, 0.75); }
 
-/* ============================================================
-   CONTAINER
-============================================================ */
 .container { max-width: 1100px; margin: 0 auto; padding: 30px 20px 60px; flex: 1; width: 100%; }
 
 /* ============================================================
@@ -437,7 +530,6 @@ img { max-width: 100%; height: auto; }
   background: var(--bg);
   transition: var(--transition);
 }
-.mrc-header:hover { box-shadow: inset 0 0 0 2px var(--primary-l); }
 .mrc-icon {
   width: 68px; height: 68px;
   background: var(--grad-maroon);
@@ -501,7 +593,7 @@ img { max-width: 100%; height: auto; }
 .mrc-content-inner { padding: 20px 32px 32px; }
 
 /* ============================================================
-   RESULT CARD (Individual Class)
+   RESULT CARD
 ============================================================ */
 .result-card {
   background: var(--bg);
@@ -598,7 +690,6 @@ img { max-width: 100%; height: auto; }
 .result-card.expanded .rc-details { max-height: 3000px; }
 .rc-details-inner { padding: 20px 24px; background: var(--bg); }
 
-/* Info Grid */
 .info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -620,7 +711,6 @@ img { max-width: 100%; height: auto; }
 }
 .info-item span { font-size: 14px; font-weight: 700; color: var(--t-hi); }
 
-/* Subjects Table */
 .subjects-table-wrap {
   margin: 16px 0;
   border-radius: 12px;
@@ -661,7 +751,6 @@ img { max-width: 100%; height: auto; }
 }
 [data-theme="dark"] .subjects-table tfoot td { color: var(--primary-l); }
 
-/* Summary Box */
 .marks-summary-box {
   border-radius: 14px;
   padding: 20px 24px;
@@ -693,7 +782,6 @@ img { max-width: 100%; height: auto; }
 .marks-summary-box .summary-item .value.pass { color: var(--success); }
 .marks-summary-box .summary-item .value.fail { color: var(--danger); }
 
-/* Remarks */
 .remarks-box {
   padding: 14px 18px;
   background: var(--info-light);
@@ -707,7 +795,6 @@ img { max-width: 100%; height: auto; }
 [data-theme="dark"] .remarks-box { background: rgba(59, 130, 246, 0.15); color: #93c5fd; }
 .remarks-box i { margin-top: 2px; }
 
-/* Action Buttons */
 .rc-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; padding-top: 16px; box-shadow: inset 0 1px 0 var(--sd-soft); }
 .rc-btn {
   padding: 12px 22px;
@@ -855,27 +942,18 @@ img { max-width: 100%; height: auto; }
 [data-theme="dark"] .btn-back { color: var(--primary-l); }
 .btn-back:hover { box-shadow: var(--press); transform: translateY(-2px); }
 
-/* ============================================================
-   ALERTS
-============================================================ */
 .alert { padding: 14px 18px; border-radius: var(--radius-sm); margin-top: 12px; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 13px; }
 .alert-error { background: var(--danger-light); color: var(--danger); box-shadow: var(--press-xs); }
 .alert-success { background: var(--success-light); color: var(--success); box-shadow: var(--press-xs); }
 .alert-warning { background: var(--warning-light); color: #92400e; box-shadow: var(--press-xs); }
 .alert-info { background: var(--info-light); color: var(--info); box-shadow: var(--press-xs); }
 
-/* ============================================================
-   EMPTY STATE
-============================================================ */
 .empty-state { text-align: center; padding: 50px 20px; color: var(--t-mid); }
 .empty-state i { font-size: 56px; opacity: 0.4; margin-bottom: 16px; display: block; color: var(--primary-d); }
 [data-theme="dark"] .empty-state i { color: var(--primary-l); }
 .empty-state h3 { font-family: 'Playfair Display', serif; color: var(--t-hi); margin-bottom: 8px; font-size: 20px; font-weight: 800; }
 .empty-state p { font-size: 14px; color: var(--t-mid); }
 
-/* ============================================================
-   TOAST
-============================================================ */
 .toast-container { position: fixed; top: 90px; right: 20px; z-index: 99999; }
 .toast {
   padding: 14px 24px;
@@ -1009,9 +1087,6 @@ img { max-width: 100%; height: auto; }
   .social-icon { width: 42px; height: 42px; font-size: 15px; }
 }
 
-/* ============================================================
-   RESPONSIVE
-============================================================ */
 @media (max-width: 768px) {
   .page-header { padding: 40px 20px 30px; }
   .page-header h1 { font-size: 26px; }
@@ -1035,9 +1110,6 @@ img { max-width: 100%; height: auto; }
   .new-result-notification .nr-btn { width: 100%; justify-content: center; }
 }
 
-/* ============================================================
-   PRINT
-============================================================ */
 @media print {
   .navbar, .page-header, .footer, .btn-primary, .btn-secondary, .btn-back, .form-actions, .toast-container, .new-result-notification, .rc-actions, .rc-chevron { display: none !important; }
   body { padding-top: 0 !important; background: white !important; }
@@ -1265,39 +1337,52 @@ try {
 } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
 
 // ============================================================
-// NAV DROPDOWN (click-based)
+// NAV DROPDOWN (More) — Desktop click + Mobile accordion
 // ============================================================
 function toggleNavDropdown(e) {
   e.preventDefault();
   e.stopPropagation();
   const parent = e.currentTarget.parentElement;
-  if (document.getElementById('navLinks').classList.contains('active')) {
-    const dropdown = parent.querySelector('.dropdown-menu-nav');
-    const arrow = e.currentTarget.querySelector('.dropdown-arrow');
+  const dropdown = parent.querySelector('.dropdown-menu-nav');
+  const arrow = e.currentTarget.querySelector('.dropdown-arrow');
+
+  // Mobile check
+  const isMobile = window.innerWidth <= 900 ||
+                   document.getElementById('navLinks')?.classList.contains('active');
+
+  if (isMobile) {
+    // Mobile accordion
     if (dropdown) dropdown.classList.toggle('show-mobile');
     if (arrow) arrow.classList.toggle('rotated');
-    return;
+  } else {
+    // Desktop click-based
+    document.querySelectorAll('.nav-links > li.open').forEach(li => {
+      if (li !== parent) li.classList.remove('open');
+    });
+    parent.classList.toggle('open');
   }
-  document.querySelectorAll('.nav-links > li.open').forEach(li => {
-    if (li !== parent) li.classList.remove('open');
-  });
-  parent.classList.toggle('open');
 }
+
+// Close desktop dropdown on outside click
 document.addEventListener('click', (e) => {
   if (!e.target.closest('.nav-links > li')) {
     document.querySelectorAll('.nav-links > li.open').forEach(li => li.classList.remove('open'));
   }
 });
+
+// Close on Escape
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     document.querySelectorAll('.nav-links > li.open').forEach(li => li.classList.remove('open'));
+    document.querySelectorAll('.dropdown-menu-nav.show-mobile').forEach(d => d.classList.remove('show-mobile'));
+    document.querySelectorAll('.dropdown-arrow.rotated').forEach(a => a.classList.remove('rotated'));
     document.getElementById('loginDropdown')?.classList.remove('show');
     document.getElementById('loginDropdownMobile')?.classList.remove('show');
   }
 });
 
 // ============================================================
-// NAVBAR, MOBILE MENU, LOGIN DROPDOWN
+// NAVBAR SCROLL / MOBILE MENU / LOGIN DROPDOWN
 // ============================================================
 const navbar = document.getElementById("navbar");
 window.addEventListener("scroll", function() {
@@ -1865,7 +1950,7 @@ function generatePrintHTML(student, marksheets) {
         <td style="text-align:center;">${formatMonth(m.exam_session || m.session)}</td>
         <td style="text-align:center;font-weight:700;">${esc(m.obtained_marks || "—")}</td>
         <td style="text-align:center;font-weight:700;">${esc(m.max_marks || "—")}</td>
-        <td style="text-align:center;font-weight:700;color:#c9972b;">${esc(m.result_status || "—")}</td>
+        <td style="text-align:center;font-weight:700;color:#8b1a1a;">${esc(m.result_status || "—")}</td>
       </tr>
     `;
   });
@@ -1879,7 +1964,7 @@ function generatePrintHTML(student, marksheets) {
 body { font-family: 'Segoe UI', Arial, sans-serif; color:#1a2332; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
 .page { max-width:100%; padding:6px 8px 30px; position:relative; }
 .watermark { position:fixed; inset:0; pointer-events:none; z-index:0; display:flex; align-items:center; justify-content:center; }
-.watermark-text { font-size:110px; font-weight:900; color:rgba(201,151,43,0.06); letter-spacing:20px; transform:rotate(-35deg); }
+.watermark-text { font-size:110px; font-weight:900; color:rgba(139,26,26,0.06); letter-spacing:20px; transform:rotate(-35deg); }
 .header { text-align:center; padding-bottom:12px; border-bottom:3px double #6b1414; margin-bottom:14px; position:relative; z-index:1; }
 .header img { width:65px; height:65px; border-radius:50%; border:2px solid #6b1414; padding:3px; background:#fff; }
 .school-name { font-family:Georgia,serif; font-size:20px; font-weight:900; text-transform:uppercase; letter-spacing:2px; color:#4a0d0d; margin-top:6px; }
@@ -1909,7 +1994,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#1a2332; -webkit-print-
         <img src="logo.png" onerror="this.style.display='none'">
         <div class="school-name">Govt. Sr. Sec. School Shilla</div>
         <div class="school-addr">Shilla • Teh. Nerwa • Distt. Shimla • Himachal Pradesh — 171210</div>
-        <div class="title-box">📜 Official Marksheet</div>
+        <div class="title-box">Provisional Marksheet</div>
     </div>
     <table class="info-table">
         <tr><td class="lbl">Student ID</td><td>${esc(s.student_id)}</td><td class="lbl">Full Name</td><td style="font-weight:800;">${esc(s.name)}</td></tr>
@@ -1939,9 +2024,9 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#1a2332; -webkit-print-
         <div class="sig-box"><div class="sig-line"></div><div class="sig-name">Principal</div><div style="font-size:9px;color:#64748b;">Govt. Sr. Sec. School Shilla</div></div>
     </div>
     <div class="footer">
-        <span>📅 Print Date: <strong>${new Date().toLocaleDateString("en-IN")}</strong></span>
-        <span>🆔 ${esc(s.student_id)}-${Date.now().toString(36).toUpperCase()}</span>
-        <span>✅ Digitally Verified</span>
+        <span>Print Date: <strong>${new Date().toLocaleDateString("en-IN")}</strong></span>
+        <span>${esc(s.student_id)}-${Date.now().toString(36).toUpperCase()}</span>
+        <span>Digitally Verified</span>
     </div>
 </div>
 <script>window.onload = function() { setTimeout(function() { window.print(); }, 800); };<\/script>
