@@ -447,72 +447,6 @@ body {
   opacity: 0.85;
 }
 
-.pin-otp-wrap {
-  display: flex;
-  gap: clamp(8px, 2vw, 12px);
-  justify-content: center;
-  margin: 20px 0 14px;
-  padding: 4px;
-}
-.pin-box {
-  width: clamp(42px, 12vw, 54px);
-  height: clamp(52px, 14vw, 62px);
-  border: none;
-  border-radius: 15px;
-  background: var(--bg);
-  font-family: var(--font-display);
-  font-size: clamp(20px, 5vw, 24px);
-  font-weight: 700;
-  color: var(--t-hi);
-  text-align: center;
-  outline: none;
-  box-shadow: var(--press);
-  transition: box-shadow 0.3s var(--ease), transform 0.2s var(--ease), background 0.3s var(--ease);
-  caret-color: var(--navy);
-  padding: 0;
-  -webkit-appearance: none;
-  appearance: none;
-}
-.pin-box:focus {
-  box-shadow: var(--press-lg), 0 0 0 3px rgba(30, 58, 138, 0.18);
-  transform: translateY(-2px);
-}
-.pin-box.filled {
-  background: rgba(59, 91, 219, 0.08);
-  box-shadow: var(--press), 0 0 0 2px rgba(30, 58, 138, 0.15);
-}
-.pin-box.invalid {
-  box-shadow: var(--press), 0 0 0 3px rgba(185, 28, 28, 0.3);
-  animation: shakeX 0.4s var(--ease);
-}
-.pin-box.verified {
-  box-shadow: var(--press), 0 0 0 3px rgba(5, 150, 105, 0.3);
-  background: rgba(5, 150, 105, 0.08);
-}
-.pin-sep {
-  display: flex;
-  align-items: center;
-  font-size: 20px;
-  color: var(--t-lo);
-  font-weight: 700;
-  padding-bottom: 4px;
-  pointer-events: none;
-  opacity: 0.5;
-}
-.pin-meter {
-  height: 4px;
-  border-radius: 4px;
-  background: var(--sd-soft);
-  margin: 12px 4px 0;
-  overflow: hidden;
-}
-.pin-meter-bar {
-  height: 100%;
-  width: 0%;
-  border-radius: 4px;
-  background: var(--grad-gold);
-  transition: width 0.35s var(--ease), background 0.35s var(--ease);
-}
 .attempt-warn {
   display: none;
   align-items: center;
@@ -779,8 +713,6 @@ body {
   body { padding: 12px; }
   .card { border-radius: 22px; padding: 24px 18px 22px; }
   .blob { filter: blur(70px); }
-  .pin-otp-wrap { gap: 6px; }
-  .pin-box { width: 42px; height: 50px; font-size: 18px; border-radius: 12px; }
   .step-dot { width: 34px; height: 34px; font-size: 12px; }
   .step-label { font-size: 8.5px; letter-spacing: 0.8px; }
   .step-line { margin-bottom: 22px; }
@@ -792,7 +724,6 @@ body {
   .card { padding: 20px 15px 18px; border-radius: 18px; }
   .tag { padding: 6px 14px; letter-spacing: 1.5px; }
   .btn { letter-spacing: 1px; }
-  .pin-box { width: 38px; height: 46px; font-size: 16px; }
   .step-dot { width: 30px; height: 30px; font-size: 11px; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -891,8 +822,9 @@ body {
     </div>
 
     <button type="button" class="btn" id="btnStep1" onclick="verifyUsername()">
+      <span class="spinner"></span>
       <i class="fas fa-arrow-right btn-ic"></i>
-      <span>Continue</span>
+      <span id="btnStep1Text">Continue</span>
     </button>
   </div>
 
@@ -919,7 +851,7 @@ body {
     <button type="button" class="btn" id="btnStep2" onclick="sendOTP()">
       <span class="spinner"></span>
       <i class="fas fa-paper-plane btn-ic"></i>
-      <span>Send OTP</span>
+      <span id="btnStep2Text">Send OTP</span>
     </button>
 
     <button type="button" class="btn-back" onclick="goBack(1)">
@@ -955,7 +887,7 @@ body {
     <button type="button" class="btn" id="btnStep3" onclick="verifyOTP()">
       <span class="spinner"></span>
       <i class="fas fa-shield-halved btn-ic"></i>
-      <span>Verify & Sign In</span>
+      <span id="btnStep3Text">Verify & Sign In</span>
     </button>
 
     <button type="button" class="btn-back" onclick="resendOTP()" id="resendBtn">
@@ -1117,7 +1049,7 @@ body {
   }
 
   // ============================================================
-  // STEP 1 — VERIFY USERNAME (FORMAT CHECK ONLY, NO SERVER CALL)
+  // STEP 1 — VERIFY USERNAME (REAL SERVER CHECK)
   // ============================================================
   async function verifyUsername() {
     if (isVerifying) return;
@@ -1125,7 +1057,6 @@ body {
 
     const userVal = usernameInput.value.trim();
 
-    // Format validation
     if (!userVal) {
       markInvalid(usernameInput);
       showAlert('err', 'User ID Required', 'Please enter your User ID.');
@@ -1139,23 +1070,82 @@ body {
 
     isVerifying = true;
     usernameInput.disabled = true;
-    showVerify('Validating User ID…');
+    const btn = $('btnStep1');
+    const btnText = $('btnStep1Text');
+    btn.disabled = true;
+    btn.classList.add('loading');
+    btnText.textContent = 'Checking…';
+    showVerify('Checking User ID…');
 
-    await new Promise(r => setTimeout(r, 700));
+    try {
+      const res = await fetch(`${API_BASE}/check-username`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: userVal })
+      });
+      const data = await res.json();
 
-    usernameInput.classList.add('verified');
-    showVerifySuccess('User ID OK');
-    await new Promise(r => setTimeout(r, 700));
-    hideVerify(200);
+      await new Promise(r => setTimeout(r, 700));
 
-    usernameInput.disabled = false;
-    isVerifying = false;
+      // Account locked
+      if (data.exists && data.blocked) {
+        showVerifyError('Locked');
+        await new Promise(r => setTimeout(r, 1000));
+        hideVerify(200);
+        usernameInput.disabled = false;
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        btnText.textContent = 'Continue';
+        isVerifying = false;
+        showAlert('err', 'Account Locked', data.message || 'Account locked. Try again later.');
+        return;
+      }
 
-    goToStep(2);
+      // User not found — STOP HERE
+      if (!data.success || !data.exists) {
+        showVerifyError('Not Found');
+        await new Promise(r => setTimeout(r, 1000));
+        hideVerify(200);
+        usernameInput.disabled = false;
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        btnText.textContent = 'Continue';
+        isVerifying = false;
+        markInvalid(usernameInput);
+        showAlert('err', 'User ID Not Found', 'This User ID is not registered in our system. Please check and try again.');
+        return;
+      }
+
+      // SUCCESS
+      usernameInput.classList.add('verified');
+      showVerifySuccess('User ID Verified');
+      await new Promise(r => setTimeout(r, 800));
+      hideVerify(200);
+
+      usernameInput.disabled = false;
+      btn.disabled = false;
+      btn.classList.remove('loading');
+      btnText.textContent = 'Continue';
+      isVerifying = false;
+
+      goToStep(2);
+
+    } catch (err) {
+      await new Promise(r => setTimeout(r, 500));
+      showVerifyError('Error');
+      await new Promise(r => setTimeout(r, 800));
+      hideVerify(200);
+      usernameInput.disabled = false;
+      btn.disabled = false;
+      btn.classList.remove('loading');
+      btnText.textContent = 'Continue';
+      isVerifying = false;
+      showAlert('err', 'Network Error', 'Unable to reach the server. Please check your internet.');
+    }
   }
 
   // ============================================================
-  // STEP 2 — SEND OTP (ACTUAL VERIFICATION HERE)
+  // STEP 2 — SEND OTP
   // ============================================================
   async function sendOTP() {
     if (isVerifying) return;
@@ -1173,8 +1163,10 @@ body {
     isVerifying = true;
     passwordInput.disabled = true;
     const btn = $('btnStep2');
+    const btnText = $('btnStep2Text');
     btn.disabled = true;
     btn.classList.add('loading');
+    btnText.textContent = 'Sending…';
     showVerify('Verifying Credentials…');
 
     try {
@@ -1198,12 +1190,11 @@ body {
         showVerifyError('Account Locked');
         await new Promise(r => setTimeout(r, 1000));
         hideVerify(200);
-
         passwordInput.disabled = false;
         btn.disabled = false;
         btn.classList.remove('loading');
+        btnText.textContent = 'Send OTP';
         isVerifying = false;
-
         showAlert('err', 'Account Locked', `Too many failed attempts. Try again after ${timeText}.`);
         return;
       }
@@ -1212,13 +1203,12 @@ body {
         showVerifyError('Invalid Credentials');
         await new Promise(r => setTimeout(r, 1000));
         hideVerify(200);
-
         passwordInput.disabled = false;
         btn.disabled = false;
         btn.classList.remove('loading');
+        btnText.textContent = 'Send OTP';
         isVerifying = false;
 
-        // Better message
         let errTitle = 'Login Failed';
         let errMsg = data.message || 'Invalid credentials.';
         if (data.code === 'INVALID_CREDENTIALS') {
@@ -1231,7 +1221,7 @@ body {
         return;
       }
 
-      // SUCCESS — save temp
+      // SUCCESS
       try {
         localStorage.setItem('tempUsername', username);
         localStorage.setItem('tempPassword', password);
@@ -1244,6 +1234,7 @@ body {
       passwordInput.disabled = false;
       btn.disabled = false;
       btn.classList.remove('loading');
+      btnText.textContent = 'Send OTP';
       isVerifying = false;
 
       goToStep(3);
@@ -1258,6 +1249,7 @@ body {
       passwordInput.disabled = false;
       btn.disabled = false;
       btn.classList.remove('loading');
+      btnText.textContent = 'Send OTP';
       isVerifying = false;
       showAlert('err', 'Network Error', 'Unable to reach the server. Please try again.');
     }
@@ -1283,8 +1275,10 @@ body {
     isVerifying = true;
     otpInput.disabled = true;
     const btn = $('btnStep3');
+    const btnText = $('btnStep3Text');
     btn.disabled = true;
     btn.classList.add('loading');
+    btnText.textContent = 'Verifying…';
     showVerify('Verifying OTP…');
 
     try {
@@ -1304,6 +1298,7 @@ body {
         otpInput.disabled = false;
         btn.disabled = false;
         btn.classList.remove('loading');
+        btnText.textContent = 'Verify & Sign In';
         isVerifying = false;
         otpInput.value = '';
         otpInput.focus();
@@ -1336,6 +1331,7 @@ body {
       otpInput.disabled = false;
       btn.disabled = false;
       btn.classList.remove('loading');
+      btnText.textContent = 'Verify & Sign In';
       isVerifying = false;
       showAlert('err', 'Network Error', 'Unable to reach the server. Please try again.');
     }
