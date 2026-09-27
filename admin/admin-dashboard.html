@@ -1,1709 +1,1857 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <title>Admin Dashboard | GSSS SHILLA</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <style>
-    /* ============================================================
-       ROOT VARIABLES - CLEAN THEME
-    ============================================================ */
-    :root {
-      --bg: #f5f7fb;
-      --bg-white: #ffffff;
-      --bg-card: #ffffff;
-      --bg-sidebar: #ffffff;
-      --text-primary: #1a2332;
-      --text-secondary: #5a6a7e;
-      --text-muted: #94a3b8;
-      --gold: #c9972b;
-      --gold-light: #e8b84b;
-      --gold-bg: #fef8ed;
-      --blue: #4a8af4;
-      --blue-bg: #eef4ff;
-      --green: #10b981;
-      --green-bg: #ecfdf5;
-      --purple: #8b5cf6;
-      --purple-bg: #f5f0ff;
-      --pink: #ec4899;
-      --pink-bg: #fdf2f8;
-      --orange: #f59e0b;
-      --orange-bg: #fffbeb;
-      --red: #ef4444;
-      --border: #e8edf8;
-      --shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-      --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
-      --radius: 16px;
-      --radius-sm: 10px;
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Admin Dashboard | GSSS SHILLA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+/* ============================================================
+   THEME — NAVY + PURPLE (PURE NEUMORPHISM)
+   ============================================================ */
+:root {
+  --bg: #e5e8f2;
+  --surface: #e5e8f2;
 
-    /* ============================================================
-       RESET
-    ============================================================ */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      height: 100%;
-      overflow-x: hidden;
-    }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text-primary);
-      display: flex;
-      flex-direction: column;
-    }
+  --t-hi: #0f1738;
+  --t-mid: #4d5678;
+  --t-lo: #8891b0;
 
-    /* ============================================================
-       LAYOUT
-    ============================================================ */
-    .dashboard { display: flex; flex: 1; min-height: 100vh; }
+  --navy: #1e2a78;
+  --navy-d: #151e5a;
+  --navy-l: #3d4db8;
+  --navy-xl: #6b79e0;
 
-    /* ============================================================
-       SESSION TIMER BAR - TOP OF PAGE
-    ============================================================ */
-    .session-timer-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: var(--border);
-      z-index: 9997;
-      overflow: hidden;
-    }
-    .session-timer-bar .fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--green), var(--gold));
-      width: 100%;
-      transition: width 1s linear;
-    }
-    .session-timer-bar .fill.warning {
-      background: var(--orange);
-    }
-    .session-timer-bar .fill.danger {
-      background: var(--red);
-      animation: blink 0.5s ease infinite;
-    }
+  --purple: #7c3aed;
+  --purple-d: #6d28d9;
+  --purple-l: #a78bfa;
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
+  --emerald: #059669;
+  --amber: #d97706;
+  --rose: #dc2626;
+  --sky: #0284c7;
+  --pink: #db2777;
 
-    /* ============================================================
-       SESSION OVERLAY
-    ============================================================ */
-    .session-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(8px);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-      animation: fadeIn 0.4s ease;
-    }
-    .session-overlay.active { display: flex; }
+  /* Neumorphic shadow colors */
+  --sd: rgba(120, 128, 180, 0.55);
+  --sd-soft: rgba(120, 128, 180, 0.35);
+  --sd-strong: rgba(95, 105, 160, 0.68);
+  --sd-heavy: rgba(65, 75, 130, 0.82);
+  --sl: #ffffff;
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
+  /* INSET (andar dhasa) */
+  --press-xs: inset 2px 2px 5px var(--sd-soft), inset -2px -2px 5px var(--sl);
+  --press-sm: inset 4px 4px 9px var(--sd), inset -4px -4px 9px var(--sl);
+  --press: inset 6px 6px 13px var(--sd-strong), inset -6px -6px 13px var(--sl);
+  --press-lg: inset 9px 9px 20px var(--sd-heavy), inset -9px -9px 20px var(--sl);
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
+  /* RAISED (bahar ubhra) */
+  --raise-xs: 2px 2px 5px var(--sd-soft), -2px -2px 5px var(--sl);
+  --raise-sm: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl);
+  --raise: 6px 6px 13px var(--sd), -6px -6px 13px var(--sl);
+  --raise-lg: 10px 10px 22px var(--sd-strong), -10px -10px 22px var(--sl);
 
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-8px); }
-      75% { transform: translateX(8px); }
-    }
+  --grad-primary: linear-gradient(135deg, #7c3aed 0%, #3d4db8 50%, #1e2a78 100%);
+  --grad-navy: linear-gradient(135deg, #3d4db8 0%, #1e2a78 100%);
+  --grad-emerald: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  --grad-amber: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  --grad-rose: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  --grad-sky: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+  --grad-pink: linear-gradient(135deg, #db2777 0%, #ec4899 100%);
+  --grad-purple: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
 
-    .session-popup {
-      background: var(--bg-white);
-      border-radius: 24px;
-      padding: 48px 40px 40px;
-      max-width: 440px;
-      width: 92%;
-      text-align: center;
-      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
-      animation: fadeIn 0.5s ease;
-      border: 1px solid rgba(201, 151, 43, 0.15);
-    }
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+}
 
-    .session-popup .school-logo {
-      width: 80px;
-      height: 80px;
-      border-radius: 20px;
-      background: var(--gold-bg);
-      margin: 0 auto 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-      border: 2px solid var(--gold);
-    }
-    .session-popup .school-logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      border-radius: 12px;
-    }
+[data-theme="dark"] {
+  --bg: #0f1424;
+  --surface: #0f1424;
 
-    .session-popup .icon-box {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      margin: 0 auto 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 36px;
-      border: 2px solid #fecaca;
-      animation: pulse 2s infinite;
-    }
-    .session-popup .icon-box.expired { background: #fef2f2; color: var(--red); }
-    .session-popup .icon-box.invalid { background: #fef2f2; color: var(--red); animation: shake 0.5s ease, pulse 2s infinite 0.5s; }
+  --t-hi: #e8ecf5;
+  --t-mid: #9aa4c5;
+  --t-lo: #5d678a;
 
-    .session-popup h2 {
-      font-size: 26px;
-      font-weight: 800;
-      color: var(--text-primary);
-      margin-bottom: 6px;
-    }
-    .session-popup h2 span { color: var(--gold); }
+  --navy: #7b8efc;
+  --navy-l: #95a4ff;
+  --purple: #a78bfa;
+  --purple-l: #c4b5fd;
 
-    .session-popup .sub-text {
-      font-size: 14px;
-      color: var(--text-secondary);
-      margin-bottom: 6px;
-      line-height: 1.5;
-    }
+  --sd: rgba(0, 0, 0, 0.55);
+  --sd-soft: rgba(0, 0, 0, 0.4);
+  --sd-strong: rgba(0, 0, 0, 0.72);
+  --sd-heavy: rgba(0, 0, 0, 0.88);
+  --sl: rgba(255, 255, 255, 0.06);
+}
 
-    .session-popup .session-timer {
-      font-size: 13px;
-      color: var(--text-muted);
-      background: var(--bg);
-      padding: 8px 16px;
-      border-radius: 50px;
-      display: inline-block;
-      margin: 8px 0 20px;
-      font-weight: 500;
-    }
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+*:focus, *:focus-visible { outline: none; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
-    .session-popup .school-name-popup {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--gold);
-      letter-spacing: 0.5px;
-      margin-bottom: 20px;
-      padding: 6px 14px;
-      background: var(--gold-bg);
-      border-radius: 50px;
-      display: inline-block;
-    }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--t-hi);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
+  display: flex;
+  flex-direction: column;
+}
 
-    .session-popup .login-again-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 40px;
-      background: linear-gradient(135deg, var(--gold), var(--gold-light));
-      color: #fff;
-      border: none;
-      border-radius: 50px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: var(--transition);
-      font-family: 'Inter', sans-serif;
-      text-decoration: none;
-      box-shadow: 0 4px 20px rgba(201, 151, 43, 0.3);
-    }
-    .session-popup .login-again-btn:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 35px rgba(201, 151, 43, 0.4);
-    }
+/* ============================================================
+   SESSION TIMER BAR
+   ============================================================ */
+.session-timer-bar {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--surface);
+  z-index: 9997;
+  box-shadow: var(--press-xs);
+}
+.session-timer-bar .fill {
+  height: 100%;
+  background: var(--grad-emerald);
+  width: 100%;
+  transition: width 1s linear;
+  box-shadow: 0 0 8px rgba(5, 150, 105, 0.5);
+}
+.session-timer-bar .fill.warning { background: var(--grad-amber); box-shadow: 0 0 8px rgba(217, 119, 6, 0.5); }
+.session-timer-bar .fill.danger { background: var(--grad-rose); box-shadow: 0 0 8px rgba(220, 38, 38, 0.5); animation: blink 0.6s ease infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
 
-    /* ============================================================
-       SIDEBAR
-    ============================================================ */
-    .sidebar {
-      width: 270px;
-      height: 100vh;
-      position: sticky;
-      top: 0;
-      background: var(--bg-white);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      padding: 24px 16px;
-      overflow-y: auto;
-      z-index: 100;
-      flex-shrink: 0;
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .sidebar::-webkit-scrollbar { width: 4px; }
-    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 20px; }
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.dashboard { display: flex; flex: 1; min-height: 100vh; }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 0 8px 24px;
-      border-bottom: 2px solid var(--border);
-      margin-bottom: 24px;
-      flex-shrink: 0;
-    }
-    .brand-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .brand-icon img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      border-radius: 14px;
-    }
-    .brand-text .name {
-      font-size: 17px;
-      font-weight: 800;
-      color: var(--text-primary);
-      line-height: 1.1;
-    }
-    .brand-text .name span { color: var(--gold); }
-    .brand-text .role {
-      font-size: 10px;
-      color: var(--text-muted);
-      font-weight: 500;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+.sidebar {
+  width: 264px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 12px;
+  overflow-y: auto;
+  z-index: 100;
+  flex-shrink: 0;
+  box-shadow: inset -3px 0 10px var(--sd-soft), inset 3px 0 10px var(--sl);
+  transition: transform 0.4s var(--ease), background-color 0.4s var(--ease);
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--sd); border-radius: 20px; }
 
-    .nav-group { margin-bottom: 20px; flex-shrink: 0; }
-    .nav-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      padding: 0 12px;
-      margin-bottom: 8px;
-    }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: var(--text-secondary);
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 500;
-      transition: var(--transition);
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      width: 100%;
-      text-align: left;
-      margin-bottom: 2px;
-    }
-    .nav-item .icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      background: var(--bg);
-      flex-shrink: 0;
-      transition: var(--transition);
-    }
-    .nav-item:hover {
-      color: var(--text-primary);
-      background: var(--bg);
-      transform: translateX(4px);
-    }
-    .nav-item:hover .icon {
-      background: var(--gold-bg);
-      color: var(--gold);
-      transform: scale(1.05);
-    }
-    .nav-item.active {
-      color: var(--text-primary);
-      background: var(--gold-bg);
-      border: 1px solid rgba(201, 151, 43, 0.15);
-    }
-    .nav-item.active .icon {
-      background: var(--gold);
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(201, 151, 43, 0.3);
-    }
+.sidebar-close {
+  display: none;
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 38px; height: 38px;
+  border: none;
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--t-mid);
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: var(--press-sm);
+  transition: all 0.3s var(--ease);
+  align-items: center;
+  justify-content: center;
+}
+.sidebar-close:hover { box-shadow: var(--press); transform: rotate(90deg); }
 
-    .sidebar-bottom {
-      margin-top: auto;
-      padding-top: 16px;
-      border-top: 2px solid var(--border);
-      flex-shrink: 0;
-    }
-    .admin-profile {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
-      border-radius: var(--radius-sm);
-      background: var(--bg);
-      transition: var(--transition);
-      cursor: pointer;
-    }
-    .admin-profile:hover {
-      background: var(--gold-bg);
-    }
-    .admin-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--gold), var(--gold-light));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
-      flex-shrink: 0;
-    }
-    .admin-info .aname {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-    .admin-info .aemail {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
+/* Brand */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px;
+  margin-bottom: 18px;
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--press);
+  flex-shrink: 0;
+}
+.brand-icon {
+  width: 44px; height: 44px;
+  border-radius: 13px;
+  background: var(--grad-primary);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow:
+    inset 2px 2px 5px rgba(20, 30, 70, 0.6),
+    inset -2px -2px 5px rgba(160, 130, 230, 0.4),
+    3px 3px 10px var(--sd),
+    -3px -3px 10px var(--sl);
+  padding: 4px;
+}
+.brand-icon img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  border-radius: 9px;
+  background: #fff;
+}
+.brand-text .name {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--t-hi);
+  line-height: 1.1;
+  letter-spacing: -0.2px;
+}
+.brand-text .name span {
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.brand-text .role {
+  font-size: 9px;
+  color: var(--t-lo);
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
 
-    /* ============================================================
-       MAIN AREA
-    ============================================================ */
-    .main {
-      flex: 1;
-      padding: 28px 32px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      overflow-y: auto;
-      min-height: 100vh;
-    }
-    .main::-webkit-scrollbar { width: 4px; }
-    .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 20px; }
+/* Nav */
+.nav-group { margin-bottom: 16px; flex-shrink: 0; }
+.nav-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--t-lo);
+  padding: 0 14px;
+  margin-bottom: 8px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  text-decoration: none;
+  color: var(--t-mid);
+  padding: 11px 13px;
+  border-radius: 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: all 0.3s var(--ease);
+  cursor: pointer;
+  border: none;
+  background: var(--surface);
+  width: 100%;
+  text-align: left;
+  margin-bottom: 6px;
+  box-shadow: var(--press-sm);
+  position: relative;
+}
+.nav-item .icon {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  background: var(--surface);
+  box-shadow: var(--press-xs);
+  color: var(--t-mid);
+  flex-shrink: 0;
+  transition: all 0.3s var(--ease);
+}
+.nav-item:hover {
+  color: var(--t-hi);
+  box-shadow: var(--press);
+  transform: translateX(3px);
+}
+.nav-item:hover .icon {
+  color: var(--purple);
+  box-shadow: var(--press-sm);
+}
+.nav-item.active {
+  color: #fff;
+  background: var(--grad-primary);
+  box-shadow:
+    inset 3px 3px 7px rgba(20, 30, 70, 0.6),
+    inset -3px -3px 7px rgba(160, 130, 230, 0.35),
+    3px 3px 10px var(--sd),
+    -3px -3px 10px var(--sl);
+}
+.nav-item.active .icon {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  box-shadow: inset 1px 1px 2px rgba(0,0,0,0.2);
+}
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: #fff;
+  border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+}
 
-    /* ============================================================
-       TOPBAR
-    ============================================================ */
-    .topbar {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      background: var(--bg-white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 24px;
-      box-shadow: var(--shadow);
-      transition: var(--transition);
-    }
-    .topbar:hover { box-shadow: var(--shadow-hover); }
-    .menu-btn {
-      display: none;
-      background: var(--bg);
-      color: var(--text-primary);
-      border: 1px solid var(--border);
-      width: 40px;
-      height: 40px;
-      border-radius: var(--radius-sm);
-      font-size: 18px;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: var(--transition);
-    }
-    .menu-btn:hover { background: var(--border); transform: rotate(90deg); }
-    .topbar-title { flex: 1; }
-    .topbar-title h3 {
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--text-primary);
-    }
-    .topbar-title h3 span { color: var(--gold); }
-    .topbar-title p {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-    .topbar-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .logout-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 24px;
-      background: linear-gradient(135deg, var(--gold), var(--gold-light));
-      color: #fff;
-      border: none;
-      border-radius: 50px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      font-family: 'Inter', sans-serif;
-    }
-    .logout-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 28px rgba(201, 151, 43, 0.35);
-    }
+.sidebar-bottom {
+  margin-top: auto;
+  padding-top: 14px;
+  flex-shrink: 0;
+}
+.admin-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--press-sm);
+  transition: all 0.3s var(--ease);
+  cursor: pointer;
+}
+.admin-profile:hover { box-shadow: var(--press); }
+.admin-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--grad-primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow:
+    inset 2px 2px 4px rgba(20, 30, 70, 0.5),
+    inset -2px -2px 4px rgba(160, 130, 230, 0.35),
+    3px 3px 8px var(--sd),
+    -3px -3px 8px var(--sl);
+}
+.admin-info .aname {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--t-hi);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+.admin-info .aemail {
+  font-size: 10.5px;
+  color: var(--t-lo);
+  font-weight: 500;
+}
 
-    /* ============================================================
-       WELCOME BANNER
-    ============================================================ */
-    .welcome-banner {
-      background: linear-gradient(135deg, #fef8ed, #f5f0ff);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 32px 36px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 20px;
-      box-shadow: var(--shadow);
-      transition: var(--transition);
-    }
-    .welcome-banner:hover { box-shadow: var(--shadow-hover); }
-    .banner-text h1 {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--text-primary);
-      line-height: 1.2;
-    }
-    .banner-text h1 span { color: var(--gold); }
-    .banner-text p {
-      color: var(--text-secondary);
-      font-size: 14px;
-      margin-top: 4px;
-    }
-    .banner-stats {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .bstat {
-      background: var(--bg-white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 14px 22px;
-      text-align: center;
-      min-width: 90px;
-      transition: var(--transition);
-    }
-    .bstat:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-hover);
-      border-color: var(--gold);
-    }
-    .bstat .val {
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--text-primary);
-    }
-    .bstat .val.gold { color: var(--gold); }
-    .bstat .lbl {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
+/* ============================================================
+   MAIN
+   ============================================================ */
+.main {
+  flex: 1;
+  padding: 24px 28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  min-height: 100vh;
+}
+.main::-webkit-scrollbar { width: 4px; }
+.main::-webkit-scrollbar-thumb { background: var(--sd); border-radius: 20px; }
 
-    /* ============================================================
-       SESSION BOX
-    ============================================================ */
-    .session-box {
-      background: var(--bg-white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-      box-shadow: var(--shadow);
-      transition: var(--transition);
-    }
-    .session-box:hover {
-      box-shadow: var(--shadow-hover);
-      border-color: var(--gold);
-    }
-    .session-box .left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .session-box .left .icon {
-      width: 48px;
-      height: 48px;
-      border-radius: var(--radius-sm);
-      background: var(--gold-bg);
-      color: var(--gold);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0;
-    }
-    .session-box .left .info .label {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-    .session-box .left .info .time {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--text-primary);
-      font-variant-numeric: tabular-nums;
-    }
-    .session-box .left .info .time.warning { color: var(--orange); }
-    .session-box .left .info .time.danger { color: var(--red); animation: blink 0.5s ease infinite; }
+/* ============================================================
+   TOPBAR — NEUMORPHIC
+   ============================================================ */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 14px 22px;
+  box-shadow: var(--press), var(--raise-sm);
+  transition: all 0.3s var(--ease);
+}
+.menu-btn {
+  display: none;
+  background: var(--surface);
+  color: var(--t-hi);
+  border: none;
+  width: 42px; height: 42px;
+  border-radius: 14px;
+  font-size: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.3s var(--ease);
+  box-shadow: var(--press-sm);
+  align-items: center;
+  justify-content: center;
+}
+.menu-btn:hover { box-shadow: var(--press); }
 
-    .session-box .right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .session-box .right .status {
-      font-size: 12px;
-      font-weight: 600;
-      padding: 4px 14px;
-      border-radius: 50px;
-    }
-    .session-box .right .status.active {
-      background: var(--green-bg);
-      color: var(--green);
-    }
-    .session-box .right .status.warning {
-      background: var(--orange-bg);
-      color: var(--orange);
-    }
-    .session-box .right .status.danger {
-      background: #fef2f2;
-      color: var(--red);
-      animation: blink 0.5s ease infinite;
-    }
-    .session-box .right .progress-wrap {
-      width: 120px;
-    }
-    .session-box .right .progress-wrap .bar {
-      width: 100%;
-      height: 4px;
-      background: var(--border);
-      border-radius: 50px;
-      overflow: hidden;
-    }
-    .session-box .right .progress-wrap .bar .fill {
-      height: 100%;
-      background: var(--green);
-      border-radius: 50px;
-      transition: width 1s linear;
-    }
-    .session-box .right .progress-wrap .bar .fill.warning { background: var(--orange); }
-    .session-box .right .progress-wrap .bar .fill.danger { background: var(--red); }
+.topbar-title { flex: 1; }
+.topbar-title h3 {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--t-hi);
+  letter-spacing: -0.2px;
+}
+.topbar-title p {
+  font-size: 12px;
+  color: var(--t-lo);
+  margin-top: 2px;
+  font-weight: 500;
+}
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
 
-    /* ============================================================
-       STAT CARDS
-    ============================================================ */
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
-    }
-    .stat-card {
-      background: var(--bg-white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px 26px;
-      transition: var(--transition);
-      box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
-    }
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-    }
-    .stat-card.c1::before { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
-    .stat-card.c2::before { background: linear-gradient(90deg, var(--blue), #3b7ad4); }
-    .stat-card.c3::before { background: linear-gradient(90deg, var(--green), #34d399); }
-    .stat-card.c4::before { background: linear-gradient(90deg, var(--purple), #a78bfa); }
+.theme-btn {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface);
+  color: var(--purple);
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--press-sm);
+  transition: all 0.35s var(--ease);
+}
+.theme-btn:hover {
+  box-shadow: var(--press);
+  transform: rotate(180deg) scale(1.05);
+}
+.theme-btn:active {
+  box-shadow: var(--press-lg);
+  transform: rotate(180deg) scale(0.98);
+}
 
-    .stat-card:hover {
-      transform: translateY(-6px);
-      box-shadow: var(--shadow-hover);
-      border-color: var(--gold);
-    }
-    .stat-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      margin-bottom: 14px;
-      transition: var(--transition);
-    }
-    .stat-card:hover .stat-icon { transform: scale(1.1); }
-    .c1 .stat-icon { background: var(--gold-bg); color: var(--gold); }
-    .c2 .stat-icon { background: var(--blue-bg); color: var(--blue); }
-    .c3 .stat-icon { background: var(--green-bg); color: var(--green); }
-    .c4 .stat-icon { background: var(--purple-bg); color: var(--purple); }
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  background: var(--grad-primary);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.35s var(--ease);
+  font-family: var(--font-body);
+  box-shadow:
+    inset 2px 2px 5px rgba(20, 30, 70, 0.6),
+    inset -2px -2px 5px rgba(160, 130, 230, 0.4),
+    4px 4px 10px var(--sd),
+    -4px -4px 10px var(--sl);
+}
+.logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 3px 3px 7px rgba(20, 30, 70, 0.65),
+    inset -3px -3px 7px rgba(160, 130, 230, 0.45),
+    7px 7px 16px var(--sd-strong),
+    -7px -7px 16px var(--sl);
+}
+.logout-btn:active { transform: translateY(0); }
+.logout-btn i { font-size: 13px; }
 
-    .stat-val {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--text-primary);
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-    .stat-label {
-      font-size: 13px;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
+/* ============================================================
+   WELCOME BANNER — NEUMORPHIC
+   ============================================================ */
+.welcome-banner {
+  background: var(--surface);
+  border-radius: 24px;
+  padding: 26px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  box-shadow: var(--press), var(--raise-sm);
+  position: relative;
+  overflow: hidden;
+}
+.welcome-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%; right: -10%;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.12), transparent 70%);
+  pointer-events: none;
+}
+.banner-text { position: relative; z-index: 1; }
+.banner-text h1 {
+  font-family: var(--font-display);
+  font-size: 25px;
+  font-weight: 700;
+  color: var(--t-hi);
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+}
+.banner-text h1 #greetingText { color: var(--t-mid); font-weight: 500; }
+.banner-text h1 #welcomeName {
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.banner-text p {
+  color: var(--t-mid);
+  font-size: 13px;
+  margin-top: 6px;
+  font-weight: 500;
+}
+.banner-stats { display: flex; gap: 12px; flex-wrap: wrap; position: relative; z-index: 1; }
+.bstat {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 14px 20px;
+  text-align: center;
+  min-width: 92px;
+  box-shadow: var(--press-sm);
+  transition: all 0.3s var(--ease);
+}
+.bstat:hover {
+  box-shadow: var(--press);
+  transform: translateY(-3px);
+}
+.bstat .val {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--t-hi);
+  line-height: 1;
+}
+.bstat .val.gold {
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.bstat .lbl {
+  font-size: 10px;
+  color: var(--t-lo);
+  margin-top: 4px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-    /* ============================================================
-       MODULES
-    ============================================================ */
-    .main-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-    .section-card {
-      background: var(--bg-white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      transition: var(--transition);
-    }
-    .section-card:hover { box-shadow: var(--shadow-hover); }
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border);
-    }
-    .section-header h4 {
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-    .section-header p {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-    .see-all {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--gold);
-      text-decoration: none;
-      padding: 6px 14px;
-      background: var(--gold-bg);
-      border-radius: 8px;
-      transition: var(--transition);
-    }
-    .see-all:hover { background: rgba(201, 151, 43, 0.15); transform: translateX(4px); }
+/* ============================================================
+   SESSION BOX
+   ============================================================ */
+.session-box {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  box-shadow: var(--press);
+}
+.session-box .left { display: flex; align-items: center; gap: 14px; }
+.session-box .left .icon {
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--purple);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px;
+  flex-shrink: 0;
+  box-shadow: var(--press-sm);
+}
+.session-box .left .info .label {
+  font-size: 10.5px;
+  color: var(--t-lo);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.session-box .left .info .time {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--t-hi);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.session-box .left .info .time.warning { color: var(--amber); }
+.session-box .left .info .time.danger { color: var(--rose); animation: blink 0.5s ease infinite; }
+.session-box .right { display: flex; align-items: center; gap: 14px; }
+.session-box .right .status {
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  box-shadow: var(--press-xs);
+}
+.session-box .right .status.active { color: var(--emerald); }
+.session-box .right .status.warning { color: var(--amber); }
+.session-box .right .status.danger { color: var(--rose); animation: blink 0.5s ease infinite; }
+.session-box .right .progress-wrap { width: 120px; }
+.session-box .right .progress-wrap .bar {
+  width: 100%;
+  height: 6px;
+  background: var(--surface);
+  border-radius: 100px;
+  overflow: hidden;
+  box-shadow: var(--press-xs);
+}
+.session-box .right .progress-wrap .bar .fill {
+  height: 100%;
+  background: var(--grad-emerald);
+  border-radius: 100px;
+  transition: width 1s linear;
+}
+.session-box .right .progress-wrap .bar .fill.warning { background: var(--grad-amber); }
+.session-box .right .progress-wrap .bar .fill.danger { background: var(--grad-rose); }
 
-    .modules-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      padding: 20px;
-    }
-    .module-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      padding: 18px 14px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      text-decoration: none;
-      transition: var(--transition);
-      text-align: center;
-    }
-    .module-item:hover {
-      background: var(--bg-white);
-      border-color: var(--gold);
-      transform: translateY(-6px);
-      box-shadow: var(--shadow-hover);
-    }
-    .module-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      transition: var(--transition);
-    }
-    .module-item:hover .module-icon { transform: scale(1.1); }
-    .module-item .mtitle {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-    .module-item .msub {
-      font-size: 10px;
-      color: var(--text-muted);
-    }
+/* ============================================================
+   STAT CARDS — NEUMORPHIC
+   ============================================================ */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.stat-card {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 22px 22px;
+  transition: all 0.35s var(--ease);
+  box-shadow: var(--press);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  transition: height 0.3s var(--ease);
+}
+.stat-card.c1::before { background: var(--grad-primary); }
+.stat-card.c2::before { background: var(--grad-sky); }
+.stat-card.c3::before { background: var(--grad-emerald); }
+.stat-card.c4::before { background: var(--grad-pink); }
 
-    /* ============================================================
-       OVERLAY
-    ============================================================ */
-    .overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(4px);
-      z-index: 99;
-      transition: opacity 0.3s ease;
-    }
-    .overlay.active { display: block; }
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--press-lg);
+}
+.stat-card:hover::before { height: 4px; }
+.stat-card:active { transform: translateY(-2px); box-shadow: var(--press); }
 
-    .sidebar-close {
-      display: none;
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 36px;
-      height: 36px;
-      border: none;
-      border-radius: var(--radius-sm);
-      background: var(--bg);
-      color: var(--text-primary);
-      font-size: 18px;
-      cursor: pointer;
-      transition: var(--transition);
-      align-items: center;
-      justify-content: center;
-    }
-    .sidebar-close:hover { background: var(--border); transform: rotate(90deg); }
+.stat-icon {
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  margin-bottom: 12px;
+  transition: all 0.35s var(--ease);
+  box-shadow: var(--press-sm);
+}
+.stat-card:hover .stat-icon { transform: scale(1.1) rotate(-6deg); }
+.c1 .stat-icon { color: var(--purple); }
+.c2 .stat-icon { color: var(--sky); }
+.c3 .stat-icon { color: var(--emerald); }
+.c4 .stat-icon { color: var(--pink); }
 
-    /* ============================================================
-       FOOTER
-    ============================================================ */
-    .footer {
-      background: var(--bg-white);
-      border-top: 1px solid var(--border);
-      padding: 20px 32px;
-      margin-top: auto;
-    }
-    .footer-content {
-      max-width: 100%;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .footer-content span,
-    .footer-content a {
-      font-size: 13px;
-      color: var(--text-muted);
-      text-decoration: none;
-    }
-    .footer-content a { font-weight: 600; transition: var(--transition); }
-    .footer-content a:hover { color: var(--gold); text-decoration: underline; }
-    .footer-content .gold-link { color: var(--gold); }
+.stat-val {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--t-hi);
+  line-height: 1;
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
+}
+.stat-label {
+  font-size: 12px;
+  color: var(--t-mid);
+  font-weight: 600;
+}
 
-    .footer-social {
-      display: flex;
-      gap: 12px;
-    }
-    .footer-social a {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--bg);
-      color: var(--text-muted);
-      font-size: 15px;
-      transition: var(--transition);
-      text-decoration: none;
-    }
-    .footer-social a:hover {
-      background: var(--gold-bg);
-      color: var(--gold);
-      transform: translateY(-4px);
-      box-shadow: 0 4px 16px rgba(201, 151, 43, 0.2);
-    }
+/* ============================================================
+   SECTION CARD
+   ============================================================ */
+.section-card {
+  background: var(--surface);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: var(--press);
+  transition: all 0.3s var(--ease);
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+}
+.section-header h4 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--t-hi);
+  letter-spacing: -0.2px;
+}
+.section-header p {
+  font-size: 11.5px;
+  color: var(--t-lo);
+  margin-top: 3px;
+  font-weight: 500;
+}
+.see-all {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--purple);
+  text-decoration: none;
+  padding: 8px 14px;
+  background: var(--surface);
+  border-radius: 100px;
+  transition: all 0.3s var(--ease);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: var(--press-sm);
+}
+.see-all:hover { box-shadow: var(--press); transform: translateX(3px); }
 
-    /* ============================================================
-       RESPONSIVE
-    ============================================================ */
-    @media (max-width: 1200px) {
-      .stat-grid { grid-template-columns: repeat(2, 1fr); }
-      .modules-grid { grid-template-columns: repeat(2, 1fr); }
-      .banner-stats { display: none; }
-    }
+/* ============================================================
+   MODULES — NEUMORPHIC
+   ============================================================ */
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 0 20px 20px;
+}
+.module-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 12px;
+  background: var(--surface);
+  border-radius: 16px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.35s var(--ease);
+  text-align: center;
+  color: inherit;
+  box-shadow: var(--press-sm);
+}
+.module-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--press);
+}
+.module-item:active { transform: translateY(-2px); }
+.module-icon {
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  transition: all 0.35s var(--ease);
+  box-shadow: var(--press-xs);
+}
+.module-item:hover .module-icon { transform: scale(1.12) rotate(-6deg); }
+.module-item .mtitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--t-hi);
+}
+.module-item .msub {
+  font-size: 10px;
+  color: var(--t-lo);
+  font-weight: 500;
+}
 
-    @media (max-width: 992px) {
-      .main { padding: 20px; }
-      .modules-grid { grid-template-columns: repeat(2, 1fr); }
-      .topbar { flex-wrap: wrap; gap: 12px; }
-      .topbar-title { width: 100%; }
-      .footer-content { flex-direction: column; text-align: center; }
-    }
+/* ============================================================
+   TWO COLUMN
+   ============================================================ */
+.two-col {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 20px;
+}
 
-    @media (max-width: 768px) {
-      .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        transform: translateX(-100%);
-        z-index: 999;
-        width: 280px;
-        height: 100vh;
-        overflow-y: auto;
-        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.15);
-        border-right: none;
-      }
-      .sidebar.open { transform: translateX(0); }
-      .sidebar-close {
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        z-index: 10;
-      }
-      .menu-btn {
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-      }
-      .main { padding: 16px; gap: 16px; }
-      .stat-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-      .modules-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .welcome-banner {
-        padding: 20px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-      }
-      .banner-text h1 { font-size: 22px; }
-      .banner-stats {
-        display: flex;
-        width: 100%;
-        gap: 10px;
-      }
-      .bstat {
-        flex: 1;
-        padding: 10px;
-        min-width: auto;
-      }
-      .bstat .val { font-size: 18px; }
-      .session-box {
-        padding: 16px 20px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-      }
-      .session-box .left .info .time { font-size: 22px; }
-      .session-box .right .progress-wrap { width: 100%; }
-      .logout-btn .lbl { display: none; }
-      .logout-btn { padding: 10px 16px; }
-      .topbar-title h3 { font-size: 18px; }
-    }
+/* LIST — NEUMORPHIC CARDS */
+.list-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 20px 20px;
+}
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border-radius: 14px;
+  transition: all 0.3s var(--ease);
+  cursor: pointer;
+  box-shadow: var(--press-sm);
+}
+.list-item:hover {
+  box-shadow: var(--press);
+  transform: translateX(3px);
+}
+.list-icon {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+  box-shadow: var(--press-xs);
+}
+.list-body { flex: 1; min-width: 0; }
+.list-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--t-hi);
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.list-sub {
+  font-size: 10.5px;
+  color: var(--t-lo);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.list-badge {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 5px 10px;
+  border-radius: 100px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  box-shadow: var(--press-xs);
+}
+.badge-new { color: var(--rose); }
+.badge-ok { color: var(--emerald); }
+.badge-info { color: var(--sky); }
+.badge-warn { color: var(--amber); }
 
-    @media (max-width: 480px) {
-      .stat-grid { grid-template-columns: 1fr; }
-      .modules-grid { grid-template-columns: 1fr; }
-      .main { padding: 10px; }
-      .welcome-banner { padding: 16px; }
-      .banner-text h1 { font-size: 20px; }
-      .banner-stats { flex-direction: column; }
-      .bstat { width: 100%; }
-      .topbar-title h3 { font-size: 16px; }
-      .topbar { padding: 12px 16px; }
-      .footer { padding: 16px; }
-      .session-box .left .info .time { font-size: 20px; }
+/* ============================================================
+   CHART — NEUMORPHIC
+   ============================================================ */
+.chart-area {
+  padding: 0 20px 20px;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 200px;
+}
+.bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  justify-content: flex-end;
+}
+.bar {
+  width: 100%;
+  max-width: 40px;
+  border-radius: 10px 10px 4px 4px;
+  background: var(--grad-primary);
+  transition: all 0.3s var(--ease);
+  box-shadow:
+    inset 1px 1px 2px rgba(255, 255, 255, 0.25),
+    2px 2px 8px var(--sd);
+  animation: growBar 0.8s var(--ease) backwards;
+  cursor: pointer;
+}
+.bar:hover { transform: scaleY(1.05) translateY(-3px); filter: brightness(1.08); }
+.bar-wrap:nth-child(1) .bar { animation-delay: 0.05s; }
+.bar-wrap:nth-child(2) .bar { animation-delay: 0.1s; }
+.bar-wrap:nth-child(3) .bar { animation-delay: 0.15s; }
+.bar-wrap:nth-child(4) .bar { animation-delay: 0.2s; }
+.bar-wrap:nth-child(5) .bar { animation-delay: 0.25s; }
+.bar-wrap:nth-child(6) .bar { animation-delay: 0.3s; }
+@keyframes growBar {
+  from { height: 0 !important; opacity: 0; }
+}
+.bar-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--t-lo);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-      .session-popup {
-        padding: 32px 20px 28px;
-      }
-      .session-popup h2 { font-size: 22px; }
-      .session-popup .icon-box {
-        width: 60px;
-        height: 60px;
-        font-size: 28px;
-      }
-    }
-  </style>
+/* ============================================================
+   OVERLAY
+   ============================================================ */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 15, 30, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 99;
+}
+.overlay.active { display: block; }
+
+/* ============================================================
+   SESSION POPUP
+   ============================================================ */
+.session-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 15, 30, 0.65);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+.session-overlay.active { display: flex; }
+
+.session-popup {
+  background: var(--surface);
+  border-radius: 26px;
+  padding: 40px 36px 34px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--press-lg), var(--raise-lg);
+}
+.session-popup .school-logo {
+  width: 76px; height: 76px;
+  border-radius: 20px;
+  margin: 0 auto 16px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 10px;
+  background: var(--surface);
+  box-shadow: var(--press);
+}
+.session-popup .school-logo img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+}
+.session-popup .school-name-popup {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--purple);
+  letter-spacing: 0.5px;
+  margin-bottom: 22px;
+  padding: 7px 16px;
+  background: var(--surface);
+  border-radius: 100px;
+  display: inline-block;
+  box-shadow: var(--press-sm);
+}
+.session-popup .icon-box {
+  width: 70px; height: 70px;
+  border-radius: 50%;
+  margin: 0 auto 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px;
+  background: var(--surface);
+  box-shadow: var(--press);
+  color: var(--rose);
+}
+.session-popup h2 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--t-hi);
+  margin-bottom: 8px;
+}
+.session-popup h2 span {
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.session-popup .sub-text {
+  font-size: 13px;
+  color: var(--t-mid);
+  margin-bottom: 18px;
+  line-height: 1.55;
+  font-weight: 500;
+}
+.session-popup .session-timer {
+  font-size: 11.5px;
+  color: var(--t-lo);
+  background: var(--surface);
+  padding: 8px 16px;
+  border-radius: 50px;
+  display: inline-block;
+  margin-bottom: 22px;
+  font-weight: 600;
+  box-shadow: var(--press-sm);
+}
+.session-popup .login-again-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  background: var(--grad-primary);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.35s var(--ease);
+  font-family: var(--font-body);
+  text-decoration: none;
+  box-shadow:
+    inset 2px 2px 5px rgba(20, 30, 70, 0.6),
+    inset -2px -2px 5px rgba(160, 130, 230, 0.4),
+    4px 4px 12px var(--sd),
+    -4px -4px 12px var(--sl);
+}
+.session-popup .login-again-btn:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 3px 3px 7px rgba(20, 30, 70, 0.65),
+    inset -3px -3px 7px rgba(160, 130, 230, 0.45),
+    8px 8px 20px var(--sd-strong),
+    -8px -8px 20px var(--sl);
+}
+
+/* ============================================================
+   FOOTER — NEUMORPHIC
+   ============================================================ */
+.footer {
+  background: var(--surface);
+  padding: 20px 28px;
+  margin-top: auto;
+  box-shadow: inset 0 2px 6px var(--sd-soft);
+}
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer-content span,
+.footer-content a {
+  font-size: 12px;
+  color: var(--t-lo);
+  text-decoration: none;
+  font-weight: 500;
+}
+.footer-content a { font-weight: 700; transition: color 0.3s var(--ease); }
+.footer-content a:hover { color: var(--purple); }
+.footer-content .gold-link {
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.footer-social { display: flex; gap: 8px; }
+.footer-social a {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--t-lo);
+  font-size: 13px;
+  transition: all 0.3s var(--ease);
+  text-decoration: none;
+  box-shadow: var(--press-sm);
+}
+.footer-social a:hover {
+  color: var(--purple);
+  transform: translateY(-3px);
+  box-shadow: var(--press);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1200px) {
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .modules-grid { grid-template-columns: repeat(3, 1fr); }
+  .two-col { grid-template-columns: 1fr; }
+}
+@media (max-width: 992px) {
+  .main { padding: 18px; gap: 16px; }
+  .topbar-title h3 { font-size: 17px; }
+  .footer-content { flex-direction: column; text-align: center; }
+  .modules-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    transform: translateX(-100%);
+    z-index: 999;
+    width: 280px;
+    box-shadow: 4px 0 30px rgba(0, 0, 0, 0.2);
+    border-right: none;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-close { display: flex; }
+  .menu-btn { display: flex; }
+  .main { padding: 14px; gap: 14px; }
+  .stat-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modules-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .welcome-banner { padding: 20px; flex-direction: column; align-items: flex-start; gap: 14px; }
+  .banner-text h1 { font-size: 20px; }
+  .banner-stats { display: flex; width: 100%; gap: 10px; }
+  .bstat { flex: 1; padding: 10px; min-width: auto; }
+  .bstat .val { font-size: 18px; }
+  .session-box { padding: 14px 18px; flex-direction: column; align-items: stretch; gap: 10px; }
+  .session-box .left .info .time { font-size: 20px; }
+  .session-box .right { justify-content: space-between; }
+  .session-box .right .progress-wrap { width: 100%; }
+  .logout-btn .lbl { display: none; }
+  .logout-btn { padding: 10px 14px; }
+  .topbar { padding: 12px 16px; gap: 10px; }
+  .topbar-title h3 { font-size: 16px; }
+  .theme-btn { width: 38px; height: 38px; font-size: 13px; }
+  .chart-area { height: 150px; gap: 8px; }
+}
+@media (max-width: 480px) {
+  .stat-grid { grid-template-columns: 1fr; }
+  .modules-grid { grid-template-columns: 1fr; }
+  .banner-text h1 { font-size: 18px; }
+  .banner-stats { flex-direction: column; }
+  .bstat { width: 100%; }
+  .footer { padding: 14px; }
+  .footer-content span { font-size: 11px; }
+  .session-popup { padding: 28px 20px 24px; }
+  .session-popup h2 { font-size: 20px; }
+  .chart-area { padding: 0 14px 14px; height: 130px; gap: 6px; }
+  .bar-label { font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
 </head>
 <body>
 
-  <!-- SESSION TIMER BAR -->
-  <div class="session-timer-bar" id="sessionTimerBar">
-    <div class="fill" id="sessionTimerFill"></div>
-  </div>
+<div class="session-timer-bar" id="sessionTimerBar">
+  <div class="fill" id="sessionTimerFill"></div>
+</div>
 
-  <!-- SESSION OVERLAY -->
-  <div class="session-overlay" id="sessionOverlay">
-    <div class="session-popup">
-      <div class="school-logo">
-        <img src="logo(1).png" alt="GSSS SHILLA Logo">
+<div class="session-overlay" id="sessionOverlay">
+  <div class="session-popup">
+    <div class="school-logo">
+      <img src="logo(1).png" alt="GSSS SHILLA Logo" onerror="this.style.display='none'">
+    </div>
+    <div class="school-name-popup">
+      <i class="fas fa-school" style="margin-right:6px;"></i>
+      Govt. Sr. Sec. School Shilla
+    </div>
+    <div class="icon-box" id="popupIconBox">
+      <i class="fas fa-clock" id="popupIcon"></i>
+    </div>
+    <h2 id="popupTitle">Session <span>Expired</span></h2>
+    <p class="sub-text" id="popupSubText">
+      Your session has been expired due to inactivity.<br>
+      Please login again to continue.
+    </p>
+    <div class="session-timer" id="popupTimer">
+      <i class="fas fa-shield-alt" style="margin-right:6px;"></i>
+      <span id="popupStatusText">Secure session ended</span>
+    </div>
+    <button class="login-again-btn" onclick="redirectToLogin()">
+      <i class="fas fa-sign-in-alt"></i>
+      <span id="popupBtnText">Login Again</span>
+    </button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="dashboard">
+
+  <aside class="sidebar" id="sidebar">
+    <button class="sidebar-close" onclick="closeSidebar()">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <div class="brand">
+      <div class="brand-icon">
+        <img src="logo(1).png" alt="Logo" onerror="this.style.display='none'">
       </div>
-      <div class="school-name-popup">
-        <i class="fas fa-school" style="margin-right: 6px;"></i>
-        Govt. Sr. Sec. School Shilla
+      <div class="brand-text">
+        <div class="name">GSSS <span>SHILLA</span></div>
+        <div class="role">Admin Panel</div>
       </div>
-      <div class="icon-box expired" id="popupIconBox">
-        <i class="fas fa-clock" id="popupIcon"></i>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Main</div>
+      <a class="nav-item active" href="#">
+        <span class="icon"><i class="fas fa-chart-pie"></i></span> Dashboard
+      </a>
+      <a class="nav-item" href="admin-notif.html">
+        <span class="icon"><i class="fas fa-bell"></i></span> Notices
+      </a>
+      <a class="nav-item" href="admin-downl.html">
+        <span class="icon"><i class="fas fa-cloud-download-alt"></i></span> Downloads
+      </a>
+      <a class="nav-item" href="recent.html">
+        <span class="icon"><i class="fas fa-clock"></i></span> Recent Activity
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Visuals</div>
+      <a class="nav-item" href="add-image.html">
+        <span class="icon"><i class="fas fa-sliders-h"></i></span> Home Slider
+      </a>
+      <a class="nav-item" href="admin-img.html">
+        <span class="icon"><i class="fas fa-images"></i></span> School Gallery
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Students</div>
+      <a class="nav-item" href="admin-students.html">
+        <span class="icon"><i class="fas fa-user-graduate"></i></span> Students
+      </a>
+      <a class="nav-item" href="idcard.html">
+        <span class="icon"><i class="fas fa-id-card"></i></span> ID Cards
+      </a>
+      <a class="nav-item" href="bonafide.html">
+        <span class="icon"><i class="fas fa-certificate"></i></span> Bonafide
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Academics</div>
+      <a class="nav-item" href="admin-result.html">
+        <span class="icon"><i class="fas fa-trophy"></i></span> Result Management
+      </a>
+      <a class="nav-item" href="admitCard.html">
+        <span class="icon"><i class="fas fa-id-card-clip"></i></span> Admit Cards
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Quiz & Activities</div>
+      <a class="nav-item" href="admin-quiz.html">
+        <span class="icon"><i class="fas fa-circle-question"></i></span> Quiz
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">People</div>
+      <a class="nav-item" href="admin-faculity.html">
+        <span class="icon"><i class="fas fa-chalkboard-teacher"></i></span> Faculty
+      </a>
+      <a class="nav-item" href="admin-contact.html">
+        <span class="icon"><i class="fas fa-envelope"></i></span> Contact
+      </a>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="admin-profile">
+        <div class="admin-avatar" id="adminAvatar">A</div>
+        <div class="admin-info">
+          <div class="aname" id="adminName">Admin</div>
+          <div class="aemail">Logged In</div>
+        </div>
       </div>
-      <h2 id="popupTitle">Session <span>Expired</span></h2>
-      <p class="sub-text" id="popupSubText">
-        Your session has been expired due to inactivity.<br>
-        Please login again to continue.
-      </p>
-      <div class="session-timer" id="popupTimer">
-        <i class="fas fa-shield-alt" style="margin-right: 6px;"></i>
-        <span id="popupStatusText">Secure session ended</span>
-      </div>
-      <button class="login-again-btn" onclick="redirectToLogin()">
-        <i class="fas fa-sign-in-alt"></i>
-        <span id="popupBtnText">Login Again</span>
+    </div>
+  </aside>
+
+  <div class="main">
+
+    <div class="topbar">
+      <button class="menu-btn" onclick="toggleSidebar()" aria-label="Menu">
+        <i class="fas fa-bars"></i>
       </button>
+      <div class="topbar-title">
+        <h3>Dashboard</h3>
+        <p id="dateStr">Loading...</p>
+      </div>
+      <div class="topbar-actions">
+        <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">
+          <i id="themeIcon" class="fas fa-moon"></i>
+        </button>
+        <button class="logout-btn" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> <span class="lbl">Logout</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="welcome-banner">
+      <div class="banner-text">
+        <h1><span id="greetingText">Good Morning, </span><span id="welcomeName">Admin</span></h1>
+        <p>Here's what's happening at your school today.</p>
+      </div>
+      <div class="banner-stats">
+        <div class="bstat">
+          <div class="val gold" id="statStudents">—</div>
+          <div class="lbl">Students</div>
+        </div>
+        <div class="bstat">
+          <div class="val" id="statFaculty">—</div>
+          <div class="lbl">Faculty</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="session-box" id="sessionBox">
+      <div class="left">
+        <div class="icon"><i class="fas fa-clock"></i></div>
+        <div class="info">
+          <div class="label">Session Remaining</div>
+          <div class="time" id="sessionBoxTime">30:00</div>
+        </div>
+      </div>
+      <div class="right">
+        <div class="status active" id="sessionStatus">Active</div>
+        <div class="progress-wrap">
+          <div class="bar">
+            <div class="fill" id="sessionBoxFill" style="width:100%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card c1">
+        <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
+        <div class="stat-val" id="cardStudents">—</div>
+        <div class="stat-label">Total Students</div>
+      </div>
+      <div class="stat-card c2">
+        <div class="stat-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+        <div class="stat-val" id="cardFaculty">—</div>
+        <div class="stat-label">Faculty Members</div>
+      </div>
+      <div class="stat-card c3">
+        <div class="stat-icon"><i class="fas fa-bullhorn"></i></div>
+        <div class="stat-val" id="cardNotices">—</div>
+        <div class="stat-label">Active Notices</div>
+      </div>
+      <div class="stat-card c4">
+        <div class="stat-icon"><i class="fas fa-eye"></i></div>
+        <div class="stat-val" id="cardVisitors">—</div>
+        <div class="stat-label">Total Visitors</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <h4>Quick Access</h4>
+          <p>Jump to any module instantly</p>
+        </div>
+        <a href="https://gsssshilla07.pages.dev" class="see-all" target="_blank" rel="noopener">
+          Public Page <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+      <div class="modules-grid">
+        <a class="module-item" href="admin-notif.html">
+          <div class="module-icon" style="color: var(--purple);"><i class="fas fa-bell"></i></div>
+          <div class="mtitle">Notices</div>
+          <div class="msub">Announcements</div>
+        </a>
+        <a class="module-item" href="admin-downl.html">
+          <div class="module-icon" style="color: var(--sky);"><i class="fas fa-download"></i></div>
+          <div class="mtitle">Downloads</div>
+          <div class="msub">Study materials</div>
+        </a>
+        <a class="module-item" href="add-image.html">
+          <div class="module-icon" style="color: var(--amber);"><i class="fas fa-sliders-h"></i></div>
+          <div class="mtitle">Home Slider</div>
+          <div class="msub">Slider images</div>
+        </a>
+        <a class="module-item" href="admin-img.html">
+          <div class="module-icon" style="color: var(--pink);"><i class="fas fa-images"></i></div>
+          <div class="mtitle">Gallery</div>
+          <div class="msub">School photos</div>
+        </a>
+        <a class="module-item" href="admin-result.html">
+          <div class="module-icon" style="color: var(--emerald);"><i class="fas fa-trophy"></i></div>
+          <div class="mtitle">Results</div>
+          <div class="msub">Manage results</div>
+        </a>
+        <a class="module-item" href="admin-faculity.html">
+          <div class="module-icon" style="color: var(--emerald);"><i class="fas fa-chalkboard-teacher"></i></div>
+          <div class="mtitle">Faculty</div>
+          <div class="msub">Staff management</div>
+        </a>
+        <a class="module-item" href="admin-students.html">
+          <div class="module-icon" style="color: var(--purple);"><i class="fas fa-user-graduate"></i></div>
+          <div class="mtitle">Students</div>
+          <div class="msub">Student records</div>
+        </a>
+        <a class="module-item" href="admin-contact.html">
+          <div class="module-icon" style="color: var(--pink);"><i class="fas fa-envelope"></i></div>
+          <div class="mtitle">Contact</div>
+          <div class="msub">Messages</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="two-col">
+
+      <div class="section-card">
+        <div class="section-header">
+          <div>
+            <h4>Recent Activity</h4>
+            <p>Latest updates from your portal</p>
+          </div>
+          <a href="recent.html" class="see-all">
+            View All <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+        <div class="list-stack">
+          <div class="list-item">
+            <div class="list-icon" style="color: var(--emerald);">
+              <i class="fas fa-user-plus"></i>
+            </div>
+            <div class="list-body">
+              <div class="list-title">New student registered</div>
+              <div class="list-sub"><i class="far fa-clock"></i> 2 hours ago</div>
+            </div>
+            <span class="list-badge badge-new">New</span>
+          </div>
+
+          <div class="list-item">
+            <div class="list-icon" style="color: var(--purple);">
+              <i class="fas fa-trophy"></i>
+            </div>
+            <div class="list-body">
+              <div class="list-title">Result published for Class 12</div>
+              <div class="list-sub"><i class="far fa-clock"></i> 5 hours ago</div>
+            </div>
+            <span class="list-badge badge-ok">Done</span>
+          </div>
+
+          <div class="list-item">
+            <div class="list-icon" style="color: var(--sky);">
+              <i class="fas fa-bell"></i>
+            </div>
+            <div class="list-body">
+              <div class="list-title">New notice: Exam schedule</div>
+              <div class="list-sub"><i class="far fa-clock"></i> Yesterday</div>
+            </div>
+            <span class="list-badge badge-info">Notice</span>
+          </div>
+
+          <div class="list-item">
+            <div class="list-icon" style="color: var(--amber);">
+              <i class="fas fa-certificate"></i>
+            </div>
+            <div class="list-body">
+              <div class="list-title">Bonafide certificate issued</div>
+              <div class="list-sub"><i class="far fa-clock"></i> 2 days ago</div>
+            </div>
+            <span class="list-badge badge-warn">Pending</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <div>
+            <h4>Weekly Visitors</h4>
+            <p>Last 6 days traffic</p>
+          </div>
+        </div>
+        <div class="chart-area">
+          <div class="bar-wrap"><div class="bar" style="height: 42%;"></div><div class="bar-label">Mon</div></div>
+          <div class="bar-wrap"><div class="bar" style="height: 68%;"></div><div class="bar-label">Tue</div></div>
+          <div class="bar-wrap"><div class="bar" style="height: 55%;"></div><div class="bar-label">Wed</div></div>
+          <div class="bar-wrap"><div class="bar" style="height: 88%;"></div><div class="bar-label">Thu</div></div>
+          <div class="bar-wrap"><div class="bar" style="height: 74%;"></div><div class="bar-label">Fri</div></div>
+          <div class="bar-wrap"><div class="bar" style="height: 96%;"></div><div class="bar-label">Sat</div></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-content">
+    <span>© 2026 <a href="https://gsssshilla07.pages.dev">Govt. Sr. Sec. School Shilla</a>. All rights reserved.</span>
+    <span>Developed by <a href="#" class="gold-link">Vikshant Kralta</a></span>
+    <div class="footer-social">
+      <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
+      <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
     </div>
   </div>
+</footer>
 
-  <!-- DASHBOARD -->
-  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
-
-  <div class="dashboard">
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-      <button class="sidebar-close" onclick="closeSidebar()">✕</button>
-
-      <div class="brand">
-        <div class="brand-icon">
-          <img src="logo(1).png" alt="Logo" style="width:46px; height:46px; border-radius:12px; object-fit:contain; background:#fff; padding:4px;">
-        </div>
-        <div class="brand-text">
-          <div class="name">GSSS <span>SHILLA</span></div>
-          <div class="role">Admin Panel</div>
-        </div>
-      </div>
-
-      <div class="nav-group">
-        <div class="nav-label">Main</div>
-        <a class="nav-item active" href="#">
-          <span class="icon"><i class="fas fa-chart-pie"></i></span> Dashboard
-        </a>
-        <a class="nav-item" href="admin-notif.html">
-          <span class="icon"><i class="fas fa-bell"></i></span> Notices
-        </a>
-        <a class="nav-item" href="admin-downl.html">
-          <span class="icon"><i class="fas fa-cloud-download-alt"></i></span> Downloads
-        </a>
-        <a class="nav-item" href="recent.html">
-          <span class="icon"><i class="fas fa-clock"></i></span> Recent Activity
-        </a>
-      </div>
-
-      <div class="nav-group">
-        <div class="nav-label">Visuals</div>
-        <a class="nav-item" href="add-image.html">
-          <span class="icon"><i class="fas fa-sliders-h"></i></span> Home Slider
-        </a>
-        <a class="nav-item" href="admin-img.html">
-          <span class="icon"><i class="fas fa-images"></i></span> School Gallery
-        </a>
-      </div>
-
-
-       <div class="nav-group">
-        <div class="nav-label">Students</div>
-        <a class="nav-item" href="admin-students.html">
-  <span class="icon"><i class="fa-solid fa-user-graduate"></i></span> Students Management
-</a>
-
-<a class="nav-item" href="idcard.html">
-  <span class="icon"><i class="fa-solid fa-id-card"></i></span> Student ID Cards
-</a>
-
-
-         <a class="nav-item" href="bonafide.html">
-  <span class="icon"><i class="fa-solid fa-certificate"></i></span> Bonafide Certificate
-</a>
-      </div>
-
-      <div class="nav-group">
-        <div class="nav-label">Academics</div>
-        <a class="nav-item" href="admin-result.html">
-          <span class="icon"><i class="fa-solid fa-trophy"></i></span> Result Management
-        </a>
-        
-      
-       <a class="nav-item" href="admitCard.html">
-  <span class="icon"><i class="fa-solid fa-id-card-clip"></i></span> Admit Cards
-</a>
-      </div>
-
-
-        <div class="nav-group">
-        <div class="nav-label">Quiz and Activities</div>
-       <a class="nav-item" href="admin-quiz.html">
-  <span class="icon"><i class="fa-solid fa-circle-question"></i></span> Quiz
-</a>
-       
-      </div>
-
-      <div class="nav-group">
-        <div class="nav-label">People</div>
-        <a class="nav-item" href="admin-faculity.html">
-          <span class="icon"><i class="fas fa-chalkboard-teacher"></i></span> Faculty
-        </a>
-        <a class="nav-item" href="admin-contact.html">
-          <span class="icon"><i class="fas fa-envelope"></i></span> Contact
-        </a>
-      </div>
-
-      <div class="sidebar-bottom">
-        <div class="admin-profile">
-          <div class="admin-avatar" id="adminAvatar">🛡️</div>
-          <div class="admin-info">
-            <div class="aname" id="adminName">Admin</div>
-            <div class="aemail">Logged In</div>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <!-- MAIN -->
-    <div class="main">
-
-      <!-- TOPBAR -->
-      <div class="topbar">
-        <button class="menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
-        <div class="topbar-title">
-          <h3>Dashboard</h3>
-          <p id="dateStr">Loading...</p>
-        </div>
-        <div class="topbar-actions">
-          <button class="logout-btn" onclick="logout()">
-            <i class="fas fa-sign-out-alt"></i> <span class="lbl">Logout</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- WELCOME BANNER -->
-      <div class="welcome-banner">
-        <div class="banner-text">
-          <h1><span id="greetingText" style="color: #000000; font-weight: 600;"></span> <span id="welcomeName">Admin</span></h1>
-          <p>Here's what's happening at your school today.</p>
-        </div>
-        <div class="banner-stats">
-          <div class="bstat"><div class="val gold" id="statStudents">—</div><div class="lbl">Students</div></div>
-          <div class="bstat"><div class="val" id="statFaculty">—</div><div class="lbl">Faculty</div></div>
-        </div>
-      </div>
-
-      <!-- SESSION BOX -->
-      <div class="session-box" id="sessionBox">
-        <div class="left">
-          <div class="icon"><i class="fas fa-clock"></i></div>
-          <div class="info">
-            <div class="label">Session Remaining</div>
-            <div class="time" id="sessionBoxTime">30:00</div>
-          </div>
-        </div>
-        <div class="right">
-          <div class="status active" id="sessionStatus">Active</div>
-          <div class="progress-wrap">
-            <div class="bar">
-              <div class="fill" id="sessionBoxFill" style="width:100%"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- STAT CARDS -->
-      <div class="stat-grid">
-        <div class="stat-card c1">
-          <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
-          <div class="stat-val" id="cardStudents">100+</div>
-          <div class="stat-label">Total Students</div>
-        </div>
-        <div class="stat-card c2">
-          <div class="stat-icon"><i class="fas fa-chalkboard-teacher"></i></div>
-          <div class="stat-val" id="cardFaculty">13+</div>
-          <div class="stat-label">Faculty Members</div>
-        </div>
-        <div class="stat-card c3">
-          <div class="stat-icon"><i class="fas fa-bullhorn"></i></div>
-          <div class="stat-val" id="cardNotices">N/A</div>
-          <div class="stat-label">Active Notices</div>
-        </div>
-        <div class="stat-card c4">
-          <div class="stat-icon"><i class="fas fa-eye"></i></div>
-          <div class="stat-val" id="cardVisitors">N/A</div>
-          <div class="stat-label">Total Visitors</div>
-        </div>
-      </div>
-
-      <!-- MODULES -->
-      <div class="main-grid">
-        <div class="section-card">
-          <div class="section-header">
-            <div>
-              <h4>Quick Access</h4>
-              <p>Jump to any module instantly</p>
-            </div>
-            <a href="https://gsssshilla07.pages.dev" class="see-all">View Public Page<i class="fas fa-arrow-right"></i></a>
-          </div>
-          <div class="modules-grid">
-            <a class="module-item" href="admin-notif.html">
-              <div class="module-icon" style="background:var(--gold-bg); color:var(--gold);"><i class="fas fa-bell"></i></div>
-              <div class="mtitle">Notices</div>
-              <div class="msub">Manage announcements</div>
-            </a>
-            <a class="module-item" href="admin-downl.html">
-              <div class="module-icon" style="background:var(--blue-bg); color:var(--blue);"><i class="fas fa-download"></i></div>
-              <div class="mtitle">Downloads</div>
-              <div class="msub">Study materials</div>
-            </a>
-            <a class="module-item" href="add-image.html">
-              <div class="module-icon" style="background:var(--gold-bg); color:var(--gold);"><i class="fas fa-sliders-h"></i></div>
-              <div class="mtitle">Home Slider</div>
-              <div class="msub">Manage slider images</div>
-            </a>
-            <a class="module-item" href="admin-img.html">
-              <div class="module-icon" style="background:var(--purple-bg); color:var(--purple);"><i class="fas fa-images"></i></div>
-              <div class="mtitle">Gallery</div>
-              <div class="msub">School photos</div>
-            </a>
-            <a class="module-item" href="admin-result.html">
-              <div class="module-icon" style="background:var(--blue-bg); color:var(--blue);"><i class="fa-solid fa-trophy"></i></div>
-              <div class="mtitle">Result Management</div>
-              <div class="msub">Add Result & Manage Students</div>
-            </a>
-            <a class="module-item" href="admin-faculity.html">
-              <div class="module-icon" style="background:var(--green-bg); color:var(--green);"><i class="fas fa-chalkboard-teacher"></i></div>
-              <div class="mtitle">Faculty</div>
-              <div class="msub">Staff management</div>
-            </a>
-            <a class="module-item" href="admin-contact.html">
-              <div class="module-icon" style="background:var(--pink-bg); color:var(--pink);"><i class="fas fa-envelope"></i></div>
-              <div class="mtitle">Contact</div>
-              <div class="msub">Messages & inquiries</div>
-            </a>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="footer-content">
-      <span>&copy; 2026 <a href="https://gsssshilla07.pages.dev">Govt. Sr. Sec. School Shilla</a>. All rights reserved.</span>
-      <span>Developed & Designed by <a href="#" class="gold-link">Vikshant Kralta</a></span>
-      <div class="footer-social">
-        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
-        <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
-        <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- SCRIPTS -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    // ============================================================
-    // CONFIGURATION
-    // ============================================================
-    const API_BASE = 'https://gsssshilla.onrender.com/api/admin';
-    const SESSION_DURATION = 30 * 60;
-    const SESSION_START_KEY = 'sessionStartTime';
-    
-    let sessionRemaining = SESSION_DURATION;
-    let sessionTimerInterval = null;
-
-    // ============================================================
-    // AUTH CHECK
-    // ============================================================
-    async function checkAuth() {
-        const token = localStorage.getItem('adminToken');
-        if (!token) {
-            showPopup('invalid');
-            return false;
-        }
-
-        try {
-            const res = await fetch(`${API_BASE}/verify`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const data = await res.json();
-
-            if (data.success) {
-                if (data.admin && data.admin.username) {
-                    const initial = data.admin.username.charAt(0).toUpperCase();
-                    document.getElementById('adminAvatar').textContent = initial;
-                    document.getElementById('adminName').textContent = data.admin.username;
-                    document.getElementById('welcomeName').textContent = data.admin.username;
-                }
-                startSessionTimer();
-                return true;
-            } else {
-                showPopup('expired');
-                return false;
-            }
-        } catch (err) {
-            console.error("Auth check error:", err);
-            showPopup('expired');
-            return false;
-        }
-    }
-
-    // ============================================================
-    // SESSION TIMER
-    // ============================================================
-    function getSessionRemaining() {
-        const startTime = localStorage.getItem(SESSION_START_KEY);
-        if (!startTime) return SESSION_DURATION;
-        const elapsed = Math.floor((Date.now() - parseInt(startTime)) / 1000);
-        return Math.max(0, SESSION_DURATION - elapsed);
-    }
-
-    function startSessionTimer() {
-        let startTime = localStorage.getItem(SESSION_START_KEY);
-        if (!startTime) {
-            startTime = Date.now();
-            localStorage.setItem(SESSION_START_KEY, startTime);
-        }
-        sessionRemaining = getSessionRemaining();
-        if (sessionRemaining <= 0) {
-            showPopup('expired');
-            return;
-        }
-        updateTimerDisplay();
-
-        if (sessionTimerInterval) clearInterval(sessionTimerInterval);
-
-        sessionTimerInterval = setInterval(function() {
-            sessionRemaining--;
-            updateTimerDisplay();
-
-            if (sessionRemaining === 300) {
-                showToast('⚠️ Your session will expire in 5 minutes!', 'warning');
-            }
-            if (sessionRemaining === 60) {
-                showToast('⛔ Your session will expire in 1 minute!', 'danger');
-            }
-            if (sessionRemaining <= 0) {
-                clearInterval(sessionTimerInterval);
-                sessionTimerInterval = null;
-                localStorage.removeItem(SESSION_START_KEY);
-                showPopup('expired');
-            }
-        }, 1000);
-    }
-
-    function updateTimerDisplay() {
-        const minutes = Math.floor(sessionRemaining / 60);
-        const seconds = sessionRemaining % 60;
-        const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        
-        const fill = document.getElementById('sessionTimerFill');
-        if (fill) {
-            const percentage = (sessionRemaining / SESSION_DURATION) * 100;
-            fill.style.width = percentage + '%';
-        }
-
-        const boxTime = document.getElementById('sessionBoxTime');
-        const boxFill = document.getElementById('sessionBoxFill');
-        const status = document.getElementById('sessionStatus');
-        
-        if (boxTime) boxTime.textContent = timeStr;
-        if (boxFill) {
-            const percentage = (sessionRemaining / SESSION_DURATION) * 100;
-            boxFill.style.width = percentage + '%';
-        }
-
-        const isWarning = sessionRemaining <= 300 && sessionRemaining > 60;
-        const isDanger = sessionRemaining <= 60;
-
-        if (fill) {
-            fill.className = 'fill';
-            if (isDanger) fill.classList.add('danger');
-            else if (isWarning) fill.classList.add('warning');
-        }
-        if (boxTime) {
-            boxTime.className = 'time';
-            if (isDanger) boxTime.classList.add('danger');
-            else if (isWarning) boxTime.classList.add('warning');
-        }
-        if (boxFill) {
-            boxFill.className = 'fill';
-            if (isDanger) boxFill.classList.add('danger');
-            else if (isWarning) boxFill.classList.add('warning');
-        }
-        if (status) {
-            status.className = 'status';
-            if (isDanger) {
-                status.classList.add('danger');
-                status.textContent = 'Expiring';
-            } else if (isWarning) {
-                status.classList.add('warning');
-                status.textContent = 'Warning';
-            } else {
-                status.classList.add('active');
-                status.textContent = 'Active';
-            }
-        }
-    }
-
-    // ============================================================
-    // TOAST
-    // ============================================================
-    function showToast(message, type = 'info') {
-        const toast = document.createElement('div');
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 16px 28px;
-            border-radius: 12px;
-            color: #fff;
-            font-weight: 600;
-            font-size: 14px;
-            z-index: 9998;
-            background: ${type === 'warning' ? '#f59e0b' : '#ef4444'};
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-            animation: slideUp 0.4s ease;
-            max-width: 90%;
-            text-align: center;
-        `;
-        toast.textContent = message;
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-            toast.style.animation = 'slideDown 0.4s ease';
-            setTimeout(() => {
-                if (toast.parentNode) document.body.removeChild(toast);
-            }, 400);
-        }, 5000);
-    }
-
-    // ============================================================
-    // SESSION POPUP
-    // ============================================================
-    function showPopup(type = 'expired') {
-        const overlay = document.getElementById('sessionOverlay');
-        const iconBox = document.getElementById('popupIconBox');
-        const icon = document.getElementById('popupIcon');
-        const title = document.getElementById('popupTitle');
-        const subText = document.getElementById('popupSubText');
-        const statusText = document.getElementById('popupStatusText');
-        const btnText = document.getElementById('popupBtnText');
-
-        iconBox.className = 'icon-box';
-
-        if (type === 'expired') {
-            iconBox.classList.add('expired');
-            icon.className = 'fas fa-clock';
-            title.innerHTML = 'Session <span>Expired</span>';
-            subText.innerHTML = 'Your session has been expired due to inactivity.<br>Please login again to continue.';
-            statusText.textContent = 'Secure session ended';
-            btnText.textContent = 'Login Again';
-        } else if (type === 'invalid') {
-            iconBox.classList.add('invalid');
-            icon.className = 'fas fa-lock';
-            title.innerHTML = 'Invalid <span>Access</span>';
-            subText.innerHTML = 'You are not authorized to access this page.<br>Please login with valid credentials.';
-            statusText.textContent = 'Access denied';
-            btnText.textContent = 'Go to Login';
-        }
-
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        document.body.style.position = 'fixed';
-        document.body.style.width = '100%';
-        document.body.style.height = '100%';
-        
-        localStorage.removeItem('adminToken');
-        localStorage.removeItem('adminData');
-        localStorage.removeItem('sessionStartKey');
-        
-        if (sessionTimerInterval) {
-            clearInterval(sessionTimerInterval);
-            sessionTimerInterval = null;
-        }
-    }
-
-    function redirectToLogin() {
-        document.getElementById('sessionOverlay').classList.remove('active');
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.width = '';
-        document.body.style.height = '';
-        window.location.replace("login.html");
-    }
-
-    // ============================================================
-    // DATE
-    // ============================================================
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const now = new Date();
-    document.getElementById('dateStr').textContent =
-      `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-
-    function setGreeting() {
-      const hour = new Date().getHours();
-      let greeting;
-      if (hour >= 5 && hour < 12) greeting = "Morning,";
-      else if (hour >= 12 && hour < 17) greeting = "Afternoon,";
-      else if (hour >= 17 && hour < 21) greeting = "Good Eve,";
-      else greeting = "Good Night,";
-      document.getElementById('greetingText').textContent = greeting;
-    }
-    setGreeting();
-
-    // ============================================================
-    // LOAD PROFILE
-    // ============================================================
-    async function loadProfile() {
-      const token = localStorage.getItem('adminToken');
-      if (!token) return;
-      
-      try {
-        const res = await fetch(`${API_BASE}/profile`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const data = await res.json();
-
-        if (data.success) {
-          const admin = data.data;
-          const name = admin.name || admin.username || 'Admin';
-          document.getElementById('adminName').textContent = name;
-          document.getElementById('welcomeName').textContent = name;
-          document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
-        }
-      } catch (err) {
-        console.error("Profile error:", err);
-      }
-    }
-
-    // ============================================================
-    // LOAD STATS
-    // ============================================================
-
-
-    // ============================================================
-// LOAD STATS
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
 // ============================================================
-function loadStats() {
-  document.getElementById('statStudents').textContent = '100+';
-  document.getElementById('statFaculty').textContent = '13';
-  document.getElementById('cardStudents').textContent = '100+';
-  document.getElementById('cardFaculty').textContent = '13+';
-  document.getElementById('cardNotices').textContent = 'N/A';
-  
-  // ✅ Real visitors from backend
-  loadVisitorCount();
+// CONFIG
+// ============================================================
+const API_BASE = 'https://gsssshilla.onrender.com/api/admin';
+const SESSION_DURATION = 30 * 60;
+const SESSION_START_KEY = 'sessionStartTime';
+
+let sessionRemaining = SESSION_DURATION;
+let sessionTimerInterval = null;
+
+// ============================================================
+// THEME
+// ============================================================
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const icon = document.getElementById('themeIcon');
+  if (icon) icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+  try { localStorage.setItem('theme', theme); } catch (e) {}
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  setTheme(current === 'dark' ? 'light' : 'dark');
+}
+try {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'dark') setTheme('dark');
+} catch (e) {}
+
+// ============================================================
+// AUTH
+// ============================================================
+async function checkAuth() {
+  const token = localStorage.getItem('adminToken');
+  if (!token) { showPopup('invalid'); return false; }
+  try {
+    const res = await fetch(`${API_BASE}/verify`, { headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    if (data.success) {
+      if (data.admin && data.admin.username) {
+        const initial = data.admin.username.charAt(0).toUpperCase();
+        document.getElementById('adminAvatar').textContent = initial;
+        document.getElementById('adminName').textContent = data.admin.username;
+        document.getElementById('welcomeName').textContent = data.admin.username;
+      }
+      startSessionTimer();
+      return true;
+    } else { showPopup('expired'); return false; }
+  } catch (err) { showPopup('expired'); return false; }
 }
 
 // ============================================================
-// LOAD REAL VISITOR COUNT
+// SESSION TIMER
 // ============================================================
-async function loadVisitorCount() {
-  const visitorEl = document.getElementById('cardVisitors');
-  if (!visitorEl) return;
-
-  try {
-    const res = await fetch('https://gsssshilla.onrender.com/analytics/stats');
-    const data = await res.json();
-
-    if (data && data.total !== undefined) {
-      visitorEl.textContent = Number(data.total).toLocaleString('en-IN');
-    } else {
-      visitorEl.textContent = '—';
+function getSessionRemaining() {
+  const startTime = localStorage.getItem(SESSION_START_KEY);
+  if (!startTime) return SESSION_DURATION;
+  const elapsed = Math.floor((Date.now() - parseInt(startTime)) / 1000);
+  return Math.max(0, SESSION_DURATION - elapsed);
+}
+function startSessionTimer() {
+  let startTime = localStorage.getItem(SESSION_START_KEY);
+  if (!startTime) { startTime = Date.now(); localStorage.setItem(SESSION_START_KEY, startTime); }
+  sessionRemaining = getSessionRemaining();
+  if (sessionRemaining <= 0) { showPopup('expired'); return; }
+  updateTimerDisplay();
+  if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+  sessionTimerInterval = setInterval(function () {
+    sessionRemaining--;
+    updateTimerDisplay();
+    if (sessionRemaining === 300) showToast('⚠️ Session expires in 5 minutes!', 'warning');
+    if (sessionRemaining === 60) showToast('⛔ Session expires in 1 minute!', 'danger');
+    if (sessionRemaining <= 0) {
+      clearInterval(sessionTimerInterval);
+      sessionTimerInterval = null;
+      localStorage.removeItem(SESSION_START_KEY);
+      showPopup('expired');
     }
-  } catch (err) {
-    console.error('Visitor count error:', err);
-    visitorEl.textContent = '—';
+  }, 1000);
+}
+function updateTimerDisplay() {
+  const minutes = Math.floor(sessionRemaining / 60);
+  const seconds = sessionRemaining % 60;
+  const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  const fill = document.getElementById('sessionTimerFill');
+  if (fill) fill.style.width = ((sessionRemaining / SESSION_DURATION) * 100) + '%';
+  const boxTime = document.getElementById('sessionBoxTime');
+  const boxFill = document.getElementById('sessionBoxFill');
+  const status = document.getElementById('sessionStatus');
+  if (boxTime) boxTime.textContent = timeStr;
+  if (boxFill) boxFill.style.width = ((sessionRemaining / SESSION_DURATION) * 100) + '%';
+  const isWarning = sessionRemaining <= 300 && sessionRemaining > 60;
+  const isDanger = sessionRemaining <= 60;
+  if (fill) { fill.className = 'fill'; if (isDanger) fill.classList.add('danger'); else if (isWarning) fill.classList.add('warning'); }
+  if (boxTime) { boxTime.className = 'time'; if (isDanger) boxTime.classList.add('danger'); else if (isWarning) boxTime.classList.add('warning'); }
+  if (boxFill) { boxFill.className = 'fill'; if (isDanger) boxFill.classList.add('danger'); else if (isWarning) boxFill.classList.add('warning'); }
+  if (status) {
+    status.className = 'status';
+    if (isDanger) { status.classList.add('danger'); status.textContent = 'Expiring'; }
+    else if (isWarning) { status.classList.add('warning'); status.textContent = 'Warning'; }
+    else { status.classList.add('active'); status.textContent = 'Active'; }
   }
 }
 
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    padding: 14px 24px; border-radius: 12px; color: #fff; font-weight: 700;
+    font-size: 13px; z-index: 9998; max-width: 90%; text-align: center;
+    background: ${type === 'warning' ? 'linear-gradient(135deg, #d97706, #f59e0b)' : 'linear-gradient(135deg, #dc2626, #ef4444)'};
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(20px)';
+    setTimeout(() => { if (toast.parentNode) document.body.removeChild(toast); }, 400);
+  }, 5000);
+}
 
+// ============================================================
+// SESSION POPUP
+// ============================================================
+function showPopup(type = 'expired') {
+  const overlay = document.getElementById('sessionOverlay');
+  const icon = document.getElementById('popupIcon');
+  const title = document.getElementById('popupTitle');
+  const subText = document.getElementById('popupSubText');
+  const statusText = document.getElementById('popupStatusText');
+  const btnText = document.getElementById('popupBtnText');
+  if (type === 'expired') {
+    icon.className = 'fas fa-clock';
+    title.innerHTML = 'Session <span>Expired</span>';
+    subText.innerHTML = 'Your session has been expired due to inactivity.<br>Please login again to continue.';
+    statusText.textContent = 'Secure session ended';
+    btnText.textContent = 'Login Again';
+  } else if (type === 'invalid') {
+    icon.className = 'fas fa-lock';
+    title.innerHTML = 'Invalid <span>Access</span>';
+    subText.innerHTML = 'You are not authorized to access this page.<br>Please login with valid credentials.';
+    statusText.textContent = 'Access denied';
+    btnText.textContent = 'Go to Login';
+  }
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  localStorage.removeItem('adminToken');
+  localStorage.removeItem('adminData');
+  if (sessionTimerInterval) { clearInterval(sessionTimerInterval); sessionTimerInterval = null; }
+}
+function redirectToLogin() {
+  window.location.replace("login.html");
+}
 
-    // ============================================================
-    // SIDEBAR TOGGLE
-    // ============================================================
-    function toggleSidebar() {
-      var sidebar = document.getElementById('sidebar');
-      var overlay = document.getElementById('overlay');
-      
-      if (sidebar.classList.contains('open')) {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.width = '';
-        document.body.style.height = '';
-      } else {
-        sidebar.classList.add('open');
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        document.body.style.position = 'fixed';
-        document.body.style.width = '100%';
-        document.body.style.height = '100%';
-      }
+// ============================================================
+// DATE + GREETING
+// ============================================================
+const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const now = new Date();
+document.getElementById('dateStr').textContent =
+  `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+function setGreeting() {
+  const hour = new Date().getHours();
+  let greeting;
+  if (hour >= 5 && hour < 12) greeting = "Good Morning, ";
+  else if (hour >= 12 && hour < 17) greeting = "Good Afternoon, ";
+  else if (hour >= 17 && hour < 21) greeting = "Good Evening, ";
+  else greeting = "Good Night, ";
+  document.getElementById('greetingText').textContent = greeting;
+}
+setGreeting();
+
+// ============================================================
+// PROFILE
+// ============================================================
+async function loadProfile() {
+  const token = localStorage.getItem('adminToken');
+  if (!token) return;
+  try {
+    const res = await fetch(`${API_BASE}/profile`, { headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    if (data.success) {
+      const admin = data.data;
+      const name = admin.name || admin.username || 'Admin';
+      document.getElementById('adminName').textContent = name;
+      document.getElementById('welcomeName').textContent = name;
+      document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
     }
+  } catch (err) { console.error("Profile error:", err); }
+}
 
-    function closeSidebar() {
-      var sidebar = document.getElementById('sidebar');
-      var overlay = document.getElementById('overlay');
-      
-      sidebar.classList.remove('open');
-      overlay.classList.remove('active');
-      
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-      document.body.style.height = '';
+// ============================================================
+// LOAD STATS — REAL DATA
+// ============================================================
+async function loadStats() {
+  // Students
+  try {
+    const res = await fetch('https://gsssshilla.onrender.com/api/students?limit=1');
+    const data = await res.json();
+    const total = (data.pagination && data.pagination.total) || (data.data && data.data.length) || 0;
+    document.getElementById('cardStudents').textContent = total;
+    document.getElementById('statStudents').textContent = total;
+  } catch (e) {
+    document.getElementById('cardStudents').textContent = '—';
+    document.getElementById('statStudents').textContent = '—';
+  }
+
+  // Faculty
+  try {
+    const res = await fetch('https://gsssshilla.onrender.com/api/faculty');
+    const data = await res.json();
+    const list = data.data || data.faculty || [];
+    const total = Array.isArray(list) ? list.length : 0;
+    document.getElementById('cardFaculty').textContent = total;
+    document.getElementById('statFaculty').textContent = total;
+  } catch (e) {
+    document.getElementById('cardFaculty').textContent = '—';
+    document.getElementById('statFaculty').textContent = '—';
+  }
+
+  // Notices
+  try {
+    const res = await fetch('https://gsssshilla.onrender.com/api/notices');
+    const data = await res.json();
+    const list = data.data || data.notices || [];
+    const total = Array.isArray(list) ? list.length : 0;
+    document.getElementById('cardNotices').textContent = total;
+  } catch (e) {
+    document.getElementById('cardNotices').textContent = '—';
+  }
+
+  // Visitors
+  try {
+    const res = await fetch('https://gsssshilla.onrender.com/analytics/stats');
+    const data = await res.json();
+    if (data && data.total !== undefined) {
+      document.getElementById('cardVisitors').textContent = Number(data.total).toLocaleString('en-IN');
+    } else {
+      document.getElementById('cardVisitors').textContent = '—';
     }
+  } catch (e) {
+    document.getElementById('cardVisitors').textContent = '—';
+  }
+}
 
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeSidebar();
-    });
+// ============================================================
+// SIDEBAR
+// ============================================================
+function toggleSidebar() {
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('overlay');
+  if (sidebar.classList.contains('open')) {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  } else {
+    sidebar.classList.add('open');
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSidebar(); });
+window.addEventListener('resize', function () { if (window.innerWidth > 768) closeSidebar(); });
 
-    window.addEventListener('resize', function() {
-      if (window.innerWidth > 768) closeSidebar();
-    });
+// ============================================================
+// SESSION CHECK
+// ============================================================
+setInterval(async function () {
+  const token = localStorage.getItem('adminToken');
+  if (!token) return;
+  const overlay = document.getElementById('sessionOverlay');
+  if (overlay.classList.contains('active')) return;
+  try {
+    const res = await fetch(`${API_BASE}/verify`, { headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    if (!data.success) showPopup('expired');
+  } catch (err) { showPopup('expired'); }
+}, 30000);
 
-    // ============================================================
-    // SESSION CHECK - EVERY 30 SECONDS
-    // ============================================================
-    setInterval(async function() {
-      const token = localStorage.getItem('adminToken');
-      if (!token) return;
-      
-      const overlay = document.getElementById('sessionOverlay');
-      if (overlay.classList.contains('active')) return;
-      
-      try {
-        const res = await fetch(`${API_BASE}/verify`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const data = await res.json();
-        if (!data.success) showPopup('expired');
-      } catch (err) {
-        showPopup('expired');
-      }
-    }, 30000);
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener("DOMContentLoaded", async function () {
+  var isAuth = await checkAuth();
+  if (isAuth) {
+    await loadProfile();
+    await loadStats();
+  }
+});
 
-    // ============================================================
-    // INIT
-    // ============================================================
-    window.addEventListener("DOMContentLoaded", async function() {
-      var isAuth = await checkAuth();
-      if (isAuth) {
-        await loadProfile();
-        loadStats();
-      }
-    });
-
-    // ============================================================
-    // BACK BUTTON BLOCK
-    // ============================================================
-    window.history.pushState(null, null, window.location.href);
-    window.onpopstate = function() {
-      window.history.pushState(null, null, window.location.href);
-    };
-
-    // ============================================================
-    // LOGOUT
-    // ============================================================
-    function logout() {
-      Swal.fire({
-        title: "Logout?",
-        text: "Do you really want to logout?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#c9972b",
-        cancelButtonColor: "#e91e63",
-        confirmButtonText: "Yes, Logout",
-        cancelButtonText: "Cancel"
-      }).then(function(result) {
-        if (result.isConfirmed) {
-          localStorage.removeItem('adminToken');
-          localStorage.removeItem('adminData');
-          localStorage.removeItem('sessionStartTime');
-          if (sessionTimerInterval) {
-            clearInterval(sessionTimerInterval);
-            sessionTimerInterval = null;
-          }
-          window.location.replace("login.html");
-        }
-      });
+// ============================================================
+// LOGOUT
+// ============================================================
+function logout() {
+  Swal.fire({
+    title: "Logout?",
+    text: "Do you really want to logout?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#7c3aed",
+    cancelButtonColor: "#e91e63",
+    confirmButtonText: "Yes, Logout",
+    cancelButtonText: "Cancel"
+  }).then(function (result) {
+    if (result.isConfirmed) {
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminData');
+      localStorage.removeItem('sessionStartTime');
+      if (sessionTimerInterval) { clearInterval(sessionTimerInterval); sessionTimerInterval = null; }
+      window.location.replace("login.html");
     }
+  });
+}
 
-    // ============================================================
-    // ACTIVE NAV
-    // ============================================================
-    document.querySelectorAll('.nav-item').forEach(function(item) {
-      item.addEventListener('click', function() {
-        document.querySelectorAll('.nav-item').forEach(function(i) {
-          i.classList.remove('active');
-        });
-        this.classList.add('active');
-      });
-    });
-  </script>
+// ============================================================
+// ACTIVE NAV
+// ============================================================
+document.querySelectorAll('.nav-item').forEach(function (item) {
+  item.addEventListener('click', function () {
+    document.querySelectorAll('.nav-item').forEach(function (i) { i.classList.remove('active'); });
+    this.classList.add('active');
+  });
+});
+
+// ============================================================
+// BACK BUTTON
+// ============================================================
+window.history.pushState(null, null, window.location.href);
+window.onpopstate = function () { window.history.pushState(null, null, window.location.href); };
+</script>
 </body>
 </html>
