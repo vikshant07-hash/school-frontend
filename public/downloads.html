@@ -1280,22 +1280,27 @@ img { max-width: 100%; height: auto; }
       <option value="7">Class 7</option><option value="8">Class 8</option><option value="9">Class 9</option>
       <option value="10">Class 10</option><option value="11">Class 11</option><option value="12">Class 12</option>
     </select>
+
+    <!-- ✅ FIXED: Category values now match backend exactly -->
     <select id="filterCategory" onchange="loadDownloads(1)">
       <option value="all">All Categories</option>
-      <option value="model-paper">Model Paper</option>
-      <option value="previous-year">Previous Year</option>
-      <option value="syllabus">Syllabus</option>
-      <option value="other">Other</option>
+      <option value="Model Paper">Model Paper</option>
+      <option value="Previous Year">Previous Year</option>
+      <option value="Syllabus">Syllabus</option>
+      <option value="Other">Other</option>
     </select>
+
+    <!-- ✅ FIXED: Session values now match backend format (4-digit years) -->
     <select id="filterSession" onchange="loadDownloads(1)">
       <option value="all">All Sessions</option>
-      <option value="2024-25">2024-25</option>
-      <option value="2025-26">2025-26</option>
-      <option value="2026-27">2026-27</option>
-      <option value="2027-28">2027-28</option>
-      <option value="2028-29">2028-29</option>
-      <option value="2029-30">2029-30</option>
+      <option value="2024-2025">2024-2025</option>
+      <option value="2025-2026">2025-2026</option>
+      <option value="2026-2027">2026-2027</option>
+      <option value="2027-2028">2027-2028</option>
+      <option value="2028-2029">2028-2029</option>
+      <option value="2029-2030">2029-2030</option>
     </select>
+
     <input type="text" id="searchInput" placeholder="Search files..." onkeyup="debounceSearch()">
   </div>
 
@@ -1484,7 +1489,7 @@ let searchTimeout;
 // BUILD ONE DOWNLOAD CARD HTML
 // ============================================================
 function buildCardHtml(item, index) {
-  const catLabel = (item.category || '').replace(/-/g, ' ');
+  const catLabel = item.category || 'Other';
   const seriesHtml = item.series ? `<span class="series-tag">Set-${item.series}</span>` : '';
 
   let descHtml = '';
@@ -1519,7 +1524,7 @@ function buildCardHtml(item, index) {
 }
 
 // ============================================================
-// LOAD DOWNLOADS (Backend filters — work correctly)
+// LOAD DOWNLOADS — Sends all filters to backend
 // ============================================================
 async function loadDownloads(page = 1) {
   currentPage = page;
@@ -1533,7 +1538,7 @@ async function loadDownloads(page = 1) {
     const sessionFilter = document.getElementById('filterSession').value;
     const searchFilter = document.getElementById('searchInput').value;
 
-    // Send ALL filters to backend — backend handles them correctly
+    // Send ALL filters to backend
     const params = new URLSearchParams({
       class: classFilter,
       category: categoryFilter,
