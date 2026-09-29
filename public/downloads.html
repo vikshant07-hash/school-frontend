@@ -668,6 +668,74 @@ img { max-width: 100%; height: auto; }
 }
 
 /* ============================================================
+   CLASS GROUP (New — for class-wise grouping)
+============================================================ */
+.class-group {
+  margin-bottom: 44px;
+}
+.class-group:last-child { margin-bottom: 0; }
+
+.class-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding: 14px 20px;
+  background: var(--bg);
+  border-radius: 18px;
+  box-shadow: var(--press);
+  position: relative;
+}
+.class-heading::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 5px; height: 60%;
+  background: var(--grad-maroon);
+  border-radius: 0 5px 5px 0;
+}
+.class-heading .class-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  color: var(--primary-d);
+  background: var(--bg);
+  box-shadow: var(--press-sm);
+  flex-shrink: 0;
+}
+[data-theme="dark"] .class-heading .class-icon { color: var(--primary-l); }
+.class-heading .class-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--t-hi);
+  letter-spacing: -0.01em;
+  flex: 1;
+}
+.class-heading .class-count {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--primary-d);
+  background: var(--bg);
+  padding: 6px 14px;
+  border-radius: 50px;
+  box-shadow: var(--press-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+[data-theme="dark"] .class-heading .class-count { color: var(--primary-l); }
+
+@media (max-width: 480px) {
+  .class-heading { padding: 12px 16px; gap: 10px; }
+  .class-heading .class-icon { width: 38px; height: 38px; font-size: 15px; }
+  .class-heading .class-title { font-size: 16px; }
+  .class-heading .class-count { font-size: 10px; padding: 5px 10px; }
+}
+
+/* ============================================================
    DOWNLOAD GRID
 ============================================================ */
 .downloads-grid {
@@ -1222,12 +1290,18 @@ img { max-width: 100%; height: auto; }
     </select>
     <select id="filterSession" onchange="loadDownloads(1)">
       <option value="all">All Sessions</option>
+      <option value="2024-25">2024-25</option>
+      <option value="2025-26">2025-26</option>
+      <option value="2026-27">2026-27</option>
+      <option value="2027-28">2027-28</option>
+      <option value="2028-29">2028-29</option>
+      <option value="2029-30">2029-30</option>
     </select>
     <input type="text" id="searchInput" placeholder="Search files..." onkeyup="debounceSearch()">
   </div>
 
-  <!-- DOWNLOADS GRID -->
-  <div class="downloads-grid" id="downloadsList">
+  <!-- DOWNLOADS LIST (class groups rendered dynamically) -->
+  <div id="downloadsList">
     <div class="loading-state"><i class="fas fa-spinner fa-spin"></i><p>Loading downloads...</p></div>
   </div>
 
@@ -1407,78 +1481,134 @@ const API_BASE = "https://gsssshilla.onrender.com";
 let currentPage = 1;
 let searchTimeout;
 
-async function loadSessions() {
-  try {
-    const res = await fetch(`${API_BASE}/api/downloads/sessions`);
-    const data = await res.json();
-    if (data.success) {
-      const select = document.getElementById('filterSession');
-      select.innerHTML = '<option value="all">All Sessions</option>';
-      data.data.forEach(s => { select.innerHTML += `<option value="${s}">${s}</option>`; });
-    }
-  } catch (err) { console.error(err); }
+// Session options (fixed)
+const SESSION_OPTIONS = [
+  '2024-25', '2025-26', '2026-27',
+  '2027-28', '2028-29', '2029-30'
+];
+
+// Session dropdown fill (no API needed now)
+function loadSessions() {
+  const select = document.getElementById('filterSession');
+  if (!select) return;
+  select.innerHTML = '<option value="all">All Sessions</option>';
+  SESSION_OPTIONS.forEach(s => {
+    select.innerHTML += `<option value="${s}">${s}</option>`;
+  });
 }
 
+// ============================================================
+// BUILD ONE DOWNLOAD CARD HTML
+// ============================================================
+function buildCardHtml(item, index) {
+  const catLabel = (item.category || '').replace('-', ' ');
+  const seriesHtml = item.series ? `<span class="series-tag">Set-${item.series}</span>` : '';
+
+  let descHtml = '';
+  if (item.description) {
+    descHtml = `
+      <div class="desc collapsed" id="desc-${index}">${escapeHtml(item.description)}</div>
+      <button class="read-more-btn" id="rm-${index}" onclick="toggleReadMore(${index})" style="display:none;">
+        Read More <i class="fas fa-chevron-down"></i>
+      </button>`;
+  }
+
+  return `
+    <div class="download-card">
+      <div class="download-info">
+        <h4>${escapeHtml(item.title)} ${seriesHtml}</h4>
+        ${descHtml}
+        <div class="download-meta">
+          <span class="badge badge-class"><i class="fas fa-graduation-cap"></i> Class ${item.class}</span>
+          <span class="badge badge-category"><i class="fas fa-tag"></i> ${escapeHtml(catLabel)}</span>
+          <span class="badge badge-session"><i class="fas fa-calendar"></i> ${escapeHtml(item.session_year)}</span>
+          ${item.subject ? `<span class="badge badge-subject"><i class="fas fa-book"></i> ${escapeHtml(item.subject)}</span>` : ''}
+          <span class="download-count"><i class="fas fa-download"></i> ${item.download_count || 0}</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="${API_BASE}/api/downloads/${item.id}/download" target="_blank" class="download-btn">
+          <i class="fas fa-download"></i> Download
+        </a>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// LOAD DOWNLOADS (with class grouping when class=all)
+// ============================================================
 async function loadDownloads(page = 1) {
   currentPage = page;
-  const grid = document.getElementById('downloadsList');
+  const wrapper = document.getElementById('downloadsList');
   const pagination = document.getElementById('pagination');
-  grid.innerHTML = `<div class="loading-state"><i class="fas fa-spinner fa-spin"></i><p>Loading downloads...</p></div>`;
+  wrapper.innerHTML = `<div class="loading-state"><i class="fas fa-spinner fa-spin"></i><p>Loading downloads...</p></div>`;
 
   try {
+    const classFilter = document.getElementById('filterClass').value;
     const params = new URLSearchParams({
-      class: document.getElementById('filterClass').value,
+      class: classFilter,
       category: document.getElementById('filterCategory').value,
       session: document.getElementById('filterSession').value,
       search: document.getElementById('searchInput').value,
       page: page,
-      limit: 15
+      limit: 30
     });
     const res = await fetch(`${API_BASE}/api/downloads?${params}`);
     const data = await res.json();
+
     if (!data.success || !data.data || data.data.length === 0) {
-      grid.innerHTML = `<div class="empty-state"><i class="fas fa-folder-open"></i><h3>No files found</h3><p>Try adjusting your search or filters.</p></div>`;
+      wrapper.innerHTML = `<div class="downloads-grid"><div class="empty-state"><i class="fas fa-folder-open"></i><h3>No files found</h3><p>Try adjusting your search or filters.</p></div></div>`;
       pagination.innerHTML = '';
       return;
     }
-    grid.innerHTML = data.data.map((item, index) => {
-      const catLabel = item.category.replace('-', ' ');
-      const seriesHtml = item.series ? `<span class="series-tag">Set-${item.series}</span>` : '';
 
-      let descHtml = '';
-      if (item.description) {
-        descHtml = `
-          <div class="desc collapsed" id="desc-${index}">${escapeHtml(item.description)}</div>
-          <button class="read-more-btn" id="rm-${index}" onclick="toggleReadMore(${index})" style="display:none;">
-            Read More <i class="fas fa-chevron-down"></i>
-          </button>`;
-      }
+    if (classFilter === 'all') {
+      // ---- CLASS-WISE GROUPING ----
+      const groups = {};
+      data.data.forEach(item => {
+        const cls = String(item.class);
+        if (!groups[cls]) groups[cls] = [];
+        groups[cls].push(item);
+      });
 
-      return `
-        <div class="download-card">
-          <div class="download-info">
-            <h4>${escapeHtml(item.title)} ${seriesHtml}</h4>
-            ${descHtml}
-            <div class="download-meta">
-              <span class="badge badge-class"><i class="fas fa-graduation-cap"></i> Class ${item.class}</span>
-              <span class="badge badge-category"><i class="fas fa-tag"></i> ${escapeHtml(catLabel)}</span>
-              <span class="badge badge-session"><i class="fas fa-calendar"></i> ${escapeHtml(item.session_year)}</span>
-              ${item.subject ? `<span class="badge badge-subject"><i class="fas fa-book"></i> ${escapeHtml(item.subject)}</span>` : ''}
-              <span class="download-count"><i class="fas fa-download"></i> ${item.download_count || 0}</span>
+      // Sort class numbers ascending
+      const sortedClasses = Object.keys(groups).sort((a, b) => Number(a) - Number(b));
+
+      let html = '';
+      let cardIndex = 0;
+
+      sortedClasses.forEach(cls => {
+        const items = groups[cls];
+        html += `
+          <div class="class-group">
+            <div class="class-heading">
+              <div class="class-icon"><i class="fas fa-graduation-cap"></i></div>
+              <div class="class-title">Class ${cls}</div>
+              <div class="class-count">${items.length} file${items.length > 1 ? 's' : ''}</div>
+            </div>
+            <div class="downloads-grid">
+              ${items.map(item => buildCardHtml(item, cardIndex++)).join('')}
             </div>
           </div>
-          <div class="card-footer">
-            <a href="${API_BASE}/api/downloads/${item.id}/download" target="_blank" class="download-btn">
-              <i class="fas fa-download"></i> Download
-            </a>
-          </div>
+        `;
+      });
+
+      wrapper.innerHTML = html;
+    } else {
+      // ---- NORMAL GRID (when specific class selected) ----
+      let cardIndex = 0;
+      wrapper.innerHTML = `
+        <div class="downloads-grid">
+          ${data.data.map(item => buildCardHtml(item, cardIndex++)).join('')}
         </div>
       `;
-    }).join('');
+    }
 
     // Check Read More buttons
     setTimeout(checkReadMoreButtons, 50);
 
+    // Pagination
     pagination.innerHTML = '';
     if (data.pagination && data.pagination.totalPages > 1) {
       for (let i = 1; i <= data.pagination.totalPages; i++) {
@@ -1487,7 +1617,7 @@ async function loadDownloads(page = 1) {
     }
   } catch (err) {
     console.error(err);
-    grid.innerHTML = `<div class="empty-state" style="color: var(--t-mid);"><i class="fas fa-exclamation-circle" style="color:#ef4444;"></i><h3>Failed to Load</h3><p>Unable to load downloads.</p></div>`;
+    wrapper.innerHTML = `<div class="downloads-grid"><div class="empty-state" style="color: var(--t-mid);"><i class="fas fa-exclamation-circle" style="color:#ef4444;"></i><h3>Failed to Load</h3><p>Unable to load downloads.</p></div></div>`;
     pagination.innerHTML = '';
   }
 }
