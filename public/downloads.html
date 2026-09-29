@@ -67,7 +67,7 @@
 }
 
 /* ============================================================
-   DARK MODE — Neutral grey + warm gold (no pink)
+   DARK MODE — Neutral grey + warm gold
 ============================================================ */
 [data-theme="dark"] {
   --bg: #1c1c1e;
@@ -668,7 +668,7 @@ img { max-width: 100%; height: auto; }
 }
 
 /* ============================================================
-   CLASS GROUP (for class-wise grouping)
+   CLASS GROUP
 ============================================================ */
 .class-group {
   margin-bottom: 44px;
@@ -801,7 +801,6 @@ img { max-width: 100%; height: auto; }
 }
 [data-theme="dark"] .download-info h4 .series-tag { color: var(--primary-l); }
 
-/* Description with Read More */
 .download-info .desc {
   font-size: 13px;
   color: var(--t-mid);
@@ -1388,7 +1387,7 @@ try {
 } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
 
 // ============================================================
-// NAV DROPDOWN (click-based)
+// NAV DROPDOWN
 // ============================================================
 function toggleNavDropdown(e) {
   e.preventDefault();
@@ -1480,22 +1479,6 @@ setupDropdown("loginBtnMobile", "loginDropdownMobile");
 const API_BASE = "https://gsssshilla.onrender.com";
 let currentPage = 1;
 let searchTimeout;
-let allDownloadsCache = []; // Full data cache
-
-// Session options (fixed)
-const SESSION_OPTIONS = [
-  '2024-25', '2025-26', '2026-27',
-  '2027-28', '2028-29', '2029-30'
-];
-
-function loadSessions() {
-  const select = document.getElementById('filterSession');
-  if (!select) return;
-  select.innerHTML = '<option value="all">All Sessions</option>';
-  SESSION_OPTIONS.forEach(s => {
-    select.innerHTML += `<option value="${s}">${s}</option>`;
-  });
-}
 
 // ============================================================
 // BUILD ONE DOWNLOAD CARD HTML
@@ -1536,36 +1519,7 @@ function buildCardHtml(item, index) {
 }
 
 // ============================================================
-// FETCH ALL DATA ONCE (based on class filter only)
-// ============================================================
-async function fetchAllData() {
-  const classFilter = document.getElementById('filterClass').value;
-
-  try {
-    // Fetch with big limit to get everything for that class
-    const params = new URLSearchParams({
-      class: classFilter,
-      page: 1,
-      limit: 1000
-    });
-    const res = await fetch(`${API_BASE}/api/downloads?${params}`);
-    const data = await res.json();
-
-    if (!data.success || !data.data) {
-      allDownloadsCache = [];
-      return [];
-    }
-    allDownloadsCache = data.data;
-    return allDownloadsCache;
-  } catch (err) {
-    console.error('Fetch error:', err);
-    allDownloadsCache = [];
-    return [];
-  }
-}
-
-// ============================================================
-// LOAD DOWNLOADS (with client-side filtering)
+// LOAD DOWNLOADS (Backend filters — work correctly)
 // ============================================================
 async function loadDownloads(page = 1) {
   currentPage = page;
@@ -1574,70 +1528,37 @@ async function loadDownloads(page = 1) {
   wrapper.innerHTML = `<div class="loading-state"><i class="fas fa-spinner fa-spin"></i><p>Loading downloads...</p></div>`;
 
   try {
-    // Step 1: Fetch all data for selected class (or all)
-    const allData = await fetchAllData();
-
-    if (allData.length === 0) {
-      wrapper.innerHTML = `<div class="downloads-grid"><div class="empty-state"><i class="fas fa-folder-open"></i><h3>No files found</h3><p>Try adjusting your filters.</p></div></div>`;
-      pagination.innerHTML = '';
-      return;
-    }
-
-    // Step 2: Apply client-side filters
     const classFilter = document.getElementById('filterClass').value;
     const categoryFilter = document.getElementById('filterCategory').value;
     const sessionFilter = document.getElementById('filterSession').value;
-    const searchFilter = document.getElementById('searchInput').value.trim().toLowerCase();
+    const searchFilter = document.getElementById('searchInput').value;
 
-    let filtered = allData.slice();
+    // Send ALL filters to backend — backend handles them correctly
+    const params = new URLSearchParams({
+      class: classFilter,
+      category: categoryFilter,
+      session: sessionFilter,
+      search: searchFilter,
+      page: page,
+      limit: 20
+    });
 
-    // Category filter
-    if (categoryFilter !== 'all') {
-      filtered = filtered.filter(item => {
-        const itemCat = String(item.category || '').toLowerCase().trim();
-        return itemCat === categoryFilter.toLowerCase().trim();
-      });
-    }
+    const res = await fetch(`${API_BASE}/api/downloads?${params}`);
+    const data = await res.json();
 
-    // Session filter
-    if (sessionFilter !== 'all') {
-      filtered = filtered.filter(item => {
-        const itemSession = String(item.session_year || '').trim();
-        return itemSession === sessionFilter.trim();
-      });
-    }
-
-    // Search filter
-    if (searchFilter) {
-      filtered = filtered.filter(item => {
-        const title = String(item.title || '').toLowerCase();
-        const desc = String(item.description || '').toLowerCase();
-        const subject = String(item.subject || '').toLowerCase();
-        return title.includes(searchFilter) ||
-               desc.includes(searchFilter) ||
-               subject.includes(searchFilter);
-      });
-    }
-
-    // Step 3: Empty state check
-    if (filtered.length === 0) {
+    if (!data.success || !data.data || data.data.length === 0) {
       wrapper.innerHTML = `<div class="downloads-grid"><div class="empty-state"><i class="fas fa-folder-open"></i><h3>No files found</h3><p>Try adjusting your search or filters.</p></div></div>`;
       pagination.innerHTML = '';
       return;
     }
 
-    // Step 4: Client-side pagination
-    const PER_PAGE = 15;
-    const totalPages = Math.ceil(filtered.length / PER_PAGE);
-    const safePage = Math.min(page, totalPages) || 1;
-    const startIdx = (safePage - 1) * PER_PAGE;
-    const pageItems = filtered.slice(startIdx, startIdx + PER_PAGE);
-
-    // Step 5: Render
+    // ==========================================
+    // RENDER: Class grouping vs Normal grid
+    // ==========================================
     if (classFilter === 'all') {
       // ---- CLASS-WISE GROUPING ----
       const groups = {};
-      pageItems.forEach(item => {
+      data.data.forEach(item => {
         const cls = String(item.class);
         if (!groups[cls]) groups[cls] = [];
         groups[cls].push(item);
@@ -1646,7 +1567,7 @@ async function loadDownloads(page = 1) {
       const sortedClasses = Object.keys(groups).sort((a, b) => Number(a) - Number(b));
 
       let html = '';
-      let cardIndex = startIdx;
+      let cardIndex = 0;
 
       sortedClasses.forEach(cls => {
         const items = groups[cls];
@@ -1667,21 +1588,23 @@ async function loadDownloads(page = 1) {
       wrapper.innerHTML = html;
     } else {
       // ---- NORMAL GRID ----
-      let cardIndex = startIdx;
+      let cardIndex = 0;
       wrapper.innerHTML = `
         <div class="downloads-grid">
-          ${pageItems.map(item => buildCardHtml(item, cardIndex++)).join('')}
+          ${data.data.map(item => buildCardHtml(item, cardIndex++)).join('')}
         </div>
       `;
     }
 
     setTimeout(checkReadMoreButtons, 50);
 
-    // Step 6: Pagination buttons
+    // ==========================================
+    // PAGINATION
+    // ==========================================
     pagination.innerHTML = '';
-    if (totalPages > 1) {
-      for (let i = 1; i <= totalPages; i++) {
-        pagination.innerHTML += `<button class="${i === safePage ? 'active' : ''}" onclick="loadDownloads(${i})">${i}</button>`;
+    if (data.pagination && data.pagination.totalPages > 1) {
+      for (let i = 1; i <= data.pagination.totalPages; i++) {
+        pagination.innerHTML += `<button class="${i === page ? 'active' : ''}" onclick="loadDownloads(${i})">${i}</button>`;
       }
     }
   } catch (err) {
@@ -1744,7 +1667,7 @@ window.addEventListener('resize', function() {
 // ============================================================
 function debounceSearch() {
   clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => loadDownloads(1), 400);
+  searchTimeout = setTimeout(() => loadDownloads(1), 500);
 }
 function escapeHtml(text) {
   if (!text) return '';
@@ -1754,7 +1677,6 @@ function escapeHtml(text) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  loadSessions();
   loadDownloads(1);
 });
 </script>
