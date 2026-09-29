@@ -668,7 +668,7 @@ img { max-width: 100%; height: auto; }
 }
 
 /* ============================================================
-   CLASS GROUP (New — for class-wise grouping)
+   CLASS GROUP (for class-wise grouping)
 ============================================================ */
 .class-group {
   margin-bottom: 44px;
@@ -1300,7 +1300,7 @@ img { max-width: 100%; height: auto; }
     <input type="text" id="searchInput" placeholder="Search files..." onkeyup="debounceSearch()">
   </div>
 
-  <!-- DOWNLOADS LIST (class groups rendered dynamically) -->
+  <!-- DOWNLOADS LIST -->
   <div id="downloadsList">
     <div class="loading-state"><i class="fas fa-spinner fa-spin"></i><p>Loading downloads...</p></div>
   </div>
@@ -1480,6 +1480,7 @@ setupDropdown("loginBtnMobile", "loginDropdownMobile");
 const API_BASE = "https://gsssshilla.onrender.com";
 let currentPage = 1;
 let searchTimeout;
+let allDownloadsCache = []; // Full data cache
 
 // Session options (fixed)
 const SESSION_OPTIONS = [
@@ -1487,7 +1488,6 @@ const SESSION_OPTIONS = [
   '2027-28', '2028-29', '2029-30'
 ];
 
-// Session dropdown fill (no API needed now)
 function loadSessions() {
   const select = document.getElementById('filterSession');
   if (!select) return;
@@ -1501,7 +1501,7 @@ function loadSessions() {
 // BUILD ONE DOWNLOAD CARD HTML
 // ============================================================
 function buildCardHtml(item, index) {
-  const catLabel = (item.category || '').replace('-', ' ');
+  const catLabel = (item.category || '').replace(/-/g, ' ');
   const seriesHtml = item.series ? `<span class="series-tag">Set-${item.series}</span>` : '';
 
   let descHtml = '';
@@ -1521,7 +1521,7 @@ function buildCardHtml(item, index) {
         <div class="download-meta">
           <span class="badge badge-class"><i class="fas fa-graduation-cap"></i> Class ${item.class}</span>
           <span class="badge badge-category"><i class="fas fa-tag"></i> ${escapeHtml(catLabel)}</span>
-          <span class="badge badge-session"><i class="fas fa-calendar"></i> ${escapeHtml(item.session_year)}</span>
+          <span class="badge badge-session"><i class="fas fa-calendar"></i> ${escapeHtml(item.session_year || 'N/A')}</span>
           ${item.subject ? `<span class="badge badge-subject"><i class="fas fa-book"></i> ${escapeHtml(item.subject)}</span>` : ''}
           <span class="download-count"><i class="fas fa-download"></i> ${item.download_count || 0}</span>
         </div>
@@ -1536,7 +1536,36 @@ function buildCardHtml(item, index) {
 }
 
 // ============================================================
-// LOAD DOWNLOADS (with class grouping when class=all)
+// FETCH ALL DATA ONCE (based on class filter only)
+// ============================================================
+async function fetchAllData() {
+  const classFilter = document.getElementById('filterClass').value;
+
+  try {
+    // Fetch with big limit to get everything for that class
+    const params = new URLSearchParams({
+      class: classFilter,
+      page: 1,
+      limit: 1000
+    });
+    const res = await fetch(`${API_BASE}/api/downloads?${params}`);
+    const data = await res.json();
+
+    if (!data.success || !data.data) {
+      allDownloadsCache = [];
+      return [];
+    }
+    allDownloadsCache = data.data;
+    return allDownloadsCache;
+  } catch (err) {
+    console.error('Fetch error:', err);
+    allDownloadsCache = [];
+    return [];
+  }
+}
+
+// ============================================================
+// LOAD DOWNLOADS (with client-side filtering)
 // ============================================================
 async function loadDownloads(page = 1) {
   currentPage = page;
@@ -1545,38 +1574,79 @@ async function loadDownloads(page = 1) {
   wrapper.innerHTML = `<div class="loading-state"><i class="fas fa-spinner fa-spin"></i><p>Loading downloads...</p></div>`;
 
   try {
-    const classFilter = document.getElementById('filterClass').value;
-    const params = new URLSearchParams({
-      class: classFilter,
-      category: document.getElementById('filterCategory').value,
-      session: document.getElementById('filterSession').value,
-      search: document.getElementById('searchInput').value,
-      page: page,
-      limit: 30
-    });
-    const res = await fetch(`${API_BASE}/api/downloads?${params}`);
-    const data = await res.json();
+    // Step 1: Fetch all data for selected class (or all)
+    const allData = await fetchAllData();
 
-    if (!data.success || !data.data || data.data.length === 0) {
+    if (allData.length === 0) {
+      wrapper.innerHTML = `<div class="downloads-grid"><div class="empty-state"><i class="fas fa-folder-open"></i><h3>No files found</h3><p>Try adjusting your filters.</p></div></div>`;
+      pagination.innerHTML = '';
+      return;
+    }
+
+    // Step 2: Apply client-side filters
+    const classFilter = document.getElementById('filterClass').value;
+    const categoryFilter = document.getElementById('filterCategory').value;
+    const sessionFilter = document.getElementById('filterSession').value;
+    const searchFilter = document.getElementById('searchInput').value.trim().toLowerCase();
+
+    let filtered = allData.slice();
+
+    // Category filter
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(item => {
+        const itemCat = String(item.category || '').toLowerCase().trim();
+        return itemCat === categoryFilter.toLowerCase().trim();
+      });
+    }
+
+    // Session filter
+    if (sessionFilter !== 'all') {
+      filtered = filtered.filter(item => {
+        const itemSession = String(item.session_year || '').trim();
+        return itemSession === sessionFilter.trim();
+      });
+    }
+
+    // Search filter
+    if (searchFilter) {
+      filtered = filtered.filter(item => {
+        const title = String(item.title || '').toLowerCase();
+        const desc = String(item.description || '').toLowerCase();
+        const subject = String(item.subject || '').toLowerCase();
+        return title.includes(searchFilter) ||
+               desc.includes(searchFilter) ||
+               subject.includes(searchFilter);
+      });
+    }
+
+    // Step 3: Empty state check
+    if (filtered.length === 0) {
       wrapper.innerHTML = `<div class="downloads-grid"><div class="empty-state"><i class="fas fa-folder-open"></i><h3>No files found</h3><p>Try adjusting your search or filters.</p></div></div>`;
       pagination.innerHTML = '';
       return;
     }
 
+    // Step 4: Client-side pagination
+    const PER_PAGE = 15;
+    const totalPages = Math.ceil(filtered.length / PER_PAGE);
+    const safePage = Math.min(page, totalPages) || 1;
+    const startIdx = (safePage - 1) * PER_PAGE;
+    const pageItems = filtered.slice(startIdx, startIdx + PER_PAGE);
+
+    // Step 5: Render
     if (classFilter === 'all') {
       // ---- CLASS-WISE GROUPING ----
       const groups = {};
-      data.data.forEach(item => {
+      pageItems.forEach(item => {
         const cls = String(item.class);
         if (!groups[cls]) groups[cls] = [];
         groups[cls].push(item);
       });
 
-      // Sort class numbers ascending
       const sortedClasses = Object.keys(groups).sort((a, b) => Number(a) - Number(b));
 
       let html = '';
-      let cardIndex = 0;
+      let cardIndex = startIdx;
 
       sortedClasses.forEach(cls => {
         const items = groups[cls];
@@ -1596,23 +1666,22 @@ async function loadDownloads(page = 1) {
 
       wrapper.innerHTML = html;
     } else {
-      // ---- NORMAL GRID (when specific class selected) ----
-      let cardIndex = 0;
+      // ---- NORMAL GRID ----
+      let cardIndex = startIdx;
       wrapper.innerHTML = `
         <div class="downloads-grid">
-          ${data.data.map(item => buildCardHtml(item, cardIndex++)).join('')}
+          ${pageItems.map(item => buildCardHtml(item, cardIndex++)).join('')}
         </div>
       `;
     }
 
-    // Check Read More buttons
     setTimeout(checkReadMoreButtons, 50);
 
-    // Pagination
+    // Step 6: Pagination buttons
     pagination.innerHTML = '';
-    if (data.pagination && data.pagination.totalPages > 1) {
-      for (let i = 1; i <= data.pagination.totalPages; i++) {
-        pagination.innerHTML += `<button class="${i === page ? 'active' : ''}" onclick="loadDownloads(${i})">${i}</button>`;
+    if (totalPages > 1) {
+      for (let i = 1; i <= totalPages; i++) {
+        pagination.innerHTML += `<button class="${i === safePage ? 'active' : ''}" onclick="loadDownloads(${i})">${i}</button>`;
       }
     }
   } catch (err) {
@@ -1675,7 +1744,7 @@ window.addEventListener('resize', function() {
 // ============================================================
 function debounceSearch() {
   clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => loadDownloads(1), 500);
+  searchTimeout = setTimeout(() => loadDownloads(1), 400);
 }
 function escapeHtml(text) {
   if (!text) return '';
