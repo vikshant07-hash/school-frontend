@@ -264,6 +264,39 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 
 .footer { background: var(--bg-white); border-top: 1px solid var(--border); padding: 18px 32px; text-align: center; font-size: 13px; color: var(--text-muted); }
 
+/* ===== BACKUP MODAL STYLES ===== */
+.backup-info-box { background: var(--blue-bg); padding: 14px 16px; border-radius: 10px; border-left: 4px solid var(--blue); margin-bottom: 18px; font-size: 13px; color: var(--text-primary); line-height: 1.6; }
+.backup-info-box strong { color: var(--blue); display: block; margin-bottom: 4px; }
+
+.backup-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.backup-actions .btn, .backup-actions label.btn { margin: 0; }
+
+.backup-mode-box { display: flex; gap: 14px; align-items: center; padding: 12px 16px; background: var(--bg); border-radius: 10px; margin-bottom: 16px; font-size: 13px; flex-wrap: wrap; }
+.backup-mode-box b { font-size: 12px; color: var(--text-secondary); }
+.backup-mode-box label { display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 12px; background: var(--bg-white); border: 1.5px solid var(--border); border-radius: 8px; transition: var(--transition); }
+.backup-mode-box label:has(input:checked) { border-color: var(--gold); background: var(--gold-bg); }
+.backup-mode-box label:has(input[value="replace"]:checked) { border-color: var(--red); background: var(--red-bg); }
+.backup-mode-box input[type="radio"] { accent-color: var(--gold); }
+
+.backup-list-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; background: var(--bg-white); transition: var(--transition); }
+.backup-list-item:hover { border-color: var(--gold); box-shadow: var(--shadow); transform: translateY(-1px); }
+.backup-list-item .backup-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--gold-bg); display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 18px; flex-shrink: 0; }
+.backup-list-item .backup-info { flex: 1; min-width: 0; }
+.backup-list-item .backup-info .bname { font-size: 12.5px; font-weight: 700; word-break: break-all; color: var(--text-primary); }
+.backup-list-item .backup-info .bmeta { font-size: 11.5px; color: var(--text-muted); margin-top: 3px; display: flex; gap: 10px; flex-wrap: wrap; }
+.backup-list-item .backup-info .bmeta i { color: var(--gold); margin-right: 3px; }
+.backup-list-item .backup-actions-cell { display: flex; gap: 5px; flex-shrink: 0; }
+
+.backup-badge { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; letter-spacing: 0.4px; }
+.backup-badge.auto { background: var(--blue-bg); color: var(--blue); }
+.backup-badge.manual { background: var(--green-bg); color: var(--green); }
+
+.backup-empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px; background: var(--bg); border-radius: 10px; }
+.backup-empty i { font-size: 36px; display: block; margin-bottom: 12px; color: var(--border-strong); }
+
+.backup-loading { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px; }
+.backup-loading i { font-size: 24px; display: block; margin-bottom: 10px; color: var(--gold); }
+
 @media (max-width: 768px) {
     .navbar { padding: 0 16px; }
     .nav-links { display: none; flex-direction: column; position: absolute; top: 68px; left: 0; right: 0; background: var(--bg-white); padding: 14px; border-bottom: 1px solid var(--border); box-shadow: var(--shadow-hover); }
@@ -278,6 +311,11 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
     .session-bar { flex-direction: column; align-items: stretch; }
     .email-input-row, .otp-input-row { flex-direction: column; }
     .otp-send-btn { width: 100%; }
+    .backup-list-item { flex-wrap: wrap; }
+    .backup-list-item .backup-actions-cell { width: 100%; justify-content: flex-end; margin-top: 6px; }
+    .backup-mode-box { flex-direction: column; align-items: stretch; }
+    .backup-actions { flex-direction: column; }
+    .backup-actions .btn, .backup-actions label.btn { width: 100%; justify-content: center; }
 }
 </style>
 </head>
@@ -303,7 +341,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
     <ul class="nav-links" id="navLinks">
         <li><a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
         <li><a href="admin-students.html" class="active"><i class="fas fa-users"></i> Students Management</a></li>
-    
+        <li><a href="#" onclick="openBackupModal(); return false;"><i class="fas fa-database"></i> Backup & Restore</a></li>
     </ul>
     <div class="nav-right">
         <div class="admin-badge">
@@ -320,6 +358,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
         <h1><i class="fas fa-users"></i> Student Management</h1>
         <div class="header-actions">
             <button class="btn btn-outline" onclick="refreshAll()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <button class="btn btn-primary" onclick="openBackupModal()"><i class="fas fa-database"></i> Backup & Restore</button>
             <button class="btn btn-success" onclick="openAddModal()"><i class="fas fa-user-plus"></i> Add Student</button>
         </div>
     </div>
@@ -665,12 +704,65 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
     </div>
 </div>
 
+<!-- BACKUP & RESTORE MODAL -->
+<div class="modal-overlay" id="backupModal">
+    <div class="modal-content" style="max-width:820px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-database"></i> Backup & Restore</h2>
+            <button class="close-btn" onclick="closeModal('backupModal')">&times;</button>
+        </div>
+
+        <div class="backup-info-box">
+            <strong><i class="fas fa-clock"></i> Auto Backup Schedule</strong>
+            Roz raat <b>2:00 AM (IST)</b> par automatic backup ban jaata hai.
+            Sirf last <b>10 backups</b> hi rakhe jaate hain — purane automatically delete ho jaate hain.
+        </div>
+
+        <div class="backup-actions">
+            <button class="btn btn-success" onclick="createManualBackup()" id="btnCreateBackup">
+                <i class="fas fa-plus-circle"></i> Create Backup Now
+            </button>
+            <label class="btn btn-primary" style="cursor:pointer;">
+                <i class="fas fa-upload"></i> Upload & Restore
+                <input type="file" accept=".json,application/json" style="display:none;" onchange="handleRestoreUpload(event)">
+            </label>
+            <button class="btn btn-outline" onclick="loadBackupList()">
+                <i class="fas fa-sync-alt"></i> Refresh List
+            </button>
+        </div>
+
+        <div class="backup-mode-box">
+            <b><i class="fas fa-shield-alt"></i> Restore Mode:</b>
+            <label>
+                <input type="radio" name="restoreMode" value="merge" checked>
+                <span>Merge (Safe)</span>
+            </label>
+            <label>
+                <input type="radio" name="restoreMode" value="replace">
+                <span style="color:var(--red);font-weight:700;">Replace (All Data)</span>
+            </label>
+            <span style="font-size:11px;color:var(--text-muted);flex-basis:100%;">
+                <b>Merge:</b> existing students update honge, naye add honge.
+                <b>Replace:</b> ⚠️ SAARA existing data delete hoga, phir backup se restore hoga.
+            </span>
+        </div>
+
+        <h3 class="form-section"><i class="fas fa-history"></i> Available Backups</h3>
+        <div id="backupListContainer">
+            <div class="backup-loading">
+                <i class="fas fa-spinner fa-spin"></i> Loading backups…
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="toast-container" id="toastContainer"></div>
 <div class="save-status" id="saveStatus"><i class="fas fa-save"></i> <span id="saveStatusText">Draft saved</span></div>
 <footer class="footer"><span>&copy; 2026 Govt. Sr. Sec. School Shilla. All rights reserved.</span></footer>
 
 <script>
 const STUDENT_API = "https://gsssshilla.onrender.com/api/students";
+const BACKUP_API = "https://gsssshilla.onrender.com/api/backup";
 const CURRENT_SESSION_KEY = "currentSession";
 const DRAFT_KEY = "studentFormDraft";
 
@@ -733,24 +825,21 @@ async function checkAuth() {
     let token = null;
     try { token = localStorage.getItem("adminToken"); } catch (e) {}
     if (!token) { showPopup(); return false; }
-    
+
     try {
-        const res = await fetch("https://gsssshilla.onrender.com/api/admin/verify", { 
-            headers: { Authorization: `Bearer ${token}` } 
+        const res = await fetch("https://gsssshilla.onrender.com/api/admin/verify", {
+            headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();
-        
+
         if (data.success) {
             const admin = data.admin || {};
-            
-            // ✅ Name ko prefer karo, agar nahi hai to username
             const displayName = admin.name || admin.fullName || admin.username || "Admin";
             const initial = displayName.charAt(0).toUpperCase();
-            
+
             $("#adminAvatar").textContent = initial;
             $("#adminName").textContent = displayName;
-            
-            // ✅ Save for PDF "Issued by" line
+
             try {
                 localStorage.setItem("adminData", JSON.stringify({
                     id: admin.id || "",
@@ -760,39 +849,34 @@ async function checkAuth() {
                 }));
                 localStorage.setItem("adminName", displayName);
             } catch (e) {}
-            
-            // ✅ Agar verify mein name nahi aaya, to profile se try karo
+
             if (!admin.name && !admin.fullName) {
                 fetchAdminNameFromProfile(token);
             }
-            
+
             return true;
-        } else { 
-            showPopup(); 
-            return false; 
+        } else {
+            showPopup();
+            return false;
         }
-    } catch (err) { 
-        return true; 
+    } catch (err) {
+        return true;
     }
 }
 
-// ✅ Naya helper — profile se real name laayega (agar verify mein na mile)
 async function fetchAdminNameFromProfile(token) {
     try {
         const res = await fetch("https://gsssshilla.onrender.com/api/admin/profile", {
             headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();
-        
-        // Aapke backend response ke hisaab se adjust karein
         const admin = data.data || data.admin || data;
         const name = admin?.name || admin?.fullName || admin?.username;
-        
+
         if (name && name !== "Admin") {
             $("#adminName").textContent = name;
             $("#adminAvatar").textContent = name.charAt(0).toUpperCase();
-            
-            // PDF ke liye bhi save karo
+
             try {
                 const existing = JSON.parse(localStorage.getItem("adminData") || "{}");
                 localStorage.setItem("adminData", JSON.stringify({
@@ -965,6 +1049,271 @@ function clearDraft() {
     localStorage.removeItem(DRAFT_KEY);
     $("#draftBanner").classList.remove("on");
     state.hasDraft = false;
+}
+
+// ============================================================
+// BACKUP & RESTORE SYSTEM
+// ============================================================
+function openBackupModal() {
+    openModal("backupModal");
+    loadBackupList();
+}
+
+async function loadBackupList() {
+    const container = $("#backupListContainer");
+    container.innerHTML = `
+        <div class="backup-loading">
+            <i class="fas fa-spinner fa-spin"></i> Loading backups…
+        </div>
+    `;
+
+    try {
+        const token = localStorage.getItem("adminToken");
+        const res = await fetch(`${BACKUP_API}/list`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (res.status === 401) { showPopup(); return; }
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+
+        if (!data.backups || data.backups.length === 0) {
+            container.innerHTML = `
+                <div class="backup-empty">
+                    <i class="fas fa-inbox"></i>
+                    Koi backup nahi mila.<br>
+                    <span style="font-size:12px;">"Create Backup Now" click karke pehla backup banayein.</span>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = data.backups.map(b => {
+            const sizeMB = (b.size / 1024 / 1024).toFixed(2);
+            const date = new Date(b.createdAt).toLocaleString("en-IN", {
+                day: "2-digit", month: "short", year: "numeric",
+                hour: "2-digit", minute: "2-digit"
+            });
+            const typeBadge = b.type === 'auto'
+                ? '<span class="backup-badge auto"><i class="fas fa-robot"></i> AUTO</span>'
+                : '<span class="backup-badge manual"><i class="fas fa-hand-pointer"></i> MANUAL</span>';
+            const studentCount = b.stats?.students || 0;
+
+            return `
+                <div class="backup-list-item">
+                    <div class="backup-icon"><i class="fas fa-file-code"></i></div>
+                    <div class="backup-info">
+                        <div class="bname">${esc(b.filename)}</div>
+                        <div class="bmeta">
+                            <span><i class="fas fa-clock"></i> ${esc(date)}</span>
+                            <span><i class="fas fa-users"></i> ${studentCount} students</span>
+                            <span><i class="fas fa-hdd"></i> ${sizeMB} MB</span>
+                            ${typeBadge}
+                        </div>
+                    </div>
+                    <div class="backup-actions-cell">
+                        <button class="action-btn view" onclick="downloadBackup('${esc(b.filename)}')" title="Download">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="action-btn edit" onclick="restoreBackup('${esc(b.filename)}')" title="Restore">
+                            <i class="fas fa-undo"></i> Restore
+                        </button>
+                        <button class="action-btn delete" onclick="deleteBackup('${esc(b.filename)}')" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join("");
+    } catch (err) {
+        if (err.message !== "Session expired") {
+            container.innerHTML = `
+                <div class="backup-empty" style="color:var(--red);">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    ${esc(err.message)}
+                </div>
+            `;
+        }
+    }
+}
+
+async function createManualBackup() {
+    const btn = $("#btnCreateBackup");
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating…';
+
+    try {
+        const token = localStorage.getItem("adminToken");
+        const res = await fetch(`${BACKUP_API}/create`, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (res.status === 401) { showPopup(); return; }
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+
+        showToast(`Backup created ✅ (${data.stats?.students || 0} students)`, "success", 5000);
+        loadBackupList();
+    } catch (err) {
+        if (err.message !== "Session expired") showToast("Backup failed: " + err.message, "error");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+    }
+}
+
+function downloadBackup(filename) {
+    const token = localStorage.getItem("adminToken");
+    if (!token) { showPopup(); return; }
+    const url = `${BACKUP_API}/download/${encodeURIComponent(filename)}?token=${encodeURIComponent(token)}`;
+    window.open(url, "_blank");
+    showToast("Download starting…", "info", 3000);
+}
+
+async function deleteBackup(filename) {
+    if (!confirm(`Delete backup?\n\n"${filename}"\n\nYe action undo nahi ho sakta.`)) return;
+
+    try {
+        const token = localStorage.getItem("adminToken");
+        const res = await fetch(`${BACKUP_API}/${encodeURIComponent(filename)}`, {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (res.status === 401) { showPopup(); return; }
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+
+        showToast("Backup deleted ✅", "success");
+        loadBackupList();
+    } catch (err) {
+        if (err.message !== "Session expired") showToast("Delete failed: " + err.message, "error");
+    }
+}
+
+async function restoreBackup(filename) {
+    const mode = document.querySelector('input[name="restoreMode"]:checked').value;
+
+    let warning = "";
+    if (mode === "replace") {
+        warning = `⚠️ REPLACE MODE WARNING ⚠️\n\n` +
+                  `Saara existing student data DELETE ho jaayega aur "${filename}" se replace hoga.\n\n` +
+                  `Ye action undo nahi ho sakta!\n\n` +
+                  `Kya aap sure hain?`;
+    } else {
+        warning = `RESTORE (MERGE MODE)\n\n` +
+                  `File: "${filename}"\n\n` +
+                  `• Existing students update honge\n` +
+                  `• Naye students add honge\n` +
+                  `• Koi data delete nahi hoga\n\n` +
+                  `Continue?`;
+    }
+
+    if (!confirm(warning)) return;
+
+    if (mode === "replace") {
+        const typed = prompt('Type "REPLACE" (all caps) to confirm data replacement:');
+        if (typed !== "REPLACE") {
+            showToast("Restore cancelled", "info");
+            return;
+        }
+    }
+
+    showToast("Restoring… Please wait", "info", 15000);
+
+    try {
+        const token = localStorage.getItem("adminToken");
+        const res = await fetch(`${BACKUP_API}/restore/${encodeURIComponent(filename)}`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ mode })
+        });
+        if (res.status === 401) { showPopup(); return; }
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+
+        showToast(
+            `Restored ✅ Inserted: ${data.inserted || 0}, Updated: ${data.updated || 0}, Skipped: ${data.skipped || 0}`,
+            "success",
+            8000
+        );
+        loadStudents();
+    } catch (err) {
+        if (err.message !== "Session expired") showToast("Restore failed: " + err.message, "error", 8000);
+    }
+}
+
+async function handleRestoreUpload(event) {
+    const file = event.target.files[0];
+    event.target.value = "";
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith(".json")) {
+        showToast("Sirf .json backup file allowed hai", "error");
+        return;
+    }
+
+    if (file.size > 100 * 1024 * 1024) {
+        showToast("File 100 MB se badi hai", "error");
+        return;
+    }
+
+    const mode = document.querySelector('input[name="restoreMode"]:checked').value;
+
+    let warning = "";
+    if (mode === "replace") {
+        warning = `⚠️ REPLACE MODE WARNING ⚠️\n\n` +
+                  `File: "${file.name}"\n\n` +
+                  `Saara existing student data DELETE ho jaayega aur is file se replace hoga.\n\n` +
+                  `Ye action undo nahi ho sakta!\n\n` +
+                  `Continue?`;
+    } else {
+        warning = `UPLOAD & RESTORE (MERGE MODE)\n\n` +
+                  `File: "${file.name}" (${(file.size/1024/1024).toFixed(2)} MB)\n\n` +
+                  `• Existing students update honge\n` +
+                  `• Naye students add honge\n\n` +
+                  `Continue?`;
+    }
+
+    if (!confirm(warning)) return;
+
+    if (mode === "replace") {
+        const typed = prompt('Type "REPLACE" (all caps) to confirm:');
+        if (typed !== "REPLACE") {
+            showToast("Restore cancelled", "info");
+            return;
+        }
+    }
+
+    showToast("Uploading & restoring… Please wait", "info", 20000);
+
+    try {
+        const token = localStorage.getItem("adminToken");
+        const fd = new FormData();
+        fd.append("backupFile", file);
+        fd.append("mode", mode);
+
+        const res = await fetch(`${BACKUP_API}/restore-upload`, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${token}` },
+            body: fd
+        });
+        if (res.status === 401) { showPopup(); return; }
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+
+        showToast(
+            `Restored ✅ Inserted: ${data.inserted || 0}, Updated: ${data.updated || 0}, Skipped: ${data.skipped || 0}`,
+            "success",
+            8000
+        );
+        loadStudents();
+        loadBackupList();
+    } catch (err) {
+        if (err.message !== "Session expired") showToast("Restore failed: " + err.message, "error", 8000);
+    }
 }
 
 // ============================================================
@@ -1703,7 +2052,6 @@ $$('#studentForm input[type="file"]').forEach(input => {
         const actionsDiv = document.createElement("div");
         actionsDiv.className = "preview-actions";
 
-        // View button (local preview)
         const viewBtn = document.createElement("button");
         viewBtn.type = "button";
         viewBtn.className = "view-local-btn";
@@ -1715,7 +2063,6 @@ $$('#studentForm input[type="file"]').forEach(input => {
         };
         actionsDiv.appendChild(viewBtn);
 
-        // Remove button
         const removeBtn = document.createElement("button");
         removeBtn.type = "button";
         removeBtn.className = "remove-local-btn";
@@ -1869,7 +2216,6 @@ async function openEditModal(id) {
             checkMobileUsage(s.mobile_number);
         }
 
-        // ✅ Existing docs with VIEW + DOWNLOAD + PROXY for PDF
         const existingDocs = {
             studentPhoto: { url: s.student_photo_url, label: "Student Photo", type: "image" },
             signature: { url: s.signature_url, label: "Signature", type: "image" },
@@ -1894,7 +2240,6 @@ async function openEditModal(id) {
 
             const iconClass = doc.type === "image" ? "fa-image" : "fa-file-pdf";
 
-            // ✅ PDF proxy for Cloudinary PDFs
             const viewUrl = (doc.type === "pdf" && doc.url.includes("res.cloudinary.com"))
                 ? `${STUDENT_API}/proxy-pdf?url=${encodeURIComponent(doc.url)}`
                 : doc.url;
@@ -2043,7 +2388,6 @@ async function openViewModal(id) {
         if (!s || !s.id) throw new Error("Student not found");
         const row = (l, v) => `<div class="view-row"><span class="lbl">${esc(l)}</span><span class="val">${esc(v ?? "—")}</span></div>`;
 
-        // ✅ Doc card with view + download + proxy for PDFs
         const docLink = (l, url, type = "pdf") => {
             if (!url) return `<span class="empty"><i class="fas fa-times-circle"></i> ${esc(l)}</span>`;
             const icon = type === "image" ? "fa-image" : "fa-file-pdf";
@@ -2241,7 +2585,12 @@ document.addEventListener("click", (e) => {
 });
 
 document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") { closeModal("formModal"); closeModal("viewModal"); closeModal("setSessionModal"); }
+    if (e.key === "Escape") {
+        closeModal("formModal");
+        closeModal("viewModal");
+        closeModal("setSessionModal");
+        closeModal("backupModal");
+    }
 });
 
 // ============================================================
