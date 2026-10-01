@@ -360,8 +360,132 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
             <button class="btn btn-outline" onclick="refreshAll()"><i class="fas fa-sync-alt"></i> Refresh</button>
             <button class="btn btn-primary" onclick="openBackupModal()"><i class="fas fa-database"></i> Backup & Restore</button>
             <button class="btn btn-success" onclick="openAddModal()"><i class="fas fa-user-plus"></i> Add Student</button>
+            <button class="btn btn-primary btn-sm" onclick="openListPdfModal()">
+    <i class="fas fa-file-pdf"></i> Print List PDF
+            </button>
         </div>
     </div>
+    <!-- PROFESSIONAL LIST PDF MODAL -->
+<div class="modal-overlay" id="listPdfModal">
+    <div class="modal-content" style="max-width:640px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-file-pdf"></i> Print Professional List PDF</h2>
+            <button class="close-btn" onclick="closeModal('listPdfModal')">&times;</button>
+        </div>
+
+        <div style="background:var(--blue-bg);padding:12px 16px;border-radius:10px;border-left:4px solid var(--blue);margin-bottom:16px;font-size:12px;color:var(--text-primary);">
+            <b><i class="fas fa-info-circle"></i> Landscape A4 PDF</b> — Header, footer, page numbers, aur school signature area sab include hoga.
+        </div>
+
+        <form id="listPdfForm" onsubmit="generateListPdf(event)">
+            <!-- Filters (auto-populated from current filters) -->
+            <h3 class="form-section"><i class="fas fa-filter"></i> Filters</h3>
+            <div class="form-grid">
+                <label>Class
+                    <select id="pdfClass">
+                        <option value="">All Classes</option>
+                        <option>Nursery</option><option>LKG</option><option>UKG</option>
+                        <option>1</option><option>2</option><option>3</option><option>4</option>
+                        <option>5</option><option>6</option><option>7</option><option>8</option>
+                        <option>9</option><option>10</option><option>11</option><option>12</option>
+                    </select>
+                </label>
+                <label>Session
+                    <input type="text" id="pdfSession" placeholder="2025-26">
+                </label>
+                <label>Stream
+                    <select id="pdfStream">
+                        <option value="">All Streams</option>
+                        <option>Non-Specialized</option><option>Science</option>
+                        <option>Commerce</option><option>Arts</option>
+                    </select>
+                </label>
+                <label>Gender
+                    <select id="pdfGender">
+                        <option value="">All</option>
+                        <option>Male</option><option>Female</option><option>Other</option>
+                    </select>
+                </label>
+                <label>Category
+                    <select id="pdfCategory">
+                        <option value="">All Categories</option>
+                        <option>General</option><option>SC</option><option>ST</option>
+                        <option>OBC</option><option>EWS</option><option>Other</option>
+                    </select>
+                </label>
+                <label>Status
+                    <select id="pdfStatus">
+                        <option value="">All Status</option>
+                        <option>Active</option><option>Promoted</option><option>Passed</option>
+                        <option>Dropped</option><option>Transferred</option>
+                    </select>
+                </label>
+            </div>
+
+            <!-- Title & Reason -->
+            <h3 class="form-section"><i class="fas fa-heading"></i> Document Info</h3>
+            <label class="full">
+                Title
+                <input type="text" id="pdfTitle" value="STUDENT LIST" maxlength="80" style="padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;">
+            </label>
+            <div style="margin-top:12px;">
+                <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+                    <input type="checkbox" id="pdfIncludeReason" style="width:16px;height:16px;accent-color:var(--gold);">
+                    <b>Include Reason (optional)</b>
+                </label>
+                <input type="text" id="pdfReason" placeholder="e.g., Annual Report 2025-26, PTA Meeting, Admission List..." maxlength="200"
+                       style="margin-top:6px;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;width:100%;">
+            </div>
+
+            <!-- Columns -->
+            <h3 class="form-section"><i class="fas fa-columns"></i> Columns to Include</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;">
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="sl" checked> Sl. No.</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="studentId" checked> Student ID</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="admissionNumber" checked> Admission No.</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="name" checked> Name</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="fatherName" checked> Father Name</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="motherName"> Mother Name</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="class" checked> Class</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="rollNumber" checked> Roll No.</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="session" checked> Session</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="gender" checked> Gender</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="category" checked> Category</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="stream"> Stream</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="dob"> Date of Birth</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="mobile" checked> Mobile</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="email"> Email</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="aadhar"> Aadhaar</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="apaar"> APAAR ID</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="status"> Status</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="address"> Address</label>
+            </div>
+
+            <!-- Photo/Signature -->
+            <h3 class="form-section"><i class="fas fa-image"></i> Image Columns (Optional)</h3>
+            <div style="display:flex;gap:20px;font-size:13px;">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                    <input type="checkbox" id="pdfIncludePhoto" style="width:16px;height:16px;accent-color:var(--gold);">
+                    Include Photo Column
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                    <input type="checkbox" id="pdfIncludeSignature" style="width:16px;height:16px;accent-color:var(--gold);">
+                    Include Signature Column
+                </label>
+            </div>
+            <p style="font-size:11px;color:var(--text-muted);margin-top:6px;">
+                <i class="fas fa-info-circle"></i> Photos/signature add karne se PDF size badh sakta hai aur generate hone me zyada time lag sakta hai.
+            </p>
+        </form>
+
+        <div style="display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border);padding-top:16px;margin-top:20px;">
+            <button type="button" class="btn btn-outline" onclick="closeModal('listPdfModal')">Cancel</button>
+            <button type="button" class="btn btn-primary" id="btnGeneratePdf" onclick="generateListPdf(event)">
+                <i class="fas fa-file-pdf"></i> Generate PDF
+            </button>
+        </div>
+    </div>
+</div>
 
     <div class="session-bar">
         <div class="session-info">
@@ -2591,6 +2715,7 @@ document.addEventListener("keydown", (e) => {
         closeModal("viewModal");
         closeModal("setSessionModal");
         closeModal("backupModal");
+        closeModal("listPdfModal");
     }
 });
 
@@ -2797,6 +2922,96 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
         showToast("PDF generation failed: " + e.message, "error");
     }
 }
+// ============================================================
+// ✅ PROFESSIONAL LIST PDF
+// ============================================================
+function openListPdfModal() {
+    // Pre-fill from current filters
+    $("#pdfClass").value = state.filters.class || "";
+    $("#pdfSession").value = state.previewSession || state.currentSession || "";
+    $("#pdfStream").value = state.filters.stream || "";
+    $("#pdfGender").value = state.filters.gender || "";
+    $("#pdfCategory").value = state.filters.category || "";
+    $("#pdfStatus").value = state.filters.status || "";
+
+    // Reset title/reason
+    $("#pdfTitle").value = "STUDENT LIST";
+    $("#pdfIncludeReason").checked = false;
+    $("#pdfReason").value = "";
+    $("#pdfIncludePhoto").checked = false;
+    $("#pdfIncludeSignature").checked = false;
+
+    openModal("listPdfModal");
+}
+
+function generateListPdf(event) {
+    if (event) event.preventDefault();
+
+    const btn = $("#btnGeneratePdf");
+    const originalHTML = btn.innerHTML;
+
+    // Collect selected columns
+    const selectedCols = Array.from(document.querySelectorAll(".pdf-col:checked"))
+        .map(cb => cb.value);
+
+    if (selectedCols.length === 0) {
+        showToast("Please select at least one column", "warning");
+        return;
+    }
+
+    // Build query
+    const params = new URLSearchParams();
+    const cls = $("#pdfClass").value;
+    const ses = $("#pdfSession").value.trim();
+    const str = $("#pdfStream").value;
+    const gen = $("#pdfGender").value;
+    const cat = $("#pdfCategory").value;
+    const sts = $("#pdfStatus").value;
+
+    if (cls) params.set("class", cls);
+    if (ses) params.set("session", ses);
+    if (str) params.set("stream", str);
+    if (gen) params.set("gender", gen);
+    if (cat) params.set("category", cat);
+    if (sts) params.set("status", sts);
+
+    const title = $("#pdfTitle").value.trim() || "STUDENT LIST";
+    params.set("title", title);
+    params.set("columns", selectedCols.join(","));
+
+    if ($("#pdfIncludeReason").checked && $("#pdfReason").value.trim()) {
+        params.set("includeReason", "true");
+        params.set("reason", $("#pdfReason").value.trim());
+    }
+    if ($("#pdfIncludePhoto").checked) params.set("includePhoto", "true");
+    if ($("#pdfIncludeSignature").checked) params.set("includeSignature", "true");
+
+    // Sort/order
+    params.set("sortBy", state.sortBy || "class");
+    params.set("order", state.order || "asc");
+
+    // Build URL with token (optional)
+    const token = localStorage.getItem("adminToken") || "";
+    const url = `${STUDENT_API}/list-pdf?${params.toString()}`;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating…';
+    showToast("Generating PDF… Please wait", "info", 5000);
+
+    // Open in new tab — the browser will download/inline view
+    const newWindow = window.open(url, "_blank");
+    if (!newWindow) {
+        showToast("Popup blocked — please allow popups", "warning");
+    }
+
+    setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+        closeModal("listPdfModal");
+        showToast("PDF generated ✅", "success");
+    }, 1500);
+}
+    
 
 // ============================================================
 // INIT
