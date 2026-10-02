@@ -1218,8 +1218,7 @@ function openBackupModal() {
     openModal("backupModal");
     loadBackupList();
 }
-
-async function loadBackupList() {
+    async function loadBackupList() {
     const container = $("#backupListContainer");
     container.innerHTML = `
         <div class="backup-loading">
@@ -1248,15 +1247,27 @@ async function loadBackupList() {
         }
 
         container.innerHTML = data.backups.map(b => {
-            const sizeMB = (b.size / 1024 / 1024).toFixed(2);
-            const date = new Date(b.createdAt).toLocaleString("en-IN", {
-                day: "2-digit", month: "short", year: "numeric",
-                hour: "2-digit", minute: "2-digit"
-            });
+            // ✅ FIX: Support BOTH old (camelCase) and new (DB snake_case) formats
+            const createdRaw = b.created_at || b.createdAt;
+            const date = createdRaw
+                ? new Date(createdRaw).toLocaleString("en-IN", {
+                    day: "2-digit", month: "short", year: "numeric",
+                    hour: "2-digit", minute: "2-digit"
+                  })
+                : "—";
+
+            // ✅ Size: handle both size (bytes) and size_bytes
+            const sizeBytes = Number(b.size_bytes || b.size || 0);
+            const sizeMB = sizeBytes > 0 ? (sizeBytes / 1024 / 1024).toFixed(2) : "0.00";
+
+            // ✅ Student count: handle both stats.students and student_count
+            const studentCount = Number(
+                (b.stats && b.stats.students) || b.student_count || 0
+            );
+
             const typeBadge = b.type === 'auto'
                 ? '<span class="backup-badge auto"><i class="fas fa-robot"></i> AUTO</span>'
                 : '<span class="backup-badge manual"><i class="fas fa-hand-pointer"></i> MANUAL</span>';
-            const studentCount = b.stats?.students || 0;
 
             return `
                 <div class="backup-list-item">
@@ -1296,6 +1307,9 @@ async function loadBackupList() {
     }
 }
 
+
+                    
+            
 async function createManualBackup() {
     const btn = $("#btnCreateBackup");
     const originalHTML = btn.innerHTML;
