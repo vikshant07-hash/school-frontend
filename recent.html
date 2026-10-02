@@ -1,998 +1,1231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Recent Updates - School</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet"/>
-
-    <style>
-        /* ============================================================
-           CSS VARIABLES
-           ============================================================ */
-        :root {
-            --primary: #1a3a6b;
-            --primary-light: #2a5a9b;
-            --primary-dark: #0f2a4b;
-            --gold: #d4a843;
-            --gold-light: #f0d68a;
-            --bg: #f0f2f6;
-            --card-bg: #ffffff;
-            --text-primary: #1a2332;
-            --text-secondary: #3d4a5c;
-            --text-muted: #7a879a;
-            --border: #dce1e8;
-            --shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-            --shadow-hover: 0 6px 28px rgba(26, 58, 107, 0.10);
-            --radius: 8px;
-            --transition: 0.25s ease;
-        }
-
-        /* ============================================================
-           RESET
-           ============================================================ */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* ============================================================
-           MAIN WRAPPER
-           ============================================================ */
-        .container {
-            width: 100%;
-            max-width: 860px;
-            margin: 0 auto;
-        }
-
-        /* ============================================================
-           HEADER
-           ============================================================ */
-        .header {
-            background: var(--primary);
-            padding: 16px 24px;
-            border-radius: var(--radius) var(--radius) 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            border-bottom: 3px solid var(--gold);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .header-icon {
-            width: 38px;
-            height: 38px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            color: var(--gold);
-        }
-
-        .header-text h1 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #fff;
-            letter-spacing: 0.02em;
-        }
-        .header-text h1 span { color: var(--gold); }
-        .header-text p {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-top: 1px;
-        }
-
-        .header-badge {
-            background: var(--gold);
-            color: var(--primary-dark);
-            padding: 3px 16px;
-            border-radius: 30px;
-            font-size: 0.62rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .header-badge .dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #22c55e;
-            animation: pulse-dot 1.8s infinite;
-        }
-
-        /* ============================================================
-           MAIN BOX
-           ============================================================ */
-        .updates-box {
-            background: var(--card-bg);
-            border-radius: 0 0 var(--radius) var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            border: 1px solid var(--border);
-            border-top: none;
-            transition: box-shadow var(--transition);
-        }
-        .updates-box:hover { box-shadow: var(--shadow-hover); }
-
-        /* ============================================================
-           CONTROLS BAR
-           ============================================================ */
-        .controls {
-            padding: 8px 20px;
-            background: #f8fafc;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .controls-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.78rem;
-            color: var(--text-muted);
-        }
-
-        .controls-left .count {
-            background: var(--primary);
-            color: #fff;
-            font-size: 0.62rem;
-            font-weight: 600;
-            padding: 1px 12px;
-            border-radius: 30px;
-            min-width: 24px;
-            text-align: center;
-        }
-
-        .controls-left .status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .controls-left .status .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #22c55e;
-            display: inline-block;
-            transition: background var(--transition);
-        }
-        .controls-left .status .dot.paused { background: #f87171; }
-
-        .controls-right {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 4px 14px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-family: inherit;
-            font-size: 0.7rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all var(--transition);
-            background: #fff;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .btn:hover { background: var(--bg); border-color: #c0c8d4; }
-
-        .btn-pause {
-            background: #fef2f2;
-            border-color: #fecaca;
-            color: #dc2626;
-        }
-        .btn-pause:hover { background: #fecaca; }
-        .btn-pause.active {
-            background: #dcfce7;
-            border-color: #86efac;
-            color: #16a34a;
-        }
-        .btn-pause.active:hover { background: #86efac; }
-
-        .btn-icon { padding: 4px 10px; font-size: 0.7rem; }
-
-        /* ============================================================
-           SCROLLING WRAPPER
-           ============================================================ */
-        .scrolling-wrapper {
-            max-height: 560px;
-            overflow-y: auto;
-            padding: 4px 12px 12px 12px;
-            scroll-behavior: smooth;
-        }
-
-        .scrolling-wrapper::-webkit-scrollbar { width: 5px; }
-        .scrolling-wrapper::-webkit-scrollbar-track { background: #f1f3f6; border-radius: 10px; }
-        .scrolling-wrapper::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .scrolling-wrapper::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        .scrolling-wrapper { scrollbar-width: thin; scrollbar-color: #cbd5e1 #f1f3f6; }
-
-        /* ============================================================
-           UNIQUE TABLE-LAYOUT
-           ============================================================ */
-        .update-item {
-            display: grid;
-            grid-template-columns: 130px 1fr 1fr 110px;
-            gap: 12px;
-            padding: 10px 12px;
-            border-bottom: 1px solid #f0f2f5;
-            align-items: center;
-            transition: background var(--transition);
-            animation: fadeIn 0.3s ease forwards;
-            opacity: 0;
-            font-size: 0.85rem;
-            border-radius: 4px;
-            margin-bottom: 1px;
-        }
-
-        .update-item:last-child { border-bottom: none; }
-
-        .update-item:hover {
-            background: #f8fafc;
-            border-left: 3px solid var(--gold);
-        }
-
-        /* ---- DATE ---- */
-        .update-item .col-date {
-            font-size: 0.78rem;
-            font-weight: 500;
-            color: var(--text-muted);
-            white-space: nowrap;
-        }
-
-        .update-item .col-date .badge-new {
-            display: inline-block;
-            background: #dcfce7;
-            color: #16a34a;
-            font-size: 0.5rem;
-            font-weight: 700;
-            padding: 1px 8px;
-            border-radius: 30px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-left: 4px;
-            vertical-align: middle;
-        }
-
-        /* ---- TITLE ---- */
-        .update-item .col-title {
-            font-weight: 600;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: default;
-        }
-
-        .update-item .col-title .file-icon {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            flex-shrink: 0;
-        }
-
-        /* ---- DESCRIPTION ---- */
-        .update-item .col-desc {
-            color: var(--text-secondary);
-            font-size: 0.82rem;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 1;
-            -webkit-box-orient: vertical;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .update-item .col-desc.expanded {
-            -webkit-line-clamp: unset;
-            display: block;
-        }
-
-        .update-item .col-desc .read-more {
-            background: none;
-            border: none;
-            color: var(--primary-light);
-            font-size: 0.7rem;
-            font-weight: 500;
-            cursor: pointer;
-            padding: 0;
-            font-family: inherit;
-            margin-left: 4px;
-            transition: color var(--transition);
-        }
-        .update-item .col-desc .read-more:hover {
-            color: var(--primary);
-            text-decoration: underline;
-        }
-
-        /* ---- FILE ---- */
-        .update-item .col-file {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            justify-content: flex-end;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            white-space: nowrap;
-        }
-
-        .update-item .col-file .file-btn {
-            background: none;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 2px 10px;
-            font-size: 0.68rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-family: inherit;
-            transition: all var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: #fff;
-        }
-
-        .update-item .col-file .file-btn:hover {
-            background: var(--bg);
-            border-color: var(--primary-light);
-            color: var(--primary);
-        }
-
-        .update-item .col-file .file-btn .size {
-            color: var(--text-muted);
-            font-size: 0.58rem;
-        }
-
-        /* ============================================================
-           LOADING / EMPTY
-           ============================================================ */
-        .loading-state {
-            text-align: center;
-            padding: 48px 20px;
-            color: var(--text-muted);
-        }
-        .loading-state .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid var(--border);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 12px;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 48px 20px;
-            color: var(--text-muted);
-        }
-        .empty-state .icon { font-size: 2.6rem; margin-bottom: 10px; opacity: 0.5; }
-
-        /* ============================================================
-           MODAL
-           ============================================================ */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 1000;
-            background: rgba(15, 23, 42, 0.55);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            animation: fadeIn 0.2s ease;
-            padding: 20px;
-        }
-
-        .modal-content {
-            position: relative;
-            background: var(--card-bg);
-            margin: 6% auto;
-            padding: 28px 32px;
-            width: 100%;
-            max-width: 640px;
-            max-height: 90vh;
-            border-radius: var(--radius);
-            overflow-y: auto;
-            animation: scaleIn 0.25s ease;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-            border: 1px solid var(--border);
-        }
-
-        .modal-content .close {
-            position: absolute;
-            top: 14px;
-            right: 18px;
-            font-size: 1.6rem;
-            font-weight: 300;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: color var(--transition);
-            background: none;
-            border: none;
-            line-height: 1;
-        }
-        .modal-content .close:hover { color: var(--text-primary); }
-
-        .modal-content h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 14px;
-            color: var(--text-primary);
-            padding-right: 32px;
-        }
-
-        .modal-content .file-preview { text-align: center; padding: 8px 0; }
-        .modal-content img { max-width: 100%; max-height: 55vh; border-radius: 4px; object-fit: contain; }
-        .modal-content video,
-        .modal-content audio { max-width: 100%; border-radius: 4px; }
-
-        .modal-content .file-actions {
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .modal-content .file-actions a {
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: color var(--transition);
-        }
-        .modal-content .file-actions a:hover {
-            color: var(--primary-dark);
-            text-decoration: underline;
-        }
-
-        /* ============================================================
-           ANIMATIONS
-           ============================================================ */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.8); }
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.96) translateY(8px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        /* ============================================================
-           RESPONSIVE — MOBILE FIRST
-           ============================================================ */
-        @media (max-width: 768px) {
-            .update-item {
-                grid-template-columns: 1fr;
-                gap: 3px;
-                padding: 12px 14px;
-                border-left: 3px solid transparent;
-            }
-
-            .update-item:hover {
-                border-left: 3px solid var(--gold);
-            }
-
-            .update-item .col-date {
-                font-size: 0.7rem;
-                order: 1;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                flex-wrap: wrap;
-            }
-
-            .update-item .col-title {
-                font-size: 0.92rem;
-                order: 2;
-            }
-
-            .update-item .col-desc {
-                font-size: 0.84rem;
-                -webkit-line-clamp: 2;
-                order: 3;
-                padding: 2px 0;
-            }
-
-            .update-item .col-file {
-                justify-content: flex-start;
-                order: 4;
-                margin-top: 2px;
-            }
-
-            .update-item .col-file .file-btn {
-                font-size: 0.68rem;
-                padding: 2px 12px;
-            }
-
-            .controls {
-                padding: 8px 14px;
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .controls-left {
-                justify-content: space-between;
-            }
-
-            .controls-right {
-                justify-content: flex-start;
-            }
-
-            .scrolling-wrapper {
-                max-height: 440px;
-                padding: 4px 8px 10px 8px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body { padding: 10px; }
-
-            .header {
-                padding: 12px 14px;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .header-text h1 { font-size: 0.95rem; }
-            .header-text p { font-size: 0.7rem; }
-
-            .controls-left { font-size: 0.7rem; }
-            .controls-right .btn { font-size: 0.6rem; padding: 3px 10px; }
-
-            .update-item {
-                padding: 10px 12px;
-                gap: 2px;
-            }
-
-            .update-item .col-title { font-size: 0.85rem; }
-            .update-item .col-desc { font-size: 0.78rem; }
-            .update-item .col-date { font-size: 0.65rem; }
-
-            .modal-content { padding: 16px; margin: 10% auto; }
-
-            .header-badge { font-size: 0.55rem; padding: 2px 12px; }
-        }
-
-        @media (max-width: 360px) {
-            .update-item .col-title { font-size: 0.78rem; }
-            .update-item .col-desc { font-size: 0.72rem; }
-            .update-item .col-file .file-btn { font-size: 0.6rem; padding: 1px 8px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Check Result — GSSS Shilla</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; scroll-behavior: smooth; }
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(135deg, #0f2942 0%, #1e4a73 50%, #059669 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #0f172a;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding: 0;
+}
+button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+button { cursor: pointer; border: none; background: none; }
+h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0.02em; }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.page-header {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px 24px;
+    color: #ffffff;
+}
+.header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.school-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.school-logo {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #ffffff, #f0f5fb);
+    color: #0f2942;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px;
+    letter-spacing: -0.5px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+}
+.school-info h1 {
+    font-size: 18px;
+    color: #ffffff;
+    margin-bottom: 2px;
+    font-weight: 700;
+}
+.school-info p {
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.school-info p::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: #f59e0b;
+    border-radius: 50%;
+    display: inline-block;
+}
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+/* ============================================================
+   MAIN CONTAINER
+   ============================================================ */
+.page-main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+    text-align: center;
+    color: #ffffff;
+    margin-bottom: 32px;
+    padding: 0 16px;
+}
+.hero-icon {
+    width: 72px; height: 72px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #f59e0b, #059669);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    margin-bottom: 16px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+.hero h2 {
+    font-size: 28px;
+    color: #ffffff;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+}
+.hero p {
+    font-size: 14.5px;
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* ============================================================
+   SEARCH CARD
+   ============================================================ */
+.search-card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+    padding: 32px;
+    margin-bottom: 28px;
+}
+.search-card h3 {
+    font-size: 17px;
+    color: #0f2942;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.search-card h3 i {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #0f2942, #1e4a73);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+.search-sub {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 24px;
+    padding-left: 46px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.form-group label .required { color: #dc2626; margin-left: 3px; }
+.form-group label .hint {
+    text-transform: none;
+    letter-spacing: 0;
+    color: #94a3b8;
+    font-weight: 500;
+    font-size: 11px;
+    margin-left: 4px;
+}
+
+.input-wrap {
+    position: relative;
+}
+.input-wrap i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #059669;
+    font-size: 14px;
+    pointer-events: none;
+}
+.form-control {
+    width: 100%;
+    padding: 13px 16px 13px 42px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: #ffffff;
+    font-size: 14.5px;
+    transition: all 0.18s;
+    color: #0f2942;
+    font-weight: 500;
+}
+.form-control::placeholder { color: #94a3b8; font-weight: 400; }
+.form-control:focus {
+    outline: none;
+    border-color: #059669;
+    box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.12);
+}
+
+.search-btn {
+    width: 100%;
+    padding: 15px 24px;
+    background: linear-gradient(135deg, #0f2942, #1e4a73);
+    color: #ffffff;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 6px 18px rgba(15, 41, 66, 0.28);
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+}
+.search-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #1e4a73, #2563eb);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(15, 41, 66, 0.35);
+}
+.search-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ============================================================
+   RESULT AREA
+   ============================================================ */
+.result-area { min-height: 200px; }
+
+/* Student Header Card */
+.student-hero {
+    background: linear-gradient(135deg, #0f2942 0%, #1e4a73 100%);
+    border-radius: 20px;
+    padding: 28px;
+    color: #ffffff;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    box-shadow: 0 20px 40px rgba(15, 41, 66, 0.35);
+    position: relative;
+    overflow: hidden;
+}
+.student-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -50%;
+    width: 100%; height: 200%;
+    background: radial-gradient(circle, rgba(5, 150, 105, 0.15) 0%, transparent 60%);
+    pointer-events: none;
+}
+.student-photo-hero {
+    width: 110px; height: 130px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 3px solid rgba(255, 255, 255, 0.25);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 36px;
+    position: relative;
+    z-index: 1;
+}
+.student-photo-hero img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+}
+.student-details {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    z-index: 1;
+}
+.student-details h3 {
+    font-size: 24px;
+    color: #ffffff;
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+}
+.student-id-line {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+.student-id-line .dot {
+    width: 4px; height: 4px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+}
+.student-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+.meta-box {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 10px 14px;
+    backdrop-filter: blur(6px);
+}
+.meta-box .label {
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, 0.65);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    margin-bottom: 3px;
+}
+.meta-box .value {
+    font-size: 14px;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* Result Card */
+.result-card {
+    background: #ffffff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    margin-bottom: 22px;
+    border: 1.5px solid #e2e8f0;
+}
+.result-card-head {
+    background: linear-gradient(135deg, #f8fafc, #f0f5fb);
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #e2e8f0;
+}
+.result-card-head h4 {
+    font-size: 17px;
+    color: #0f2942;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+.result-card-head h4 i {
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+}
+.result-card-head .sub {
+    font-size: 12.5px;
+    color: #64748b;
+    font-weight: 500;
+    padding-left: 42px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 30px;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+}
+.badge i { font-size: 11px; }
+.badge-pass     { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
+.badge-fail     { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; }
+.badge-absent   { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
+.badge-withheld { background: linear-gradient(135deg, #ede9fe, #ddd6fe); color: #5b21b6; }
+
+/* Summary Grid */
+.result-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 14px;
+    padding: 22px 24px;
+    background: #fafbfd;
+    border-bottom: 1px solid #f1f5f9;
+}
+.summary-box {
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px 12px;
+    text-align: center;
+    transition: all 0.2s;
+}
+.summary-box:hover {
+    border-color: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(5, 150, 105, 0.12);
+}
+.summary-box .label {
+    font-size: 10.5px;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+}
+.summary-box .value {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f2942;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+.summary-box .value small {
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: 600;
+}
+.summary-box.grade-good .value { color: #059669; }
+.summary-box.grade-mid  .value { color: #d97706; }
+.summary-box.grade-bad  .value { color: #dc2626; }
+
+/* Marks Table */
+.marks-table-wrap {
+    padding: 0 24px 24px;
+    overflow-x: auto;
+}
+.marks-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13.5px;
+}
+.marks-table thead th {
+    background: #f8fafc;
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #475569;
+    font-weight: 700;
+    border-bottom: 2px solid #e2e8f0;
+    white-space: nowrap;
+}
+.marks-table tbody td {
+    padding: 13px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    font-weight: 500;
+}
+.marks-table tbody tr:last-child td { border-bottom: none; }
+.marks-table tbody tr:hover { background: #fafbfd; }
+.marks-table .subject-name {
+    font-weight: 700;
+    color: #0f2942;
+}
+.marks-table .fail-row {
+    background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%);
+}
+.marks-table .fail-row td { color: #991b1b; }
+.marks-table .fail-row .subject-name { color: #dc2626; }
+
+.mini-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    font-size: 10.5px;
+    font-weight: 700;
+    border-radius: 20px;
+    background: #fef3c7;
+    color: #92400e;
+}
+.mini-badge i { font-size: 9px; }
+
+/* Failed Warning */
+.failed-warning {
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    border-top: 1.5px solid #fecaca;
+    font-size: 13px;
+    color: #991b1b;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-weight: 500;
+}
+.failed-warning i {
+    color: #dc2626;
+    font-size: 15px;
+    margin-top: 1px;
+}
+
+/* Result Actions */
+.result-actions {
+    display: flex;
+    gap: 10px;
+    padding: 16px 24px;
+    background: #fafbfd;
+    border-top: 1px solid #f1f5f9;
+    flex-wrap: wrap;
+}
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: 1.5px solid transparent;
+}
+.action-btn-primary {
+    background: linear-gradient(135deg, #0f2942, #1e4a73);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(15, 41, 66, 0.2);
+}
+.action-btn-primary:hover {
+    background: linear-gradient(135deg, #1e4a73, #2563eb);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(15, 41, 66, 0.3);
+}
+.action-btn-outline {
+    background: #ffffff;
+    color: #334155;
+    border-color: #e2e8f0;
+}
+.action-btn-outline:hover {
+    background: #f8fafc;
+    border-color: #059669;
+    color: #059669;
+    transform: translateY(-1px);
+}
+
+/* Empty / Loading / Error states */
+.state-box {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 60px 32px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+.state-box .state-icon {
+    width: 80px; height: 80px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #e0e9f5, #d1fae5);
+    color: #059669;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    margin-bottom: 18px;
+}
+.state-box h3 {
+    font-size: 18px;
+    color: #0f2942;
+    margin-bottom: 8px;
+}
+.state-box p {
+    font-size: 13.5px;
+    color: #64748b;
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+.state-box.error .state-icon {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #dc2626;
+}
+.state-box.warning .state-icon {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #d97706;
+}
+
+.spinner {
+    width: 44px; height: 44px;
+    border: 4px solid #e2e8f0;
+    border-top-color: #059669;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   INFO SECTION (bottom)
+   ============================================================ */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 32px;
+}
+.info-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    padding: 20px;
+    color: #ffffff;
+}
+.info-card .info-icon {
+    width: 42px; height: 42px;
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.15);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    margin-bottom: 12px;
+    color: #fbbf24;
+}
+.info-card h4 {
+    font-size: 14px;
+    color: #ffffff;
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+.info-card p {
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+}
+
+/* ============================================================
+   PRINT
+   ============================================================ */
+@media print {
+    body { background: #ffffff !important; padding: 0; }
+    .page-header, .hero, .search-card, .result-actions, .info-grid, .back-btn { display: none !important; }
+    .page-main { padding: 0; max-width: 100%; }
+    .student-hero {
+        background: #0f2942 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        box-shadow: none;
+        page-break-after: avoid;
+    }
+    .result-card {
+        box-shadow: none;
+        border: 1px solid #cbd5e1;
+        page-break-inside: avoid;
+    }
+    .marks-table { font-size: 11px; }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+    .page-header { padding: 16px 18px; }
+    .school-info h1 { font-size: 15px; }
+    .school-info p { font-size: 11.5px; }
+    .school-logo { width: 44px; height: 44px; font-size: 14px; }
+    .back-btn { padding: 8px 14px; font-size: 12px; }
+    .page-main { padding: 22px 16px 40px; }
+    .hero h2 { font-size: 22px; }
+    .hero p { font-size: 13px; }
+    .hero-icon { width: 60px; height: 60px; font-size: 24px; }
+    .search-card { padding: 22px; border-radius: 16px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .student-hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 24px 20px;
+    }
+    .student-photo-hero { width: 90px; height: 105px; }
+    .student-details h3 { font-size: 20px; }
+    .student-id-line { justify-content: center; }
+    .student-meta-grid { grid-template-columns: 1fr 1fr; }
+    .result-card-head { padding: 16px 18px; }
+    .result-summary { padding: 18px; gap: 10px; grid-template-columns: repeat(2, 1fr); }
+    .summary-box .value { font-size: 18px; }
+    .marks-table-wrap { padding: 0 12px 18px; }
+    .marks-table { font-size: 12px; }
+    .marks-table thead th, .marks-table tbody td { padding: 10px 8px; }
+    .result-actions { padding: 14px 18px; }
+    .action-btn { padding: 10px 16px; font-size: 12.5px; flex: 1; justify-content: center; }
+}
+
+/* ============================================================
+   FADE-IN
+   ============================================================ */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 0.35s ease; }
+</style>
 </head>
 <body>
 
-    <div class="container">
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="page-header">
+    <div class="header-inner">
+        <div class="school-brand">
+            <div class="school-logo">GSS</div>
+            <div class="school-info">
+                <h1>GSSS Shilla</h1>
+                <p>Result Verification Portal</p>
+            </div>
+        </div>
+        <a href="/" class="back-btn">
+            <i class="fa-solid fa-arrow-left"></i> Back to Home
+        </a>
+    </div>
+</header>
 
-        <!-- ===== HEADER ===== -->
-        <header class="header">
-            <div class="header-left">
-                <div class="header-icon">🏛️</div>
-                <div class="header-text">
-                    <h1>📢 <span>Recent</span> Updates</h1>
-                    <p>Govt. Sr. Sec. School, Shilla</p>
+<!-- ============================================================
+     MAIN
+     ============================================================ -->
+<main class="page-main">
+
+    <div class="hero">
+        <div class="hero-icon">
+            <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <h2>Check Your Result</h2>
+        <p>Enter your Roll Number and Date of Birth to view your examination results.</p>
+    </div>
+
+    <!-- Search Form -->
+    <div class="search-card">
+        <h3><i class="fa-solid fa-magnifying-glass"></i> Result Lookup</h3>
+        <p class="search-sub">All fields marked with <span style="color:#dc2626;">*</span> are required</p>
+
+        <form id="lookupForm" onsubmit="event.preventDefault(); checkResult();">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Roll Number <span class="required">*</span></label>
+                    <div class="input-wrap">
+                        <i class="fa-solid fa-hashtag"></i>
+                        <input type="text" class="form-control" id="rollNumber"
+                               placeholder="e.g. 101" autocomplete="off" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth <span class="required">*</span></label>
+                    <div class="input-wrap">
+                        <i class="fa-solid fa-calendar"></i>
+                        <input type="date" class="form-control" id="dob"
+                               placeholder="YYYY-MM-DD" required>
+                    </div>
                 </div>
             </div>
-            <div class="header-badge">
-                <span class="dot"></span>
-                <span>Live</span>
-            </div>
-        </header>
-
-        <!-- ===== UPDATES BOX ===== -->
-        <section class="updates-box">
-
-            <!-- Controls -->
-            <div class="controls">
-                <div class="controls-left">
-                    <span class="count" id="updateCount">0</span>
-                    <span class="status">
-                        <span class="dot" id="statusDot"></span>
-                        <span id="statusText">Loading...</span>
-                    </span>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Class <span class="hint">(optional)</span></label>
+                    <div class="input-wrap">
+                        <i class="fa-solid fa-school"></i>
+                        <select class="form-control" id="classFilter" style="padding-left: 42px;">
+                            <option value="">All Classes</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="controls-right">
-                    <button class="btn btn-pause" id="pauseBtn" onclick="togglePause()">
-                        <span id="pauseIcon">⏸️</span> <span id="pauseLabel">Pause</span>
-                    </button>
-                    <button class="btn btn-icon" onclick="scrollTop()" title="Top">⬆</button>
-                    <button class="btn btn-icon" onclick="scrollBottom()" title="Bottom">⬇</button>
-                </div>
-            </div>
-
-            <!-- Scrolling Wrapper -->
-            <div class="scrolling-wrapper" id="scrollingWrapper">
-                <div id="updatesContainer">
-                    <div class="loading-state">
-                        <div class="spinner"></div>
-                        <p>Loading updates...</p>
+                <div class="form-group">
+                    <label>Session <span class="hint">(optional)</span></label>
+                    <div class="input-wrap">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <input type="text" class="form-control" id="sessionFilter"
+                               placeholder="e.g. 2026-27" autocomplete="off">
                     </div>
                 </div>
             </div>
 
-        </section>
-
+            <button type="submit" class="search-btn" id="searchBtn">
+                <i class="fa-solid fa-magnifying-glass"></i> Check Result
+            </button>
+        </form>
     </div>
 
-    <!-- ===== FILE MODAL ===== -->
-    <div id="fileModal" class="modal">
-        <div class="modal-content">
-            <button class="close" onclick="closeModal()">&times;</button>
-            <div id="modalBody"></div>
+    <!-- Result Area -->
+    <div class="result-area" id="resultArea">
+        <div class="state-box">
+            <div class="state-icon">
+                <i class="fa-solid fa-user-graduate"></i>
+            </div>
+            <h3>Enter your details to begin</h3>
+            <p>Your results will appear here after verification</p>
         </div>
     </div>
 
-    <script>
-        // ============================================================
-        // CONFIG
-        // ============================================================
-        const API_URL = 'https://gsssshilla.onrender.com';
-        const SCROLL_STEP = 0.65;
-        const SCROLL_INTERVAL = 40;
+    <!-- Info Cards -->
+    <div class="info-grid">
+        <div class="info-card">
+            <div class="info-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <h4>Secure &amp; Verified</h4>
+            <p>All results are securely stored and verified by the school administration</p>
+        </div>
+        <div class="info-card">
+            <div class="info-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <h4>Permanent Record</h4>
+            <p>Your results remain accessible throughout your academic journey</p>
+        </div>
+        <div class="info-card">
+            <div class="info-icon"><i class="fa-solid fa-circle-question"></i></div>
+            <h4>Need Help?</h4>
+            <p>Contact the school office if you cannot find your result</p>
+        </div>
+    </div>
 
-        // ============================================================
-        // STATE
-        // ============================================================
-        let isPaused = false;
-        let timer = null;
-        let updates = [];
-        let pos = 0;
+</main>
 
-        // ============================================================
-        // DOM REFS
-        // ============================================================
-        const wrapper = document.getElementById('scrollingWrapper');
-        const container = document.getElementById('updatesContainer');
-        const pauseBtn = document.getElementById('pauseBtn');
-        const pauseIcon = document.getElementById('pauseIcon');
-        const pauseLabel = document.getElementById('pauseLabel');
-        const statusDot = document.getElementById('statusDot');
-        const statusText = document.getElementById('statusText');
-        const updateCount = document.getElementById('updateCount');
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const API_BASE = "https://gsssshilla.onrender.com/api/results";
 
-        // ============================================================
-        // FETCH UPDATES
-        // ============================================================
-        async function loadUpdates() {
-            try {
-                const res = await fetch(`${API_URL}/recent-public?t=${Date.now()}`);
-                const data = await res.json();
+// ============================================================
+// HELPERS
+// ============================================================
+function escapeHtml(str) {
+    if (str === null || str === undefined) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 
-                if (data.success && data.data) {
-                    updates = data.data;
-                    updateCount.textContent = updates.length;
-                    render(updates);
-                    startScroll();
-                    statusText.textContent = 'Scrolling';
-                    statusDot.className = 'dot';
-                } else {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="icon">📭</div>
-                            <p>No updates available</p>
-                        </div>
-                    `;
-                    statusText.textContent = 'No updates';
-                    statusDot.className = 'dot paused';
-                }
-            } catch (err) {
-                console.error('Load error:', err);
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon">⚠️</div>
-                        <p>Failed to load updates</p>
-                        <p style="font-size:0.85rem;color:var(--text-muted);">${err.message}</p>
-                        <button onclick="loadUpdates()" style="margin-top:12px;padding:6px 20px;background:var(--primary);color:#fff;border:none;border-radius:4px;font-family:inherit;font-weight:500;cursor:pointer;">Retry</button>
-                    </div>
-                `;
-                statusText.textContent = 'Error';
-                statusDot.className = 'dot paused';
-            }
-        }
+function formatDate(d) {
+    if (!d) return "—";
+    try {
+        const dt = new Date(d);
+        if (isNaN(dt.getTime())) return String(d);
+        return dt.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+    } catch { return String(d); }
+}
 
-        // ============================================================
-        // RENDER — TABLE LAYOUT
-        // ============================================================
-        function render(items) {
-            if (!items || items.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon">📭</div>
-                        <p>No updates available</p>
-                    </div>
-                `;
-                return;
-            }
+function formatMark(v) {
+    if (v === null || v === undefined || v === "") return "—";
+    const n = parseFloat(v);
+    if (isNaN(n)) return "—";
+    return Number.isInteger(n) ? n : n.toFixed(2);
+}
 
-            let html = '';
-            items.forEach((item, i) => {
-                const isNew = item.is_new === 1 || item.is_new_dynamic === 1;
-                // ✅ DATE — full format, not hours ago
-                const date = formatDateFull(item.created_at);
-                const hasFile = !!item.file_url;
-                const size = item.file_size ? formatSize(item.file_size) : '';
-                const icon = getFileIcon(item.file_type);
-                const desc = item.description || '';
-                const isLong = desc.length > 100;
+function getGradeClass(percentage) {
+    const p = parseFloat(percentage) || 0;
+    if (p >= 70) return "grade-good";
+    if (p >= 40) return "grade-mid";
+    return "grade-bad";
+}
 
-                html += `
-                    <div class="update-item" style="animation-delay: ${i * 0.04}s">
-                        <!-- DATE -->
-                        <div class="col-date">
-                            ${date}
-                            ${isNew ? '<span class="badge-new">New</span>' : ''}
-                        </div>
+function getResultBadgeClass(status) {
+    if (!status) return "badge-fail";
+    if (status === "Pass") return "badge-pass";
+    if (status === "Absent") return "badge-absent";
+    if (status === "Withheld") return "badge-withheld";
+    return "badge-fail";
+}
 
-                        <!-- TITLE -->
-                        <div class="col-title">
-                            ${hasFile ? `<span class="file-icon">${icon}</span>` : ''}
-                            ${escapeHtml(item.title)}
-                        </div>
+function getResultIcon(status) {
+    if (status === "Pass") return "fa-circle-check";
+    if (status === "Absent") return "fa-user-slash";
+    if (status === "Withheld") return "fa-ban";
+    return "fa-circle-xmark";
+}
 
-                        <!-- DESCRIPTION -->
-                        <div class="col-desc" id="desc-${item.id}" onclick="toggleReadMore(${item.id})">
-                            ${escapeHtml(desc.substring(0, 100))}${isLong ? '...' : ''}
-                            ${isLong ? `<span class="read-more">Read more</span>` : ''}
-                        </div>
-
-                        <!-- FILE -->
-                        <div class="col-file">
-                            ${hasFile ? `
-                                <button class="file-btn" onclick="openFile('${item.id}','${item.file_url}','${item.file_type}','${escapeHtml(item.title)}')">
-                                    ${icon} ${size ? `<span class="size">${size}</span>` : '📎'}
-                                </button>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-        }
-
-        // ============================================================
-        // READ MORE
-        // ============================================================
-        function toggleReadMore(id) {
-            const el = document.getElementById(`desc-${id}`);
-            if (!el) return;
-
-            const full = updates.find(u => u.id === id)?.description || '';
-            const isExpanded = el.classList.contains('expanded');
-
-            if (isExpanded) {
-                el.classList.remove('expanded');
-                el.innerHTML = escapeHtml(full.substring(0, 100)) + '... <span class="read-more">Read more</span>';
-            } else {
-                el.classList.add('expanded');
-                el.innerHTML = escapeHtml(full) + ' <span class="read-more">Read less</span>';
-            }
-        }
-
-        // ============================================================
-        // SCROLL
-        // ============================================================
-        function startScroll() {
-            stopScroll();
-            if (wrapper.scrollHeight <= wrapper.clientHeight) {
-                statusText.textContent = 'All visible';
-                return;
-            }
-
-            isPaused = false;
-            updateUI();
-            pos = 0;
-
-            timer = setInterval(() => {
-                if (!isPaused) {
-                    pos += SCROLL_STEP;
-                    if (pos >= wrapper.scrollHeight - wrapper.clientHeight) {
-                        pos = 0;
-                    }
-                    wrapper.scrollTop = pos;
-                }
-            }, SCROLL_INTERVAL);
-        }
-
-        function stopScroll() {
-            if (timer) { clearInterval(timer);
-                timer = null; }
-        }
-
-        // ============================================================
-        // PAUSE
-        // ============================================================
-        function togglePause() {
-            isPaused = !isPaused;
-            updateUI();
-
-            if (!isPaused && wrapper.scrollTop + wrapper.clientHeight >= wrapper.scrollHeight - 2) {
-                pos = 0;
-                wrapper.scrollTop = 0;
-            }
-        }
-
-        function updateUI() {
-            if (isPaused) {
-                pauseIcon.textContent = '▶️';
-                pauseLabel.textContent = 'Resume';
-                pauseBtn.classList.add('active');
-                statusText.textContent = 'Paused';
-                statusDot.className = 'dot paused';
-            } else {
-                pauseIcon.textContent = '⏸️';
-                pauseLabel.textContent = 'Pause';
-                pauseBtn.classList.remove('active');
-                statusText.textContent = 'Scrolling';
-                statusDot.className = 'dot';
-            }
-        }
-
-        // ============================================================
-        // SCROLL CONTROLS
-        // ============================================================
-        function scrollTop() {
-            wrapper.scrollTo({ top: 0, behavior: 'smooth' });
-            pos = 0;
-        }
-
-        function scrollBottom() {
-            wrapper.scrollTo({ top: wrapper.scrollHeight, behavior: 'smooth' });
-            pos = wrapper.scrollHeight - wrapper.clientHeight;
-        }
-
-        // ============================================================
-        // MODAL
-        // ============================================================
-        function openFile(id, url, type, title) {
-            const modal = document.getElementById('fileModal');
-            const body = document.getElementById('modalBody');
-
-            if (!url) {
-                body.innerHTML = `
-                    <div style="text-align:center;padding:20px 0;">
-                        <div style="font-size:2.8rem;margin-bottom:6px;">📄</div>
-                        <h3>${title}</h3>
-                        <p style="color:var(--text-muted);">No attachment</p>
-                    </div>
-                `;
-                modal.style.display = 'block';
-                return;
-            }
-
-            let preview = '';
-            if (type?.startsWith('image/')) {
-                preview = `<img src="${url}" alt="${title}" style="max-width:100%;max-height:55vh;border-radius:4px;" />`;
-            } else if (type?.startsWith('video/')) {
-                preview = `<video controls style="max-width:100%;max-height:55vh;border-radius:4px;"><source src="${url}" type="${type}"></video>`;
-            } else if (type?.startsWith('audio/')) {
-                preview = `<audio controls style="width:100%;"><source src="${url}" type="${type}"></audio>`;
-            } else if (type === 'application/pdf') {
-                preview = `<iframe src="${url}" style="width:100%;height:420px;border:none;border-radius:4px;"></iframe>`;
-            } else {
-                preview = `
-                    <div style="text-align:center;padding:16px 0;">
-                        <div style="font-size:3rem;margin-bottom:6px;">📎</div>
-                        <p style="color:var(--text-secondary);margin-bottom:8px;">${type || 'File'}</p>
-                        <a href="${url}" download style="padding:6px 20px;background:var(--primary);color:#fff;border-radius:4px;text-decoration:none;font-weight:500;">Download</a>
-                    </div>
-                `;
-            }
-
-            body.innerHTML = `
-                <h3>${title}</h3>
-                <div class="file-preview">${preview}</div>
-                <div class="file-actions">
-                    <a href="${url}" target="_blank">🔗 Open</a>
-                    <a href="${url}" download>📥 Download</a>
-                </div>
-            `;
-
-            modal.style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('fileModal').style.display = 'none';
-        }
-
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
-        window.addEventListener('click', (e) => { if (e.target === document.getElementById('fileModal')) closeModal(); });
-
-        // ============================================================
-        // HELPERS
-        // ============================================================
-        // ✅ FULL DATE FORMAT — not hours ago
-        function formatDateFull(ts) {
-            if (!ts) return 'N/A';
-            const d = new Date(ts);
-            return d.toLocaleString('en-IN', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            });
-        }
-
-        function formatSize(bytes) {
-            if (!bytes) return '';
-            if (bytes < 1024) return bytes + ' B';
-            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-            return (bytes / 1048576).toFixed(1) + ' MB';
-        }
-
-        function getFileIcon(mime) {
-            if (!mime) return '📄';
-            if (mime.startsWith('image/')) return '🖼️';
-            if (mime === 'application/pdf') return '📄';
-            if (mime.startsWith('audio/')) return '🎵';
-            if (mime.startsWith('video/')) return '🎬';
-            return '📎';
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // ============================================================
-        // AUTO REFRESH (5 min)
-        // ============================================================
-        setInterval(loadUpdates, 300000);
-
-        // ============================================================
-        // INIT
-        // ============================================================
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('🏛️ Govt-Style Updates Loaded');
-            console.log('📡 API:', API_URL);
-            loadUpdates();
+// ============================================================
+// LOAD CLASSES (for dropdown)
+// ============================================================
+async function loadClasses() {
+    try {
+        const res = await fetch(`${API_BASE}/public/classes-list`);
+        if (!res.ok) return;
+        const json = await res.json();
+        const classes = json.data || [];
+        const sel = document.getElementById("classFilter");
+        classes.forEach(c => {
+            const opt = document.createElement("option");
+            opt.value = c.class_name;
+            opt.textContent = c.name || c.class_name;
+            sel.appendChild(opt);
         });
-    </script>
+    } catch (e) {
+        console.warn("Class load failed:", e);
+    }
+}
 
+// ============================================================
+// CHECK RESULT
+// ============================================================
+async function checkResult() {
+    const rollNumber = document.getElementById("rollNumber").value.trim();
+    const dob = document.getElementById("dob").value;
+    const cls = document.getElementById("classFilter").value;
+    const session = document.getElementById("sessionFilter").value.trim();
+
+    if (!rollNumber || !dob) {
+        showErrorState("Missing Information", "Please enter both Roll Number and Date of Birth.");
+        return;
+    }
+
+    const area = document.getElementById("resultArea");
+    const btn = document.getElementById("searchBtn");
+
+    area.innerHTML = `
+        <div class="state-box">
+            <div class="spinner"></div>
+            <h3>Searching for your result...</h3>
+            <p>Please wait a moment</p>
+        </div>
+    `;
+    btn.disabled = true;
+
+    try {
+        const body = { roll_number: rollNumber, dob };
+        if (cls) body.class = cls;
+        if (session) body.session = session;
+
+        const res = await fetch(`${API_BASE}/public/lookup`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify(body)
+        });
+
+        const json = await res.json();
+
+        if (!res.ok || !json.success) {
+            showErrorState(
+                json.message || "No result found",
+                "Please verify your Roll Number and Date of Birth, then try again.",
+                res.status === 404
+            );
+            return;
+        }
+
+        renderResults(json.data);
+    } catch (err) {
+        showErrorState(
+            "Connection Error",
+            "Unable to connect to the server. Please check your internet and try again."
+        );
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+// ============================================================
+// SHOW ERROR STATE
+// ============================================================
+function showErrorState(title, message, isNotFound = false) {
+    const area = document.getElementById("resultArea");
+    area.innerHTML = `
+        <div class="state-box ${isNotFound ? 'warning' : 'error'} fade-in">
+            <div class="state-icon">
+                <i class="fa-solid ${isNotFound ? 'fa-magnifying-glass' : 'fa-circle-xmark'}"></i>
+            </div>
+            <h3>${escapeHtml(title)}</h3>
+            <p>${escapeHtml(message)}</p>
+        </div>
+    `;
+}
+
+// ============================================================
+// RENDER RESULTS
+// ============================================================
+function renderResults(data) {
+    const { student, results, total_results } = data;
+    const area = document.getElementById("resultArea");
+
+    if (!results || results.length === 0) {
+        area.innerHTML = `
+            ${renderStudentHero(student)}
+            <div class="state-box warning fade-in" style="margin-top: 22px;">
+                <div class="state-icon">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                </div>
+                <h3>No results published yet</h3>
+                <p>Your results will appear here once they are published by the school. Please check back later.</p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = renderStudentHero(student);
+
+    // Sort: latest session first, latest exam first
+    const sorted = [...results].sort((a, b) => {
+        if ((b.session_name || "") !== (a.session_name || "")) {
+            return (b.session_name || "").localeCompare(a.session_name || "");
+        }
+        return (b.result_id || 0) - (a.result_id || 0);
+    });
+
+    sorted.forEach(r => {
+        html += renderResultCard(r);
+    });
+
+    area.innerHTML = `<div class="fade-in">${html}</div>`;
+}
+
+// ============================================================
+// STUDENT HERO
+// ============================================================
+function renderStudentHero(student) {
+    const photoHtml = student.photo
+        ? `<img src="${escapeHtml(student.photo)}" alt="Photo" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-user\\'></i>';" />`
+        : `<i class="fa-solid fa-user"></i>`;
+
+    return `
+        <div class="student-hero fade-in">
+            <div class="student-photo-hero">${photoHtml}</div>
+            <div class="student-details">
+                <h3>${escapeHtml(student.name || "—")}</h3>
+                <div class="student-id-line">
+                    <span><i class="fa-solid fa-id-card"></i> ${escapeHtml(student.student_id || "—")}</span>
+                    <span class="dot"></span>
+                    <span><i class="fa-solid fa-hashtag"></i> Roll ${escapeHtml(student.roll_number || "—")}</span>
+                    <span class="dot"></span>
+                    <span><i class="fa-solid fa-school"></i> Class ${escapeHtml(student.class || "—")}</span>
+                </div>
+                <div class="student-meta-grid">
+                    ${student.father_name ? `
+                        <div class="meta-box">
+                            <div class="label">Father's Name</div>
+                            <div class="value">${escapeHtml(student.father_name)}</div>
+                        </div>` : ""}
+                    ${student.dob ? `
+                        <div class="meta-box">
+                            <div class="label">Date of Birth</div>
+                            <div class="value">${formatDate(student.dob)}</div>
+                        </div>` : ""}
+                    ${student.section ? `
+                        <div class="meta-box">
+                            <div class="label">Section</div>
+                            <div class="value">${escapeHtml(student.section)}</div>
+                        </div>` : ""}
+                    ${student.stream ? `
+                        <div class="meta-box">
+                            <div class="label">Stream</div>
+                            <div class="value">${escapeHtml(student.stream)}</div>
+                        </div>` : ""}
+                    ${student.session ? `
+                        <div class="meta-box">
+                            <div class="label">Session</div>
+                            <div class="value">${escapeHtml(student.session)}</div>
+                        </div>` : ""}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// ============================================================
+// RESULT CARD
+// ============================================================
+function renderResultCard(r) {
+    const isPass = r.result_status === "Pass";
+    const failedSubjects = Array.isArray(r.failed_subjects) ? r.failed_subjects : [];
+    const subjects = Array.isArray(r.subject_wise_marks) ? r.subject_wise_marks : [];
+    const badgeClass = getResultBadgeClass(r.result_status);
+    const badgeIcon = getResultIcon(r.result_status);
+    const gradeClass = getGradeClass(r.percentage);
+
+    return `
+        <div class="result-card">
+            <div class="result-card-head">
+                <div>
+                    <h4><i class="fa-solid fa-file-pen"></i> ${escapeHtml(r.exam_name || "—")}</h4>
+                    <div class="sub">
+                        Session: <strong>${escapeHtml(r.session_name || "—")}</strong>
+                        ${r.class_name ? `&nbsp;·&nbsp; Class: <strong>${escapeHtml(r.class_name)}</strong>` : ""}
+                        ${r.section_name ? `&nbsp;·&nbsp; Section: <strong>${escapeHtml(r.section_name)}</strong>` : ""}
+                    </div>
+                </div>
+                <span class="badge ${badgeClass}">
+                    <i class="fa-solid ${badgeIcon}"></i>
+                    ${escapeHtml(r.result_status || "—")}
+                </span>
+            </div>
+
+            <div class="result-summary">
+                <div class="summary-box">
+                    <div class="label">Total Marks</div>
+                    <div class="value">
+                        ${formatMark(r.grand_total)}<small> / ${formatMark(r.max_total)}</small>
+                    </div>
+                </div>
+                <div class="summary-box ${gradeClass}">
+                    <div class="label">Percentage</div>
+                    <div class="value">${formatMark(r.percentage)}%</div>
+                </div>
+                <div class="summary-box ${gradeClass}">
+                    <div class="label">Grade</div>
+                    <div class="value">${escapeHtml(r.overall_grade || "—")}</div>
+                </div>
+                <div class="summary-box">
+                    <div class="label">Subjects</div>
+                    <div class="value">${subjects.length}</div>
+                </div>
+                ${failedSubjects.length > 0 ? `
+                    <div class="summary-box grade-bad">
+                        <div class="label">Failed</div>
+                        <div class="value">${failedSubjects.length}</div>
+                    </div>
+                ` : ""}
+            </div>
+
+            ${subjects.length > 0 ? `
+                <div class="marks-table-wrap">
+                    <table class="marks-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Subject</th>
+                                <th>Theory</th>
+                                <th>Practical</th>
+                                <th>Internal</th>
+                                <th>Project</th>
+                                <th>Total</th>
+                                <th>Max</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${subjects.map((m, i) => {
+                                const isFail = failedSubjects.includes(m.subject_name);
+                                const isAbsent = m.absent_type && m.absent_type !== "Present";
+                                return `
+                                    <tr class="${isFail ? 'fail-row' : ''}">
+                                        <td>${i + 1}</td>
+                                        <td class="subject-name">
+                                            ${escapeHtml(m.subject_name || "—")}
+                                            ${isAbsent ? `<span class="mini-badge" style="margin-left:8px;"><i class="fa-solid fa-user-slash"></i> ${escapeHtml(m.absent_type)}</span>` : ""}
+                                        </td>
+                                        <td>${formatMark(m.theory_marks)}</td>
+                                        <td>${formatMark(m.practical_marks)}</td>
+                                        <td>${formatMark(m.internal_marks)}</td>
+                                        <td>${formatMark(m.project_marks)}</td>
+                                        <td class="text-bold">${formatMark(m.total_marks)}</td>
+                                        <td>${formatMark(m.max_marks)}</td>
+                                        <td class="text-bold">${escapeHtml(m.grade || "—")}</td>
+                                    </tr>
+                                `;
+                            }).join("")}
+                        </tbody>
+                    </table>
+                </div>
+            ` : ""}
+
+            ${failedSubjects.length > 0 ? `
+                <div class="failed-warning">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>Failed Subjects:</strong>
+                        ${failedSubjects.map(s => escapeHtml(s)).join(", ")}
+                    </div>
+                </div>
+            ` : ""}
+
+            <div class="result-actions">
+                <button class="action-btn action-btn-primary" onclick="printResult()">
+                    <i class="fa-solid fa-print"></i> Print Result
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// ============================================================
+// PRINT RESULT
+// ============================================================
+function printResult() {
+    window.print();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener("DOMContentLoaded", () => {
+    loadClasses();
+    // Focus first input
+    document.getElementById("rollNumber")?.focus();
+});
+</script>
 </body>
 </html>
