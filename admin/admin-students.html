@@ -317,6 +317,12 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
     .backup-actions { flex-direction: column; }
     .backup-actions .btn, .backup-actions label.btn { width: 100%; justify-content: center; }
 }
+    #layoutTableLabel:has(input:checked),
+#layoutCardLabel:has(input:checked) {
+    border-color: var(--gold);
+    background: var(--gold-bg);
+    box-shadow: 0 0 0 3px rgba(201,151,245,0.15);
+}
 </style>
 </head>
 <body>
@@ -460,6 +466,35 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
                 <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="status"> Status</label>
                 <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" class="pdf-col" value="address"> Address</label>
             </div>
+            <!-- ✅ Layout Selection -->
+<h3 class="form-section"><i class="fas fa-th-large"></i> PDF Layout</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;">
+    <label style="display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:var(--transition);background:var(--bg);" id="layoutTableLabel">
+        <input type="radio" name="pdfLayout" value="table" checked style="width:18px;height:18px;accent-color:var(--gold);margin-top:2px;">
+        <div>
+            <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:2px;">
+                <i class="fas fa-table" style="color:var(--blue);"></i> Table View
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);line-height:1.5;">
+                Compact — har student ek row me. Best for kam columns (name, class, roll).
+            </div>
+        </div>
+    </label>
+    <label style="display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:var(--transition);background:var(--bg);" id="layoutCardLabel">
+        <input type="radio" name="pdfLayout" value="card" style="width:18px;height:18px;accent-color:var(--gold);margin-top:2px;">
+        <div>
+            <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:2px;">
+                <i class="fas fa-id-card" style="color:var(--purple);"></i> Card View
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);line-height:1.5;">
+                Detailed — har student ka apna box, 2 lines me data, big photo. Best for zyada columns.
+            </div>
+        </div>
+    </label>
+</div>
+<p style="font-size:11px;color:var(--text-muted);margin-bottom:16px;">
+    <i class="fas fa-info-circle"></i> <b>Tip:</b> Agar aap photo/signature include kar rahe ho ya 8+ columns select kiye ho, to <b>Card View</b> better dikhega.
+</p>
 
             <!-- Photo/Signature -->
             <h3 class="form-section"><i class="fas fa-image"></i> Image Columns (Optional)</h3>
@@ -2925,6 +2960,14 @@ body { font-family: 'Segoe UI', 'Georgia', Arial, sans-serif; color: #1a2332; ba
 // ============================================================
 // ✅ PROFESSIONAL LIST PDF
 // ============================================================
+
+
+    
+    
+
+    // ============================================================
+// ✅ PROFESSIONAL LIST PDF
+// ============================================================
 function openListPdfModal() {
     // Pre-fill from current filters
     $("#pdfClass").value = state.filters.class || "";
@@ -2941,6 +2984,10 @@ function openListPdfModal() {
     $("#pdfIncludePhoto").checked = false;
     $("#pdfIncludeSignature").checked = false;
 
+    // ✅ Default layout: table
+    const tableRadio = document.querySelector('input[name="pdfLayout"][value="table"]');
+    if (tableRadio) tableRadio.checked = true;
+
     openModal("listPdfModal");
 }
 
@@ -2950,14 +2997,24 @@ function generateListPdf(event) {
     const btn = $("#btnGeneratePdf");
     const originalHTML = btn.innerHTML;
 
-    // Collect selected columns
-    const selectedCols = Array.from(document.querySelectorAll(".pdf-col:checked"))
-        .map(cb => cb.value);
+    // ============================================================
+    // ✅ COLUMN ORDER LOGIC
+    // Frontend me jo bhi checkboxes DOM me hain, unko order preserve karo
+    // Jis order me checkbox placed hai, usi order me columns bhejo
+    // ============================================================
+    const allCheckboxes = Array.from(document.querySelectorAll(".pdf-col"));
+    const selectedCols = allCheckboxes
+        .filter(cb => cb.checked)   // only checked
+        .map(cb => cb.value);        // preserve DOM order automatically
 
     if (selectedCols.length === 0) {
         showToast("Please select at least one column", "warning");
         return;
     }
+
+    // ✅ Get selected layout
+    const layoutRadio = document.querySelector('input[name="pdfLayout"]:checked');
+    const layout = layoutRadio ? layoutRadio.value : "table";
 
     // Build query
     const params = new URLSearchParams();
@@ -2978,6 +3035,7 @@ function generateListPdf(event) {
     const title = $("#pdfTitle").value.trim() || "STUDENT LIST";
     params.set("title", title);
     params.set("columns", selectedCols.join(","));
+    params.set("layout", layout);              // ✅ Layout bhejo
 
     if ($("#pdfIncludeReason").checked && $("#pdfReason").value.trim()) {
         params.set("includeReason", "true");
@@ -2990,15 +3048,13 @@ function generateListPdf(event) {
     params.set("sortBy", state.sortBy || "class");
     params.set("order", state.order || "asc");
 
-    // Build URL with token (optional)
-    const token = localStorage.getItem("adminToken") || "";
     const url = `${STUDENT_API}/list-pdf?${params.toString()}`;
 
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating…';
     showToast("Generating PDF… Please wait", "info", 5000);
 
-    // Open in new tab — the browser will download/inline view
+    // Open in new tab
     const newWindow = window.open(url, "_blank");
     if (!newWindow) {
         showToast("Popup blocked — please allow popups", "warning");
