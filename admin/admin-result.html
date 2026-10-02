@@ -5,19 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Result Management — School ERP</title>
 
-<!-- Font Awesome 6 -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 /* ============================================================
    RESET & BASE
    ============================================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 15px; }
+html { font-size: 15px; scroll-behavior: smooth; }
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: #f4f6fb;
-    color: #1f2937;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f1f5f9;
+    color: #0f172a;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
@@ -26,187 +26,295 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 button { cursor: pointer; border: none; background: none; }
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
-h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
+h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0.02em; }
 
 /* ============================================================
-   CSS VARIABLES
+   THEME TOKENS — "Navy + Emerald + Amber"
    ============================================================ */
 :root {
-    --primary: #4f46e5;
-    --primary-dark: #4338ca;
-    --primary-light: #eef2ff;
-    --success: #10b981;
-    --success-light: #d1fae5;
-    --warning: #f59e0b;
-    --warning-light: #fef3c7;
-    --danger: #ef4444;
-    --danger-light: #fee2e2;
-    --info: #3b82f6;
-    --info-light: #dbeafe;
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-300: #d1d5db;
-    --gray-400: #9ca3af;
-    --gray-500: #6b7280;
-    --gray-600: #4b5563;
-    --gray-700: #374151;
-    --gray-800: #1f2937;
-    --gray-900: #111827;
-    --sidebar-width: 260px;
-    --topbar-height: 64px;
-    --radius: 10px;
-    --radius-sm: 6px;
-    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-    --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
-    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+    /* Primary */
+    --navy-900: #0f2942;
+    --navy-800: #163a5c;
+    --navy-700: #1e4a73;
+    --navy-600: #2563eb;
+    --navy-100: #e0e9f5;
+    --navy-50:  #f0f5fb;
+
+    /* Emerald (Accent 1) */
+    --emerald-700: #047857;
+    --emerald-600: #059669;
+    --emerald-500: #10b981;
+    --emerald-100: #d1fae5;
+    --emerald-50:  #ecfdf5;
+
+    /* Amber (Accent 2) */
+    --amber-700: #b45309;
+    --amber-600: #d97706;
+    --amber-500: #f59e0b;
+    --amber-100: #fef3c7;
+    --amber-50:  #fffbeb;
+
+    /* Semantic */
+    --danger-600: #dc2626;
+    --danger-100: #fee2e2;
+    --danger-50:  #fef2f2;
+    --info-600:   #0284c7;
+    --info-100:   #e0f2fe;
+    --info-50:    #f0f9ff;
+    --purple-600: #7c3aed;
+    --purple-100: #ede9fe;
+
+    /* Neutrals */
+    --slate-900: #0f172a;
+    --slate-800: #1e293b;
+    --slate-700: #334155;
+    --slate-600: #475569;
+    --slate-500: #64748b;
+    --slate-400: #94a3b8;
+    --slate-300: #cbd5e1;
+    --slate-200: #e2e8f0;
+    --slate-100: #f1f5f9;
+    --slate-50:  #f8fafc;
+
+    /* UI */
+    --sidebar-w: 272px;
+    --topbar-h: 68px;
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+
+    --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+    --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+
+    --transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
 /* ============================================================
    TOPBAR
    ============================================================ */
 .topbar {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: var(--topbar-height);
-    background: #fff;
-    border-bottom: 1px solid var(--gray-200);
+    top: 0; left: 0; right: 0;
+    height: var(--topbar-h);
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
+    padding: 0 24px;
     z-index: 1000;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 }
 .topbar-left { display: flex; align-items: center; gap: 16px; }
 .menu-toggle {
     display: none;
-    width: 40px;
-    height: 40px;
-    align-items: center;
-    justify-content: center;
+    width: 40px; height: 40px;
+    align-items: center; justify-content: center;
     border-radius: var(--radius-sm);
-    color: var(--gray-700);
-    transition: background 0.15s;
+    color: #334155;
+    transition: var(--transition);
 }
-.menu-toggle:hover { background: var(--gray-100); }
-.brand { display: flex; align-items: center; gap: 12px; }
+.menu-toggle:hover { background: #f1f5f9; }
+
+.brand { display: flex; align-items: center; gap: 14px; }
 .brand-logo {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 14px;
+    width: 44px; height: 44px;
+    border-radius: var(--radius);
+    background: linear-gradient(135deg, #0f2942 0%, #1e4a73 100%);
+    color: #ffffff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 15px;
     letter-spacing: -0.5px;
+    box-shadow: 0 4px 10px rgba(15, 41, 66, 0.25);
+    position: relative;
 }
-.brand-title { font-size: 15px; font-weight: 700; color: var(--gray-900); }
-.brand-sub { font-size: 11px; color: var(--gray-500); }
+.brand-logo::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #059669, #f59e0b);
+    z-index: -1;
+    opacity: 0.15;
+}
+.brand-title { font-size: 15px; font-weight: 700; color: #0f172a; letter-spacing: -0.01em; }
+.brand-sub {
+    font-size: 11px; color: #64748b;
+    display: flex; align-items: center; gap: 5px;
+    font-weight: 500;
+}
+.brand-sub::before {
+    content: '';
+    width: 5px; height: 5px;
+    background: #059669;
+    border-radius: 50%;
+    display: inline-block;
+}
+
 .topbar-center { flex: 1; display: flex; justify-content: center; }
 .session-picker {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--gray-600);
-}
-.session-picker select {
-    padding: 8px 12px;
-    border: 1px solid var(--gray-300);
-    border-radius: var(--radius-sm);
-    background: #fff;
-    font-weight: 600;
-    color: var(--gray-800);
-    cursor: pointer;
-    min-width: 140px;
-}
-.session-picker select:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
-}
-.topbar-right { display: flex; align-items: center; gap: 12px; }
-.admin-profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 6px 12px 6px 6px;
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 6px 6px 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
     border-radius: 30px;
-    background: var(--gray-100);
+    font-size: 12.5px;
+    color: #475569;
+    font-weight: 500;
 }
-.admin-avatar {
-    width: 34px;
-    height: 34px;
+.session-picker > span {
+    display: flex; align-items: center; gap: 6px;
+}
+.session-picker > span i { color: #059669; font-size: 11px; }
+.session-picker select {
+    padding: 6px 12px;
+    border: none;
+    background: #ffffff;
+    border-radius: 20px;
+    font-weight: 600;
+    color: #0f2942;
+    cursor: pointer;
+    min-width: 130px;
+    font-size: 12.5px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+.session-picker select:focus { outline: none; box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15); }
+
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.icon-btn {
+    width: 40px; height: 40px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-sm);
+    color: #475569;
+    transition: var(--transition);
+    position: relative;
+}
+.icon-btn:hover { background: #f1f5f9; color: #0f2942; }
+.icon-btn .badge-dot {
+    position: absolute; top: 8px; right: 8px;
+    width: 8px; height: 8px;
+    background: #dc2626;
     border-radius: 50%;
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
+    border: 2px solid #ffffff;
 }
-.admin-name { font-size: 13px; font-weight: 600; color: var(--gray-900); }
-.admin-role { font-size: 11px; color: var(--gray-500); }
+
+.admin-profile {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 14px 6px 6px;
+    border-radius: 30px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.admin-profile:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.admin-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #059669 0%, #0f2942 100%);
+    color: #ffffff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+}
+.admin-name { font-size: 13px; font-weight: 600; color: #0f172a; }
+.admin-role { font-size: 11px; color: #64748b; font-weight: 500; }
 
 /* ============================================================
-   SIDEBAR
+   SIDEBAR — Dark Navy Gradient
    ============================================================ */
 .sidebar {
     position: fixed;
-    top: var(--topbar-height);
-    left: 0;
-    bottom: 0;
-    width: var(--sidebar-width);
-    background: #fff;
-    border-right: 1px solid var(--gray-200);
+    top: var(--topbar-h);
+    left: 0; bottom: 0;
+    width: var(--sidebar-w);
+    background: linear-gradient(180deg, #0f2942 0%, #163a5c 100%);
     overflow-y: auto;
     z-index: 900;
-    transition: transform 0.2s ease;
-    padding: 16px 0;
+    transition: transform 0.25s ease;
+    padding: 16px 0 20px;
+    color: #cbd5e1;
+    box-shadow: 2px 0 12px rgba(15, 41, 66, 0.08);
 }
-.sidebar::-webkit-scrollbar { width: 6px; }
-.sidebar::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
-.sidebar-nav { display: flex; flex-direction: column; gap: 2px; }
+.sidebar::-webkit-scrollbar { width: 5px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 3px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+
+.sidebar-nav { display: flex; flex-direction: column; gap: 2px; padding: 0 12px; }
 .nav-section-title {
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 10.5px; font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--gray-400);
-    padding: 14px 20px 6px;
+    letter-spacing: 0.1em;
+    color: rgba(203, 213, 225, 0.55);
+    padding: 18px 12px 8px;
+    display: flex; align-items: center; gap: 8px;
 }
+.nav-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(203, 213, 225, 0.15), transparent);
+}
+
 .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 20px;
-    font-size: 14px;
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px;
+    font-size: 13.5px;
     font-weight: 500;
-    color: var(--gray-700);
-    border-left: 3px solid transparent;
-    transition: all 0.15s;
+    color: #cbd5e1;
+    border-radius: 10px;
+    transition: var(--transition);
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
-.nav-item:hover { background: var(--gray-50); color: var(--primary); }
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+}
 .nav-item.active {
-    background: var(--primary-light);
-    color: var(--primary);
-    border-left-color: var(--primary);
+    background: linear-gradient(135deg, rgba(5, 150, 105, 0.2), rgba(245, 158, 11, 0.1));
+    color: #ffffff;
     font-weight: 600;
+    box-shadow: inset 3px 0 0 #059669;
 }
-.nav-icon { width: 18px; text-align: center; font-size: 15px; }
+.nav-item.active .nav-icon { color: #10b981; }
+
+.nav-icon {
+    width: 20px; text-align: center;
+    font-size: 14px;
+    color: rgba(203, 213, 225, 0.75);
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+.nav-item:hover .nav-icon { color: #ffffff; }
+
+.nav-badge {
+    margin-left: auto;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 10px;
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+}
+
 .sidebar-overlay {
     display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
+    position: fixed; inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(2px);
     z-index: 899;
 }
 
@@ -214,15 +322,15 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
    MAIN CONTENT
    ============================================================ */
 .main-content {
-    margin-left: var(--sidebar-width);
-    margin-top: var(--topbar-height);
-    padding: 24px;
-    min-height: calc(100vh - var(--topbar-height));
+    margin-left: var(--sidebar-w);
+    margin-top: var(--topbar-h);
+    padding: 28px;
+    min-height: calc(100vh - var(--topbar-h));
 }
 .tab-panel { display: none; }
-.tab-panel.active { display: block; animation: fadeIn 0.2s ease; }
+.tab-panel.active { display: block; animation: fadeIn 0.25s ease; }
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(4px); }
+    from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -234,68 +342,140 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
     justify-content: space-between;
     align-items: flex-start;
     gap: 16px;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     flex-wrap: wrap;
 }
-.page-header h1 { font-size: 22px; color: var(--gray-900); margin-bottom: 4px; }
-.page-header p { font-size: 13px; color: var(--gray-500); }
+.page-header > div:first-child { flex: 1; min-width: 200px; }
+.page-title {
+    font-size: 26px;
+    color: #0f2942;
+    margin-bottom: 4px;
+    display: flex; align-items: center; gap: 12px;
+}
+.page-title i {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(5, 150, 105, 0.15), rgba(245, 158, 11, 0.15));
+    color: #047857;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 16px;
+}
+.page-sub {
+    font-size: 13.5px; color: #64748b;
+    font-weight: 500;
+}
 
 /* ============================================================
    CARDS
    ============================================================ */
 .card {
-    background: #fff;
-    border-radius: var(--radius);
+    background: #ffffff;
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
-    border: 1px solid var(--gray-200);
+    border: 1px solid #e2e8f0;
     margin-bottom: 20px;
     overflow: hidden;
+    transition: var(--transition);
 }
+.card:hover { box-shadow: var(--shadow-md); }
+
 .card-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--gray-200);
+    padding: 18px 22px;
+    border-bottom: 1px solid #f1f5f9;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 12px;
+    background: linear-gradient(180deg, #ffffff, #fafbfd);
 }
-.card-header h3 { font-size: 15px; color: var(--gray-900); }
-.card-body { padding: 20px; }
+.card-header h3 {
+    font-size: 15px;
+    color: #0f2942;
+    display: flex; align-items: center; gap: 10px;
+}
+.card-header h3 i {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: #f0f5fb;
+    color: #1e4a73;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 13px;
+}
+.card-body { padding: 22px; }
 
 /* ============================================================
    STATS GRID
    ============================================================ */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
     gap: 16px;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 .stat-card {
-    background: #fff;
+    background: #ffffff;
     border-radius: var(--radius);
-    padding: 18px;
+    padding: 20px;
     display: flex;
     align-items: center;
-    gap: 14px;
-    border: 1px solid var(--gray-200);
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.15s, box-shadow 0.15s;
+    gap: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: var(--shadow-xs);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
 }
-.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--stat-accent, #059669);
+}
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--stat-accent, #059669);
+}
+.stat-card[data-accent="navy"] { --stat-accent: #1e4a73; }
+.stat-card[data-accent="emerald"] { --stat-accent: #059669; }
+.stat-card[data-accent="amber"] { --stat-accent: #d97706; }
+.stat-card[data-accent="info"] { --stat-accent: #0284c7; }
+.stat-card[data-accent="danger"] { --stat-accent: #dc2626; }
+.stat-card[data-accent="purple"] { --stat-accent: #7c3aed; }
+
 .stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
     font-size: 20px;
     flex-shrink: 0;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
 }
-.stat-info { min-width: 0; }
-.stat-label { font-size: 12px; color: var(--gray-500); font-weight: 500; }
-.stat-value { font-size: 22px; font-weight: 700; color: var(--gray-900); margin-top: 2px; }
+.stat-icon.navy    { background: linear-gradient(135deg, #0f2942, #1e4a73); }
+.stat-icon.emerald { background: linear-gradient(135deg, #059669, #10b981); }
+.stat-icon.amber   { background: linear-gradient(135deg, #d97706, #f59e0b); }
+.stat-icon.info    { background: linear-gradient(135deg, #0284c7, #0ea5e9); }
+.stat-icon.danger  { background: linear-gradient(135deg, #dc2626, #ef4444); }
+.stat-icon.purple  { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+
+.stat-info { min-width: 0; flex: 1; }
+.stat-label {
+    font-size: 11.5px;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.stat-value {
+    font-size: 26px;
+    font-weight: 800;
+    color: #0f2942;
+    margin-top: 4px;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
 
 /* ============================================================
    BUTTONS
@@ -305,29 +485,84 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 9px 16px;
+    padding: 10px 18px;
     font-size: 13.5px;
     font-weight: 600;
     border-radius: var(--radius-sm);
-    transition: all 0.15s;
+    transition: var(--transition);
     white-space: nowrap;
-    border: 1px solid transparent;
+    border: 1.5px solid transparent;
+    letter-spacing: -0.005em;
 }
 .btn i { font-size: 13px; }
-.btn:disabled { opacity: 0.55; cursor: not-allowed; }
-.btn-primary { background: var(--primary); color: #fff; }
-.btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
-.btn-success { background: var(--success); color: #fff; }
-.btn-success:hover:not(:disabled) { background: #059669; }
-.btn-danger { background: var(--danger); color: #fff; }
-.btn-danger:hover:not(:disabled) { background: #dc2626; }
-.btn-warning { background: var(--warning); color: #fff; }
-.btn-warning:hover:not(:disabled) { background: #d97706; }
-.btn-outline { background: #fff; border-color: var(--gray-300); color: var(--gray-700); }
-.btn-outline:hover:not(:disabled) { background: var(--gray-50); border-color: var(--gray-400); }
-.btn-sm { padding: 6px 12px; font-size: 12.5px; }
-.btn-icon { width: 34px; height: 34px; padding: 0; border-radius: var(--radius-sm); }
-.btn-icon.btn-sm { width: 28px; height: 28px; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-primary {
+    background: linear-gradient(135deg, #0f2942, #1e4a73);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(15, 41, 66, 0.2);
+}
+.btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #1e4a73, #2563eb);
+    box-shadow: 0 4px 12px rgba(15, 41, 66, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(5, 150, 105, 0.2);
+}
+.btn-success:hover:not(:disabled) {
+    background: linear-gradient(135deg, #047857, #059669);
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(217, 119, 6, 0.2);
+}
+.btn-warning:hover:not(:disabled) {
+    background: linear-gradient(135deg, #b45309, #d97706);
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.2);
+}
+.btn-danger:hover:not(:disabled) {
+    background: linear-gradient(135deg, #b91c1c, #dc2626);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-outline {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    color: #334155;
+}
+.btn-outline:hover:not(:disabled) {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    color: #0f2942;
+    transform: translateY(-1px);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: #334155;
+}
+.btn-ghost:hover:not(:disabled) { background: #f1f5f9; }
+
+.btn-sm { padding: 7px 13px; font-size: 12.5px; }
+.btn-sm i { font-size: 11px; }
+.btn-icon { width: 36px; height: 36px; padding: 0; }
+.btn-icon.btn-sm { width: 30px; height: 30px; }
 
 /* ============================================================
    FILTER BAR
@@ -336,66 +571,74 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
-    padding: 14px 16px;
-    background: var(--gray-50);
-    border-radius: var(--radius-sm);
-    margin-bottom: 16px;
-    border: 1px solid var(--gray-200);
+    padding: 16px 18px;
+    background: linear-gradient(135deg, #f8fafc, #f0f5fb);
+    border-radius: var(--radius);
+    margin-bottom: 18px;
+    border: 1px solid #e2e8f0;
     align-items: center;
 }
 .filter-bar label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: var(--gray-600);
-    font-weight: 500;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12.5px;
+    color: #475569;
+    font-weight: 600;
 }
+.filter-bar label > i { color: #059669; font-size: 12px; }
 .filter-bar select,
 .filter-bar input[type="text"],
 .filter-bar input[type="date"] {
-    padding: 7px 10px;
-    border: 1px solid var(--gray-300);
+    padding: 8px 12px;
+    border: 1.5px solid #e2e8f0;
     border-radius: var(--radius-sm);
-    background: #fff;
+    background: #ffffff;
     font-size: 13px;
-    min-width: 130px;
+    min-width: 140px;
+    color: #0f2942;
+    font-weight: 500;
+    transition: var(--transition);
 }
 .filter-bar select:focus,
 .filter-bar input:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+    border-color: #059669;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
 }
 
 /* ============================================================
    TABLE
    ============================================================ */
-.table-wrapper { overflow-x: auto; border-radius: var(--radius-sm); }
-.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.table-wrapper { overflow-x: auto; border-radius: var(--radius); }
+.table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13.5px; }
 .table thead th {
-    background: var(--gray-50);
-    padding: 11px 14px;
+    background: linear-gradient(180deg, #f8fafc, #f1f5f9);
+    padding: 12px 16px;
     text-align: left;
-    font-weight: 600;
-    color: var(--gray-600);
-    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
-    border-bottom: 1px solid var(--gray-200);
+    letter-spacing: 0.06em;
+    border-bottom: 1.5px solid #e2e8f0;
     white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 .table tbody td {
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--gray-100);
-    color: var(--gray-700);
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
     vertical-align: middle;
 }
-.table tbody tr:hover { background: var(--gray-50); }
+.table tbody tr { transition: background 0.15s; }
+.table tbody tr:hover { background: #fafbfd; }
 .table tbody tr:last-child td { border-bottom: none; }
+
 .text-center { text-align: center; }
-.text-muted { color: var(--gray-400) !important; }
+.text-muted { color: #94a3b8 !important; }
 .text-right { text-align: right; }
+.text-bold { font-weight: 700; color: #0f2942; }
 
 /* ============================================================
    BADGES
@@ -405,55 +648,139 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
     align-items: center;
     gap: 5px;
     padding: 4px 10px;
-    font-size: 11.5px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     border-radius: 20px;
     white-space: nowrap;
+    letter-spacing: 0.01em;
+    border: 1px solid transparent;
 }
-.badge i { font-size: 10px; }
-.badge-primary { background: var(--primary-light); color: var(--primary-dark); }
-.badge-success { background: var(--success-light); color: #065f46; }
-.badge-warning { background: var(--warning-light); color: #92400e; }
-.badge-danger { background: var(--danger-light); color: #991b1b; }
-.badge-info { background: var(--info-light); color: #1e40af; }
-.badge-gray { background: var(--gray-100); color: var(--gray-700); }
+.badge i { font-size: 9px; }
+
+.badge-primary { background: #e0e9f5; color: #1e4a73; border-color: #c9dbf0; }
+.badge-success { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+.badge-warning { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+.badge-danger  { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+.badge-info    { background: #e0f2fe; color: #075985; border-color: #bae6fd; }
+.badge-purple  { background: #ede9fe; color: #5b21b6; border-color: #ddd6fe; }
+.badge-gray    { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
 
 /* ============================================================
    EMPTY STATE
    ============================================================ */
 .empty-state {
     text-align: center;
-    padding: 40px 20px;
-    color: var(--gray-400);
+    padding: 50px 24px;
+    color: #94a3b8;
     font-size: 13.5px;
 }
-.empty-state i { font-size: 36px; display: block; margin-bottom: 10px; opacity: 0.5; }
+.empty-state i {
+    font-size: 44px;
+    display: block;
+    margin-bottom: 14px;
+    opacity: 0.35;
+    color: #059669;
+}
+.empty-state h3 {
+    font-size: 15px;
+    color: #475569;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+.empty-state p { font-size: 13px; color: #94a3b8; }
 
 /* ============================================================
    QUICK ACTIONS
    ============================================================ */
 .quick-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
 }
+.quick-action {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: var(--radius);
+    text-align: left;
+    transition: var(--transition);
+    color: #0f2942;
+    font-weight: 600;
+    font-size: 13.5px;
+}
+.quick-action:hover {
+    border-color: #059669;
+    background: linear-gradient(135deg, #ffffff, #ecfdf5);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+.quick-action .qa-icon {
+    width: 42px; height: 42px;
+    border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    color: #ffffff; font-size: 16px;
+    flex-shrink: 0;
+}
+.quick-action .qa-icon.navy    { background: linear-gradient(135deg, #0f2942, #1e4a73); }
+.quick-action .qa-icon.emerald { background: linear-gradient(135deg, #059669, #10b981); }
+.quick-action .qa-icon.amber   { background: linear-gradient(135deg, #d97706, #f59e0b); }
+.quick-action .qa-icon.info    { background: linear-gradient(135deg, #0284c7, #0ea5e9); }
 
 /* ============================================================
-   TEMPLATES GRID
+   TEMPLATES / EXAM CARDS GRID
    ============================================================ */
-.templates-grid {
+.templates-grid,
+.exam-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
     gap: 16px;
 }
-.template-card {
-    border: 1px solid var(--gray-200);
+.template-card,
+.exam-card {
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
     border-radius: var(--radius);
-    padding: 16px;
-    background: var(--gray-50);
+    padding: 18px;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
 }
-.template-card h4 { font-size: 14px; margin-bottom: 8px; color: var(--gray-900); }
-.template-card .template-meta { font-size: 12px; color: var(--gray-500); margin-bottom: 10px; }
+.template-card::before,
+.exam-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #059669, #f59e0b);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.template-card:hover,
+.exam-card:hover {
+    border-color: #059669;
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+.template-card:hover::before,
+.exam-card:hover::before { opacity: 1; }
+
+.template-card h4,
+.exam-card-title {
+    font-size: 14.5px;
+    color: #0f2942;
+    margin-bottom: 4px;
+    font-weight: 700;
+}
+.template-card .template-meta,
+.exam-card-sub {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 14px;
+    font-weight: 500;
+}
 .template-card .template-items {
     display: flex;
     flex-wrap: wrap;
@@ -461,72 +788,130 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
 }
 .template-item-chip {
     padding: 4px 10px;
-    background: #fff;
-    border: 1px solid var(--gray-200);
+    background: #f0f5fb;
+    border: 1px solid #c9dbf0;
     border-radius: 20px;
-    font-size: 11.5px;
-    font-weight: 500;
-    color: var(--gray-700);
+    font-size: 11px;
+    font-weight: 600;
+    color: #1e4a73;
+}
+
+.exam-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+    gap: 8px;
+}
+.exam-card-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+.exam-card-stat {
+    background: linear-gradient(135deg, #f8fafc, #f0f5fb);
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #e2e8f0;
+}
+.exam-card-stat .label {
+    font-size: 10.5px;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+.exam-card-stat .value {
+    font-weight: 800;
+    color: #0f2942;
+    font-size: 18px;
+    margin-top: 2px;
+    letter-spacing: -0.02em;
+}
+.exam-card-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
 }
 
 /* ============================================================
-   TWO COLUMN LAYOUT
+   TWO COLUMN LAYOUT (Student Subjects)
    ============================================================ */
 .two-col-layout {
     display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 16px;
+    grid-template-columns: 340px 1fr;
+    gap: 20px;
 }
 .two-col-layout .col-left h4,
 .two-col-layout .col-right h4 {
-    font-size: 13px;
-    color: var(--gray-600);
+    font-size: 12px;
+    color: #64748b;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 10px;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
 }
+.two-col-layout .col-left h4 i,
+.two-col-layout .col-right h4 i { color: #059669; }
+
 .student-list {
-    max-height: 500px;
+    max-height: 560px;
     overflow-y: auto;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-sm);
-    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: var(--radius);
+    background: #ffffff;
 }
 .student-item {
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--gray-100);
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f5f9;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
-    transition: background 0.1s;
+    gap: 12px;
+    transition: var(--transition);
 }
-.student-item:hover { background: var(--gray-50); }
-.student-item.active { background: var(--primary-light); border-left: 3px solid var(--primary); }
+.student-item:last-child { border-bottom: none; }
+.student-item:hover { background: #f8fafc; }
+.student-item.active {
+    background: linear-gradient(135deg, #ecfdf5, #f0fdfa);
+    box-shadow: inset 3px 0 0 #059669;
+}
 .student-item .student-avatar {
-    width: 34px;
-    height: 34px;
+    width: 38px; height: 38px;
     border-radius: 50%;
-    background: var(--gray-200);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    color: var(--gray-600);
+    background: linear-gradient(135deg, #e0e9f5, #c9dbf0);
+    color: #1e4a73;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
     flex-shrink: 0;
 }
 .student-item .student-info { min-width: 0; flex: 1; }
-.student-item .student-name { font-size: 13px; font-weight: 600; color: var(--gray-800); }
-.student-item .student-meta { font-size: 11.5px; color: var(--gray-500); }
+.student-item .student-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #0f2942;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.student-item .student-meta {
+    font-size: 11.5px;
+    color: #64748b;
+    margin-top: 2px;
+}
 
 /* ============================================================
    MODAL
    ============================================================ */
 .modal-overlay {
     display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(15,23,42,0.5);
+    position: fixed; inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
     z-index: 2000;
     align-items: flex-start;
     justify-content: center;
@@ -535,140 +920,173 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
 }
 .modal-overlay.active { display: flex; }
 .modal {
-    background: #fff;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-lg);
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
     width: 100%;
     max-width: 640px;
     margin: auto;
-    animation: modalIn 0.2s ease;
+    animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
 }
-.modal-sm { max-width: 420px; }
+.modal-sm { max-width: 440px; }
 @keyframes modalIn {
-    from { opacity: 0; transform: scale(0.96); }
-    to { opacity: 1; transform: scale(1); }
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
 .modal-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--gray-200);
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: linear-gradient(135deg, #f8fafc, #ffffff);
 }
-.modal-header h3 { font-size: 16px; color: var(--gray-900); }
+.modal-header h3 {
+    font-size: 16px;
+    color: #0f2942;
+    display: flex; align-items: center; gap: 10px;
+}
+.modal-header h3::before {
+    content: '';
+    width: 4px; height: 20px;
+    background: linear-gradient(180deg, #059669, #f59e0b);
+    border-radius: 2px;
+}
 .modal-close {
-    width: 32px;
-    height: 32px;
+    width: 34px; height: 34px;
     border-radius: var(--radius-sm);
-    color: var(--gray-500);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    color: #64748b;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition);
 }
-.modal-close:hover { background: var(--gray-100); color: var(--gray-800); }
-.modal-body { padding: 20px; }
+.modal-close:hover { background: #f1f5f9; color: #0f2942; }
+.modal-body { padding: 24px; }
 .modal-footer {
-    padding: 14px 20px;
-    border-top: 1px solid var(--gray-200);
+    padding: 16px 24px;
+    border-top: 1px solid #f1f5f9;
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-    background: var(--gray-50);
+    background: #f8fafc;
 }
 
 /* ============================================================
    FORM
    ============================================================ */
-.form-group { margin-bottom: 16px; }
+.form-group { margin-bottom: 18px; }
 .form-group label {
     display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gray-700);
-    margin-bottom: 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 8px;
+    letter-spacing: 0.01em;
 }
-.form-group label .required { color: var(--danger); margin-left: 2px; }
+.form-group label .required { color: #dc2626; margin-left: 3px; }
 .form-control {
     width: 100%;
-    padding: 9px 12px;
-    border: 1px solid var(--gray-300);
+    padding: 11px 14px;
+    border: 1.5px solid #e2e8f0;
     border-radius: var(--radius-sm);
-    background: #fff;
+    background: #ffffff;
     font-size: 13.5px;
-    transition: all 0.15s;
+    transition: var(--transition);
+    color: #0f2942;
+    font-weight: 500;
 }
 .form-control:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+    border-color: #059669;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
 }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.form-help { font-size: 11.5px; color: var(--gray-500); margin-top: 4px; }
+.form-control::placeholder { color: #94a3b8; font-weight: 400; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-help {
+    font-size: 11.5px;
+    color: #64748b;
+    margin-top: 6px;
+    display: flex; align-items: center; gap: 5px;
+}
 
 /* ============================================================
    TOAST
    ============================================================ */
 .toast-container {
     position: fixed;
-    top: 80px;
-    right: 20px;
+    top: 84px; right: 24px;
     z-index: 3000;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    max-width: 400px;
 }
 .toast {
-    background: #fff;
-    border-radius: var(--radius-sm);
-    padding: 12px 16px;
-    box-shadow: var(--shadow-lg);
-    border-left: 4px solid var(--info);
-    min-width: 260px;
-    max-width: 380px;
+    background: #ffffff;
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    box-shadow: var(--shadow-xl);
+    border-left: 4px solid #0284c7;
+    min-width: 280px;
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    animation: toastIn 0.25s ease;
+    gap: 12px;
+    animation: toastIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.25s;
 }
 @keyframes toastIn {
-    from { opacity: 0; transform: translateX(20px); }
+    from { opacity: 0; transform: translateX(30px); }
     to { opacity: 1; transform: translateX(0); }
 }
-.toast.success { border-left-color: var(--success); }
-.toast.error { border-left-color: var(--danger); }
-.toast.warning { border-left-color: var(--warning); }
-.toast-icon { font-size: 16px; flex-shrink: 0; }
-.toast.success .toast-icon { color: var(--success); }
-.toast.error .toast-icon { color: var(--danger); }
-.toast.warning .toast-icon { color: var(--warning); }
-.toast.info .toast-icon { color: var(--info); }
-.toast-message { font-size: 13px; color: var(--gray-700); flex: 1; }
+.toast.success { border-left-color: #059669; }
+.toast.error   { border-left-color: #dc2626; }
+.toast.warning { border-left-color: #d97706; }
+.toast.info    { border-left-color: #0284c7; }
+
+.toast-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    width: 24px; height: 24px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+}
+.toast.success .toast-icon { background: #d1fae5; color: #059669; }
+.toast.error .toast-icon   { background: #fee2e2; color: #dc2626; }
+.toast.warning .toast-icon { background: #fef3c7; color: #d97706; }
+.toast.info .toast-icon    { background: #e0f2fe; color: #0284c7; }
+
+.toast-message { font-size: 13px; color: #334155; flex: 1; font-weight: 500; line-height: 1.5; }
 
 /* ============================================================
    LOADING
    ============================================================ */
 .loading-overlay {
     display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(255,255,255,0.7);
+    position: fixed; inset: 0;
+    background: rgba(248, 250, 252, 0.85);
+    backdrop-filter: blur(4px);
     z-index: 4000;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
 }
 .loading-overlay.active { display: flex; }
 .spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid var(--gray-200);
-    border-top-color: var(--primary);
+    width: 44px; height: 44px;
+    border: 4px solid #e2e8f0;
+    border-top-color: #059669;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-.loading-text { font-size: 13px; color: var(--gray-600); font-weight: 500; }
+.loading-text {
+    font-size: 13px;
+    color: #0f2942;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
 
 /* ============================================================
    PAGINATION
@@ -677,103 +1095,150 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
     display: flex;
     justify-content: center;
     gap: 6px;
-    padding: 16px 0 4px;
+    padding: 20px 0 4px;
     flex-wrap: wrap;
 }
 .pagination button {
-    min-width: 34px;
-    height: 34px;
+    min-width: 36px;
+    height: 36px;
     border-radius: var(--radius-sm);
-    background: #fff;
-    border: 1px solid var(--gray-200);
-    color: var(--gray-700);
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    color: #475569;
     font-size: 13px;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    transition: var(--transition);
 }
-.pagination button:hover:not(:disabled) { background: var(--gray-50); }
-.pagination button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-.pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+.pagination button:hover:not(:disabled) {
+    background: #f8fafc;
+    border-color: #059669;
+    color: #059669;
+}
+.pagination button.active {
+    background: linear-gradient(135deg, #0f2942, #1e4a73);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 2px 6px rgba(15, 41, 66, 0.25);
+}
+.pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ============================================================
    MARKS ENTRY TABLE
    ============================================================ */
+.marks-entry-table { font-size: 13px; }
 .marks-entry-table input[type="number"] {
-    width: 70px;
-    padding: 6px 8px;
-    border: 1px solid var(--gray-300);
-    border-radius: var(--radius-sm);
+    width: 74px;
+    padding: 7px 8px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 6px;
     font-size: 13px;
     text-align: center;
+    font-weight: 600;
+    color: #0f2942;
+    transition: var(--transition);
 }
 .marks-entry-table input[type="number"]:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(79,70,229,0.15);
+    border-color: #059669;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
 }
 .marks-entry-table input.input-error {
-    border-color: var(--danger);
-    background: #fff5f5;
+    border-color: #dc2626;
+    background: #fef2f2;
+    color: #991b1b;
 }
 .marks-entry-table select {
-    padding: 5px 8px;
-    border: 1px solid var(--gray-300);
-    border-radius: var(--radius-sm);
+    padding: 6px 10px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 6px;
     font-size: 12.5px;
-    background: #fff;
+    background: #ffffff;
+    color: #0f2942;
+    font-weight: 500;
+    cursor: pointer;
 }
+.marks-entry-table select:focus {
+    outline: none;
+    border-color: #059669;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
+}
+.marks-entry-table input[type="text"] {
+    padding: 7px 10px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 12.5px;
+    color: #0f2942;
+}
+.marks-entry-table input[type="text"]:focus {
+    outline: none;
+    border-color: #059669;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
+}
+.mark-total {
+    font-weight: 800;
+    color: #0f2942;
+    font-size: 14px;
+}
+.mark-grade {
+    display: inline-block;
+    padding: 3px 10px;
+    background: #f0f5fb;
+    color: #1e4a73;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+    border: 1px solid #c9dbf0;
+}
+
 .marks-entry-actions {
     display: flex;
     gap: 10px;
-    padding: 14px 0;
+    padding: 18px 0 0;
     flex-wrap: wrap;
     align-items: center;
-    border-top: 1px solid var(--gray-200);
-    margin-top: 12px;
-    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+    margin-top: 16px;
 }
 
 /* ============================================================
-   EXAM CARDS GRID
+   ANALYTICS CARDS
    ============================================================ */
-.exam-cards-grid {
+.analytics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
 }
-.exam-card {
-    background: #fff;
-    border: 1px solid var(--gray-200);
+.analytics-card {
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
     border-radius: var(--radius);
     padding: 16px;
-    transition: all 0.15s;
+    text-align: center;
 }
-.exam-card:hover { box-shadow: var(--shadow-md); }
-.exam-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 12px;
+.analytics-card .analytics-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+    font-weight: 700;
+    margin-bottom: 8px;
 }
-.exam-card-title { font-size: 14px; font-weight: 700; color: var(--gray-900); }
-.exam-card-sub { font-size: 11.5px; color: var(--gray-500); margin-top: 2px; }
-.exam-card-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 12px;
+.analytics-card .analytics-value {
+    font-size: 26px;
+    font-weight: 800;
+    color: #0f2942;
+    letter-spacing: -0.02em;
 }
-.exam-card-stat {
-    background: var(--gray-50);
-    padding: 8px 10px;
-    border-radius: var(--radius-sm);
+.analytics-card .analytics-sub {
     font-size: 11.5px;
+    color: #94a3b8;
+    margin-top: 4px;
+    font-weight: 500;
 }
-.exam-card-stat .label { color: var(--gray-500); }
-.exam-card-stat .value { font-weight: 700; color: var(--gray-800); font-size: 14px; }
-.exam-card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
 /* ============================================================
    RESPONSIVE
@@ -783,18 +1248,38 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
     .topbar-center { display: none; }
 }
 @media (max-width: 768px) {
+    :root { --sidebar-w: 280px; }
     .sidebar { transform: translateX(-100%); }
     .sidebar.open { transform: translateX(0); }
     .sidebar-overlay.active { display: block; }
-    .main-content { margin-left: 0; padding: 16px; }
-    .menu-toggle { display: flex; }
-    .stats-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-    .form-row { grid-template-columns: 1fr; }
+    .main-content { margin-left: 0; padding: 18px 16px; }
+    .menu-toggle { display: inline-flex; }
     .admin-info { display: none; }
-    .page-header h1 { font-size: 18px; }
-    .filter-bar { flex-direction: column; align-items: stretch; }
+    .brand-title { font-size: 14px; }
+    .brand-sub { font-size: 10px; }
+    .page-title { font-size: 20px; }
+    .page-title i { width: 34px; height: 34px; font-size: 14px; }
+    .stats-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    .stat-value { font-size: 22px; }
+    .form-row { grid-template-columns: 1fr; }
+    .filter-bar { flex-direction: column; align-items: stretch; padding: 14px; }
     .filter-bar label { justify-content: space-between; }
-    .filter-bar select, .filter-bar input { flex: 1; }
+    .filter-bar select, .filter-bar input { flex: 1; min-width: 0; }
+    .modal { max-width: 100%; }
+    .modal-body { padding: 18px; }
+    .modal-header, .modal-footer { padding: 14px 18px; }
+    .toast-container { top: auto; bottom: 20px; right: 16px; left: 16px; max-width: none; }
+}
+
+/* ============================================================
+   PRINT
+   ============================================================ */
+@media print {
+    .topbar, .sidebar, .filter-bar, .page-header button,
+    .btn, .toast-container, .loading-overlay, .sidebar-overlay { display: none !important; }
+    .main-content { margin: 0 !important; padding: 0 !important; }
+    body { background: #ffffff; }
+    .card { box-shadow: none; border: 1px solid #e2e8f0; page-break-inside: avoid; }
 }
 </style>
 </head>
@@ -818,13 +1303,20 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
     </div>
     <div class="topbar-center">
         <label class="session-picker">
-            <span><i class="fa-solid fa-calendar-days"></i> Session:</span>
+            <span><i class="fa-solid fa-calendar-days"></i> Session</span>
             <select id="globalSessionSelect">
                 <option value="">Loading...</option>
             </select>
         </label>
     </div>
     <div class="topbar-right">
+        <button class="icon-btn" title="Notifications">
+            <i class="fa-solid fa-bell"></i>
+            <span class="badge-dot"></span>
+        </button>
+        <button class="icon-btn" title="Help">
+            <i class="fa-solid fa-circle-question"></i>
+        </button>
         <div class="admin-profile">
             <div class="admin-avatar">A</div>
             <div class="admin-info">
@@ -927,14 +1419,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
      ============================================================ -->
 <main class="main-content">
 
-    <!-- ============================================================
-         TAB 1: DASHBOARD
-         ============================================================ -->
+    <!-- ============ TAB 1: DASHBOARD ============ -->
     <section class="tab-panel active" id="tab-dashboard">
         <div class="page-header">
             <div>
-                <h1>Dashboard</h1>
-                <p>Overview of examination and result processing</p>
+                <h1 class="page-title"><i class="fa-solid fa-chart-line"></i> Dashboard</h1>
+                <p class="page-sub">Overview of examination and result processing</p>
             </div>
             <button class="btn btn-outline" onclick="loadDashboardStats()">
                 <i class="fa-solid fa-rotate"></i> Refresh
@@ -942,55 +1432,43 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon" style="background:#eef2ff;color:#4f46e5;">
-                    <i class="fa-solid fa-users"></i>
-                </div>
+            <div class="stat-card" data-accent="navy">
+                <div class="stat-icon navy"><i class="fa-solid fa-users"></i></div>
                 <div class="stat-info">
                     <div class="stat-label">Total Students</div>
                     <div class="stat-value" id="statTotalStudents">—</div>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background:#dbeafe;color:#3b82f6;">
-                    <i class="fa-solid fa-file-pen"></i>
-                </div>
+            <div class="stat-card" data-accent="info">
+                <div class="stat-icon info"><i class="fa-solid fa-file-pen"></i></div>
                 <div class="stat-info">
                     <div class="stat-label">Total Exams</div>
                     <div class="stat-value" id="statTotalExams">—</div>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background:#d1fae5;color:#10b981;">
-                    <i class="fa-solid fa-bullhorn"></i>
-                </div>
+            <div class="stat-card" data-accent="emerald">
+                <div class="stat-icon emerald"><i class="fa-solid fa-bullhorn"></i></div>
                 <div class="stat-info">
                     <div class="stat-label">Published Exams</div>
                     <div class="stat-value" id="statPublishedExams">—</div>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background:#fef3c7;color:#f59e0b;">
-                    <i class="fa-solid fa-hourglass-half"></i>
-                </div>
+            <div class="stat-card" data-accent="amber">
+                <div class="stat-icon amber"><i class="fa-solid fa-hourglass-half"></i></div>
                 <div class="stat-info">
                     <div class="stat-label">Draft Marks</div>
                     <div class="stat-value" id="statDraftMarks">—</div>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background:#d1fae5;color:#10b981;">
-                    <i class="fa-solid fa-graduation-cap"></i>
-                </div>
+            <div class="stat-card" data-accent="emerald">
+                <div class="stat-icon emerald"><i class="fa-solid fa-graduation-cap"></i></div>
                 <div class="stat-info">
                     <div class="stat-label">Pass Count</div>
                     <div class="stat-value" id="statPassCount">—</div>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background:#fee2e2;color:#ef4444;">
-                    <i class="fa-solid fa-circle-xmark"></i>
-                </div>
+            <div class="stat-card" data-accent="danger">
+                <div class="stat-icon danger"><i class="fa-solid fa-circle-xmark"></i></div>
                 <div class="stat-info">
                     <div class="stat-label">Fail Count</div>
                     <div class="stat-value" id="statFailCount">—</div>
@@ -1000,21 +1478,25 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
 
         <div class="card">
             <div class="card-header">
-                <h3>Quick Actions</h3>
+                <h3><i class="fa-solid fa-bolt"></i> Quick Actions</h3>
             </div>
             <div class="card-body">
                 <div class="quick-actions">
-                    <button class="btn btn-primary" onclick="switchTab('exams')">
-                        <i class="fa-solid fa-file-pen"></i> Manage Exams
+                    <button class="quick-action" onclick="switchTab('exams')">
+                        <div class="qa-icon navy"><i class="fa-solid fa-file-pen"></i></div>
+                        Manage Exams
                     </button>
-                    <button class="btn btn-primary" onclick="switchTab('marks-entry')">
-                        <i class="fa-solid fa-pen-to-square"></i> Enter Marks
+                    <button class="quick-action" onclick="switchTab('marks-entry')">
+                        <div class="qa-icon emerald"><i class="fa-solid fa-pen-to-square"></i></div>
+                        Enter Marks
                     </button>
-                    <button class="btn btn-primary" onclick="switchTab('verification')">
-                        <i class="fa-solid fa-circle-check"></i> Verify Marks
+                    <button class="quick-action" onclick="switchTab('verification')">
+                        <div class="qa-icon amber"><i class="fa-solid fa-circle-check"></i></div>
+                        Verify Marks
                     </button>
-                    <button class="btn btn-primary" onclick="switchTab('student-subjects')">
-                        <i class="fa-solid fa-users"></i> Assign Subjects
+                    <button class="quick-action" onclick="switchTab('student-subjects')">
+                        <div class="qa-icon info"><i class="fa-solid fa-users"></i></div>
+                        Assign Subjects
                     </button>
                 </div>
             </div>
@@ -1022,7 +1504,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
 
         <div class="card">
             <div class="card-header">
-                <h3>Class-wise Overview</h3>
+                <h3><i class="fa-solid fa-table-list"></i> Class-wise Overview</h3>
             </div>
             <div class="card-body">
                 <div class="table-wrapper">
@@ -1034,7 +1516,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                                 <th>Published</th>
                                 <th>Draft Marks</th>
                                 <th>Verified Marks</th>
-                                <th>Actions</th>
+                                <th class="text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1046,14 +1528,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         </div>
     </section>
 
-    <!-- ============================================================
-         TAB 2: SESSIONS
-         ============================================================ -->
+    <!-- ============ TAB 2: SESSIONS ============ -->
     <section class="tab-panel" id="tab-sessions">
         <div class="page-header">
             <div>
-                <h1>Academic Sessions</h1>
-                <p>Manage academic sessions (2024-25, 2025-26...)</p>
+                <h1 class="page-title"><i class="fa-solid fa-calendar-days"></i> Academic Sessions</h1>
+                <p class="page-sub">Manage academic sessions (2024-25, 2025-26...)</p>
             </div>
             <button class="btn btn-primary" onclick="openSessionModal()">
                 <i class="fa-solid fa-plus"></i> Add Session
@@ -1083,14 +1563,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         </div>
     </section>
 
-    <!-- ============================================================
-         TAB 3: CLASSES
-         ============================================================ -->
+    <!-- ============ TAB 3: CLASSES ============ -->
     <section class="tab-panel" id="tab-classes">
         <div class="page-header">
             <div>
-                <h1>Classes</h1>
-                <p>Manage classes from Nursery to Class 12</p>
+                <h1 class="page-title"><i class="fa-solid fa-school"></i> Classes</h1>
+                <p class="page-sub">Manage classes from Nursery to Class 12</p>
             </div>
             <button class="btn btn-primary" onclick="openClassModal()">
                 <i class="fa-solid fa-plus"></i> Add Class
@@ -1131,14 +1609,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         </div>
     </section>
 
-    <!-- ============================================================
-         TAB 4: SECTIONS
-         ============================================================ -->
+    <!-- ============ TAB 4: SECTIONS ============ -->
     <section class="tab-panel" id="tab-sections">
         <div class="page-header">
             <div>
-                <h1>Sections</h1>
-                <p>Manage sections (A, B, C) per class</p>
+                <h1 class="page-title"><i class="fa-solid fa-layer-group"></i> Sections</h1>
+                <p class="page-sub">Manage sections (A, B, C) per class</p>
             </div>
             <button class="btn btn-primary" onclick="openSectionModal()">
                 <i class="fa-solid fa-plus"></i> Add Section
@@ -1175,14 +1651,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         </div>
     </section>
 
-    <!-- ============================================================
-         TAB 5: STREAMS
-         ============================================================ -->
+    <!-- ============ TAB 5: STREAMS ============ -->
     <section class="tab-panel" id="tab-streams">
         <div class="page-header">
             <div>
-                <h1>Streams</h1>
-                <p>Science, Arts, Commerce for classes 11-12</p>
+                <h1 class="page-title"><i class="fa-solid fa-water"></i> Streams</h1>
+                <p class="page-sub">Science, Arts, Commerce for classes 11-12</p>
             </div>
             <button class="btn btn-primary" onclick="openStreamModal()">
                 <i class="fa-solid fa-plus"></i> Add Stream
@@ -1211,14 +1685,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         </div>
     </section>
 
-    <!-- ============================================================
-         TAB 6: SUBJECTS
-         ============================================================ -->
+    <!-- ============ TAB 6: SUBJECTS ============ -->
     <section class="tab-panel" id="tab-subjects">
         <div class="page-header">
             <div>
-                <h1>Subjects</h1>
-                <p>Manage subjects — Core, Elective, Language, Vocational</p>
+                <h1 class="page-title"><i class="fa-solid fa-book"></i> Subjects</h1>
+                <p class="page-sub">Manage subjects — Core, Elective, Language, Vocational</p>
             </div>
             <button class="btn btn-primary" onclick="openSubjectModal()">
                 <i class="fa-solid fa-plus"></i> Add Subject
@@ -1265,14 +1737,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         </div>
     </section>
 
-    <!-- ============================================================
-         TAB 7: CLASS-SUBJECTS
-         ============================================================ -->
+    <!-- ============ TAB 7: CLASS-SUBJECTS ============ -->
     <section class="tab-panel" id="tab-class-subjects">
         <div class="page-header">
             <div>
-                <h1>Class-Subject Mapping</h1>
-                <p>Assign default subjects to classes/streams</p>
+                <h1 class="page-title"><i class="fa-solid fa-link"></i> Class-Subject Mapping</h1>
+                <p class="page-sub">Assign default subjects to classes/streams</p>
             </div>
             <button class="btn btn-primary" onclick="openClassSubjectModal()">
                 <i class="fa-solid fa-plus"></i> Map Subjects
@@ -1289,7 +1759,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                         </select>
                     </label>
                     <label>
-                        Stream:
+                        <i class="fa-solid fa-water"></i> Stream:
                         <select id="csStreamFilter" onchange="loadClassSubjects()">
                             <option value="">All Streams</option>
                         </select>
@@ -1315,14 +1785,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         </div>
     </section>
 
-    <!-- ============================================================
-         TAB 8: STUDENT SUBJECTS
-         ============================================================ -->
+    <!-- ============ TAB 8: STUDENT SUBJECTS ============ -->
     <section class="tab-panel" id="tab-student-subjects">
         <div class="page-header">
             <div>
-                <h1>Student Subject Assignment</h1>
-                <p>Assign subjects to individual students (session-wise)</p>
+                <h1 class="page-title"><i class="fa-solid fa-users"></i> Student Subject Assignment</h1>
+                <p class="page-sub">Assign subjects to individual students (session-wise)</p>
             </div>
         </div>
 
@@ -1353,7 +1821,8 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                         <div class="student-list" id="ssStudentList">
                             <div class="empty-state">
                                 <i class="fa-solid fa-user-graduate"></i>
-                                Select class to view students
+                                <h3>No students loaded</h3>
+                                <p>Select a class to view students</p>
                             </div>
                         </div>
                     </div>
@@ -1362,7 +1831,8 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                         <div id="ssSubjectPanel">
                             <div class="empty-state">
                                 <i class="fa-solid fa-hand-pointer"></i>
-                                Select a student
+                                <h3>Select a student</h3>
+                                <p>Their subjects will appear here</p>
                             </div>
                         </div>
                     </div>
@@ -1371,14 +1841,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         </div>
     </section>
 
-    <!-- ============================================================
-         TAB 9: EXAM TEMPLATES
-         ============================================================ -->
+    <!-- ============ TAB 9: EXAM TEMPLATES ============ -->
     <section class="tab-panel" id="tab-exam-templates">
         <div class="page-header">
             <div>
-                <h1>Exam Templates</h1>
-                <p>Predefined exam structures (Class 6-8, Class 9-12)</p>
+                <h1 class="page-title"><i class="fa-solid fa-clipboard-list"></i> Exam Templates</h1>
+                <p class="page-sub">Predefined exam structures (Class 6-8, Class 9-12)</p>
             </div>
             <button class="btn btn-primary" onclick="openTemplateModal()">
                 <i class="fa-solid fa-plus"></i> Add Template
@@ -1390,21 +1858,19 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                 <div id="templatesList" class="templates-grid">
                     <div class="empty-state">
                         <i class="fa-solid fa-spinner fa-spin"></i>
-                        Loading...
+                        <h3>Loading templates</h3>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ============================================================
-         TAB 10: EXAMS
-         ============================================================ -->
+    <!-- ============ TAB 10: EXAMS ============ -->
     <section class="tab-panel" id="tab-exams">
         <div class="page-header">
             <div>
-                <h1>Exams</h1>
-                <p>Manage exam instances per session &amp; class</p>
+                <h1 class="page-title"><i class="fa-solid fa-file-pen"></i> Exams</h1>
+                <p class="page-sub">Manage exam instances per session &amp; class</p>
             </div>
             <button class="btn btn-primary" onclick="openGenerateExamsModal()">
                 <i class="fa-solid fa-bolt"></i> Generate from Template
@@ -1439,35 +1905,16 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                 </div>
 
                 <div id="examsCardsView" class="exam-cards-grid"></div>
-
-                <div class="table-wrapper" style="display:none;" id="examsTableView">
-                    <table class="table" id="examsTable">
-                        <thead>
-                            <tr>
-                                <th>Exam</th>
-                                <th>Session</th>
-                                <th>Class</th>
-                                <th>Subjects</th>
-                                <th>Marks</th>
-                                <th>Status</th>
-                                <th class="text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
             </div>
         </div>
     </section>
 
-    <!-- ============================================================
-         TAB 11: MARKS ENTRY
-         ============================================================ -->
+    <!-- ============ TAB 11: MARKS ENTRY ============ -->
     <section class="tab-panel" id="tab-marks-entry">
         <div class="page-header">
             <div>
-                <h1>Marks Entry</h1>
-                <p>Enter marks for students — only assigned subjects shown</p>
+                <h1 class="page-title"><i class="fa-solid fa-pen-to-square"></i> Marks Entry</h1>
+                <p class="page-sub">Enter marks for students — only assigned subjects shown</p>
             </div>
         </div>
 
@@ -1507,21 +1954,20 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                 <div id="marksEntryArea">
                     <div class="empty-state">
                         <i class="fa-solid fa-pen-to-square"></i>
-                        Select session, class, exam &amp; subject to begin marks entry
+                        <h3>Ready to enter marks</h3>
+                        <p>Select session, class, exam &amp; subject to begin</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ============================================================
-         TAB 12: VERIFICATION
-         ============================================================ -->
+    <!-- ============ TAB 12: VERIFICATION ============ -->
     <section class="tab-panel" id="tab-verification">
         <div class="page-header">
             <div>
-                <h1>Marks Verification</h1>
-                <p>Verify submitted marks — approve or return for correction</p>
+                <h1 class="page-title"><i class="fa-solid fa-circle-check"></i> Marks Verification</h1>
+                <p class="page-sub">Verify submitted marks — approve or return for correction</p>
             </div>
         </div>
 
@@ -1555,21 +2001,20 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                 <div id="verificationArea">
                     <div class="empty-state">
                         <i class="fa-solid fa-circle-check"></i>
-                        Select filters to load marks for verification
+                        <h3>Ready for verification</h3>
+                        <p>Select filters to load marks for verification</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ============================================================
-         TAB 13: FINAL RESULTS
-         ============================================================ -->
+    <!-- ============ TAB 13: FINAL RESULTS ============ -->
     <section class="tab-panel" id="tab-final-results">
         <div class="page-header">
             <div>
-                <h1>Final Results</h1>
-                <p>Finalize and lock results for publication</p>
+                <h1 class="page-title"><i class="fa-solid fa-flag-checkered"></i> Final Results</h1>
+                <p class="page-sub">Finalize and lock results for publication</p>
             </div>
         </div>
 
@@ -1591,21 +2036,20 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                 <div id="finalResultsArea">
                     <div class="empty-state">
                         <i class="fa-solid fa-flag-checkered"></i>
-                        Select session &amp; class to view exams for finalization
+                        <h3>Ready for finalization</h3>
+                        <p>Select session &amp; class to view exams</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ============================================================
-         TAB 14: PUBLISHED RESULTS
-         ============================================================ -->
+    <!-- ============ TAB 14: PUBLISHED RESULTS ============ -->
     <section class="tab-panel" id="tab-published-results">
         <div class="page-header">
             <div>
-                <h1>Published Results</h1>
-                <p>View &amp; manage published exam results</p>
+                <h1 class="page-title"><i class="fa-solid fa-bullhorn"></i> Published Results</h1>
+                <p class="page-sub">View &amp; manage published exam results</p>
             </div>
         </div>
 
@@ -1622,32 +2066,24 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                             <option value="">All Classes</option>
                         </select>
                     </label>
-                    <label>
-                        <i class="fa-solid fa-file-pen"></i> Exam:
-                        <select id="prExamFilter" onchange="loadPublishedResults()">
-                            <option value="">All Exams</option>
-                        </select>
-                    </label>
                 </div>
 
                 <div id="publishedResultsArea">
                     <div class="empty-state">
                         <i class="fa-solid fa-bullhorn"></i>
-                        Loading...
+                        <h3>Loading...</h3>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ============================================================
-         TAB 15: ANALYTICS
-         ============================================================ -->
+    <!-- ============ TAB 15: ANALYTICS ============ -->
     <section class="tab-panel" id="tab-analytics">
         <div class="page-header">
             <div>
-                <h1>Analytics</h1>
-                <p>Exam-wise and subject-wise performance analytics</p>
+                <h1 class="page-title"><i class="fa-solid fa-chart-pie"></i> Analytics</h1>
+                <p class="page-sub">Exam-wise and subject-wise performance analytics</p>
             </div>
         </div>
 
@@ -1675,21 +2111,20 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                 <div id="analyticsArea">
                     <div class="empty-state">
                         <i class="fa-solid fa-chart-pie"></i>
-                        Select filters to view analytics
+                        <h3>Ready for analytics</h3>
+                        <p>Select filters to view analytics</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ============================================================
-         TAB 16: AUDIT LOGS
-         ============================================================ -->
+    <!-- ============ TAB 16: AUDIT LOGS ============ -->
     <section class="tab-panel" id="tab-audit-logs">
         <div class="page-header">
             <div>
-                <h1>Audit Logs</h1>
-                <p>Complete trail of all result-related actions</p>
+                <h1 class="page-title"><i class="fa-solid fa-magnifying-glass"></i> Audit Logs</h1>
+                <p class="page-sub">Complete trail of all result-related actions</p>
             </div>
         </div>
 
@@ -1715,11 +2150,11 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                         <input type="text" id="alStudentFilter" placeholder="Student ID..." oninput="debounceLoadAuditLogs()">
                     </label>
                     <label>
-                        From:
+                        <i class="fa-solid fa-calendar"></i> From:
                         <input type="date" id="alFromDate" onchange="loadAuditLogs()">
                     </label>
                     <label>
-                        To:
+                        <i class="fa-solid fa-calendar"></i> To:
                         <input type="date" id="alToDate" onchange="loadAuditLogs()">
                     </label>
                 </div>
@@ -1746,31 +2181,32 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         </div>
     </section>
 
-    <!-- ============================================================
-         TAB 17: SETTINGS
-         ============================================================ -->
+    <!-- ============ TAB 17: SETTINGS ============ -->
     <section class="tab-panel" id="tab-settings">
         <div class="page-header">
             <div>
-                <h1>Settings</h1>
-                <p>Result system configuration</p>
+                <h1 class="page-title"><i class="fa-solid fa-gear"></i> Settings</h1>
+                <p class="page-sub">Result system configuration</p>
             </div>
         </div>
 
         <div class="card">
             <div class="card-header">
-                <h3>Quick Links</h3>
+                <h3><i class="fa-solid fa-link"></i> Quick Links</h3>
             </div>
             <div class="card-body">
                 <div class="quick-actions">
-                    <a href="/result-verify.html" target="_blank" class="btn btn-outline">
-                        <i class="fa-solid fa-magnifying-glass"></i> Public Verification Page
+                    <a href="/result-verify.html" target="_blank" class="quick-action">
+                        <div class="qa-icon info"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        Public Verification
                     </a>
-                    <button class="btn btn-outline" onclick="openGradingModal()">
-                        <i class="fa-solid fa-graduation-cap"></i> Grading Scheme
+                    <button class="quick-action" onclick="openGradingModal()">
+                        <div class="qa-icon emerald"><i class="fa-solid fa-graduation-cap"></i></div>
+                        Grading Scheme
                     </button>
-                    <button class="btn btn-outline" onclick="openPolicyModal()">
-                        <i class="fa-solid fa-clipboard-list"></i> Assessment Policy
+                    <button class="quick-action" onclick="openPolicyModal()">
+                        <div class="qa-icon amber"><i class="fa-solid fa-clipboard-list"></i></div>
+                        Assessment Policy
                     </button>
                 </div>
             </div>
@@ -1778,12 +2214,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
 
         <div class="card">
             <div class="card-header">
-                <h3>Grading Scheme</h3>
+                <h3><i class="fa-solid fa-graduation-cap"></i> Grading Scheme</h3>
             </div>
             <div class="card-body" id="gradingSchemeArea">
                 <div class="empty-state">
                     <i class="fa-solid fa-spinner fa-spin"></i>
-                    Loading...
+                    <h3>Loading...</h3>
                 </div>
             </div>
         </div>
@@ -1791,16 +2227,11 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
 
 </main>
 
-<!-- ============================================================
-     MODAL CONTAINER
-     ============================================================ -->
+<!-- MODALS -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal" id="modalContent"></div>
 </div>
 
-<!-- ============================================================
-     CONFIRM DIALOG
-     ============================================================ -->
 <div class="modal-overlay" id="confirmOverlay">
     <div class="modal modal-sm">
         <div class="modal-header">
@@ -1816,23 +2247,19 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
     </div>
 </div>
 
-<!-- ============================================================
-     TOAST CONTAINER
-     ============================================================ -->
+<!-- TOAST + LOADING -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- ============================================================
-     LOADING OVERLAY
-     ============================================================ -->
 <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
     <div class="loading-text" id="loadingText">Loading...</div>
 </div>
 
 <script>
-/* PART 2: JavaScript will be added next */
-/* ============================================================
+/* JS will be pasted here in next part */
+   /* ============================================================
    RESULT MANAGEMENT — COMPLETE JAVASCRIPT
+   Theme: Navy + Emerald + Amber
    ============================================================ */
 
 (function () {
@@ -1841,8 +2268,8 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
     // ============================================================
     // CONFIG
     // ============================================================
-    
-   const API_BASE = "https://gsssshilla.onrender.com/api/results";
+    const API_BASE = "https://gsssshilla.onrender.com/api/results";
+    const STUDENT_API_BASE = "https://gsssshilla.onrender.com/api/students";
     const TOKEN_KEY = "authToken";
 
     // ============================================================
@@ -1858,9 +2285,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         subjects: [],
         exams: [],
         templates: [],
-        selectedStudent: null,
-        selectedExamForMarks: null,
-        selectedSubjectForMarks: null
+        selectedStudent: null
     };
 
     // ============================================================
@@ -1874,9 +2299,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
 
     async function apiRequest(method, path, body = null, opts = {}) {
         const url = API_BASE + path;
-        const headers = {
-            "Accept": "application/json"
-        };
+        const headers = { "Accept": "application/json" };
         const token = getToken();
         if (token) headers["Authorization"] = "Bearer " + token;
 
@@ -1944,8 +2367,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         container.appendChild(t);
         setTimeout(() => {
             t.style.opacity = "0";
-            t.style.transform = "translateX(20px)";
-            t.style.transition = "all 0.25s";
+            t.style.transform = "translateX(30px)";
             setTimeout(() => t.remove(), 260);
         }, duration);
     }
@@ -2033,20 +2455,20 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
     function statusBadge(status) {
         if (!status) return `<span class="badge badge-gray">—</span>`;
         const map = {
-            DRAFT: { cls: "badge-gray", icon: "fa-pen", label: "Draft" },
-            IN_PROGRESS: { cls: "badge-info", icon: "fa-spinner", label: "In Progress" },
-            SUBMITTED: { cls: "badge-warning", icon: "fa-paper-plane", label: "Submitted" },
-            VERIFIED: { cls: "badge-primary", icon: "fa-circle-check", label: "Verified" },
-            FINALIZED: { cls: "badge-success", icon: "fa-lock", label: "Finalized" },
-            PUBLISHED: { cls: "badge-success", icon: "fa-bullhorn", label: "Published" },
-            UNPUBLISHED: { cls: "badge-warning", icon: "fa-eye-slash", label: "Unpublished" },
-            ACTIVE: { cls: "badge-success", icon: "fa-circle-check", label: "Active" },
-            INACTIVE: { cls: "badge-gray", icon: "fa-circle", label: "Inactive" },
-            REJECTED: { cls: "badge-danger", icon: "fa-rotate-left", label: "Returned" },
-            Pass: { cls: "badge-success", icon: "fa-circle-check", label: "Pass" },
-            Fail: { cls: "badge-danger", icon: "fa-circle-xmark", label: "Fail" },
-            Absent: { cls: "badge-warning", icon: "fa-user-slash", label: "Absent" },
-            Withheld: { cls: "badge-danger", icon: "fa-ban", label: "Withheld" }
+            DRAFT:       { cls: "badge-gray",    icon: "fa-pen",            label: "Draft" },
+            IN_PROGRESS: { cls: "badge-info",    icon: "fa-spinner",        label: "In Progress" },
+            SUBMITTED:   { cls: "badge-warning", icon: "fa-paper-plane",    label: "Submitted" },
+            VERIFIED:    { cls: "badge-primary", icon: "fa-circle-check",   label: "Verified" },
+            FINALIZED:   { cls: "badge-success", icon: "fa-lock",           label: "Finalized" },
+            PUBLISHED:   { cls: "badge-success", icon: "fa-bullhorn",       label: "Published" },
+            UNPUBLISHED: { cls: "badge-warning", icon: "fa-eye-slash",      label: "Unpublished" },
+            ACTIVE:      { cls: "badge-success", icon: "fa-circle-check",   label: "Active" },
+            INACTIVE:    { cls: "badge-gray",    icon: "fa-circle",         label: "Inactive" },
+            REJECTED:    { cls: "badge-danger",  icon: "fa-rotate-left",    label: "Returned" },
+            Pass:        { cls: "badge-success", icon: "fa-circle-check",   label: "Pass" },
+            Fail:        { cls: "badge-danger",  icon: "fa-circle-xmark",   label: "Fail" },
+            Absent:      { cls: "badge-warning", icon: "fa-user-slash",     label: "Absent" },
+            Withheld:    { cls: "badge-danger",  icon: "fa-ban",            label: "Withheld" }
         };
         const m = map[status] || { cls: "badge-gray", icon: "fa-circle", label: status };
         return `<span class="badge ${m.cls}"><i class="fa-solid ${m.icon}"></i> ${m.label}</span>`;
@@ -2069,30 +2491,30 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         document.getElementById("sidebar").classList.remove("open");
         document.getElementById("sidebarOverlay").classList.remove("active");
 
-        // Lazy load data per tab
+        // Lazy load per tab
         switch (tab) {
-            case "dashboard": loadDashboardStats(); break;
-            case "sessions": loadSessions(); break;
-            case "classes": loadClasses(); break;
-            case "sections": loadSections(); break;
-            case "streams": loadStreams(); break;
-            case "subjects": loadSubjects(); break;
-            case "class-subjects": initClassSubjectsTab(); break;
-            case "student-subjects": initStudentSubjectsTab(); break;
-            case "exam-templates": loadTemplates(); break;
-            case "exams": initExamsTab(); break;
-            case "marks-entry": initMarksEntryTab(); break;
-            case "verification": initVerificationTab(); break;
-            case "final-results": initFinalResultsTab(); break;
-            case "published-results": initPublishedResultsTab(); break;
-            case "analytics": initAnalyticsTab(); break;
-            case "audit-logs": loadAuditLogs(); break;
-            case "settings": loadGradingScheme(); break;
+            case "dashboard":          loadDashboardStats(); break;
+            case "sessions":           loadSessions(); break;
+            case "classes":            loadClasses(); break;
+            case "sections":           loadSections(); break;
+            case "streams":            loadStreams(); break;
+            case "subjects":           loadSubjects(); break;
+            case "class-subjects":     initClassSubjectsTab(); break;
+            case "student-subjects":   initStudentSubjectsTab(); break;
+            case "exam-templates":     loadTemplates(); break;
+            case "exams":              initExamsTab(); break;
+            case "marks-entry":        initMarksEntryTab(); break;
+            case "verification":       initVerificationTab(); break;
+            case "final-results":      initFinalResultsTab(); break;
+            case "published-results":  initPublishedResultsTab(); break;
+            case "analytics":          initAnalyticsTab(); break;
+            case "audit-logs":         loadAuditLogs(); break;
+            case "settings":           loadGradingScheme(); break;
         }
     }
 
     // ============================================================
-    // GLOBAL INITIALIZATION
+    // APP INITIALIZATION
     // ============================================================
     async function initApp() {
         try {
@@ -2109,7 +2531,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
     }
 
     function bindGlobalEvents() {
-        // Sidebar nav
+        // Sidebar navigation
         document.querySelectorAll(".nav-item").forEach(item => {
             item.addEventListener("click", (e) => {
                 e.preventDefault();
@@ -2128,7 +2550,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
             document.getElementById("sidebarOverlay").classList.remove("active");
         });
 
-        // Modal close on backdrop click
+        // Modal backdrop click
         document.getElementById("modalOverlay").addEventListener("click", (e) => {
             if (e.target.id === "modalOverlay") closeModal();
         });
@@ -2136,7 +2558,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         // Global session select
         document.getElementById("globalSessionSelect").addEventListener("change", (e) => {
             STATE.sessionId = parseInt(e.target.value) || null;
-            // Reload current tab data
             switchTab(STATE.currentTab);
         });
     }
@@ -2183,16 +2604,16 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         }
         tbody.innerHTML = STATE.sessions.map(s => `
             <tr>
-                <td><strong>${escapeHtml(s.session_code)}</strong></td>
+                <td class="text-bold">${escapeHtml(s.session_code)}</td>
                 <td>${formatDate(s.start_date)}</td>
                 <td>${formatDate(s.end_date)}</td>
                 <td>${s.is_current ? `<span class="badge badge-success"><i class="fa-solid fa-star"></i> Current</span>` : "—"}</td>
                 <td>${statusBadge(s.is_active ? "ACTIVE" : "INACTIVE")}</td>
                 <td class="text-right">
-                    <button class="btn btn-sm btn-outline" onclick="editSession(${s.id})" title="Edit">
+                    <button class="btn btn-sm btn-outline btn-icon" onclick="editSession(${s.id})" title="Edit">
                         <i class="fa-solid fa-pen"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline" onclick="deleteSession(${s.id})" title="Delete">
+                    <button class="btn btn-sm btn-outline btn-icon" onclick="deleteSession(${s.id})" title="Delete">
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 </td>
@@ -2229,8 +2650,8 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="sessCurrent" ${session?.is_current ? "checked" : ""}>
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="sessCurrent" ${session?.is_current ? "checked" : ""} style="width: 18px; height: 18px; accent-color: #059669;">
                         Mark as current session
                     </label>
                 </div>
@@ -2244,7 +2665,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         `);
     };
 
-    window.editSession = async function (id) {
+    window.editSession = function (id) {
         const s = STATE.sessions.find(x => x.id === id);
         if (s) openSessionModal(s);
     };
@@ -2324,11 +2745,13 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         tbody.innerHTML = STATE.classes.map(c => `
             <tr>
                 <td>${c.display_order}</td>
-                <td><strong>${escapeHtml(c.class_name)}</strong></td>
+                <td class="text-bold">${escapeHtml(c.class_name)}</td>
                 <td><span class="badge badge-info">${escapeHtml(c.class_group || "—")}</span></td>
                 <td>${statusBadge(c.is_active ? "ACTIVE" : "INACTIVE")}</td>
                 <td class="text-right">
-                    <button class="btn btn-sm btn-outline" onclick="openClassModal(${c.id})"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn btn-sm btn-outline btn-icon" onclick="openClassModal(${c.id})">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
                 </td>
             </tr>
         `).join("");
@@ -2361,7 +2784,8 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
             <div class="modal-body">
                 <div class="form-group">
                     <label>Class Name <span class="required">*</span></label>
-                    <input type="text" class="form-control" id="clsName" placeholder="e.g. 7, Nursery" value="${escapeHtml(c?.class_name || "")}" ${c ? "readonly" : ""}>
+                    <input type="text" class="form-control" id="clsName" placeholder="e.g. 7, Nursery"
+                        value="${escapeHtml(c?.class_name || "")}" ${c ? "readonly" : ""}>
                 </div>
                 <div class="form-group">
                     <label>Class Group <span class="required">*</span></label>
@@ -2400,15 +2824,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         try {
             showLoading("Saving...");
             if (id) {
-                // No update API for classes yet — using PUT as fallback if exists
-                await api.put("/classes/" + id, body).catch(() => {
-                    throw new Error("Class update not supported. Delete & recreate.");
-                });
-                showToast("Class updated", "success");
-            } else {
-                await api.post("/classes", body);
-                showToast("Class created", "success");
+                showToast("Class update not supported — delete & recreate", "warning");
+                closeModal();
+                return;
             }
+            await api.post("/classes", body);
+            showToast("Class created", "success");
             closeModal();
             await loadClasses();
         } catch (err) {
@@ -2446,12 +2867,14 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         STATE.classes.forEach(c => { classMap[c.id] = c.class_name; });
         tbody.innerHTML = STATE.sections.map(s => `
             <tr>
-                <td><strong>${escapeHtml(s.section_name)}</strong></td>
+                <td class="text-bold">${escapeHtml(s.section_name)}</td>
                 <td>${escapeHtml(classMap[s.parent_id] || "—")}</td>
                 <td>${s.capacity || "—"}</td>
                 <td>${statusBadge(s.is_active ? "ACTIVE" : "INACTIVE")}</td>
                 <td class="text-right">
-                    <button class="btn btn-sm btn-outline" onclick="openSectionModal(${s.id})"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn btn-sm btn-outline btn-icon" onclick="openSectionModal(${s.id})">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
                 </td>
             </tr>
         `).join("");
@@ -2479,7 +2902,8 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
             <div class="modal-body">
                 <div class="form-group">
                     <label>Section Name <span class="required">*</span></label>
-                    <input type="text" class="form-control" id="secName" placeholder="e.g. A" value="${escapeHtml(s?.section_name || "")}">
+                    <input type="text" class="form-control" id="secName" placeholder="e.g. A"
+                        value="${escapeHtml(s?.section_name || "")}">
                 </div>
                 <div class="form-group">
                     <label>Class <span class="required">*</span></label>
@@ -2503,6 +2927,11 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
     };
 
     window.saveSection = async function (id) {
+        if (id) {
+            showToast("Section update not supported", "warning");
+            closeModal();
+            return;
+        }
         const body = {
             section_name: document.getElementById("secName").value.trim(),
             class_id: document.getElementById("secClass").value,
@@ -2514,11 +2943,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         }
         try {
             showLoading("Saving...");
-            if (id) {
-                showToast("Section update not supported", "warning");
-                closeModal();
-                return;
-            }
             await api.post("/sections", body);
             showToast("Section created", "success");
             closeModal();
@@ -2556,7 +2980,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         tbody.innerHTML = STATE.streams.map(s => `
             <tr>
                 <td><span class="badge badge-info">${escapeHtml(s.stream_code)}</span></td>
-                <td><strong>${escapeHtml(s.stream_name)}</strong></td>
+                <td class="text-bold">${escapeHtml(s.stream_name)}</td>
                 <td>${s.display_order}</td>
                 <td>${statusBadge(s.is_active ? "ACTIVE" : "INACTIVE")}</td>
                 <td class="text-right">—</td>
@@ -2657,12 +3081,14 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         tbody.innerHTML = STATE.subjects.map(s => `
             <tr>
                 <td><span class="badge badge-info">${escapeHtml(s.subject_code)}</span></td>
-                <td><strong>${escapeHtml(s.subject_name)}</strong></td>
+                <td class="text-bold">${escapeHtml(s.subject_name)}</td>
                 <td>${escapeHtml(s.subject_type || "—")}</td>
                 <td>${escapeHtml(s.component_type || "—")}</td>
                 <td>${statusBadge(s.is_active ? "ACTIVE" : "INACTIVE")}</td>
                 <td class="text-right">
-                    <button class="btn btn-sm btn-outline" onclick="openSubjectModal(${s.id})"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn btn-sm btn-outline btn-icon" onclick="openSubjectModal(${s.id})">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
                 </td>
             </tr>
         `).join("");
@@ -2679,16 +3105,19 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                 <div class="form-row">
                     <div class="form-group">
                         <label>Subject Code <span class="required">*</span></label>
-                        <input type="text" class="form-control" id="subCode" placeholder="PHY" value="${escapeHtml(s?.subject_code || "")}" ${s ? "readonly" : ""}>
+                        <input type="text" class="form-control" id="subCode" placeholder="PHY"
+                            value="${escapeHtml(s?.subject_code || "")}" ${s ? "readonly" : ""}>
                     </div>
                     <div class="form-group">
                         <label>Short Name</label>
-                        <input type="text" class="form-control" id="subShort" value="${escapeHtml(s?.subject_short_name || "")}">
+                        <input type="text" class="form-control" id="subShort"
+                            value="${escapeHtml(s?.subject_short_name || "")}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Subject Name <span class="required">*</span></label>
-                    <input type="text" class="form-control" id="subName" placeholder="Physics" value="${escapeHtml(s?.subject_name || "")}">
+                    <input type="text" class="form-control" id="subName" placeholder="Physics"
+                        value="${escapeHtml(s?.subject_name || "")}">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -2708,9 +3137,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                             <option value="Theory+Practical" ${s?.component_type === "Theory+Practical" ? "selected" : ""}>Theory + Practical</option>
                             <option value="Theory+Internal" ${s?.component_type === "Theory+Internal" ? "selected" : ""}>Theory + Internal</option>
                             <option value="Theory+Practical+Internal" ${s?.component_type === "Theory+Practical+Internal" ? "selected" : ""}>Theory + Practical + Internal</option>
-                            <option value="Practical" ${s?.component_type === "Practical" ? "selected" : ""}>Practical Only</option>
-                            <option value="Internal" ${s?.component_type === "Internal" ? "selected" : ""}>Internal Only</option>
-                            <option value="Project" ${s?.component_type === "Project" ? "selected" : ""}>Project</option>
                         </select>
                     </div>
                 </div>
@@ -2795,11 +3221,11 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         tbody.innerHTML = items.map(i => `
             <tr>
                 <td><span class="badge badge-info">${escapeHtml(i.subject_code)}</span></td>
-                <td>${escapeHtml(i.subject_name)}</td>
+                <td class="text-bold">${escapeHtml(i.subject_name)}</td>
                 <td>${i.stream_id ? escapeHtml(streamMap[i.stream_id] || "—") : "—"}</td>
                 <td>${i.is_optional ? "Yes" : "No"}</td>
                 <td class="text-right">
-                    <button class="btn btn-sm btn-outline" onclick="removeClassSubject(${i.id})">
+                    <button class="btn btn-sm btn-outline btn-icon" onclick="removeClassSubject(${i.id})">
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 </td>
@@ -2834,11 +3260,13 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                 </div>
                 <div class="form-group">
                     <label>Subjects <span class="required">*</span></label>
-                    <div style="max-height: 260px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px;">
+                    <div style="max-height: 280px; overflow-y: auto; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 12px;">
                         ${STATE.subjects.map(s => `
-                            <label style="display: flex; align-items: center; gap: 8px; padding: 6px 4px; font-weight: 500;">
-                                <input type="checkbox" value="${s.id}" class="cs-subject-checkbox">
-                                ${escapeHtml(s.subject_name)} <small style="color:#9ca3af;">(${escapeHtml(s.subject_code)})</small>
+                            <label style="display: flex; align-items: center; gap: 10px; padding: 8px 6px; font-weight: 500; cursor: pointer; border-radius: 6px;">
+                                <input type="checkbox" value="${s.id}" class="cs-subject-checkbox"
+                                    style="width: 18px; height: 18px; accent-color: #059669;">
+                                <span>${escapeHtml(s.subject_name)}</span>
+                                <small style="color:#94a3b8; font-weight: 600;">(${escapeHtml(s.subject_code)})</small>
                             </label>
                         `).join("")}
                     </div>
@@ -2904,7 +3332,9 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
 
         const el = document.getElementById("ssSessionFilter");
         const curVal = STATE.sessionId;
-        el.innerHTML = STATE.sessions.map(s => `<option value="${s.id}" ${s.id === curVal ? "selected" : ""}>${escapeHtml(s.session_code)}</option>`).join("");
+        el.innerHTML = STATE.sessions.map(s =>
+            `<option value="${s.id}" ${s.id === curVal ? "selected" : ""}>${escapeHtml(s.session_code)}</option>`
+        ).join("");
     }
 
     async function loadStudentsForSubjectAssignment() {
@@ -2913,50 +3343,50 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         const list = document.getElementById("ssStudentList");
 
         if (!classId) {
-            list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-user-graduate"></i>Select class to view students</div>`;
-            document.getElementById("ssSubjectPanel").innerHTML = `<div class="empty-state"><i class="fa-solid fa-hand-pointer"></i>Select a student</div>`;
+            list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-user-graduate"></i><h3>No students loaded</h3><p>Select a class</p></div>`;
+            document.getElementById("ssSubjectPanel").innerHTML = `<div class="empty-state"><i class="fa-solid fa-hand-pointer"></i><h3>Select a student</h3></div>`;
             return;
         }
 
         try {
-            list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i>Loading students...</div>`;
-            const params = { class_id: classId };
-            if (sectionId) params.section_id = sectionId;
-            // We reuse /class-subjects? No — we need students. Fallback: use a "students" endpoint
-            const res = await fetchStudentsForAssignment(classId, sectionId);
-            renderStudentList(res);
-        } catch (err) {
-            list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-xmark"></i>${escapeHtml(err.message)}</div>`;
-        }
-    }
+            list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><h3>Loading students...</h3></div>`;
+            const className = STATE.classes.find(c => c.id == classId)?.class_name;
+            if (!className) throw new Error("Class not found");
 
-    async function fetchStudentsForAssignment(classId, sectionId) {
-        // We call a generic endpoint (assumed available in the school ERP)
-        // Fallback: use classes API to get students by class
-        const className = STATE.classes.find(c => c.id == classId)?.class_name;
-        if (!className) return [];
-        try {
-            const res = await fetch(`/api/students?class=${encodeURIComponent(className)}`, {
-                headers: { "Accept": "application/json" }
-            });
-            if (!res.ok) return [];
+            const url = `${STUDENT_API_BASE}?class=${encodeURIComponent(className)}&limit=500`;
+            const token = getToken();
+            const headers = { "Accept": "application/json" };
+            if (token) headers["Authorization"] = "Bearer " + token;
+
+            const res = await fetch(url, { headers });
+            if (!res.ok) throw new Error(`Failed (${res.status})`);
             const json = await res.json();
-            return json.data || json || [];
-        } catch {
-            return [];
+            let students = json.data || json.students || json || [];
+
+            // Filter by section if selected (match by section name)
+            if (sectionId) {
+                const secName = STATE.sections.find(s => s.id == sectionId)?.section_name;
+                if (secName) {
+                    students = students.filter(s => s.section && String(s.section).toUpperCase() === String(secName).toUpperCase());
+                }
+            }
+
+            renderStudentList(students);
+        } catch (err) {
+            list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-xmark"></i><h3>Error</h3><p>${escapeHtml(err.message)}</p></div>`;
         }
     }
 
     function renderStudentList(students) {
         const list = document.getElementById("ssStudentList");
         if (!students || !students.length) {
-            list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-user-slash"></i>No students found</div>`;
+            list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-user-slash"></i><h3>No students found</h3></div>`;
             return;
         }
         list.innerHTML = students.map(s => {
             const initial = (s.name || "S").trim().charAt(0).toUpperCase();
             return `
-                <div class="student-item" onclick="selectStudentForSubjects('${escapeHtml(s.student_id)}', '${escapeHtml(s.name)}')">
+                <div class="student-item" onclick="selectStudentForSubjects('${escapeHtml(s.student_id)}', '${escapeHtml(s.name)}', this)">
                     <div class="student-avatar">${initial}</div>
                     <div class="student-info">
                         <div class="student-name">${escapeHtml(s.name || "—")}</div>
@@ -2967,53 +3397,57 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         }).join("");
     }
 
-    window.selectStudentForSubjects = async function (studentId, name) {
+    window.selectStudentForSubjects = async function (studentId, name, el) {
         STATE.selectedStudent = { student_id: studentId, name };
 
-        document.querySelectorAll(".student-item").forEach(el => el.classList.remove("active"));
-        event?.currentTarget?.classList?.add("active");
+        document.querySelectorAll(".student-item").forEach(x => x.classList.remove("active"));
+        if (el) el.classList.add("active");
 
         const sessionId = document.getElementById("ssSessionFilter").value;
         const panel = document.getElementById("ssSubjectPanel");
-        panel.innerHTML = `<div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i>Loading subjects...</div>`;
+        panel.innerHTML = `<div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><h3>Loading subjects...</h3></div>`;
 
         try {
             const res = await api.get("/student-subjects/" + studentId, { session_id: sessionId });
-            const assigned = res.data || [];
+            const assigned = res.data?.subjects || res.data || [];
             const assignedIds = new Set(assigned.map(a => a.subject_id));
             const classId = document.getElementById("ssClassFilter").value;
 
-            // Fetch class subjects
             const csRes = await api.get("/class-subjects", { class_id: classId });
             const classSubjects = csRes.data || [];
 
             panel.innerHTML = `
-                <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-                    <div><strong>${escapeHtml(name)}</strong> <small style="color:#6b7280;">(${escapeHtml(studentId)})</small></div>
+                <div style="margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <div>
+                        <div style="font-weight: 700; color: #0f2942;">${escapeHtml(name)}</div>
+                        <small style="color:#64748b; font-weight: 500;">${escapeHtml(studentId)}</small>
+                    </div>
                     <button class="btn btn-sm btn-primary" onclick="saveStudentSubjects('${escapeHtml(studentId)}')">
                         <i class="fa-solid fa-floppy-disk"></i> Save
                     </button>
                 </div>
-                <div style="max-height: 420px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px;">
+                <div style="max-height: 420px; overflow-y: auto; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 12px; background: #fff;">
                     ${classSubjects.length ? classSubjects.map(cs => `
-                        <label style="display:flex; align-items:center; gap:8px; padding:8px 6px; border-bottom:1px solid #f3f4f6; font-weight:500;">
-                            <input type="checkbox" class="ss-subject-checkbox" value="${cs.subject_id}" ${assignedIds.has(cs.subject_id) ? "checked" : ""}>
-                            ${escapeHtml(cs.subject_name)} <small style="color:#9ca3af;">(${escapeHtml(cs.subject_code)})</small>
+                        <label style="display:flex; align-items:center; gap:10px; padding:10px 8px; border-bottom:1px solid #f1f5f9; font-weight:500; cursor:pointer;">
+                            <input type="checkbox" class="ss-subject-checkbox" value="${cs.subject_id}"
+                                ${assignedIds.has(cs.subject_id) ? "checked" : ""}
+                                style="width:18px; height:18px; accent-color: #059669;">
+                            <span>${escapeHtml(cs.subject_name)}</span>
+                            <small style="color:#94a3b8; font-weight: 600;">(${escapeHtml(cs.subject_code)})</small>
                         </label>
-                    `).join("") : `<div class="empty-state" style="padding:20px;">No subjects mapped to this class</div>`}
+                    `).join("") : `<div class="empty-state" style="padding:30px;"><i class="fa-solid fa-book"></i><h3>No subjects mapped</h3><p>Map subjects to this class first</p></div>`}
                 </div>
-                <div class="form-help" style="margin-top: 8px;">Total assigned: <strong>${assigned.length}</strong></div>
+                <div class="form-help" style="margin-top: 10px;">
+                    <i class="fa-solid fa-info-circle"></i> Total assigned: <strong>${assigned.length}</strong>
+                </div>
             `;
         } catch (err) {
-            panel.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-xmark"></i>${escapeHtml(err.message)}</div>`;
+            panel.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-xmark"></i><h3>Error</h3><p>${escapeHtml(err.message)}</p></div>`;
         }
     };
 
     window.saveStudentSubjects = async function (studentId) {
         const sessionId = document.getElementById("ssSessionFilter").value;
-        const classId = document.getElementById("ssClassFilter").value;
-        const sectionId = document.getElementById("ssSectionFilter").value || null;
-
         const checked = Array.from(document.querySelectorAll(".ss-subject-checkbox:checked")).map(cb => parseInt(cb.value));
 
         if (!checked.length) {
@@ -3026,8 +3460,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
             await api.post("/student-subjects/assign", {
                 student_id: studentId,
                 session_id: sessionId,
-                class_id: classId,
-                section_id: sectionId,
                 subject_ids: checked
             });
             showToast("Subjects assigned", "success");
@@ -3057,13 +3489,17 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
     function renderTemplates() {
         const area = document.getElementById("templatesList");
         if (!STATE.templates.length) {
-            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-clipboard-list"></i>No templates yet</div>`;
+            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-clipboard-list"></i><h3>No templates yet</h3><p>Create your first exam template</p></div>`;
             return;
         }
         area.innerHTML = STATE.templates.map(t => `
             <div class="template-card">
                 <h4>${escapeHtml(t.template_name)}</h4>
-                <div class="template-meta">${escapeHtml(t.class_group || "")} · ${t.items?.length || 0} exams</div>
+                <div class="template-meta">
+                    <i class="fa-solid fa-users"></i> ${escapeHtml(t.class_group || "")}
+                    &nbsp;·&nbsp;
+                    <i class="fa-solid fa-file-pen"></i> ${t.items?.length || 0} exams
+                </div>
                 <div class="template-items">
                     ${(t.items || []).map(i => `<span class="template-item-chip">${escapeHtml(i.exam_name)}</span>`).join("")}
                 </div>
@@ -3093,7 +3529,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                 <div class="form-group">
                     <label>Exams (comma separated)</label>
                     <input type="text" class="form-control" id="tplExams" placeholder="FA-1,FA-2,SA-1,FA-3,FA-4,SA-2">
-                    <div class="form-help">Example: FA-1,FA-2,SA-1</div>
+                    <div class="form-help"><i class="fa-solid fa-info-circle"></i> Example: FA-1,FA-2,SA-1</div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -3148,7 +3584,9 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         if (!STATE.classes.length) await loadClasses();
 
         const sessionSel = document.getElementById("examSessionFilter");
-        sessionSel.innerHTML = STATE.sessions.map(s => `<option value="${s.id}" ${s.id === STATE.sessionId ? "selected" : ""}>${escapeHtml(s.session_code)}</option>`).join("");
+        sessionSel.innerHTML = STATE.sessions.map(s =>
+            `<option value="${s.id}" ${s.id === STATE.sessionId ? "selected" : ""}>${escapeHtml(s.session_code)}</option>`
+        ).join("");
 
         await loadExams();
     }
@@ -3177,15 +3615,18 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
     function renderExamsCards() {
         const area = document.getElementById("examsCardsView");
         if (!STATE.exams.length) {
-            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-file-pen"></i>No exams found</div>`;
+            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-file-pen"></i><h3>No exams found</h3><p>Generate exams from a template or adjust filters</p></div>`;
             return;
         }
         area.innerHTML = STATE.exams.map(e => `
             <div class="exam-card">
                 <div class="exam-card-header">
-                    <div>
+                    <div style="flex: 1; min-width: 0;">
                         <div class="exam-card-title">${escapeHtml(e.name)}</div>
-                        <div class="exam-card-sub">${escapeHtml(e.class_name || "")} · ${escapeHtml(e.session_name || "")}</div>
+                        <div class="exam-card-sub">
+                            <i class="fa-solid fa-school"></i> ${escapeHtml(e.class_name || "")}
+                            <br><i class="fa-solid fa-calendar-days"></i> ${escapeHtml(e.session_name || "")}
+                        </div>
                     </div>
                     ${statusBadge(e.status)}
                 </div>
@@ -3203,10 +3644,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                     <button class="btn btn-sm btn-outline" onclick="manageExamSubjects(${e.id})">
                         <i class="fa-solid fa-book"></i> Subjects
                     </button>
-                    <button class="btn btn-sm btn-outline" onclick="finalizeExam(${e.id})" ${e.status === "FINALIZED" || e.status === "PUBLISHED" ? "disabled" : ""}>
+                    <button class="btn btn-sm btn-outline" onclick="finalizeExam(${e.id})"
+                        ${["FINALIZED", "PUBLISHED"].includes(e.status) ? "disabled" : ""}>
                         <i class="fa-solid fa-lock"></i> Finalize
                     </button>
-                    <button class="btn btn-sm btn-success" onclick="publishExam(${e.id})" ${e.status !== "FINALIZED" ? "disabled" : ""}>
+                    <button class="btn btn-sm btn-success" onclick="publishExam(${e.id})"
+                        ${e.status !== "FINALIZED" ? "disabled" : ""}>
                         <i class="fa-solid fa-bullhorn"></i> Publish
                     </button>
                 </div>
@@ -3240,10 +3683,11 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                 </div>
                 <div class="form-group">
                     <label>Classes <span class="required">*</span></label>
-                    <div style="max-height: 220px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px;">
+                    <div style="max-height: 240px; overflow-y: auto; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 12px;">
                         ${STATE.classes.map(c => `
-                            <label style="display:flex; align-items:center; gap:8px; padding:6px 4px; font-weight:500;">
-                                <input type="checkbox" value="${c.id}" class="gen-class-checkbox">
+                            <label style="display:flex; align-items:center; gap:10px; padding:8px 6px; font-weight:500; cursor:pointer;">
+                                <input type="checkbox" value="${c.id}" class="gen-class-checkbox"
+                                    style="width:18px; height:18px; accent-color: #059669;">
                                 ${escapeHtml(c.class_name)}
                             </label>
                         `).join("")}
@@ -3303,23 +3747,26 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                     <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="modal-body">
-                    <div class="filter-bar">
+                    <div class="filter-bar" style="margin-bottom: 14px;">
                         <label>
                             Max Marks:
-                            <input type="number" id="esMaxMarks" value="100" style="width:90px;">
+                            <input type="number" id="esMaxMarks" value="100" style="width:100px;">
                         </label>
                         <label>
                             Pass Marks:
-                            <input type="number" id="esPassMarks" value="33" style="width:90px;">
+                            <input type="number" id="esPassMarks" value="33" style="width:100px;">
                         </label>
                     </div>
                     <div class="form-group">
                         <label>Select Subjects</label>
-                        <div style="max-height: 320px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px;">
+                        <div style="max-height: 320px; overflow-y: auto; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 12px;">
                             ${STATE.subjects.map(s => `
-                                <label style="display:flex; align-items:center; gap:8px; padding:6px 4px; font-weight:500;">
-                                    <input type="checkbox" class="es-subject-checkbox" value="${s.id}" ${assignedIds.has(s.id) ? "checked" : ""}>
-                                    ${escapeHtml(s.subject_name)} <small style="color:#9ca3af;">(${escapeHtml(s.subject_code)})</small>
+                                <label style="display:flex; align-items:center; gap:10px; padding:8px 6px; font-weight:500; cursor:pointer;">
+                                    <input type="checkbox" class="es-subject-checkbox" value="${s.id}"
+                                        ${assignedIds.has(s.id) ? "checked" : ""}
+                                        style="width:18px; height:18px; accent-color: #059669;">
+                                    ${escapeHtml(s.subject_name)}
+                                    <small style="color:#94a3b8; font-weight: 600;">(${escapeHtml(s.subject_code)})</small>
                                 </label>
                             `).join("")}
                         </div>
@@ -3403,42 +3850,34 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         if (!STATE.classes.length) await loadClasses();
 
         const sessionSel = document.getElementById("meSessionFilter");
-        sessionSel.innerHTML = STATE.sessions.map(s => `<option value="${s.id}" ${s.id === STATE.sessionId ? "selected" : ""}>${escapeHtml(s.session_code)}</option>`).join("");
+        sessionSel.innerHTML = STATE.sessions.map(s =>
+            `<option value="${s.id}" ${s.id === STATE.sessionId ? "selected" : ""}>${escapeHtml(s.session_code)}</option>`
+        ).join("");
     }
 
     async function loadExamsForMarksEntry() {
         const classId = document.getElementById("meClassFilter").value;
         const examSel = document.getElementById("meExamFilter");
-        if (!classId) {
-            examSel.innerHTML = `<option value="">Select Exam</option>`;
-            return;
-        }
+        if (!classId) { examSel.innerHTML = `<option value="">Select Exam</option>`; return; }
         const sessionId = document.getElementById("meSessionFilter").value;
         try {
             const res = await api.get("/exams", { session_id: sessionId, class_id: classId });
             const exams = res.data || [];
             examSel.innerHTML = `<option value="">Select Exam</option>` +
                 exams.map(e => `<option value="${e.id}">${escapeHtml(e.name)}</option>`).join("");
-        } catch (err) {
-            showToast(err.message, "error");
-        }
+        } catch (err) { showToast(err.message, "error"); }
     }
 
     async function loadSubjectsForMarksEntry() {
         const examId = document.getElementById("meExamFilter").value;
         const subjSel = document.getElementById("meSubjectFilter");
-        if (!examId) {
-            subjSel.innerHTML = `<option value="">Select Subject</option>`;
-            return;
-        }
+        if (!examId) { subjSel.innerHTML = `<option value="">Select Subject</option>`; return; }
         try {
             const res = await api.get("/exams/" + examId);
             const exam = res.data;
             subjSel.innerHTML = `<option value="">Select Subject</option>` +
                 (exam.subjects || []).map(s => `<option value="${s.subject_id}">${escapeHtml(s.actual_subject_name || s.subject_name)}</option>`).join("");
-        } catch (err) {
-            showToast(err.message, "error");
-        }
+        } catch (err) { showToast(err.message, "error"); }
     }
 
     async function loadMarksEntrySheet() {
@@ -3448,7 +3887,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         const area = document.getElementById("marksEntryArea");
 
         if (!examId || !subjectId) {
-            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-pen-to-square"></i>Select exam & subject</div>`;
+            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-pen-to-square"></i><h3>Ready to enter marks</h3><p>Select exam &amp; subject</p></div>`;
             return;
         }
 
@@ -3459,11 +3898,8 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
             const res = await api.get(`/marks-entry/${examId}/${subjectId}`, params);
             const { exam, subject_config, students } = res.data;
 
-            STATE.selectedExamForMarks = exam;
-            STATE.selectedSubjectForMarks = subject_config;
-
             if (!students.length) {
-                area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-user-slash"></i>No students assigned this subject</div>`;
+                area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-user-slash"></i><h3>No students assigned</h3><p>Assign this subject to students first</p></div>`;
                 return;
             }
 
@@ -3474,9 +3910,13 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
             const hasProject = (cfg.project_max || 0) > 0;
 
             area.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
                     <div>
-                        <strong>${escapeHtml(exam.exam_name)}</strong> · Max Marks: ${cfg.max_marks || 100} · Pass: ${cfg.pass_marks || 33}
+                        <div style="font-weight:700; color:#0f2942; font-size:15px;">${escapeHtml(exam.exam_name)}</div>
+                        <div style="font-size:12.5px; color:#64748b; margin-top:2px;">
+                            <i class="fa-solid fa-circle-info"></i>
+                            Max: <strong>${cfg.max_marks || 100}</strong> · Pass: <strong>${cfg.pass_marks || 33}</strong>
+                        </div>
                     </div>
                     ${statusBadge(exam.status)}
                 </div>
@@ -3512,7 +3952,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                 </div>
             `;
         } catch (err) {
-            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-xmark"></i>${escapeHtml(err.message)}</div>`;
+            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-xmark"></i><h3>Error</h3><p>${escapeHtml(err.message)}</p></div>`;
         } finally {
             hideLoading();
         }
@@ -3531,12 +3971,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
             <tr data-student="${escapeHtml(s.student_id)}">
                 <td>${escapeHtml(s.roll_number || "—")}</td>
                 <td>${escapeHtml(s.student_id)}</td>
-                <td><strong>${escapeHtml(s.student_name)}</strong></td>
+                <td class="text-bold">${escapeHtml(s.student_name)}</td>
                 ${flags.hasTheory ? `<td><input type="number" class="mark-input" data-field="theory" value="${theory}" min="0" max="${cfg.theory_max || 0}" step="0.5"></td>` : ""}
                 ${flags.hasPractical ? `<td><input type="number" class="mark-input" data-field="practical" value="${practical}" min="0" max="${cfg.practical_max || 0}" step="0.5"></td>` : ""}
                 ${flags.hasInternal ? `<td><input type="number" class="mark-input" data-field="internal" value="${internal}" min="0" max="${cfg.internal_max || 0}" step="0.5"></td>` : ""}
                 ${flags.hasProject ? `<td><input type="number" class="mark-input" data-field="project" value="${project}" min="0" max="${cfg.project_max || 0}" step="0.5"></td>` : ""}
-                <td><strong class="mark-total">${total}</strong></td>
+                <td><span class="mark-total">${total}</span></td>
                 <td><span class="mark-grade">${escapeHtml(grade)}</span></td>
                 <td>
                     <select class="mark-absent">
@@ -3547,7 +3987,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                         <option value="Withheld" ${absentType === "Withheld" ? "selected" : ""}>Withheld</option>
                     </select>
                 </td>
-                <td><input type="text" class="mark-remarks" value="${escapeHtml(remarks)}" style="width:130px;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;"></td>
+                <td><input type="text" class="mark-remarks" value="${escapeHtml(remarks)}" style="width:140px;"></td>
             </tr>
         `;
     }
@@ -3563,11 +4003,8 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                 const v = parseFloat(inp.value);
                 const max = parseFloat(inp.max || "0");
                 if (!isNaN(v)) {
-                    if (v < 0 || v > max) {
-                        inp.classList.add("input-error");
-                    } else {
-                        inp.classList.remove("input-error");
-                    }
+                    if (v < 0 || v > max) inp.classList.add("input-error");
+                    else inp.classList.remove("input-error");
                     total += isNaN(v) ? 0 : v;
                 }
             });
@@ -3615,7 +4052,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
             });
             const d = res.data || {};
             if (d.failed_count > 0) {
-                showToast(`Saved ${d.saved_count}, failed ${d.failed_count}. Check console.`, "warning");
+                showToast(`Saved ${d.saved_count}, failed ${d.failed_count}`, "warning");
                 console.warn("Failed rows:", d.failed);
             } else {
                 showToast(`Saved ${d.saved_count} marks`, "success");
@@ -3650,7 +4087,9 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         if (!STATE.sessions.length) await loadSessionsForGlobal();
         if (!STATE.classes.length) await loadClasses();
         const sessionSel = document.getElementById("vfSessionFilter");
-        sessionSel.innerHTML = STATE.sessions.map(s => `<option value="${s.id}" ${s.id === STATE.sessionId ? "selected" : ""}>${escapeHtml(s.session_code)}</option>`).join("");
+        sessionSel.innerHTML = STATE.sessions.map(s =>
+            `<option value="${s.id}" ${s.id === STATE.sessionId ? "selected" : ""}>${escapeHtml(s.session_code)}</option>`
+        ).join("");
     }
 
     async function loadExamsForVerification() {
@@ -3684,7 +4123,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         const area = document.getElementById("verificationArea");
 
         if (!examId || !subjectId) {
-            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check"></i>Select filters</div>`;
+            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Ready for verification</h3><p>Select exam &amp; subject</p></div>`;
             return;
         }
 
@@ -3694,7 +4133,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
             const { students } = res.data;
 
             if (!students.length) {
-                area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-user-slash"></i>No students</div>`;
+                area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-user-slash"></i><h3>No students</h3></div>`;
                 return;
             }
 
@@ -3702,7 +4141,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
             const verified = students.filter(s => s.marks_status === "VERIFIED");
 
             area.innerHTML = `
-                <div style="margin-bottom:12px; display:flex; gap:10px; flex-wrap:wrap;">
+                <div style="margin-bottom:16px; display:flex; gap:10px; flex-wrap:wrap;">
                     <span class="badge badge-warning"><i class="fa-solid fa-paper-plane"></i> Submitted: ${submitted.length}</span>
                     <span class="badge badge-primary"><i class="fa-solid fa-circle-check"></i> Verified: ${verified.length}</span>
                 </div>
@@ -3724,10 +4163,10 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                             ${students.map(s => `
                                 <tr>
                                     <td>${escapeHtml(s.roll_number || "—")}</td>
-                                    <td>${escapeHtml(s.student_name)} <small style="color:#6b7280;">(${escapeHtml(s.student_id)})</small></td>
+                                    <td class="text-bold">${escapeHtml(s.student_name)} <small style="color:#64748b; font-weight: 400;">(${escapeHtml(s.student_id)})</small></td>
                                     <td>${s.theory_marks ?? "—"}</td>
                                     <td>${s.practical_marks ?? "—"}</td>
-                                    <td><strong>${s.total_marks ?? 0}</strong></td>
+                                    <td class="text-bold">${s.total_marks ?? 0}</td>
                                     <td>${escapeHtml(s.grade || "—")}</td>
                                     <td>${statusBadge(s.marks_status || "—")}</td>
                                     <td>${escapeHtml(s.remarks || "—")}</td>
@@ -3746,7 +4185,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                 </div>
             `;
         } catch (err) {
-            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-xmark"></i>${escapeHtml(err.message)}</div>`;
+            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-xmark"></i><h3>Error</h3><p>${escapeHtml(err.message)}</p></div>`;
         } finally {
             hideLoading();
         }
@@ -3789,14 +4228,16 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         if (!STATE.sessions.length) await loadSessionsForGlobal();
         if (!STATE.classes.length) await loadClasses();
         const sessionSel = document.getElementById("frSessionFilter");
-        sessionSel.innerHTML = STATE.sessions.map(s => `<option value="${s.id}" ${s.id === STATE.sessionId ? "selected" : ""}>${escapeHtml(s.session_code)}</option>`).join("");
+        sessionSel.innerHTML = STATE.sessions.map(s =>
+            `<option value="${s.id}" ${s.id === STATE.sessionId ? "selected" : ""}>${escapeHtml(s.session_code)}</option>`
+        ).join("");
     }
 
     async function loadExamsForFinalization() {
         const classId = document.getElementById("frClassFilter").value;
         const area = document.getElementById("finalResultsArea");
         if (!classId) {
-            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-flag-checkered"></i>Select class</div>`;
+            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-flag-checkered"></i><h3>Select class</h3></div>`;
             return;
         }
         const sessionId = document.getElementById("frSessionFilter").value;
@@ -3805,26 +4246,29 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
             const res = await api.get("/exams", { session_id: sessionId, class_id: classId });
             const exams = res.data || [];
             if (!exams.length) {
-                area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-file-pen"></i>No exams</div>`;
+                area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-file-pen"></i><h3>No exams</h3><p>Create exams first</p></div>`;
                 return;
             }
             area.innerHTML = `<div class="exam-cards-grid">${exams.map(e => `
                 <div class="exam-card">
                     <div class="exam-card-header">
-                        <div>
+                        <div style="flex:1; min-width:0;">
                             <div class="exam-card-title">${escapeHtml(e.name)}</div>
                             <div class="exam-card-sub">${escapeHtml(e.class_name || "")}</div>
                         </div>
                         ${statusBadge(e.status)}
                     </div>
                     <div class="exam-card-actions">
-                        <button class="btn btn-sm btn-outline" onclick="finalizeExam(${e.id})" ${["FINALIZED","PUBLISHED"].includes(e.status) ? "disabled" : ""}>
+                        <button class="btn btn-sm btn-outline" onclick="finalizeExam(${e.id})"
+                            ${["FINALIZED", "PUBLISHED"].includes(e.status) ? "disabled" : ""}>
                             <i class="fa-solid fa-lock"></i> Finalize
                         </button>
-                        <button class="btn btn-sm btn-warning" onclick="unlockExam(${e.id})" ${!["FINALIZED"].includes(e.status) ? "disabled" : ""}>
+                        <button class="btn btn-sm btn-warning" onclick="unlockExam(${e.id})"
+                            ${e.status !== "FINALIZED" ? "disabled" : ""}>
                             <i class="fa-solid fa-lock-open"></i> Unlock
                         </button>
-                        <button class="btn btn-sm btn-success" onclick="publishExam(${e.id})" ${e.status !== "FINALIZED" ? "disabled" : ""}>
+                        <button class="btn btn-sm btn-success" onclick="publishExam(${e.id})"
+                            ${e.status !== "FINALIZED" ? "disabled" : ""}>
                             <i class="fa-solid fa-bullhorn"></i> Publish
                         </button>
                     </div>
@@ -3859,7 +4303,9 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         if (!STATE.sessions.length) await loadSessionsForGlobal();
         if (!STATE.classes.length) await loadClasses();
         const sessionSel = document.getElementById("prSessionFilter");
-        sessionSel.innerHTML = STATE.sessions.map(s => `<option value="${s.id}" ${s.id === STATE.sessionId ? "selected" : ""}>${escapeHtml(s.session_code)}</option>`).join("");
+        sessionSel.innerHTML = STATE.sessions.map(s =>
+            `<option value="${s.id}" ${s.id === STATE.sessionId ? "selected" : ""}>${escapeHtml(s.session_code)}</option>`
+        ).join("");
         await loadPublishedResults();
     }
 
@@ -3871,23 +4317,24 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
 
         try {
             showLoading("Loading...");
-            const params = { session_id: sessionId };
+            const params = { session_id: sessionId, status: "PUBLISHED" };
             if (classId) params.class_id = classId;
-            params.status = "PUBLISHED";
             const res = await api.get("/exams", params);
             const exams = res.data || [];
 
             if (!exams.length) {
-                area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-bullhorn"></i>No published results</div>`;
+                area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-bullhorn"></i><h3>No published results</h3><p>Publish exams to see them here</p></div>`;
                 return;
             }
 
             area.innerHTML = `<div class="exam-cards-grid">${exams.map(e => `
                 <div class="exam-card">
                     <div class="exam-card-header">
-                        <div>
+                        <div style="flex:1; min-width:0;">
                             <div class="exam-card-title">${escapeHtml(e.name)}</div>
-                            <div class="exam-card-sub">${escapeHtml(e.class_name || "")}</div>
+                            <div class="exam-card-sub">
+                                <i class="fa-solid fa-school"></i> ${escapeHtml(e.class_name || "")}
+                            </div>
                         </div>
                         ${statusBadge(e.status)}
                     </div>
@@ -3927,7 +4374,9 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         if (!STATE.sessions.length) await loadSessionsForGlobal();
         if (!STATE.classes.length) await loadClasses();
         const sessionSel = document.getElementById("anSessionFilter");
-        sessionSel.innerHTML = STATE.sessions.map(s => `<option value="${s.id}" ${s.id === STATE.sessionId ? "selected" : ""}>${escapeHtml(s.session_code)}</option>`).join("");
+        sessionSel.innerHTML = STATE.sessions.map(s =>
+            `<option value="${s.id}" ${s.id === STATE.sessionId ? "selected" : ""}>${escapeHtml(s.session_code)}</option>`
+        ).join("");
     }
 
     async function loadExamsForAnalytics() {
@@ -3947,7 +4396,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         const examId = document.getElementById("anExamFilter").value;
         const area = document.getElementById("analyticsArea");
         if (!examId) {
-            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-chart-pie"></i>Select exam</div>`;
+            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-chart-pie"></i><h3>Select exam</h3></div>`;
             return;
         }
 
@@ -3956,39 +4405,44 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
             const res = await api.get(`/analytics/exam/${examId}`);
             const d = res.data || {};
             area.innerHTML = `
-                <div class="stats-grid">
+                <div class="analytics-grid">
                     ${(d.subject_stats || []).map(s => `
-                        <div class="stat-card">
-                            <div class="stat-icon" style="background:#eef2ff;color:#4f46e5;"><i class="fa-solid fa-book"></i></div>
-                            <div class="stat-info">
-                                <div class="stat-label">${escapeHtml(s.subject_name || "—")}</div>
-                                <div class="stat-value">${s.avg_marks ? parseFloat(s.avg_marks).toFixed(1) : "—"}</div>
-                                <div class="stat-label">Avg of ${s.total_students} students</div>
-                            </div>
+                        <div class="analytics-card">
+                            <div class="analytics-label">${escapeHtml(s.subject_name || "—")}</div>
+                            <div class="analytics-value">${s.avg_marks ? parseFloat(s.avg_marks).toFixed(1) : "—"}</div>
+                            <div class="analytics-sub">Avg of ${s.total_students} students</div>
                         </div>
                     `).join("")}
                 </div>
-                <div class="card">
-                    <div class="card-header"><h3>Grade Distribution</h3></div>
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-chart-bar"></i> Grade Distribution</h3>
+                    </div>
                     <div class="card-body">
                         <div class="table-wrapper">
                             <table class="table">
                                 <thead><tr><th>Grade</th><th>Count</th></tr></thead>
                                 <tbody>
-                                    ${(d.grade_distribution || []).map(g => `<tr><td>${escapeHtml(g.grade || "—")}</td><td>${g.count}</td></tr>`).join("") || '<tr><td colspan="2" class="text-center text-muted">No data</td></tr>'}
+                                    ${(d.grade_distribution || []).map(g => `
+                                        <tr><td class="text-bold">${escapeHtml(g.grade || "—")}</td><td>${g.count}</td></tr>
+                                    `).join("") || '<tr><td colspan="2" class="text-center text-muted">No data</td></tr>'}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><h3>Result Status</h3></div>
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-circle-check"></i> Result Status</h3>
+                    </div>
                     <div class="card-body">
                         <div class="table-wrapper">
                             <table class="table">
                                 <thead><tr><th>Status</th><th>Count</th></tr></thead>
                                 <tbody>
-                                    ${(d.result_status_distribution || []).map(g => `<tr><td>${escapeHtml(g.result_status || "—")}</td><td>${g.count}</td></tr>`).join("") || '<tr><td colspan="2" class="text-center text-muted">No data</td></tr>'}
+                                    ${(d.result_status_distribution || []).map(g => `
+                                        <tr><td>${statusBadge(g.result_status)}</td><td>${g.count}</td></tr>
+                                    `).join("") || '<tr><td colspan="2" class="text-center text-muted">No data</td></tr>'}
                                 </tbody>
                             </table>
                         </div>
@@ -3996,7 +4450,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                 </div>
             `;
         } catch (err) {
-            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-xmark"></i>${escapeHtml(err.message)}</div>`;
+            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-xmark"></i><h3>Error</h3><p>${escapeHtml(err.message)}</p></div>`;
         } finally {
             hideLoading();
         }
@@ -4050,8 +4504,8 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                 <td>${escapeHtml(l.student_id || "—")}</td>
                 <td>
                     <details>
-                        <summary style="cursor:pointer;color:#4f46e5;">View</summary>
-                        <pre style="font-size:11px;background:#f9fafb;padding:8px;border-radius:4px;overflow-x:auto;margin-top:6px;">${escapeHtml(JSON.stringify({ old: l.old_value, new: l.new_value, reason: l.reason }, null, 2))}</pre>
+                        <summary style="cursor:pointer;color:#059669;font-weight:600;">View details</summary>
+                        <pre style="font-size:11px;background:#f8fafc;padding:10px;border-radius:6px;overflow-x:auto;margin-top:8px;border:1px solid #e2e8f0;">${escapeHtml(JSON.stringify({ old: l.old_value, new: l.new_value, reason: l.reason }, null, 2))}</pre>
                     </details>
                 </td>
             </tr>
@@ -4078,8 +4532,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
     // ============================================================
     async function loadGradingScheme() {
         const area = document.getElementById("gradingSchemeArea");
-        area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i>Loading...</div>`;
-        // Grading scheme is defined in master; show default
         area.innerHTML = `
             <div class="table-wrapper">
                 <table class="table">
@@ -4087,13 +4539,13 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
                         <tr><th>Range</th><th>Grade</th><th>Grade Point</th></tr>
                     </thead>
                     <tbody>
-                        <tr><td>90 - 100</td><td><span class="badge badge-success">A+</span></td><td>10</td></tr>
-                        <tr><td>80 - 89</td><td><span class="badge badge-success">A</span></td><td>9</td></tr>
-                        <tr><td>70 - 79</td><td><span class="badge badge-info">B+</span></td><td>8</td></tr>
-                        <tr><td>60 - 69</td><td><span class="badge badge-info">B</span></td><td>7</td></tr>
-                        <tr><td>50 - 59</td><td><span class="badge badge-warning">C</span></td><td>6</td></tr>
-                        <tr><td>40 - 49</td><td><span class="badge badge-warning">D</span></td><td>5</td></tr>
-                        <tr><td>0 - 39</td><td><span class="badge badge-danger">E</span></td><td>0</td></tr>
+                        <tr><td>90 - 100</td><td><span class="badge badge-success">A+</span></td><td class="text-bold">10</td></tr>
+                        <tr><td>80 - 89</td><td><span class="badge badge-success">A</span></td><td class="text-bold">9</td></tr>
+                        <tr><td>70 - 79</td><td><span class="badge badge-info">B+</span></td><td class="text-bold">8</td></tr>
+                        <tr><td>60 - 69</td><td><span class="badge badge-info">B</span></td><td class="text-bold">7</td></tr>
+                        <tr><td>50 - 59</td><td><span class="badge badge-warning">C</span></td><td class="text-bold">6</td></tr>
+                        <tr><td>40 - 49</td><td><span class="badge badge-warning">D</span></td><td class="text-bold">5</td></tr>
+                        <tr><td>0 - 39</td><td><span class="badge badge-danger">E</span></td><td class="text-bold">0</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -4125,7 +4577,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
             document.getElementById("statPassCount").textContent = o.pass_count ?? "0";
             document.getElementById("statFailCount").textContent = o.fail_count ?? "0";
 
-            // Class-wise table
             await loadDashboardClassWise();
         } catch (err) {
             showToast(err.message, "error");
@@ -4138,7 +4589,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
         const tbody = document.querySelector("#dashboardClassTable tbody");
         try {
             if (!STATE.classes.length) await loadClasses();
-            // Fetch stats per class (simple loop)
             const rows = [];
             for (const c of STATE.classes.slice(0, 15)) {
                 const res = await api.get("/exams", {
@@ -4157,12 +4607,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
             }
             tbody.innerHTML = rows.map(r => `
                 <tr>
-                    <td><strong>${escapeHtml(r.class_name)}</strong></td>
+                    <td class="text-bold">${escapeHtml(r.class_name)}</td>
                     <td>${r.exams}</td>
                     <td>${r.published}</td>
                     <td>—</td>
                     <td>${r.totalMarks}</td>
-                    <td>
+                    <td class="text-right">
                         <button class="btn btn-sm btn-outline" onclick="switchTab('exams')">
                             <i class="fa-solid fa-eye"></i> View
                         </button>
@@ -4216,7 +4666,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; }
     }
 
 })();
-    
 </script>
 </body>
 </html>
