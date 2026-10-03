@@ -3,22 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student Result — GSSS Shilla</title>
+<title>Check Result — GSSS Shilla</title>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html { font-size: 15px; scroll-behavior: smooth; }
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: linear-gradient(135deg, #0f2942 0%, #1e4a73 50%, #059669 100%);
-    background-attachment: fixed;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0a0e27;
     min-height: 100vh;
-    color: #0f172a;
+    color: #ffffff;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    position: relative;
 }
 button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 button { cursor: pointer; border: none; background: none; }
@@ -26,20 +32,76 @@ a { color: inherit; text-decoration: none; }
 h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0.02em; }
 
 /* ============================================================
+   ANIMATED BACKGROUND ORBS
+   ============================================================ */
+.bg-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+    will-change: transform;
+}
+.bg-orb.o1 {
+    width: 550px; height: 550px;
+    background: radial-gradient(circle, #06b6d4, transparent 70%);
+    top: -220px; left: -220px;
+    animation: float1 25s ease-in-out infinite;
+}
+.bg-orb.o2 {
+    width: 450px; height: 450px;
+    background: radial-gradient(circle, #8b5cf6, transparent 70%);
+    top: 35%; right: -180px;
+    animation: float2 28s ease-in-out infinite;
+}
+.bg-orb.o3 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #fb923c, transparent 70%);
+    bottom: -150px; left: 25%;
+    animation: float3 22s ease-in-out infinite;
+}
+@keyframes float1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(60px, -40px) scale(1.08); }
+    66% { transform: translate(-30px, 30px) scale(0.95); }
+}
+@keyframes float2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-50px, 40px) scale(1.1); }
+}
+@keyframes float3 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(40px, -30px) scale(0.95); }
+    66% { transform: translate(-40px, -20px) scale(1.05); }
+}
+
+/* Grid pattern overlay */
+.bg-grid {
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ============================================================
    HEADER
    ============================================================ */
 .page-header {
-    background: rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 10;
     padding: 20px 24px;
-    color: #ffffff;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(10, 14, 39, 0.7);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 .header-inner {
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -51,717 +113,1137 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
 .school-logo {
     width: 52px; height: 52px;
     border-radius: 14px;
-    background: linear-gradient(135deg, #ffffff, #f0f5fb);
-    color: #0f2942;
+    background: linear-gradient(135deg, #06b6d4, #8b5cf6, #1e2a78);
+    color: #ffffff;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 16px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    font-weight: 800; font-size: 15px;
+    letter-spacing: -0.5px;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.35);
     flex-shrink: 0;
+    font-family: 'Space Grotesk', sans-serif;
+    position: relative;
 }
-.school-info h1 { font-size: 18px; color: #ffffff; margin-bottom: 2px; font-weight: 700; }
+.school-logo::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #06b6d4, #8b5cf6, #fb923c);
+    z-index: -1;
+    opacity: 0.4;
+    filter: blur(8px);
+    animation: pulseGlow 3s ease-in-out infinite;
+}
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.7; }
+}
+.school-info h1 {
+    font-size: 18px;
+    color: #ffffff;
+    margin-bottom: 2px;
+    font-family: 'Space Grotesk', sans-serif;
+    background: linear-gradient(135deg, #ffffff, #c4b5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
 .school-info p {
-    font-size: 12.5px; color: rgba(255, 255, 255, 0.75);
-    font-weight: 500; display: flex; align-items: center; gap: 6px;
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.65);
+    display: flex; align-items: center; gap: 6px;
+    font-weight: 500;
 }
 .school-info p::before {
-    content: ''; width: 6px; height: 6px; background: #f59e0b;
-    border-radius: 50%; display: inline-block;
+    content: '';
+    width: 6px; height: 6px;
+    background: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 8px #10b981;
+    animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
 }
 .back-btn {
-    display: inline-flex; align-items: center; gap: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 10px 18px;
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px; color: #ffffff;
-    font-size: 13px; font-weight: 600;
-    transition: all 0.2s;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.back-btn:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-1px); }
+.back-btn:hover {
+    background: rgba(6, 182, 212, 0.15);
+    border-color: rgba(6, 182, 212, 0.4);
+    transform: translateX(-3px);
+    box-shadow: 0 8px 20px rgba(6, 182, 212, 0.2);
+}
 
 /* ============================================================
    MAIN
    ============================================================ */
 .page-main {
-    max-width: 1100px;
+    position: relative;
+    z-index: 5;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 32px 24px 60px;
+    padding: 32px 24px 80px;
 }
 
 /* ============================================================
    HERO
    ============================================================ */
 .hero {
-    text-align: center; color: #ffffff;
-    margin-bottom: 32px; padding: 0 16px;
+    text-align: center;
+    margin-bottom: 36px;
+    padding: 0 16px;
+    animation: slideDown 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 .hero-icon {
-    width: 72px; height: 72px; border-radius: 20px;
-    background: linear-gradient(135deg, #f59e0b, #059669);
-    color: #ffffff; display: inline-flex;
-    align-items: center; justify-content: center;
-    font-size: 30px; margin-bottom: 16px;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
-}
-.hero h2 { font-size: 28px; color: #ffffff; margin-bottom: 8px; }
-.hero p {
-    font-size: 14.5px; color: rgba(255, 255, 255, 0.85);
-    max-width: 500px; margin: 0 auto; line-height: 1.6;
-}
-
-/* ============================================================
-   PUBLISHED RESULTS SECTION
-   ============================================================ */
-.published-section {
-    margin-bottom: 32px;
-}
-.published-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: #ffffff;
-    margin-bottom: 16px;
-    padding: 0 4px;
-}
-.published-header i {
-    width: 40px; height: 40px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #f59e0b, #d97706);
+    width: 76px; height: 76px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #06b6d4, #8b5cf6);
     color: #ffffff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
-    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+    font-size: 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.4);
+    position: relative;
+    animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
-.published-header h3 {
+@keyframes bounceIn {
+    0% { opacity: 0; transform: scale(0.3); }
+    50% { opacity: 1; transform: scale(1.05); }
+    70% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+.hero-icon::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 26px;
+    background: linear-gradient(135deg, #06b6d4, #8b5cf6, #fb923c);
+    z-index: -1;
+    opacity: 0.5;
+    filter: blur(12px);
+    animation: pulseGlow 3s ease-in-out infinite;
+}
+.hero h2 {
+    font-size: 32px;
+    color: #ffffff;
+    margin-bottom: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #ffffff, #c4b5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.hero p {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 550px;
+    margin: 0 auto;
+    line-height: 1.6;
+    font-weight: 400;
+}
+
+/* ============================================================
+   SECTION TITLE
+   ============================================================ */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding: 0 4px;
+    animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+.section-title-icon {
+    width: 44px; height: 44px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #fb923c, #f97316);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    box-shadow: 0 6px 20px rgba(251, 146, 60, 0.35);
+    flex-shrink: 0;
+}
+.section-title-text h3 {
     font-size: 20px;
     color: #ffffff;
-    font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif;
+    margin-bottom: 3px;
 }
-.published-header p {
+.section-title-text p {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.75);
-    margin-top: 2px;
+    color: rgba(255, 255, 255, 0.6);
     font-weight: 500;
 }
 
-/* Published result cards grid */
+/* ============================================================
+   PUBLISHED EXAMS GRID
+   ============================================================ */
+.published-section { margin-bottom: 40px; }
+
 .published-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px;
 }
 
-.published-card {
-    background: #ffffff;
-    border-radius: 18px;
+/* Exam Card */
+.exam-card {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
     padding: 22px;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
-    transition: all 0.25s;
-    cursor: pointer;
-    border: 2px solid transparent;
+    animation: cardFadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards;
 }
-.published-card::before {
+.exam-card:nth-child(1) { animation-delay: 0.05s; }
+.exam-card:nth-child(2) { animation-delay: 0.1s; }
+.exam-card:nth-child(3) { animation-delay: 0.15s; }
+.exam-card:nth-child(4) { animation-delay: 0.2s; }
+.exam-card:nth-child(5) { animation-delay: 0.25s; }
+.exam-card:nth-child(6) { animation-delay: 0.3s; }
+@keyframes cardFadeIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.exam-card::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #7c3aed, #059669, #f59e0b);
+    height: 3px;
+    background: linear-gradient(90deg, #06b6d4, #8b5cf6, #fb923c);
+    opacity: 0;
+    transition: opacity 0.3s;
 }
-.published-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
-    border-color: #059669;
+.exam-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
 }
-.published-card-head {
+.exam-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(139, 92, 246, 0.2),
+        inset 0 0 40px rgba(139, 92, 246, 0.05);
+}
+.exam-card:hover::before { opacity: 1; }
+.exam-card:hover::after { opacity: 1; }
+
+.exam-card-head {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 14px;
-    gap: 12px;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
 }
-.published-card-icon {
-    width: 52px; height: 52px;
+.exam-card-icon {
+    width: 48px; height: 48px;
     border-radius: 14px;
-    background: linear-gradient(135deg, #7c3aed, #1e2a78);
+    background: linear-gradient(135deg, #06b6d4, #8b5cf6);
     color: #ffffff;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-    font-weight: 700;
-    flex-shrink: 0;
-    box-shadow: 0 6px 16px rgba(124, 58, 237, 0.3);
-}
-.published-card-title {
-    font-size: 17px;
-    font-weight: 800;
-    color: #0f2942;
-    margin-bottom: 6px;
-    font-family: 'Space Grotesk', sans-serif;
-}
-.published-card-meta {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    font-size: 12px;
-    color: #64748b;
-    font-weight: 600;
-    margin-bottom: 14px;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    flex-shrink: 0;
+    box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3);
+    transition: transform 0.3s;
 }
-.published-card-meta span {
+.exam-card:hover .exam-card-icon {
+    transform: scale(1.08) rotate(-5deg);
+}
+
+.exam-card-badge {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    padding: 4px 10px;
-    background: #f1f5f9;
-    border-radius: 100px;
-    border: 1px solid #e2e8f0;
-}
-.published-card-meta i { color: #059669; font-size: 11px; }
-
-.published-card-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 16px;
-    padding: 12px;
-    background: linear-gradient(135deg, #f8fafc, #f0f5fb);
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-}
-.published-card-stat { text-align: center; }
-.published-card-stat .val {
-    font-size: 20px;
-    font-weight: 800;
-    color: #0f2942;
-    font-family: 'Space Grotesk', sans-serif;
-    line-height: 1;
-}
-.published-card-stat .lbl {
+    padding: 5px 11px;
     font-size: 10px;
-    color: #64748b;
-    text-transform: uppercase;
     font-weight: 700;
+    border-radius: 100px;
+    text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-top: 4px;
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+.exam-card-badge i { font-size: 8px; }
+
+.exam-card-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 12px;
+    font-family: 'Space Grotesk', sans-serif;
+    position: relative;
+    z-index: 1;
+    line-height: 1.3;
 }
 
-.published-card-action {
+.exam-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+}
+.exam-info-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+}
+.exam-info-row i {
+    width: 16px;
+    text-align: center;
+    color: #06b6d4;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+.exam-info-row strong {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.exam-card-cta {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     padding: 11px 18px;
-    background: linear-gradient(135deg, #0f2942, #1e4a73);
+    background: linear-gradient(135deg, #06b6d4, #8b5cf6);
     color: #ffffff;
     border-radius: 12px;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 700;
     width: 100%;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
     border: none;
-    cursor: pointer;
 }
-.published-card-action:hover {
-    background: linear-gradient(135deg, #1e4a73, #2563eb);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(15, 41, 66, 0.3);
+.exam-card-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5);
 }
-.published-card-action i { font-size: 12px; }
+.exam-card-cta i { font-size: 11px; transition: transform 0.3s; }
+.exam-card:hover .exam-card-cta i { transform: translateX(3px); }
 
-.published-date {
+/* Loading state */
+.exam-card.loading {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* ============================================================
+   LOADING SKELETON
+   ============================================================ */
+.skeleton-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 22px;
+    overflow: hidden;
+    position: relative;
+}
+.skeleton-card::before {
+    content: '';
     position: absolute;
-    top: 22px;
-    right: 22px;
-    font-size: 11px;
-    color: #94a3b8;
-    font-weight: 600;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+    animation: shimmer 1.5s infinite;
 }
-
-/* Empty published state */
-.published-empty {
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+.skeleton-line {
+    height: 14px;
     background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 16px;
-    padding: 32px 24px;
-    text-align: center;
-    color: rgba(255, 255, 255, 0.9);
-}
-.published-empty i {
-    font-size: 36px;
-    color: rgba(255, 255, 255, 0.4);
+    border-radius: 7px;
     margin-bottom: 12px;
-    display: block;
 }
-.published-empty h4 {
-    font-size: 15px;
-    color: #ffffff;
-    margin-bottom: 6px;
-    font-weight: 700;
-}
-.published-empty p {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
+.skeleton-line.w-60 { width: 60%; }
+.skeleton-line.w-40 { width: 40%; }
+.skeleton-line.w-80 { width: 80%; }
+.skeleton-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    margin-bottom: 16px;
 }
 
 /* ============================================================
    SEARCH CARD
    ============================================================ */
+.search-section { animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards; }
+
 .search-card {
-    background: #ffffff;
-    border-radius: 20px;
-    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 22px;
     padding: 32px;
-    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
 }
-.search-card h3 {
-    font-size: 17px;
-    color: #0f2942;
-    margin-bottom: 6px;
+.search-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #06b6d4, #8b5cf6, #fb923c, transparent);
+    background-size: 200% 100%;
+    animation: gradientShift 4s linear infinite;
+}
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+
+.search-card-head {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 14px;
+    margin-bottom: 24px;
 }
-.search-card h3 i {
-    width: 36px; height: 36px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #0f2942, #1e4a73);
+.search-card-icon {
+    width: 44px; height: 44px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #06b6d4, #8b5cf6);
     color: #ffffff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 16px;
+    box-shadow: 0 6px 20px rgba(6, 182, 212, 0.3);
+    flex-shrink: 0;
 }
-.search-sub {
+.search-card-head h3 {
+    font-size: 18px;
+    color: #ffffff;
+    font-family: 'Space Grotesk', sans-serif;
+    margin-bottom: 3px;
+}
+.search-card-head p {
     font-size: 13px;
-    color: #64748b;
-    margin-bottom: 24px;
-    padding-left: 46px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
 }
 
+/* Read-only chips */
+.locked-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px;
+    background: rgba(6, 182, 212, 0.08);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    border-radius: 14px;
+    margin-bottom: 24px;
+    animation: fadeIn 0.4s;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.locked-info.hidden { display: none; }
+.locked-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 100px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #ffffff;
+}
+.locked-chip i { color: #06b6d4; font-size: 11px; }
+.locked-chip .chip-label {
+    color: rgba(255, 255, 255, 0.55);
+    font-weight: 500;
+    margin-right: 2px;
+}
+.change-exam-btn {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(251, 146, 60, 0.15);
+    border: 1px solid rgba(251, 146, 60, 0.3);
+    color: #fb923c;
+    border-radius: 100px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+.change-exam-btn:hover {
+    background: rgba(251, 146, 60, 0.25);
+    transform: translateX(2px);
+}
+
+/* Form */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 20px;
+    gap: 18px;
+    margin-bottom: 22px;
 }
 .form-group label {
     display: block;
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 700;
-    color: #334155;
+    color: rgba(255, 255, 255, 0.75);
     margin-bottom: 8px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
 }
-.form-group label .required { color: #dc2626; margin-left: 3px; }
+.form-group label .required { color: #fb923c; margin-left: 3px; }
 
 .input-wrap { position: relative; }
 .input-wrap i {
     position: absolute;
-    left: 14px;
+    left: 16px;
     top: 50%;
     transform: translateY(-50%);
-    color: #059669;
+    color: #06b6d4;
     font-size: 14px;
     pointer-events: none;
+    transition: color 0.3s;
 }
 .form-control {
     width: 100%;
-    padding: 13px 16px 13px 42px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    background: #ffffff;
+    padding: 14px 16px 14px 46px;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
     font-size: 14.5px;
-    transition: all 0.18s;
-    color: #0f2942;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #ffffff;
     font-weight: 500;
 }
-.form-control::placeholder { color: #94a3b8; font-weight: 400; }
+.form-control::placeholder { color: rgba(255, 255, 255, 0.35); font-weight: 400; }
 .form-control:focus {
     outline: none;
-    border-color: #059669;
-    box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.12);
+    border-color: #06b6d4;
+    background: rgba(6, 182, 212, 0.06);
+    box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.12);
 }
+.form-control:focus + i { color: #06b6d4; }
 
+/* Search button */
 .search-btn {
     width: 100%;
-    padding: 15px 24px;
-    background: linear-gradient(135deg, #0f2942, #1e4a73);
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #06b6d4, #8b5cf6);
     color: #ffffff;
-    border-radius: 12px;
+    border-radius: 14px;
     font-size: 15px;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    box-shadow: 0 6px 18px rgba(15, 41, 66, 0.28);
-    transition: all 0.2s;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.35);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.02em;
+    position: relative;
+    overflow: hidden;
+}
+.search-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
 }
 .search-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, #1e4a73, #2563eb);
     transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(15, 41, 66, 0.35);
+    box-shadow: 0 12px 32px rgba(139, 92, 246, 0.5);
 }
-.search-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+.search-btn:active:not(:disabled)::before {
+    width: 300px;
+    height: 300px;
+}
+.search-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+.search-btn .btn-loader {
+    display: none;
+    width: 18px; height: 18px;
+    border: 2.5px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+.search-btn.loading .btn-icon { display: none; }
+.search-btn.loading .btn-loader { display: block; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* ============================================================
    RESULT AREA
    ============================================================ */
-.result-area { min-height: 200px; }
+.result-area { margin-top: 30px; min-height: 100px; }
 
-/* Student Hero */
-.student-hero {
-    background: linear-gradient(135deg, #0f2942 0%, #1e4a73 100%);
+/* Loading state */
+.loader-box {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 20px;
-    padding: 28px;
-    color: #ffffff;
-    margin-bottom: 24px;
-    display: flex;
-    gap: 24px;
-    align-items: center;
-    box-shadow: 0 20px 40px rgba(15, 41, 66, 0.35);
-    position: relative;
-    overflow: hidden;
+    padding: 60px 32px;
+    text-align: center;
+    animation: fadeIn 0.4s;
 }
-.student-hero::before {
+.loader-spinner {
+    width: 60px; height: 60px;
+    margin: 0 auto 20px;
+    position: relative;
+}
+.loader-spinner::before,
+.loader-spinner::after {
     content: '';
     position: absolute;
-    top: -50%; right: -50%;
-    width: 100%; height: 200%;
-    background: radial-gradient(circle, rgba(5, 150, 105, 0.15) 0%, transparent 60%);
-    pointer-events: none;
+    border-radius: 50%;
+    border: 3px solid transparent;
 }
-.student-photo-hero {
-    width: 110px; height: 130px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 3px solid rgba(255, 255, 255, 0.25);
-    display: flex; align-items: center; justify-content: center;
-    overflow: hidden;
-    flex-shrink: 0;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 36px;
-    position: relative;
-    z-index: 1;
+.loader-spinner::before {
+    inset: 0;
+    border-top-color: #06b6d4;
+    animation: spin 1s linear infinite;
 }
-.student-photo-hero img { width: 100%; height: 100%; object-fit: cover; }
-.student-details { flex: 1; min-width: 0; position: relative; z-index: 1; }
-.student-details h3 {
-    font-size: 24px;
+.loader-spinner::after {
+    inset: 8px;
+    border-top-color: #8b5cf6;
+    animation: spin 0.7s linear infinite reverse;
+}
+.loader-text {
+    font-size: 15px;
+    font-weight: 600;
     color: #ffffff;
     margin-bottom: 6px;
     font-family: 'Space Grotesk', sans-serif;
 }
-.student-id-line {
+.loader-sub {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Result not found / error state */
+.state-box {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 60px 32px;
+    text-align: center;
+    animation: fadeIn 0.5s;
+}
+.state-icon {
+    width: 84px; height: 84px;
+    border-radius: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    margin-bottom: 20px;
+    position: relative;
+    animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+.state-box.error .state-icon {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(251, 146, 60, 0.15));
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
+.state-box.warning .state-icon {
+    background: linear-gradient(135deg, rgba(251, 146, 60, 0.15), rgba(245, 158, 11, 0.15));
+    color: #fbbf24;
+    border: 1px solid rgba(251, 146, 60, 0.25);
+}
+.state-box.info .state-icon {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(139, 92, 246, 0.15));
+    color: #22d3ee;
+    border: 1px solid rgba(6, 182, 212, 0.25);
+}
+.state-box h3 {
+    font-size: 20px;
+    color: #ffffff;
+    margin-bottom: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+}
+.state-box p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.65);
+    max-width: 450px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+/* ============================================================
+   STUDENT HERO
+   ============================================================ */
+.student-hero {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 22px;
+    padding: 28px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    animation: slideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.student-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #06b6d4, #8b5cf6, #fb923c);
+}
+.student-hero::after {
+    content: '';
+    position: absolute;
+    top: -50%; right: -10%;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.2), transparent 70%);
+    pointer-events: none;
+}
+.student-photo {
+    width: 110px; height: 130px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(139, 92, 246, 0.2));
+    border: 2px solid rgba(255, 255, 255, 0.15);
     display: flex;
     align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 14px;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 36px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
+.student-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+}
+.student-details {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    z-index: 1;
+}
+.student-details h3 {
+    font-size: 24px;
+    color: #ffffff;
+    margin-bottom: 8px;
+    font-family: 'Space Grotesk', sans-serif;
+    background: linear-gradient(135deg, #ffffff, #c4b5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.student-id-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+.student-id-line span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.student-id-line i { color: #06b6d4; font-size: 12px; }
 .student-id-line .dot {
     width: 4px; height: 4px;
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.3);
     border-radius: 50%;
 }
 .student-meta-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
-    margin-top: 16px;
+    gap: 10px;
+    margin-top: 14px;
 }
 .meta-box {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
     padding: 10px 14px;
+    transition: all 0.3s;
 }
-.meta-box .label {
-    font-size: 10.5px;
-    color: rgba(255, 255, 255, 0.65);
+.meta-box:hover {
+    background: rgba(6, 182, 212, 0.06);
+    border-color: rgba(6, 182, 212, 0.25);
+}
+.meta-box .lbl {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.5);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     font-weight: 700;
     margin-bottom: 3px;
 }
-.meta-box .value { font-size: 14px; color: #ffffff; font-weight: 700; }
-
-/* Result Card */
-.result-card {
-    background: #ffffff;
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    margin-bottom: 22px;
-    border: 1.5px solid #e2e8f0;
+.meta-box .val {
+    font-size: 13.5px;
+    color: #ffffff;
+    font-weight: 700;
 }
+
+/* ============================================================
+   RESULT CARD
+   ============================================================ */
+.result-card {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 22px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    animation: slideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .result-card-head {
-    background: linear-gradient(135deg, #f8fafc, #f0f5fb);
-    padding: 20px 24px;
+    padding: 22px 26px;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(139, 92, 246, 0.08));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    gap: 12px;
+    align-items: flex-start;
+    gap: 14px;
     flex-wrap: wrap;
-    border-bottom: 1px solid #e2e8f0;
 }
 .result-card-head h4 {
-    font-size: 17px;
-    color: #0f2942;
+    font-size: 18px;
+    color: #ffffff;
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 4px;
+    gap: 12px;
+    margin-bottom: 6px;
+    font-family: 'Space Grotesk', sans-serif;
 }
 .result-card-head h4 i {
-    width: 32px; height: 32px;
-    border-radius: 9px;
-    background: linear-gradient(135deg, #059669, #10b981);
+    width: 38px; height: 38px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, #06b6d4, #8b5cf6);
     color: #ffffff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    flex-shrink: 0;
 }
 .result-card-head .sub {
     font-size: 12.5px;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.6);
     font-weight: 500;
-    padding-left: 42px;
+    padding-left: 50px;
 }
+.result-card-head .sub strong { color: #22d3ee; font-weight: 600; }
 
-.badge {
+/* Result status badge */
+.result-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 7px 14px;
+    padding: 8px 16px;
+    border-radius: 100px;
     font-size: 12px;
     font-weight: 700;
-    border-radius: 30px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1.5px solid;
     white-space: nowrap;
 }
-.badge i { font-size: 11px; }
-.badge-pass     { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
-.badge-fail     { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; }
-.badge-absent   { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
-.badge-withheld { background: linear-gradient(135deg, #ede9fe, #ddd6fe); color: #5b21b6; }
+.result-badge.pass {
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    border-color: rgba(16, 185, 129, 0.35);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+}
+.result-badge.fail {
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.35);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+}
+.result-badge.absent {
+    background: rgba(251, 146, 60, 0.12);
+    color: #fbbf24;
+    border-color: rgba(251, 146, 60, 0.35);
+}
+.result-badge.withheld {
+    background: rgba(139, 92, 246, 0.12);
+    color: #c4b5fd;
+    border-color: rgba(139, 92, 246, 0.35);
+}
 
+/* Summary grid */
 .result-summary {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
     gap: 14px;
-    padding: 22px 24px;
-    background: #fafbfd;
-    border-bottom: 1px solid #f1f5f9;
+    padding: 22px 26px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 .summary-box {
-    background: #ffffff;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 14px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 16px 14px;
     text-align: center;
-    transition: all 0.2s;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+.summary-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #06b6d4, #8b5cf6);
+    opacity: 0;
+    transition: opacity 0.3s;
 }
 .summary-box:hover {
-    border-color: #059669;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(5, 150, 105, 0.12);
+    background: rgba(6, 182, 212, 0.06);
+    border-color: rgba(6, 182, 212, 0.3);
+    transform: translateY(-3px);
 }
-.summary-box .label {
+.summary-box:hover::before { opacity: 1; }
+.summary-box .lbl {
     font-size: 10.5px;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.55);
     text-transform: uppercase;
     font-weight: 700;
-    letter-spacing: 0.06em;
-    margin-bottom: 6px;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
 }
-.summary-box .value {
-    font-size: 22px;
+.summary-box .val {
+    font-size: 24px;
     font-weight: 800;
-    color: #0f2942;
-    line-height: 1.1;
+    color: #ffffff;
+    line-height: 1;
     font-family: 'Space Grotesk', sans-serif;
 }
-.summary-box .value small { font-size: 13px; color: #94a3b8; font-weight: 600; }
-.summary-box.grade-good .value { color: #059669; }
-.summary-box.grade-mid  .value { color: #d97706; }
-.summary-box.grade-bad  .value { color: #dc2626; }
+.summary-box .val small {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 600;
+}
+.summary-box.good .val { color: #34d399; }
+.summary-box.mid  .val { color: #fbbf24; }
+.summary-box.bad  .val { color: #f87171; }
 
-.marks-table-wrap { padding: 0 24px 24px; overflow-x: auto; }
-.marks-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13.5px; }
+/* Marks table */
+.marks-table-wrap {
+    padding: 0 26px 26px;
+    overflow-x: auto;
+}
+.marks-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
 .marks-table thead th {
-    background: #f8fafc;
     padding: 12px 14px;
     text-align: left;
-    font-size: 11px;
+    font-size: 10.5px;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #475569;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.5);
     font-weight: 700;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 1.5px solid rgba(255, 255, 255, 0.08);
     white-space: nowrap;
 }
 .marks-table tbody td {
-    padding: 13px 14px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #334155;
+    padding: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.85);
     font-weight: 500;
 }
 .marks-table tbody tr:last-child td { border-bottom: none; }
-.marks-table .subject-name { font-weight: 700; color: #0f2942; }
-.marks-table .fail-row { background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%); }
-.marks-table .fail-row td { color: #991b1b; }
-.marks-table .fail-row .subject-name { color: #dc2626; }
-.marks-table .text-bold { font-weight: 700; color: #0f2942; }
-
-.mini-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 9px;
-    font-size: 10.5px;
+.marks-table tbody tr {
+    transition: background 0.2s;
+}
+.marks-table tbody tr:hover {
+    background: rgba(6, 182, 212, 0.04);
+}
+.marks-table .subject-name {
     font-weight: 700;
-    border-radius: 20px;
-    background: #fef3c7;
-    color: #92400e;
+    color: #ffffff;
 }
-
-.failed-warning {
-    padding: 14px 24px;
-    background: linear-gradient(135deg, #fef2f2, #fee2e2);
-    border-top: 1.5px solid #fecaca;
-    font-size: 13px;
-    color: #991b1b;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    font-weight: 500;
+.marks-table .fail-row {
+    background: rgba(239, 68, 68, 0.06);
 }
-.failed-warning i { color: #dc2626; font-size: 15px; margin-top: 1px; }
+.marks-table .fail-row td { color: #f87171; }
+.marks-table .fail-row .subject-name { color: #fca5a5; }
+.marks-table .text-bold { font-weight: 800; color: #ffffff; }
 
+/* Result actions */
 .result-actions {
+    padding: 18px 26px;
     display: flex;
-    gap: 10px;
-    padding: 16px 24px;
-    background: #fafbfd;
-    border-top: 1px solid #f1f5f9;
+    gap: 12px;
     flex-wrap: wrap;
+    background: rgba(0, 0, 0, 0.15);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 .action-btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 11px 20px;
-    border-radius: 10px;
+    gap: 9px;
+    padding: 12px 22px;
+    border-radius: 12px;
     font-size: 13px;
     font-weight: 700;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1.5px solid transparent;
+    cursor: pointer;
 }
 .action-btn-primary {
-    background: linear-gradient(135deg, #0f2942, #1e4a73);
+    background: linear-gradient(135deg, #06b6d4, #8b5cf6);
     color: #ffffff;
-    box-shadow: 0 2px 8px rgba(15, 41, 66, 0.2);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
 }
 .action-btn-primary:hover {
-    background: linear-gradient(135deg, #1e4a73, #2563eb);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(15, 41, 66, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(139, 92, 246, 0.5);
 }
 .action-btn-outline {
-    background: #ffffff;
-    color: #334155;
-    border-color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.12);
 }
 .action-btn-outline:hover {
-    background: #f8fafc;
-    border-color: #059669;
-    color: #059669;
-    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(6, 182, 212, 0.4);
+    color: #22d3ee;
+    transform: translateY(-2px);
 }
-
-/* State boxes */
-.state-box {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 60px 32px;
-    text-align: center;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
-.state-box .state-icon {
-    width: 80px; height: 80px;
-    border-radius: 22px;
-    background: linear-gradient(135deg, #e0e9f5, #d1fae5);
-    color: #059669;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 34px;
-    margin-bottom: 18px;
-}
-.state-box h3 { font-size: 18px; color: #0f2942; margin-bottom: 8px; }
-.state-box p { font-size: 13.5px; color: #64748b; max-width: 400px; margin: 0 auto; line-height: 1.6; }
-.state-box.error .state-icon { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #dc2626; }
-.state-box.warning .state-icon { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #d97706; }
-
-.spinner {
-    width: 44px; height: 44px;
-    border: 4px solid #e2e8f0;
-    border-top-color: #059669;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 16px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Info Grid */
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
-    margin-top: 32px;
-}
-.info-card {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 14px;
-    padding: 20px;
-    color: #ffffff;
-}
-.info-card .info-icon {
-    width: 42px; height: 42px;
-    border-radius: 11px;
-    background: rgba(255, 255, 255, 0.15);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 17px;
-    margin-bottom: 12px;
-    color: #fbbf24;
-}
-.info-card h4 { font-size: 14px; color: #ffffff; margin-bottom: 6px; font-weight: 700; }
-.info-card p { font-size: 12.5px; color: rgba(255, 255, 255, 0.8); line-height: 1.6; }
 
 /* ============================================================
-   PROFESSIONAL MARKSHEET MODAL
+   INFO GRID
+   ============================================================ */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 40px;
+}
+.info-card {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 22px;
+    transition: all 0.3s;
+}
+.info-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(139, 92, 246, 0.3);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+.info-icon {
+    width: 46px; height: 46px;
+    border-radius: 13px;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(139, 92, 246, 0.2));
+    color: #22d3ee;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 14px;
+    border: 1px solid rgba(6, 182, 212, 0.2);
+}
+.info-card h4 {
+    font-size: 15px;
+    color: #ffffff;
+    margin-bottom: 8px;
+    font-family: 'Space Grotesk', sans-serif;
+}
+.info-card p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.6;
+}
+
+/* ============================================================
+   MARKSHEET MODAL
    ============================================================ */
 .marksheet-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.85);
-    backdrop-filter: blur(8px);
+    background: rgba(10, 14, 39, 0.92);
+    backdrop-filter: blur(12px);
     z-index: 1000;
     overflow-y: auto;
     padding: 24px;
+    animation: fadeIn 0.3s;
 }
 .marksheet-overlay.active { display: block; }
 
@@ -769,14 +1251,19 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
     max-width: 900px;
     margin: 0 auto;
     background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+    border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5);
+    animation: modalIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.94) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .marksheet-toolbar {
-    background: #0f2942;
-    padding: 14px 24px;
+    background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+    padding: 16px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -786,18 +1273,18 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
 .marksheet-toolbar h3 {
     color: #ffffff;
     font-size: 15px;
-    font-weight: 700;
     display: flex;
     align-items: center;
     gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
 }
-.marksheet-toolbar-actions { display: flex; gap: 8px; }
+.marksheet-toolbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .ms-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 9px 18px;
-    border-radius: 8px;
+    padding: 10px 18px;
+    border-radius: 10px;
     font-size: 12.5px;
     font-weight: 700;
     cursor: pointer;
@@ -805,25 +1292,30 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
     transition: all 0.2s;
     font-family: inherit;
 }
-.ms-btn-primary { background: #059669; color: #ffffff; }
-.ms-btn-primary:hover { background: #047857; }
+.ms-btn-primary {
+    background: #ffffff;
+    color: #0f2942;
+}
+.ms-btn-primary:hover {
+    background: #f0f9ff;
+    transform: translateY(-1px);
+}
 .ms-btn-outline {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.15);
     color: #ffffff;
     border: 1.5px solid rgba(255, 255, 255, 0.3);
 }
-.ms-btn-outline:hover { background: rgba(255, 255, 255, 0.1); }
+.ms-btn-outline:hover { background: rgba(255, 255, 255, 0.25); }
 
-/* ============================================================
-   MARKSHEET PRINT LAYOUT (A4 Professional)
-   ============================================================ */
+/* Marksheet print area */
+#marksheetContent { background: #ffffff; }
+
 .marksheet-print {
     background: #ffffff;
     padding: 30px 36px 24px;
     position: relative;
+    color: #0f172a;
 }
-
-/* Watermark */
 .marksheet-print::before {
     content: 'GSSS SHILLA';
     position: absolute;
@@ -837,6 +1329,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
     letter-spacing: 8px;
     pointer-events: none;
     z-index: 0;
+    white-space: nowrap;
 }
 
 .ms-header {
@@ -854,7 +1347,9 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
     border-radius: 50%;
     background: linear-gradient(135deg, #0f2942, #1e4a73);
     color: #ffffff;
-    display: flex; align-items: center; justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 22px;
     font-weight: 800;
     flex-shrink: 0;
@@ -881,7 +1376,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
     color: #94a3b8;
     font-weight: 500;
 }
-
 .ms-title-bar {
     background: linear-gradient(135deg, #0f2942, #1e4a73);
     color: #ffffff;
@@ -896,8 +1390,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
     position: relative;
     z-index: 1;
 }
-
-/* Student info + photo */
 .ms-info-block {
     display: flex;
     gap: 20px;
@@ -909,7 +1401,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
     flex: 1;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0;
     border: 1.5px solid #0f2942;
     border-radius: 8px;
     overflow: hidden;
@@ -940,7 +1431,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
     color: #0f2942;
     flex: 1;
 }
-
 .ms-photo {
     width: 100px;
     height: 120px;
@@ -957,7 +1447,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
 }
 .ms-photo img { width: 100%; height: 100%; object-fit: cover; }
 
-/* Marks table */
 .ms-marks-table {
     width: 100%;
     border-collapse: collapse;
@@ -997,7 +1486,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
 .ms-marks-table tbody tr.fail-row td { color: #991b1b; }
 .ms-marks-table tbody tr.fail-row td:nth-child(2) { color: #dc2626; }
 
-/* Summary */
 .ms-summary {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -1031,7 +1519,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
 .ms-summary-box.pass .val { color: #059669; }
 .ms-summary-box.fail .val { color: #dc2626; }
 
-/* Failed subjects */
 .ms-failed {
     background: linear-gradient(135deg, #fef2f2, #fee2e2);
     border: 1.5px solid #fecaca;
@@ -1049,13 +1536,8 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
     letter-spacing: 0.5px;
     margin-bottom: 4px;
 }
-.ms-failed .val {
-    font-size: 13px;
-    color: #991b1b;
-    font-weight: 600;
-}
+.ms-failed .val { font-size: 13px; color: #991b1b; font-weight: 600; }
 
-/* Signatures */
 .ms-footer {
     display: flex;
     justify-content: space-between;
@@ -1116,24 +1598,22 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
    ============================================================ */
 @media print {
     body { background: #ffffff !important; }
-    .page-header, .hero, .search-card, .published-section,
-    .info-grid, .back-btn, .marksheet-toolbar { display: none !important; }
+    .page-header, .hero, .search-section, .published-section,
+    .info-grid, .back-btn, .marksheet-toolbar, .bg-orb, .bg-grid { display: none !important; }
     .page-main { padding: 0; max-width: 100%; }
     .marksheet-overlay {
         position: static;
         padding: 0;
         background: #ffffff;
         display: block !important;
+        backdrop-filter: none;
     }
     .marksheet-container {
         box-shadow: none;
         max-width: 100%;
         border-radius: 0;
     }
-    .marksheet-print {
-        padding: 15mm 12mm;
-    }
-    .result-card { display: none; }
+    .marksheet-print { padding: 15mm 12mm; }
     @page { size: A4; margin: 0; }
 }
 
@@ -1143,20 +1623,27 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
 @media (max-width: 768px) {
     .page-header { padding: 16px 18px; }
     .school-info h1 { font-size: 15px; }
-    .school-logo { width: 44px; height: 44px; font-size: 14px; }
-    .page-main { padding: 22px 16px 40px; }
-    .hero h2 { font-size: 22px; }
+    .school-logo { width: 44px; height: 44px; font-size: 13px; }
+    .page-main { padding: 22px 16px 60px; }
+    .hero h2 { font-size: 24px; }
+    .hero p { font-size: 13.5px; }
+    .hero-icon { width: 64px; height: 64px; font-size: 26px; }
     .form-grid { grid-template-columns: 1fr; }
-    .search-card { padding: 22px; border-radius: 16px; }
+    .search-card { padding: 22px; }
     .published-grid { grid-template-columns: 1fr; }
-    .student-hero { flex-direction: column; text-align: center; padding: 24px 20px; }
-    .student-photo-hero { width: 90px; height: 105px; }
+    .student-hero { flex-direction: column; text-align: center; padding: 22px 18px; }
+    .student-photo { width: 90px; height: 105px; }
     .student-details h3 { font-size: 20px; }
     .student-id-line { justify-content: center; }
     .student-meta-grid { grid-template-columns: 1fr 1fr; }
-    .result-summary { grid-template-columns: repeat(2, 1fr); }
+    .result-card-head { padding: 18px 20px; }
+    .result-card-head h4 { font-size: 16px; }
+    .result-summary { padding: 18px; gap: 10px; grid-template-columns: repeat(2, 1fr); }
+    .summary-box .val { font-size: 20px; }
+    .marks-table-wrap { padding: 0 14px 16px; }
     .marks-table { font-size: 12px; }
     .marks-table thead th, .marks-table tbody td { padding: 10px 8px; }
+    .result-actions { padding: 14px; }
     .action-btn { padding: 10px 16px; font-size: 12.5px; flex: 1; justify-content: center; }
     .ms-info-grid { grid-template-columns: 1fr; }
     .ms-info-row:nth-child(even) { border-right: 1px solid #e2e8f0; }
@@ -1169,13 +1656,27 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
     .ms-title-bar { font-size: 13px; letter-spacing: 2px; }
     .ms-footer { flex-direction: column; gap: 24px; }
     .ms-sign { max-width: 100%; }
+    .section-title-text h3 { font-size: 17px; }
 }
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-.fade-in { animation: fadeIn 0.35s ease; }
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
 </style>
 </head>
 <body>
+
+<!-- ============================================================
+     BACKGROUND
+     ============================================================ -->
+<div class="bg-orb o1"></div>
+<div class="bg-orb o2"></div>
+<div class="bg-orb o3"></div>
+<div class="bg-grid"></div>
 
 <!-- ============================================================
      HEADER
@@ -1190,7 +1691,8 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
             </div>
         </div>
         <a href="/" class="back-btn">
-            <i class="fa-solid fa-arrow-left"></i> Home
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Home</span>
         </a>
     </div>
 </header>
@@ -1200,75 +1702,127 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
      ============================================================ -->
 <main class="page-main">
 
+    <!-- HERO -->
     <div class="hero">
         <div class="hero-icon">
             <i class="fa-solid fa-graduation-cap"></i>
         </div>
         <h2>Check Your Result</h2>
-        <p>Enter your Student ID and Date of Birth to view and download your marksheet.</p>
+        <p>Select a published exam below, then enter your Student ID and Date of Birth to view your marksheet.</p>
     </div>
 
-    <!-- PUBLISHED RESULTS CARDS -->
-    <div class="published-section">
-        <div class="published-header">
-            <i class="fa-solid fa-bullhorn"></i>
-            <div>
-                <h3>Recently Published Results</h3>
-                <p>Click on any card to check your result</p>
+    <!-- PUBLISHED EXAMS -->
+    <section class="published-section">
+        <div class="section-title">
+            <div class="section-title-icon">
+                <i class="fa-solid fa-bullhorn"></i>
+            </div>
+            <div class="section-title-text">
+                <h3>Published Results</h3>
+                <p>Click on any exam card to check your result</p>
             </div>
         </div>
 
         <div id="publishedGrid" class="published-grid">
-            <div class="published-empty">
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                <h4>Loading published results...</h4>
-                <p>Please wait a moment</p>
+            <!-- Skeleton loaders -->
+            <div class="skeleton-card">
+                <div class="skeleton-circle"></div>
+                <div class="skeleton-line w-80"></div>
+                <div class="skeleton-line w-60"></div>
+                <div class="skeleton-line w-40"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-circle"></div>
+                <div class="skeleton-line w-80"></div>
+                <div class="skeleton-line w-60"></div>
+                <div class="skeleton-line w-40"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-circle"></div>
+                <div class="skeleton-line w-80"></div>
+                <div class="skeleton-line w-60"></div>
+                <div class="skeleton-line w-40"></div>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- SEARCH FORM -->
-    <div class="search-card">
-        <h3><i class="fa-solid fa-magnifying-glass"></i> Result Lookup</h3>
-        <p class="search-sub">Enter your Student ID and Date of Birth to search</p>
+    <section class="search-section" id="searchSection">
+        <div class="section-title">
+            <div class="section-title-icon" style="background: linear-gradient(135deg, #06b6d4, #8b5cf6);">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <div class="section-title-text">
+                <h3>Result Lookup</h3>
+                <p>Enter your details to check your result</p>
+            </div>
+        </div>
 
-        <form id="lookupForm" onsubmit="event.preventDefault(); checkResult();">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Student ID <span class="required">*</span></label>
-                    <div class="input-wrap">
-                        <i class="fa-solid fa-id-card"></i>
-                        <input type="text" class="form-control" id="studentId"
-                               placeholder="e.g. STU001" autocomplete="off" required>
-                    </div>
+        <div class="search-card">
+            <div class="search-card-head">
+                <div class="search-card-icon">
+                    <i class="fa-solid fa-id-card"></i>
                 </div>
-                <div class="form-group">
-                    <label>Date of Birth <span class="required">*</span></label>
-                    <div class="input-wrap">
-                        <i class="fa-solid fa-calendar"></i>
-                        <input type="date" class="form-control" id="dob" required>
-                    </div>
+                <div>
+                    <h3>Enter Your Details</h3>
+                    <p>Student ID and Date of Birth are required</p>
                 </div>
             </div>
 
-            <button type="submit" class="search-btn" id="searchBtn">
-                <i class="fa-solid fa-magnifying-glass"></i> Check Result
-            </button>
-        </form>
-    </div>
+            <!-- Auto-filled info chips (visible after exam selection) -->
+            <div class="locked-info hidden" id="lockedInfo">
+                <div class="locked-chip">
+                    <i class="fa-solid fa-school"></i>
+                    <span class="chip-label">Class:</span>
+                    <span id="lockedClass">—</span>
+                </div>
+                <div class="locked-chip">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span class="chip-label">Session:</span>
+                    <span id="lockedSession">—</span>
+                </div>
+                <div class="locked-chip">
+                    <i class="fa-solid fa-clock"></i>
+                    <span class="chip-label">Exam Session:</span>
+                    <span id="lockedExamSession">—</span>
+                </div>
+                <button class="change-exam-btn" onclick="clearSelectedExam()">
+                    <i class="fa-solid fa-xmark"></i> Change Exam
+                </button>
+            </div>
+
+            <form id="lookupForm" onsubmit="event.preventDefault(); checkResult();">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Student ID <span class="required">*</span></label>
+                        <div class="input-wrap">
+                            <input type="text" class="form-control" id="studentId"
+                                   placeholder="e.g. STU001" autocomplete="off" required>
+                            <i class="fa-solid fa-id-card"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Date of Birth <span class="required">*</span></label>
+                        <div class="input-wrap">
+                            <input type="date" class="form-control" id="dob" required>
+                            <i class="fa-solid fa-calendar"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="search-btn" id="searchBtn">
+                    <i class="fa-solid fa-magnifying-glass btn-icon"></i>
+                    <span class="btn-loader"></span>
+                    <span id="searchBtnText">Check Result</span>
+                </button>
+            </form>
+        </div>
+    </section>
 
     <!-- RESULT AREA -->
-    <div class="result-area" id="resultArea">
-        <div class="state-box">
-            <div class="state-icon">
-                <i class="fa-solid fa-user-graduate"></i>
-            </div>
-            <h3>Enter your details to begin</h3>
-            <p>Your results will appear here after verification</p>
-        </div>
-    </div>
+    <div class="result-area" id="resultArea"></div>
 
-    <!-- INFO GRID -->
+    <!-- INFO CARDS -->
     <div class="info-grid">
         <div class="info-card">
             <div class="info-icon"><i class="fa-solid fa-shield-halved"></i></div>
@@ -1278,7 +1832,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
         <div class="info-card">
             <div class="info-icon"><i class="fa-solid fa-file-pdf"></i></div>
             <h4>Download Marksheet</h4>
-            <p>Get a professional A4 marksheet for each published exam</p>
+            <p>Get a professional A4 marksheet for any published exam</p>
         </div>
         <div class="info-card">
             <div class="info-icon"><i class="fa-solid fa-circle-question"></i></div>
@@ -1290,7 +1844,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
 </main>
 
 <!-- ============================================================
-     MARKSHEET MODAL (Professional A4)
+     MARKSHEET MODAL
      ============================================================ -->
 <div class="marksheet-overlay" id="marksheetOverlay">
     <div class="marksheet-container">
@@ -1314,6 +1868,9 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
 // CONFIG
 // ============================================================
 const API_BASE = "https://gsssshilla.onrender.com/api/results";
+
+// Selected exam state
+let SELECTED_EXAM = null;
 
 // ============================================================
 // HELPERS
@@ -1346,81 +1903,104 @@ function formatMark(v) {
 
 function getGradeClass(p) {
     p = parseFloat(p) || 0;
-    if (p >= 70) return "grade-good";
-    if (p >= 40) return "grade-mid";
-    return "grade-bad";
+    if (p >= 70) return "good";
+    if (p >= 40) return "mid";
+    return "bad";
 }
 
-function getResultBadgeClass(s) {
-    if (!s) return "badge-fail";
-    if (s === "Pass") return "badge-pass";
-    if (s === "Absent") return "badge-absent";
-    if (s === "Withheld") return "badge-withheld";
-    return "badge-fail";
+function getResultBadge(status) {
+    if (!status) return "fail";
+    if (status === "Pass") return "pass";
+    if (status === "Absent") return "absent";
+    if (status === "Withheld") return "withheld";
+    return "fail";
 }
 
-function getResultIcon(s) {
-    if (s === "Pass") return "fa-circle-check";
-    if (s === "Absent") return "fa-user-slash";
-    if (s === "Withheld") return "fa-ban";
+function getResultIcon(status) {
+    if (status === "Pass") return "fa-circle-check";
+    if (status === "Absent") return "fa-user-slash";
+    if (status === "Withheld") return "fa-ban";
     return "fa-circle-xmark";
 }
 
 // ============================================================
-// LOAD PUBLISHED EXAMS (Top Cards)
+// LOAD PUBLISHED EXAMS — Only status = PUBLISHED
 // ============================================================
 async function loadPublishedExams() {
     const grid = document.getElementById("publishedGrid");
 
     try {
-        // Use dashboard stats / exams endpoint to get published exams
-        const res = await fetch(`${API_BASE}/exams?status=PUBLISHED&limit=12`, {
+        // ✅ Fetch only PUBLISHED exams
+        const res = await fetch(`${API_BASE}/exams?status=PUBLISHED&limit=50`, {
             headers: { "Accept": "application/json" }
         });
 
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
-        const exams = json.data || [];
+        let exams = json.data || [];
+
+        // ✅ Triple safety filter — only published
+        exams = exams.filter(e => {
+            const status = String(e.status || "").toUpperCase();
+            return status === "PUBLISHED";
+        });
 
         if (!exams.length) {
             grid.innerHTML = `
-                <div class="published-empty">
-                    <i class="fa-solid fa-hourglass-half"></i>
-                    <h4>No results published yet</h4>
-                    <p>Once the school publishes results, they will appear here</p>
+                <div class="state-box info" style="grid-column: 1 / -1;">
+                    <div class="state-icon" style="background: linear-gradient(135deg, rgba(251, 146, 60, 0.15), rgba(245, 158, 11, 0.15)); color: #fbbf24; border: 1px solid rgba(251, 146, 60, 0.25);">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+                    <h3>No Results Published Yet</h3>
+                    <p>Once the school publishes results, they will appear here as clickable cards.</p>
                 </div>
             `;
             return;
         }
 
+        // Sort by result_date descending (latest first)
+        exams.sort((a, b) => {
+            const da = a.result_date ? new Date(a.result_date).getTime() : 0;
+            const db = b.result_date ? new Date(b.result_date).getTime() : 0;
+            return db - da;
+        });
+
         grid.innerHTML = exams.map(e => {
-            const examSession = e.data?.exam_session || "—";
-            const declaredDate = e.result_date ? formatDate(e.result_date) : null;
+            const examSession = e.data?.exam_session || e.exam_session || "—";
+            const declaredDate = e.result_date ? formatDate(e.result_date) : "—";
+            const sessionName = e.session_name || "—";
+            const className = e.class_name || "—";
 
             return `
-                <div class="published-card" onclick="scrollToForm('${escapeHtml(e.class_name || "")}', '${escapeHtml(e.name || "")}')">
-                    ${declaredDate ? `<div class="published-date"><i class="fa-regular fa-calendar"></i> ${declaredDate}</div>` : ""}
-                    <div class="published-card-head">
-                        <div class="published-card-icon">
+                <div class="exam-card" onclick="selectExam(${e.id})">
+                    <div class="exam-card-head">
+                        <div class="exam-card-icon">
                             <i class="fa-solid fa-file-pen"></i>
                         </div>
+                        <span class="exam-card-badge">
+                            <i class="fa-solid fa-circle-check"></i> Published
+                        </span>
                     </div>
-                    <div class="published-card-title">${escapeHtml(e.name || "—")}</div>
-                    <div class="published-card-meta">
-                        <span><i class="fa-solid fa-school"></i> ${escapeHtml(e.class_name || "—")}</span>
-                        <span><i class="fa-solid fa-clock"></i> ${escapeHtml(examSession)}</span>
-                    </div>
-                    <div class="published-card-stats">
-                        <div class="published-card-stat">
-                            <div class="val">${e.subjects_count || 0}</div>
-                            <div class="lbl">Subjects</div>
+                    <div class="exam-card-title">${escapeHtml(e.name || "—")}</div>
+                    <div class="exam-card-info">
+                        <div class="exam-info-row">
+                            <i class="fa-solid fa-school"></i>
+                            Class: <strong>${escapeHtml(className)}</strong>
                         </div>
-                        <div class="published-card-stat">
-                            <div class="val">${e.marks_count || 0}</div>
-                            <div class="lbl">Marks</div>
+                        <div class="exam-info-row">
+                            <i class="fa-solid fa-calendar-days"></i>
+                            Session: <strong>${escapeHtml(sessionName)}</strong>
+                        </div>
+                        <div class="exam-info-row">
+                            <i class="fa-solid fa-clock"></i>
+                            Exam Session: <strong>${escapeHtml(examSession)}</strong>
+                        </div>
+                        <div class="exam-info-row">
+                            <i class="fa-solid fa-bullhorn"></i>
+                            Published: <strong>${escapeHtml(declaredDate)}</strong>
                         </div>
                     </div>
-                    <button class="published-card-action">
+                    <button class="exam-card-cta">
                         <i class="fa-solid fa-magnifying-glass"></i> Check Result
                     </button>
                 </div>
@@ -1430,137 +2010,210 @@ async function loadPublishedExams() {
     } catch (err) {
         console.warn("Published exams load failed:", err);
         grid.innerHTML = `
-            <div class="published-empty">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                <h4>Could not load results</h4>
-                <p>Use the form below to search manually</p>
+            <div class="state-box error" style="grid-column: 1 / -1;">
+                <div class="state-icon">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+                <h3>Could Not Load Results</h3>
+                <p>Please check your internet connection or refresh the page.</p>
             </div>
         `;
     }
 }
 
-// Scroll to form
-function scrollToForm(className, examName) {
-    document.getElementById("studentId").focus();
-    document.querySelector(".search-card").scrollIntoView({ behavior: "smooth", block: "center" });
+// ============================================================
+// SELECT EXAM — Auto-fill info chips
+// ============================================================
+window.selectExam = function(examId) {
+    // Find the exam from the loaded cards
+    const cards = document.querySelectorAll(".exam-card");
+    // We need exam data - fetch it
+    fetchExamAndFill(examId);
+};
+
+async function fetchExamAndFill(examId) {
+    try {
+        const res = await fetch(`${API_BASE}/exams/${examId}`, {
+            headers: { "Accept": "application/json" }
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message || "Failed");
+
+        const exam = json.data;
+        SELECTED_EXAM = exam;
+
+        // Fill the info chips
+        document.getElementById("lockedClass").textContent = exam.class_name || "—";
+        document.getElementById("lockedSession").textContent = exam.session_name || "—";
+        document.getElementById("lockedExamSession").textContent = exam.data?.exam_session || exam.exam_session || "—";
+
+        // Show chips
+        document.getElementById("lockedInfo").classList.remove("hidden");
+
+        // Scroll to form
+        document.getElementById("searchSection").scrollIntoView({ behavior: "smooth", block: "start" });
+
+        // Focus on Student ID input
+        setTimeout(() => {
+            document.getElementById("studentId").focus();
+        }, 400);
+
+    } catch (err) {
+        alert("Could not load exam details. Please try again.");
+        console.error(err);
+    }
 }
 
 // ============================================================
-// CHECK RESULT (Student ID + DOB)
+// CLEAR SELECTED EXAM
+// ============================================================
+window.clearSelectedExam = function() {
+    SELECTED_EXAM = null;
+    document.getElementById("lockedInfo").classList.add("hidden");
+    document.getElementById("studentId").value = "";
+    document.getElementById("dob").value = "";
+    document.getElementById("resultArea").innerHTML = "";
+};
+
+// ============================================================
+// CHECK RESULT
 // ============================================================
 async function checkResult() {
     const studentId = document.getElementById("studentId").value.trim();
     const dob = document.getElementById("dob").value;
 
+    // Validate inputs
     if (!studentId || !dob) {
-        showErrorState("Missing Information", "Please enter both Student ID and Date of Birth.");
+        showState("error", "Missing Information", "Please enter both Student ID and Date of Birth.");
+        return;
+    }
+
+    // ✅ Check if exam selected
+    if (!SELECTED_EXAM) {
+        showState("warning", "No Exam Selected", "Please select an exam from the published results above first.");
         return;
     }
 
     const area = document.getElementById("resultArea");
     const btn = document.getElementById("searchBtn");
+    const btnText = document.getElementById("searchBtnText");
 
+    // Loading state
     area.innerHTML = `
-        <div class="state-box">
-            <div class="spinner"></div>
-            <h3>Searching for your result...</h3>
-            <p>Please wait a moment</p>
+        <div class="loader-box">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Fetching your result...</div>
+            <div class="loader-sub">Please wait a moment</div>
         </div>
     `;
     btn.disabled = true;
+    btn.classList.add("loading");
+    btnText.textContent = "Loading...";
 
     try {
-        const res = await fetch(`${API_BASE}/student/${encodeURIComponent(studentId)}/permanent`, {
+        // ✅ Step 1: Fetch student basic info
+        const studentRes = await fetch(`${API_BASE}/student/${encodeURIComponent(studentId)}/permanent`, {
             method: "GET",
             headers: { "Accept": "application/json" }
         });
 
-        const json = await res.json();
+        const studentJson = await studentRes.json();
 
-        // --- User Not Found ---
-        if (res.status === 404) {
-            showErrorState(
-                "User Not Found",
-                `No student found with ID "${studentId}". Please check your Student ID or contact the school office.`,
-                true
-            );
+        // Student not found
+        if (studentRes.status === 404 || (!studentJson.success && studentJson.message?.toLowerCase().includes("not found"))) {
+            showState("error", "User Not Found",
+                `No student found with Student ID "${studentId}". Please verify your ID or contact the school office.`);
             return;
         }
 
-        if (!res.ok || !json.success) {
-            showErrorState(
-                json.message || "Unable to fetch result",
-                "Please verify your details and try again.",
-                res.status === 404
-            );
+        if (!studentRes.ok || !studentJson.success) {
+            showState("error", "Unable to Fetch Result",
+                studentJson.message || "Please try again later.");
             return;
         }
 
-        // Render result
-        renderResults(json.data);
+        const data = studentJson.data;
+        const student = data.student;
+
+        // ✅ Step 2: Verify DOB matches
+        if (!student.dob) {
+            showState("error", "Data Error", "Student date of birth not available. Contact school office.");
+            return;
+        }
+
+        const inputDob = new Date(dob).toISOString().slice(0, 10);
+        const studentDob = new Date(student.dob).toISOString().slice(0, 10);
+
+        if (inputDob !== studentDob) {
+            showState("error", "Date of Birth Mismatch",
+                "The Date of Birth you entered does not match our records. Please check and try again.");
+            return;
+        }
+
+        // ✅ Step 3: Find the result ONLY for the SELECTED exam
+        const targetExamId = SELECTED_EXAM.id;
+        const targetExamName = SELECTED_EXAM.name;
+        const targetExamCode = SELECTED_EXAM.exam_code;
+
+        // Filter results — only for selected exam
+        const allResults = data.results || [];
+        const matchingResult = allResults.find(r => {
+            // Match by exam_id (strongest)
+            if (r.exam_id && r.exam_id === targetExamId) return true;
+            // Fallback: match by exam_name
+            if (r.exam_name && targetExamName && r.exam_name === targetExamName) return true;
+            return false;
+        });
+
+        // Result not found for this specific exam
+        if (!matchingResult) {
+            showState("warning", "Result Not Found",
+                `No result found for "${targetExamName}". This exam's result may not be published for you yet, or your result is not available.`,
+                student);
+            return;
+        }
+
+        // ✅ Step 4: Render result
+        renderResult(student, matchingResult, SELECTED_EXAM);
 
     } catch (err) {
-        showErrorState(
-            "Connection Error",
-            "Unable to connect to the server. Please check your internet and try again."
-        );
+        console.error("Error:", err);
+        showState("error", "Connection Error",
+            "Unable to connect to the server. Please check your internet and try again.");
     } finally {
         btn.disabled = false;
+        btn.classList.remove("loading");
+        btnText.textContent = "Check Result";
     }
 }
 
 // ============================================================
-// ERROR STATE
+// SHOW STATE (error / warning / info)
 // ============================================================
-function showErrorState(title, message, isNotFound = false) {
+function showState(type, title, message, student = null) {
     const area = document.getElementById("resultArea");
-    area.innerHTML = `
-        <div class="state-box ${isNotFound ? 'warning' : 'error'} fade-in">
+    const iconMap = {
+        error: "fa-circle-xmark",
+        warning: "fa-triangle-exclamation",
+        info: "fa-circle-info"
+    };
+    const iconClass = iconMap[type] || "fa-circle-info";
+
+    let html = "";
+    if (student) {
+        html += renderStudentHero(student);
+    }
+
+    html += `
+        <div class="state-box ${type}">
             <div class="state-icon">
-                <i class="fa-solid ${isNotFound ? 'fa-user-slash' : 'fa-circle-xmark'}"></i>
+                <i class="fa-solid ${iconClass}"></i>
             </div>
             <h3>${escapeHtml(title)}</h3>
             <p>${escapeHtml(message)}</p>
         </div>
     `;
-}
-
-// ============================================================
-// RENDER RESULTS
-// ============================================================
-function renderResults(data) {
-    const { student, results, total_results } = data;
-    const area = document.getElementById("resultArea");
-
-    if (!results || results.length === 0) {
-        area.innerHTML = `
-            ${renderStudentHero(student)}
-            <div class="state-box warning fade-in" style="margin-top: 22px;">
-                <div class="state-icon">
-                    <i class="fa-solid fa-hourglass-half"></i>
-                </div>
-                <h3>No results published yet</h3>
-                <p>Your results will appear here once they are published by the school.</p>
-            </div>
-        `;
-        return;
-    }
-
-    let html = renderStudentHero(student);
-
-    // Sort latest first
-    const sorted = [...results].sort((a, b) => {
-        if ((b.session_name || "") !== (a.session_name || "")) {
-            return (b.session_name || "").localeCompare(a.session_name || "");
-        }
-        return (b.result_id || 0) - (a.result_id || 0);
-    });
-
-    sorted.forEach(r => {
-        html += renderResultCard(r, student);
-    });
-
-    area.innerHTML = `<div class="fade-in">${html}</div>`;
+    area.innerHTML = html;
 }
 
 // ============================================================
@@ -1572,8 +2225,8 @@ function renderStudentHero(student) {
         : `<i class="fa-solid fa-user"></i>`;
 
     return `
-        <div class="student-hero fade-in">
-            <div class="student-photo-hero">${photoHtml}</div>
+        <div class="student-hero">
+            <div class="student-photo">${photoHtml}</div>
             <div class="student-details">
                 <h3>${escapeHtml(student.name || "—")}</h3>
                 <div class="student-id-line">
@@ -1583,11 +2236,10 @@ function renderStudentHero(student) {
                     <span><i class="fa-solid fa-school"></i> Class ${escapeHtml(student.class || "—")}</span>
                 </div>
                 <div class="student-meta-grid">
-                    ${student.father_name ? `<div class="meta-box"><div class="label">Father's Name</div><div class="value">${escapeHtml(student.father_name)}</div></div>` : ""}
-                    ${student.dob ? `<div class="meta-box"><div class="label">Date of Birth</div><div class="value">${formatDate(student.dob)}</div></div>` : ""}
-                    ${student.section ? `<div class="meta-box"><div class="label">Section</div><div class="value">${escapeHtml(student.section)}</div></div>` : ""}
-                    ${student.stream ? `<div class="meta-box"><div class="label">Stream</div><div class="value">${escapeHtml(student.stream)}</div></div>` : ""}
-                    ${student.session ? `<div class="meta-box"><div class="label">Session</div><div class="value">${escapeHtml(student.session)}</div></div>` : ""}
+                    ${student.father_name ? `<div class="meta-box"><div class="lbl">Father's Name</div><div class="val">${escapeHtml(student.father_name)}</div></div>` : ""}
+                    ${student.dob ? `<div class="meta-box"><div class="lbl">Date of Birth</div><div class="val">${formatDate(student.dob)}</div></div>` : ""}
+                    ${student.section ? `<div class="meta-box"><div class="lbl">Section</div><div class="val">${escapeHtml(student.section)}</div></div>` : ""}
+                    ${student.stream ? `<div class="meta-box"><div class="lbl">Stream</div><div class="val">${escapeHtml(student.stream)}</div></div>` : ""}
                 </div>
             </div>
         </div>
@@ -1595,30 +2247,33 @@ function renderStudentHero(student) {
 }
 
 // ============================================================
-// RESULT CARD
+// RENDER RESULT
 // ============================================================
-function renderResultCard(r, student) {
+function renderResult(student, r, exam) {
+    const area = document.getElementById("resultArea");
+
+    // Cache for marksheet
+    window.__currentResult = { student, result: r, exam };
+
     const failedSubjects = Array.isArray(r.failed_subjects) ? r.failed_subjects : [];
     const subjects = Array.isArray(r.subject_wise_marks) ? r.subject_wise_marks : [];
-    const badgeClass = getResultBadgeClass(r.result_status);
+    const badgeType = getResultBadge(r.result_status);
     const badgeIcon = getResultIcon(r.result_status);
     const gradeClass = getGradeClass(r.percentage);
 
-    // Cache result for marksheet download
-    const resultKey = `result_${r.result_id}`;
-    window[resultKey] = { result: r, student };
+    let html = renderStudentHero(student);
 
-    return `
+    html += `
         <div class="result-card">
             <div class="result-card-head">
                 <div>
-                    <h4><i class="fa-solid fa-file-pen"></i> ${escapeHtml(r.exam_name || "—")}</h4>
+                    <h4><i class="fa-solid fa-file-pen"></i> ${escapeHtml(r.exam_name || exam.name || "—")}</h4>
                     <div class="sub">
-                        Session: <strong>${escapeHtml(r.session_name || "—")}</strong>
-                        ${r.class_name ? `&nbsp;·&nbsp; Class: <strong>${escapeHtml(r.class_name)}</strong>` : ""}
+                        Session: <strong>${escapeHtml(r.session_name || exam.session_name || "—")}</strong>
+                        &nbsp;·&nbsp; Class: <strong>${escapeHtml(r.class_name || exam.class_name || "—")}</strong>
                     </div>
                 </div>
-                <span class="badge ${badgeClass}">
+                <span class="result-badge ${badgeType}">
                     <i class="fa-solid ${badgeIcon}"></i>
                     ${escapeHtml(r.result_status || "—")}
                 </span>
@@ -1626,20 +2281,20 @@ function renderResultCard(r, student) {
 
             <div class="result-summary">
                 <div class="summary-box">
-                    <div class="label">Total Marks</div>
-                    <div class="value">${formatMark(r.grand_total)}<small> / ${formatMark(r.max_total)}</small></div>
+                    <div class="lbl">Total Marks</div>
+                    <div class="val">${formatMark(r.grand_total)}<small> / ${formatMark(r.max_total)}</small></div>
                 </div>
                 <div class="summary-box ${gradeClass}">
-                    <div class="label">Percentage</div>
-                    <div class="value">${formatMark(r.percentage)}%</div>
+                    <div class="lbl">Percentage</div>
+                    <div class="val">${formatMark(r.percentage)}%</div>
                 </div>
                 <div class="summary-box ${gradeClass}">
-                    <div class="label">Grade</div>
-                    <div class="value">${escapeHtml(r.overall_grade || "—")}</div>
+                    <div class="lbl">Grade</div>
+                    <div class="val">${escapeHtml(r.overall_grade || "—")}</div>
                 </div>
                 <div class="summary-box">
-                    <div class="label">Subjects</div>
-                    <div class="value">${subjects.length}</div>
+                    <div class="lbl">Subjects</div>
+                    <div class="val">${subjects.length}</div>
                 </div>
             </div>
 
@@ -1679,39 +2334,32 @@ function renderResultCard(r, student) {
                 </div>
             ` : ""}
 
-            ${failedSubjects.length > 0 ? `
-                <div class="failed-warning">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                    <div><strong>Failed Subjects:</strong> ${failedSubjects.map(s => escapeHtml(s)).join(", ")}</div>
-                </div>
-            ` : ""}
-
             <div class="result-actions">
-                <button class="action-btn action-btn-primary" onclick="openMarksheet(${r.result_id})">
+                <button class="action-btn action-btn-primary" onclick="openMarksheet()">
                     <i class="fa-solid fa-file-pdf"></i> Download Marksheet
                 </button>
-                <button class="action-btn action-btn-outline" onclick="printResult()">
+                <button class="action-btn action-btn-outline" onclick="printPage()">
                     <i class="fa-solid fa-print"></i> Print Page
                 </button>
             </div>
         </div>
     `;
+
+    area.innerHTML = html;
+    area.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 // ============================================================
-// MARKSHEET — Open (Professional A4)
+// MARKSHEET
 // ============================================================
-function openMarksheet(resultId) {
-    const cached = window[`result_${resultId}`];
+function openMarksheet() {
+    const cached = window.__currentResult;
     if (!cached) {
-        alert("Result data not found. Please search again.");
+        alert("Result not loaded. Please search again.");
         return;
     }
-
-    const { result, student } = cached;
-    const content = document.getElementById("marksheetContent");
-    content.innerHTML = buildMarksheet(result, student);
-
+    const { student, result, exam } = cached;
+    document.getElementById("marksheetContent").innerHTML = buildMarksheet(student, result, exam);
     document.getElementById("marksheetOverlay").classList.add("active");
     document.body.style.overflow = "hidden";
 }
@@ -1725,25 +2373,21 @@ function printMarksheet() {
     window.print();
 }
 
-// ============================================================
-// MARKSHEET — Build (Professional A4 layout)
-// ============================================================
-function buildMarksheet(r, student) {
+function printPage() {
+    window.print();
+}
+
+function buildMarksheet(student, r, exam) {
     const failedSubjects = Array.isArray(r.failed_subjects) ? r.failed_subjects : [];
     const subjects = Array.isArray(r.subject_wise_marks) ? r.subject_wise_marks : [];
     const isPass = r.result_status === "Pass";
-
-    // Photo
     const photoHtml = student.photo
         ? `<img src="${escapeHtml(student.photo)}" alt="Photo" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-user\\'></i>';" />`
         : `<i class="fa-solid fa-user"></i>`;
-
-    // Generate unique QR-like code
     const qrCode = `GSSS-${String(student.student_id || "").padStart(8, "0")}-${String(r.result_id || "").padStart(6, "0")}`;
 
     return `
         <div class="marksheet-print">
-            <!-- Header -->
             <div class="ms-header">
                 <div class="ms-logo">GSS</div>
                 <div class="ms-header-text">
@@ -1753,10 +2397,8 @@ function buildMarksheet(r, student) {
                 </div>
             </div>
 
-            <!-- Title -->
             <div class="ms-title-bar">MARKSHEET</div>
 
-            <!-- Student Info + Photo -->
             <div class="ms-info-block">
                 <div class="ms-info-grid">
                     <div class="ms-info-row">
@@ -1789,11 +2431,11 @@ function buildMarksheet(r, student) {
                     </div>
                     <div class="ms-info-row">
                         <div class="lbl">Examination</div>
-                        <div class="val">${escapeHtml(r.exam_name || "—")}</div>
+                        <div class="val">${escapeHtml(r.exam_name || exam.name || "—")}</div>
                     </div>
                     <div class="ms-info-row">
                         <div class="lbl">Academic Session</div>
-                        <div class="val">${escapeHtml(r.session_name || "—")}</div>
+                        <div class="val">${escapeHtml(r.session_name || exam.session_name || "—")}</div>
                     </div>
                     <div class="ms-info-row">
                         <div class="lbl">Result Status</div>
@@ -1803,7 +2445,6 @@ function buildMarksheet(r, student) {
                 <div class="ms-photo">${photoHtml}</div>
             </div>
 
-            <!-- Marks Table -->
             <table class="ms-marks-table">
                 <thead>
                     <tr>
@@ -1840,7 +2481,6 @@ function buildMarksheet(r, student) {
                 </tbody>
             </table>
 
-            <!-- Summary -->
             <div class="ms-summary">
                 <div class="ms-summary-box">
                     <div class="lbl">Grand Total</div>
@@ -1860,7 +2500,6 @@ function buildMarksheet(r, student) {
                 </div>
             </div>
 
-            <!-- Failed Subjects -->
             ${failedSubjects.length > 0 ? `
                 <div class="ms-failed">
                     <div class="lbl">Failed Subjects</div>
@@ -1868,7 +2507,6 @@ function buildMarksheet(r, student) {
                 </div>
             ` : ""}
 
-            <!-- Signatures -->
             <div class="ms-footer">
                 <div class="ms-sign">
                     <div class="line">Class Teacher</div>
@@ -1884,7 +2522,6 @@ function buildMarksheet(r, student) {
                 </div>
             </div>
 
-            <!-- Footer Note -->
             <div class="ms-footer-note">
                 <div>This is a computer-generated marksheet issued by GSSS Shilla on ${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}</div>
                 <div class="qr">Verification Code: ${qrCode}</div>
@@ -1894,27 +2531,19 @@ function buildMarksheet(r, student) {
 }
 
 // ============================================================
-// PRINT PAGE (Simple)
-// ============================================================
-function printResult() {
-    window.print();
-}
-
-// ============================================================
 // INIT
 // ============================================================
 document.addEventListener("DOMContentLoaded", () => {
     loadPublishedExams();
-    document.getElementById("studentId")?.focus();
 
-    // Close marksheet with ESC key
+    // ESC key closes marksheet
     document.addEventListener("keydown", (e) => {
         if (e.key === "Escape" && document.getElementById("marksheetOverlay").classList.contains("active")) {
             closeMarksheet();
         }
     });
 
-    // Close marksheet on backdrop click
+    // Backdrop click closes
     document.getElementById("marksheetOverlay").addEventListener("click", (e) => {
         if (e.target.id === "marksheetOverlay") closeMarksheet();
     });
