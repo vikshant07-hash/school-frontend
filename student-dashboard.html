@@ -145,7 +145,7 @@ body {
 }
 
 /* ============================================================
-   RESTRICTED MODE STYLES — NEW
+   RESTRICTED MODE STYLES
    ============================================================ */
 .restricted-banner {
   padding: 18px 22px;
@@ -220,7 +220,6 @@ body {
 }
 .restricted-banner .rb-feature i { font-size: 10px; color: #059669; }
 
-/* Disabled section cards */
 .sb-nav .nv.restricted-locked {
   opacity: 0.5;
   cursor: not-allowed;
@@ -247,7 +246,6 @@ body {
   color: var(--maroon);
 }
 
-/* Disabled quiz card on dashboard */
 .quiz-card.restricted-disabled {
   opacity: 0.55;
   cursor: not-allowed;
@@ -275,7 +273,6 @@ body {
   animation: pulse 2s infinite;
 }
 
-/* Disabled download card */
 .dl-card.restricted-disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -1580,6 +1577,122 @@ body {
 .qz-score b { color: var(--maroon-d); font-weight: 800; }
 
 /* ============================================================
+   ASSIGNED SUBJECTS (NEW)
+   ============================================================ */
+.subj-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+.subj-card {
+  padding: 22px;
+  border-radius: 20px;
+  background: var(--bg);
+  box-shadow: var(--press);
+  transition: box-shadow 0.35s var(--ease), transform 0.35s var(--ease);
+  position: relative;
+  overflow: hidden;
+}
+.subj-card:hover {
+  box-shadow: var(--press-lg);
+  transform: translateY(-3px);
+}
+.subj-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 5px; height: 100%;
+  background: var(--grad-primary);
+}
+.subj-card.optional::before {
+  background: var(--grad-gold);
+}
+.subj-hd {
+  display: flex; align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.subj-ic {
+  width: 54px; height: 54px;
+  border-radius: 16px;
+  background: var(--grad-primary);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  box-shadow: var(--press-sm);
+  transition: box-shadow 0.35s var(--ease), transform 0.35s var(--ease);
+}
+.subj-card.optional .subj-ic {
+  background: var(--grad-gold);
+}
+.subj-card:hover .subj-ic {
+  transform: scale(1.06) rotate(-6deg);
+  box-shadow: var(--press);
+}
+.subj-info { flex: 1; min-width: 0; }
+.subj-name {
+  font-family: 'Instrument Serif', serif;
+  font-size: 19px; font-weight: 700;
+  color: var(--t-hi);
+  margin-bottom: 5px;
+  line-height: 1.25;
+}
+.subj-code {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--maroon-d);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: var(--bg);
+  box-shadow: var(--press-xs);
+  display: inline-block;
+}
+.subj-badge {
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 9.5px; font-weight: 900;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--grad-primary);
+  box-shadow: var(--press-xs);
+  flex-shrink: 0;
+}
+.subj-badge.optional {
+  background: var(--grad-gold);
+}
+.subj-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--sd-soft);
+}
+.subj-meta-item {
+  display: flex; flex-direction: column;
+  gap: 3px;
+}
+.subj-meta-item .l {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 800;
+  color: var(--t-lo);
+}
+.subj-meta-item .v {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--t-hi);
+}
+.subj-meta-item .v.type {
+  color: var(--maroon-d);
+}
+
+/* ============================================================
    DOWNLOADS
    ============================================================ */
 .dl-grid {
@@ -2335,6 +2448,7 @@ body.blocked .lmo { display: none !important; }
   .quiz-card { flex-direction: column; align-items: flex-start; padding: 22px; gap: 16px; }
   .quiz-btn { width: 100%; justify-content: center; }
   .dl-grid { grid-template-columns: 1fr; }
+  .subj-grid { grid-template-columns: 1fr; }
   .footer { padding: 24px 18px; font-size: 11.5px; }
   .sec-hd { padding: 16px 18px; }
   .sec-bd { padding: 18px 18px; }
@@ -2347,6 +2461,7 @@ body.blocked .lmo { display: none !important; }
   .rci-grid { grid-template-columns: 1fr 1fr; }
   .info-grid { grid-template-columns: 1fr; }
   .doc-grid { grid-template-columns: 1fr; }
+  .subj-meta { grid-template-columns: 1fr; }
   .pin-input { font-size: 18px; letter-spacing: 10px; padding-right: 52px; }
   .quiz-tabs { gap: 6px; }
   .quiz-tab { padding: 10px 12px; font-size: 11px; min-width: 0; flex: 1 1 auto; }
@@ -2515,6 +2630,10 @@ try {
       <i class="fas fa-poll"></i> My Results
       <span class="bdg hidden" id="sidebarResultBadge">0</span>
     </button>
+    <button class="nv" data-section="subjects" onclick="switchSection('subjects')">
+      <i class="fas fa-book-open"></i> My Subjects
+      <span class="bdg hidden" id="sidebarSubjectBadge">0</span>
+    </button>
     <button class="nv" data-section="quizzes" id="navQuizzes" onclick="switchSection('quizzes')">
       <i class="fas fa-brain"></i> Quizzes
       <span class="bdg hidden" id="sidebarQuizBadge">0</span>
@@ -2568,7 +2687,7 @@ try {
       <div class="stat anim-fadeup d-1"><div class="ic"><i class="fas fa-graduation-cap"></i></div><h3>Class</h3><div class="vl cy" id="statClass">—</div></div>
       <div class="stat anim-fadeup d-2"><div class="ic"><i class="fas fa-book"></i></div><h3>Stream</h3><div class="vl am" id="statStream">—</div></div>
       <div class="stat anim-fadeup d-3"><div class="ic"><i class="fas fa-hashtag"></i></div><h3>Roll Number</h3><div class="vl co" id="statRoll">—</div></div>
-      <div class="stat anim-fadeup d-4"><div class="ic"><i class="fas fa-file-alt"></i></div><h3>Documents</h3><div class="vl gr" id="statDocs">0/10</div></div>
+      <div class="stat anim-fadeup d-4"><div class="ic"><i class="fas fa-book-open"></i></div><h3>Subjects</h3><div class="vl gr" id="statSubjects">—</div></div>
     </div>
 
     <div class="rmc" id="resultMainCard">
@@ -2598,6 +2717,21 @@ try {
       </div>
     </div>
 
+    <!-- ASSIGNED SUBJECTS CARD -->
+    <div class="quiz-card" id="subjectsCard" onclick="switchSection('subjects')">
+      <div class="quiz-ic" style="background: var(--grad-cyan);"><i class="fas fa-book-open"></i></div>
+      <div class="quiz-bd">
+        <div class="quiz-tt">
+          My Assigned Subjects
+          <span class="quiz-notif" id="subjectNotifBadge" style="display:none;">New</span>
+        </div>
+        <div class="quiz-ds" id="subjectsCardDesc">View your assigned subjects and their details</div>
+      </div>
+      <button class="quiz-btn" style="background: var(--grad-cyan);" onclick="event.stopPropagation(); switchSection('subjects');">
+        <i class="fas fa-eye"></i> View Subjects
+      </button>
+    </div>
+
     <div class="quiz-card" id="quizCard" onclick="switchSection('quizzes')">
       <div class="quiz-ic"><i class="fas fa-brain"></i></div>
       <div class="quiz-bd">
@@ -2625,6 +2759,23 @@ try {
         <div id="resultsSectionContent">
           <div style="text-align:center;padding:32px;color:var(--t-lo);">
             <i class="fas fa-spinner fa-spin"></i> Loading results...
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASSIGNED SUBJECTS -->
+  <div class="sec" id="section-subjects">
+    <div class="sec-card">
+      <div class="sec-hd">
+        <h2><i class="fas fa-book-open"></i> My Assigned Subjects</h2>
+        <span class="sb" id="subjectsSectionSubtitle">Loading subjects...</span>
+      </div>
+      <div class="sec-bd">
+        <div id="subjectsSectionContent">
+          <div style="text-align:center;padding:32px;color:var(--t-lo);">
+            <i class="fas fa-spinner fa-spin"></i> Loading subjects...
           </div>
         </div>
       </div>
@@ -2810,13 +2961,12 @@ const PIN_API = "https://gsssshilla.onrender.com/api/students";
 const VERIFY_BASE = "https://gsssshilla07.pages.dev/verify-student.html";
 const NEW_RESULT_DAYS = 10;
 
-// ✅ RESTRICTED STATUSES — in students ka access limited hoga
 const RESTRICTED_STATUSES = ["dropped", "transferred", "passed"];
-// ✅ RESTRICTED STUDENTS KE LIYE BLOCKED SECTIONS
 const RESTRICTED_BLOCKED_SECTIONS = ["quizzes", "downloads"];
 
 let student = null;
 let myResultsData = null;
+let mySubjects = [];
 let allQuizzes = { live: [], upcoming: [], completed: [] };
 let currentQuizTab = "live";
 let resultExpanded = false;
@@ -2909,7 +3059,7 @@ function maskAadhaar(a) {
 }
 
 // ============================================================
-// ✅ RESTRICTED MODE — NEW FUNCTIONS
+// RESTRICTED MODE
 // ============================================================
 function isRestrictedStudent(s) {
   if (!s) return false;
@@ -2921,7 +3071,6 @@ function applyRestrictedMode(s) {
   if (!isRestrictedStudent(s)) return;
   isRestricted = true;
 
-  // 1. Sidebar — restricted sections pe lock badge lagao
   RESTRICTED_BLOCKED_SECTIONS.forEach(sectionId => {
     const navBtn = document.querySelector(`.sb-nav .nv[data-section="${sectionId}"]`);
     if (navBtn) {
@@ -2930,7 +3079,6 @@ function applyRestrictedMode(s) {
     }
   });
 
-  // 2. Quiz card on dashboard — disabled
   const quizCard = document.getElementById("quizCard");
   if (quizCard) {
     quizCard.classList.add("restricted-disabled");
@@ -2941,7 +3089,6 @@ function applyRestrictedMode(s) {
     if (desc) desc.textContent = "🔒 Yeh feature aapke restricted account mein available nahi hai";
   }
 
-  // 3. Downloads section — sirf Profile PDF allow, baaki disable
   document.querySelectorAll("#section-downloads .dl-card").forEach(card => {
     const title = card.querySelector(".dl-tt")?.textContent || "";
     const isProfilePDF = title.toLowerCase().includes("student profile");
@@ -2956,10 +3103,8 @@ function applyRestrictedMode(s) {
     }
   });
 
-  // 4. Restricted banner add karo hero ke baad
   showRestrictedBanner(s);
 
-  // 5. Agar user already restricted section pe hai to dashboard pe le jao
   const activeSec = document.querySelector(".sec.active")?.id || "";
   if (activeSec === "section-quizzes" || activeSec === "section-downloads") {
     switchSection("dashboard");
@@ -2992,6 +3137,7 @@ function showRestrictedBanner(s) {
       <div class="rb-features">
         <span class="rb-feature"><i class="fas fa-check"></i> My Profile</span>
         <span class="rb-feature"><i class="fas fa-check"></i> My Results</span>
+        <span class="rb-feature"><i class="fas fa-check"></i> My Subjects</span>
         <span class="rb-feature"><i class="fas fa-check"></i> Documents (View)</span>
         <span class="rb-feature"><i class="fas fa-check"></i> Profile PDF</span>
         <span class="rb-feature"><i class="fas fa-check"></i> Security PIN</span>
@@ -3035,7 +3181,6 @@ function toggleSidebar() {
 }
 
 function switchSection(sectionId) {
-  // ✅ RESTRICTED MODE CHECK
   if (isRestricted && RESTRICTED_BLOCKED_SECTIONS.includes(sectionId)) {
     const labels = { quizzes: "Quizzes", downloads: "Downloads" };
     showRestrictedMsg(labels[sectionId] || sectionId);
@@ -3052,6 +3197,7 @@ function switchSection(sectionId) {
   document.getElementById("sidebarOverlay").classList.remove("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (sectionId === "results") renderResultsSection();
+  if (sectionId === "subjects") renderSubjectsSection();
   if (sectionId === "quizzes") renderQuizzesSection();
   if (sectionId === "pin") loadPinStatus();
 }
@@ -3108,13 +3254,6 @@ function renderDashboard(s) {
   document.getElementById("statStream").textContent = isHigher ? (s.stream || "—") : "Non-Spec.";
   document.getElementById("statRoll").textContent = s.roll_number || "—";
 
-  const docCount = [
-    s.student_photo_url, s.signature_url, s.aadhar_card_url, s.himachali_bonafide_url,
-    s.caste_certificate_url, s.apaar_card_url, s.previous_marksheet_url,
-    s.income_certificate_url, s.bpl_certificate_url, s.other_document_url
-  ].filter(Boolean).length;
-  document.getElementById("statDocs").textContent = `${docCount}/10`;
-
   const personal = [
     ["Student ID", s.student_id], ["Admission Number", s.admission_number],
     ["Admission Date", fmtDate(s.admission_date)], ["Full Name", s.name],
@@ -3170,57 +3309,71 @@ function renderDashboard(s) {
 }
 
 // ============================================================
-// RESULTS
+// RESULTS (UPDATED for backend /student/:id/permanent)
 // ============================================================
 async function loadMyResults() {
   if (!student || !student.student_id) return;
   try {
-    const res = await fetch(`${RESULTS_API}/student/my-results/${encodeURIComponent(student.student_id)}`);
+    const res = await fetch(
+      `${RESULTS_API}/student/${encodeURIComponent(student.student_id)}/permanent`
+    );
     const data = await res.json();
-    if (!data.success || !data.data) { renderNoResults("No published marksheets found"); return; }
-    const payload = data.data || {};
-    const marksheets = payload.marksheets || [];
-    const studentInfo = payload.student || student;
-    if (marksheets.length === 0) { renderNoResults("No published marksheets found"); return; }
 
-    let summary = payload.summary;
-    if (!summary) {
-      let totalObtained = 0, totalMax = 0;
-      marksheets.forEach(m => {
-        totalObtained += parseInt(m.obtained_marks) || 0;
-        totalMax += parseInt(m.max_marks) || 0;
-      });
-      const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : "0.00";
-      summary = {
-        totalObtained, totalMax, percentage,
-        grade: calculateGrade(percentage),
-        overall_status: payload.overall_status || null,
-        overall_status_reason: payload.overall_status_reason || null
-      };
+    if (!data.success || !data.data || !data.data.results) {
+      renderNoResults("No published results yet");
+      return;
     }
-    myResultsData = { student: studentInfo, marksheets, summary };
-    updateResultMainCard(marksheets, summary);
-    renderMyResults(marksheets, summary, studentInfo);
+
+    const payload = data.data;
+    const results = payload.results || [];
+    const studentInfo = payload.student || student;
+
+    if (results.length === 0) {
+      renderNoResults("No published marksheets found");
+      return;
+    }
+
+    // Calculate summary from all results
+    let totalObtained = 0, totalMax = 0;
+    results.forEach(r => {
+      totalObtained += parseFloat(r.grand_total) || 0;
+      totalMax += parseFloat(r.max_total) || 0;
+    });
+    const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : "0.00";
+
+    const summary = {
+      totalObtained,
+      totalMax,
+      percentage,
+      grade: calculateGrade(percentage),
+      overall_status: results[0]?.result_status || null,
+      overall_status_reason: null
+    };
+
+    myResultsData = { student: studentInfo, results, summary };
+
+    updateResultMainCard(results, summary);
+    renderMyResults(results, summary, studentInfo);
   } catch (err) {
     console.warn("Results load failed:", err.message);
     renderNoResults("Unable to load results");
   }
 }
 
-function updateResultMainCard(marksheets, summary) {
+function updateResultMainCard(results, summary) {
   const countBadge = document.getElementById("resultCountBadge");
   const newBadge = document.getElementById("resultNewBadge");
   const descText = document.getElementById("resultDescText");
   const recentPill = document.getElementById("recentPill");
 
-  if (!marksheets || marksheets.length === 0) {
+  if (!results || results.length === 0) {
     countBadge.textContent = "0";
     descText.textContent = "No published results yet";
     return;
   }
-  const newResults = marksheets.filter(m => isNewResult(m.declaration_date));
-  countBadge.textContent = marksheets.length;
-  descText.textContent = `${marksheets.length} exam${marksheets.length > 1 ? "s" : ""} available`;
+  const newResults = results.filter(r => isNewResult(r.snapshot_at));
+  countBadge.textContent = results.length;
+  descText.textContent = `${results.length} exam${results.length > 1 ? "s" : ""} available`;
 
   if (newResults.length > 0) {
     newBadge.style.display = "inline-block";
@@ -3231,7 +3384,7 @@ function updateResultMainCard(marksheets, summary) {
 
   const sidebarBadge = document.getElementById("sidebarResultBadge");
   if (sidebarBadge) {
-    sidebarBadge.textContent = marksheets.length;
+    sidebarBadge.textContent = results.length;
     sidebarBadge.classList.remove("hidden");
     if (newResults.length > 0) sidebarBadge.classList.add("green");
   }
@@ -3252,19 +3405,18 @@ function renderNoResults(msg) {
   document.getElementById("resultsSectionContent").innerHTML = html;
 }
 
-function renderMyResults(marksheets, summary, studentInfo) {
-  if (!marksheets || marksheets.length === 0) {
+function renderMyResults(results, summary, studentInfo) {
+  if (!results || results.length === 0) {
     renderNoResults("No published marksheets found");
     return;
   }
 
   const overallStatus = summary.overall_status;
-  const overallReason = summary.overall_status_reason;
-  const newResults = marksheets.filter(m => isNewResult(m.declaration_date));
+  const newResults = results.filter(r => isNewResult(r.snapshot_at));
 
   let newAlertHtml = "";
   if (newResults.length > 0) {
-    const names = newResults.map(r => r.exam_type).join(", ");
+    const names = newResults.map(r => r.exam_name).join(", ");
     newAlertHtml = `
       <div class="nra">
         <div class="i"><i class="fas fa-bell"></i></div>
@@ -3284,7 +3436,6 @@ function renderMyResults(marksheets, summary, studentInfo) {
         <div class="b">
           <div class="l">Overall Result</div>
           <div class="s">${esc(overallStatus.toUpperCase())}</div>
-          ${overallReason ? `<div class="r">${esc(overallReason)}</div>` : ''}
         </div>
       </div>
     `;
@@ -3292,57 +3443,65 @@ function renderMyResults(marksheets, summary, studentInfo) {
 
   const summaryHtml = `
     <div class="sum-grid">
-      <div class="sum-box"><div class="l">Total Obtained</div><div class="v cy">${summary.totalObtained || 0}</div></div>
-      <div class="sum-box"><div class="l">Maximum Marks</div><div class="v">${summary.totalMax || 0}</div></div>
-      <div class="sum-box"><div class="l">Percentage</div><div class="v am">${summary.percentage || "0.00"}%</div></div>
-      <div class="sum-box"><div class="l">Grade</div><div class="v co">${summary.grade || "—"}</div></div>
+      <div class="sum-box"><div class="l">Total Obtained</div><div class="v cy">${summary.totalObtained}</div></div>
+      <div class="sum-box"><div class="l">Maximum Marks</div><div class="v">${summary.totalMax}</div></div>
+      <div class="sum-box"><div class="l">Percentage</div><div class="v am">${summary.percentage}%</div></div>
+      <div class="sum-box"><div class="l">Grade</div><div class="v co">${summary.grade}</div></div>
     </div>
   `;
 
-  const marksheetsHtml = marksheets.map((m) => {
-    const isNew = isNewResult(m.declaration_date);
-    const status = m.result_status;
-
-    let subjects = m.subjects || [];
-    if (typeof subjects === "string") {
-      try { subjects = JSON.parse(subjects); } catch (e) { subjects = []; }
-    }
-    if (!Array.isArray(subjects)) subjects = [];
+  const marksheetsHtml = results.map((r) => {
+    const isNew = isNewResult(r.snapshot_at);
+    const status = r.result_status;
+    const subjects = r.subject_wise_marks || [];
 
     let subjectsTable = "";
     if (subjects.length > 0) {
-      const totalSubObt = subjects.reduce((s, x) => s + (parseInt(x.obtained) || 0), 0);
-      const totalSubMax = subjects.reduce((s, x) => s + (parseInt(x.max) || 0), 0);
-
       subjectsTable = `
         <div class="sub-tbl-wrap">
           <table class="sub-tbl">
             <thead>
-              <tr><th>#</th><th>Subject</th><th>Obtained</th><th>Max</th><th>%</th></tr>
+              <tr>
+                <th>#</th>
+                <th>Subject</th>
+                <th>Theory</th>
+                <th>Practical</th>
+                <th>Internal</th>
+                <th>Total</th>
+                <th>Max</th>
+                <th>%</th>
+                <th>Grade</th>
+              </tr>
             </thead>
             <tbody>
               ${subjects.map((sub, i) => {
-                const obt = parseInt(sub.obtained) || 0;
-                const max = parseInt(sub.max) || 0;
-                const pct = max > 0 ? ((obt / max) * 100) : 0;
+                const total = parseFloat(sub.total_marks) || 0;
+                const max = parseFloat(sub.max_marks) || 0;
+                const pct = max > 0 ? ((total / max) * 100) : 0;
                 const isFail = pct < 33;
+                const isAbsent = sub.is_absent === 1 || sub.absent_type !== "Present";
+
                 return `
                   <tr>
                     <td>${i + 1}</td>
-                    <td style="font-weight:600;">${esc(sub.name || "—")}</td>
-                    <td class="${isFail ? 'fail-mk' : 'pass-mk'}">${obt}</td>
+                    <td style="font-weight:600;">${esc(sub.subject_name || "—")}</td>
+                    <td>${isAbsent ? '—' : (sub.theory_marks ?? '—')}</td>
+                    <td>${isAbsent ? '—' : (sub.practical_marks ?? '—')}</td>
+                    <td>${isAbsent ? '—' : (sub.internal_marks ?? '—')}</td>
+                    <td class="${isFail ? 'fail-mk' : 'pass-mk'}">${isAbsent ? esc(sub.absent_type) : total}</td>
                     <td>${max}</td>
-                    <td class="pct-c">${pct.toFixed(1)}%</td>
+                    <td class="pct-c">${isAbsent ? '—' : pct.toFixed(1) + '%'}</td>
+                    <td class="${isFail ? 'fail-mk' : 'pass-mk'}">${esc(sub.grade || "—")}</td>
                   </tr>
                 `;
               }).join("")}
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2" style="text-align:right;">TOTAL</td>
-                <td>${totalSubObt}</td>
-                <td>${totalSubMax}</td>
-                <td>${totalSubMax > 0 ? ((totalSubObt/totalSubMax)*100).toFixed(1) : 0}%</td>
+                <td colspan="5" style="text-align:right;">GRAND TOTAL</td>
+                <td>${r.grand_total}</td>
+                <td>${r.max_total}</td>
+                <td colspan="2">${r.percentage}% (${esc(r.overall_grade || "—")})</td>
               </tr>
             </tfoot>
           </table>
@@ -3357,16 +3516,16 @@ function renderMyResults(marksheets, summary, studentInfo) {
     }
 
     return `
-      <div class="rci ${isNew ? 'new' : ''}" data-rci-id="${m.id}">
-        <div class="rci-hd" onclick="event.stopPropagation(); toggleResultCard(${m.id});">
+      <div class="rci ${isNew ? 'new' : ''}" data-rci-id="${r.result_id}">
+        <div class="rci-hd" onclick="event.stopPropagation(); toggleResultCard(${r.result_id});">
           <div class="rci-l">
             <div class="rci-ic"><i class="fas fa-scroll"></i></div>
             <div>
-              <div class="rci-tt">${esc(m.exam_type || "Exam")}</div>
+              <div class="rci-tt">${esc(r.exam_name || "Exam")}</div>
               <div class="rci-meta">
-                <span><i class="far fa-calendar-alt"></i> ${formatMonth(m.exam_session || m.session)}</span>
-                ${m.obtained_marks ? `<span><i class="fas fa-star"></i> ${esc(m.obtained_marks)}/${esc(m.max_marks || "—")}</span>` : ''}
-                ${subjects.length > 0 ? `<span><i class="fas fa-list"></i> ${subjects.length} subjects</span>` : ''}
+                <span><i class="far fa-calendar-alt"></i> ${esc(r.session_name || "—")}</span>
+                <span><i class="fas fa-star"></i> ${r.grand_total}/${r.max_total}</span>
+                <span><i class="fas fa-list"></i> ${subjects.length} subjects</span>
               </div>
             </div>
           </div>
@@ -3378,28 +3537,32 @@ function renderMyResults(marksheets, summary, studentInfo) {
         <div class="rci-dt">
           <div class="rci-dti">
             <div class="rci-grid">
-              <div class="rci-gi"><label>Exam Type</label><span>${esc(m.exam_type || "—")}</span></div>
-              <div class="rci-gi"><label>Exam Session</label><span>${formatMonth(m.exam_session || m.session)}</span></div>
-              <div class="rci-gi"><label>Class</label><span>${esc(m.class || studentInfo.class || "—")}</span></div>
-              <div class="rci-gi"><label>Result Status</label><span>${status ? `${getStatusIcon(status)} ${esc(status)}` : "—"}</span></div>
-              <div class="rci-gi"><label>Obtained Marks</label><span>${esc(m.obtained_marks || "—")}</span></div>
-              <div class="rci-gi"><label>Maximum Marks</label><span>${esc(m.max_marks || "—")}</span></div>
-              <div class="rci-gi"><label>Percentage</label><span>${m.obtained_marks && m.max_marks ? ((parseInt(m.obtained_marks) / parseInt(m.max_marks)) * 100).toFixed(2) + "%" : "—"}</span></div>
-              <div class="rci-gi"><label>Declared On</label><span>${m.declaration_date ? fmtDate(m.declaration_date) : "—"}</span></div>
+              <div class="rci-gi"><label>Exam</label><span>${esc(r.exam_name || "—")}</span></div>
+              <div class="rci-gi"><label>Session</label><span>${esc(r.session_name || "—")}</span></div>
+              <div class="rci-gi"><label>Class</label><span>${esc(r.class_name || "—")}</span></div>
+              <div class="rci-gi"><label>Status</label><span>${status ? `${getStatusIcon(status)} ${esc(status)}` : "—"}</span></div>
+              <div class="rci-gi"><label>Grand Total</label><span>${r.grand_total}</span></div>
+              <div class="rci-gi"><label>Max Marks</label><span>${r.max_total}</span></div>
+              <div class="rci-gi"><label>Percentage</label><span>${r.percentage}%</span></div>
+              <div class="rci-gi"><label>Grade</label><span>${esc(r.overall_grade || "—")}</span></div>
             </div>
 
             ${subjectsTable}
 
-            ${m.remarks ? `<div class="rci-rem"><strong>Remarks:</strong> ${esc(m.remarks)}</div>` : ''}
+            ${r.failed_subjects && r.failed_subjects.length > 0 ? `
+              <div class="rci-rem">
+                <strong>Failed Subjects:</strong> ${r.failed_subjects.map(s => esc(s)).join(", ")}
+              </div>
+            ` : ''}
 
             <div class="rci-act">
-              <button class="rci-btn rci-btn-v" onclick="event.stopPropagation(); viewPublishedMarksheet(${m.id})">
+              <button class="rci-btn rci-btn-v" onclick="event.stopPropagation(); viewPublishedMarksheet(${r.exam_id})">
                 <i class="fas fa-eye"></i> View PDF
               </button>
-              <button class="rci-btn rci-btn-d" onclick="event.stopPropagation(); downloadPublishedMarksheet(${m.id})">
+              <button class="rci-btn rci-btn-d" onclick="event.stopPropagation(); downloadPublishedMarksheet(${r.exam_id})">
                 <i class="fas fa-download"></i> Download
               </button>
-              <button class="rci-btn rci-btn-p" onclick="event.stopPropagation(); printSingleMarksheet(${m.id})">
+              <button class="rci-btn rci-btn-p" onclick="event.stopPropagation(); printSingleMarksheet(${r.exam_id})">
                 <i class="fas fa-print"></i> Print
               </button>
             </div>
@@ -3420,7 +3583,8 @@ function renderMyResults(marksheets, summary, studentInfo) {
   const content = newAlertHtml + overallBannerHtml + summaryHtml + marksheetsHtml + printButton;
   document.getElementById("resultContent").innerHTML = content;
   document.getElementById("resultsSectionContent").innerHTML = content;
-  document.getElementById("resultsSectionSubtitle").textContent = `${marksheets.length} exam${marksheets.length > 1 ? "s" : ""} available`;
+  document.getElementById("resultsSectionSubtitle").textContent =
+    `${results.length} exam${results.length > 1 ? "s" : ""} available`;
 
   setTimeout(enableTableDrag, 100);
 }
@@ -3460,46 +3624,92 @@ function enableTableDrag() {
 }
 
 function renderResultsSection() {
-  if (myResultsData) renderMyResults(myResultsData.marksheets, myResultsData.summary, myResultsData.student);
+  if (myResultsData) renderMyResults(myResultsData.results, myResultsData.summary, myResultsData.student);
 }
 
-function viewPublishedMarksheet(id) {
-  window.open(`${RESULTS_API}/public/marksheet/${id}`, "_blank");
+// ============================================================
+// MARKSHEET PDF ACTIONS (uses backend /marksheet/:studentId/:examId)
+// ============================================================
+async function fetchMarksheetData(examId) {
+  if (!student || !student.student_id) return null;
+  try {
+    const res = await fetch(
+      `${RESULTS_API}/marksheet/${encodeURIComponent(student.student_id)}/${examId}`
+    );
+    const data = await res.json();
+    if (!data.success || !data.data) return null;
+    return data.data;
+  } catch (err) {
+    console.warn("Marksheet data fetch failed:", err.message);
+    return null;
+  }
+}
+
+async function viewPublishedMarksheet(examId) {
   showToast("Opening marksheet...", "info");
+  const data = await fetchMarksheetData(examId);
+  if (!data) return showToast("Unable to load marksheet", "error");
+  await generateMarksheetPrint(data);
 }
 
-function downloadPublishedMarksheet(id) {
-  window.location.href = `${RESULTS_API}/public/marksheet/${id}/download`;
+async function downloadPublishedMarksheet(examId) {
   showToast("Downloading marksheet...", "success");
+  const data = await fetchMarksheetData(examId);
+  if (!data) return showToast("Unable to load marksheet", "error");
+  await generateMarksheetPrint(data);
 }
 
-function printSingleMarksheet(id) {
-  const m = (myResultsData?.marksheets || []).find(x => x.id === id);
-  if (!m) return showToast("Marksheet data not found", "error");
-  generateMarksheetPrint(myResultsData.student, [m], myResultsData.summary);
+async function printSingleMarksheet(examId) {
+  const r = (myResultsData?.results || []).find(x => x.exam_id === examId);
+  if (!r) return showToast("Marksheet data not found", "error");
+  await printFullResult();
 }
 
-function printFullResult() {
-  if (!myResultsData) return showToast("No data available", "error");
-  generateMarksheetPrint(myResultsData.student, myResultsData.marksheets || [], myResultsData.summary);
+async function printFullResult() {
+  if (!myResultsData || !myResultsData.results || myResultsData.results.length === 0) {
+    return showToast("No data available", "error");
+  }
+  // Print first (latest) result
+  const examId = myResultsData.results[0].exam_id;
+  const data = await fetchMarksheetData(examId);
+  if (!data) return showToast("Unable to load marksheet", "error");
+  await generateMarksheetPrint(data);
 }
 
-async function generateMarksheetPrint(student, marksheets, summary) {
-  const s = student;
-  let totalObtained = 0, totalMax = 0;
-  marksheets.forEach(m => {
-    totalObtained += parseInt(m.obtained_marks) || 0;
-    totalMax += parseInt(m.max_marks) || 0;
-  });
-  const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : "0.00";
-  const grade = summary?.grade || calculateGrade(percentage);
-  const overallStatus = summary?.overall_status || (parseFloat(percentage) >= 33 ? "Pass" : "Fail");
+async function generateMarksheetPrint(data) {
+  const s = data.student;
+  const r = data.result;
+  const exam = data.exam;
+  const marksheetsWithSubjects = [{
+    exam_type: exam.name,
+    exam_session: exam.exam_session || data.session?.code || "",
+    result_status: r.result_status,
+    obtained_marks: r.grand_total,
+    max_marks: r.max_total,
+    subjects: (r.subject_wise_marks || []).map(m => ({
+      name: m.subject_name,
+      obtained: m.total_marks,
+      max: m.max_marks,
+      theory: m.theory_marks,
+      practical: m.practical_marks,
+      internal: m.internal_marks,
+      project: m.project_marks,
+      grade: m.grade,
+      absent_type: m.absent_type
+    }))
+  }];
+
+  const totalObtained = parseFloat(r.grand_total) || 0;
+  const totalMax = parseFloat(r.max_total) || 0;
+  const percentage = r.percentage || "0.00";
+  const grade = r.overall_grade || calculateGrade(percentage);
+  const overallStatus = r.result_status || "Pass";
   const isHigher = ["11","12"].includes(String(s.class));
   const streamDisplay = isHigher ? (s.stream || "—") : "Non-Specialized";
 
   const verificationData = {
     student_id: s.student_id, name: s.name, class: s.class || "", session: s.session || "",
-    exams: marksheets.map(m => m.exam_type).join(", ")
+    exams: exam.name || ""
   };
   const verificationUrl = `${VERIFY_BASE}?data=${encodeURIComponent(JSON.stringify(verificationData))}`;
   const qr = await generateQRCodeBase64(verificationUrl, 130);
@@ -3508,16 +3718,18 @@ async function generateMarksheetPrint(student, marksheets, summary) {
   const pw = window.open("", "_blank", "width=1100,height=850");
   if (!pw) return showToast("Popup blocked! Please allow popups.", "error");
 
-  const marksheetsWithSubjects = marksheets.map(m => {
-    let subjects = m.subjects || [];
-    if (typeof subjects === "string") {
-      try { subjects = JSON.parse(subjects); } catch (e) { subjects = []; }
-    }
-    if (!Array.isArray(subjects)) subjects = [];
-    return { ...m, subjects };
-  });
+  pw.document.write(buildMarksheetHTML({
+    s, r, exam, data, marksheetsWithSubjects,
+    totalObtained, totalMax, percentage, grade, overallStatus,
+    streamDisplay, qr, docId
+  }));
+  pw.document.close();
 
-  pw.document.write(`<!DOCTYPE html>
+  setTimeout(() => { pw.focus(); pw.print(); }, 800);
+}
+
+function buildMarksheetHTML({ s, r, exam, data, marksheetsWithSubjects, totalObtained, totalMax, percentage, grade, overallStatus, streamDisplay, qr, docId }) {
+  return `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>Marksheet - ${esc(s.name)}</title>
 <style>
 @page { size: A4; margin: 9mm 11mm; }
@@ -3622,7 +3834,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#0b1220; font-size:12px
     <div class="item"><span class="lbl">Class</span><span class="val">${esc(s.class || "—")}</span></div>
     <div class="item"><span class="lbl">Stream</span><span class="val">${esc(streamDisplay)}</span></div>
     <div class="item"><span class="lbl">Roll No</span><span class="val">${esc(s.roll_number || "—")}</span></div>
-    <div class="item"><span class="lbl">Session</span><span class="val">${esc(s.session || "—")}</span></div>
+    <div class="item"><span class="lbl">Session</span><span class="val">${esc(s.session || data.session?.code || "—")}</span></div>
   </div>
 
   <table class="info-table">
@@ -3638,55 +3850,25 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#0b1220; font-size:12px
     <div class="summary-item"><div class="lbl">Grade</div><div class="value am">${grade}</div></div>
   </div>
 
-  <div class="overall-box ${overallStatus.toLowerCase() === 'pass' ? 'pass' : overallStatus.toLowerCase() === 'compartment' ? 'compartment' : 'fail'}">
+  <div class="overall-box ${String(overallStatus).toLowerCase() === 'pass' ? 'pass' : String(overallStatus).toLowerCase() === 'compartment' ? 'compartment' : 'fail'}">
     <div class="ob-icon">${getStatusIcon(overallStatus)}</div>
     <div class="ob-body">
       <div class="ob-label">Overall Result</div>
-      <div class="ob-status">${esc(overallStatus.toUpperCase())}</div>
+      <div class="ob-status">${esc(String(overallStatus).toUpperCase())}</div>
     </div>
   </div>
 
   ${marksheetsWithSubjects.map((m, idx) => {
     const mPct = m.obtained_marks && m.max_marks ? ((parseInt(m.obtained_marks) / parseInt(m.max_marks)) * 100).toFixed(2) : "0.00";
     const st = m.result_status || "—";
-    const stCls = st.toLowerCase() === "pass" ? "pass" : st.toLowerCase() === "compartment" ? "compartment" : "fail";
+    const stCls = String(st).toLowerCase() === "pass" ? "pass" : String(st).toLowerCase() === "compartment" ? "compartment" : "fail";
     const subjList = m.subjects || [];
-
-    if (subjList.length === 0) {
-      return `
-        <div class="exam-section">
-          <div class="exam-section-title">
-            <span>Examination ${idx + 1}: ${esc(m.exam_type)}</span>
-            <span class="exam-pill">${formatMonth(m.exam_session || m.session)}</span>
-            <span class="status-pill ${stCls}">${esc(st)}</span>
-          </div>
-          <table class="marks-table">
-            <thead><tr><th>#</th><th>Examination</th><th>Session</th><th>Obtained</th><th>Max</th><th>%</th><th>Status</th></tr></thead>
-            <tbody>
-              <tr>
-                <td style="text-align:center;">1</td>
-                <td class="subj-name">${esc(m.exam_type)}</td>
-                <td style="text-align:center;">${formatMonth(m.exam_session || m.session)}</td>
-                <td>${esc(m.obtained_marks || "—")}</td>
-                <td>${esc(m.max_marks || "—")}</td>
-                <td>${mPct}%</td>
-                <td class="${stCls}">${esc(st)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
-
-    const totalSubObt = subjList.reduce((s, x) => s + (parseInt(x.obtained) || 0), 0);
-    const totalSubMax = subjList.reduce((s, x) => s + (parseInt(x.max) || 0), 0);
-    const subTotalPct = totalSubMax > 0 ? ((totalSubObt / totalSubMax) * 100).toFixed(2) : "0.00";
 
     return `
       <div class="exam-section">
         <div class="exam-section-title">
           <span>${esc(m.exam_type)}</span>
-          <span class="exam-pill">${formatMonth(m.exam_session || m.session)}</span>
+          <span class="exam-pill">${esc(m.exam_session || "—")}</span>
           <span class="status-pill ${stCls}">${esc(st)}</span>
         </div>
         <table class="marks-table">
@@ -3694,10 +3876,13 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#0b1220; font-size:12px
             <tr>
               <th>#</th>
               <th style="text-align:left;">Subject</th>
+              <th>Theory</th>
+              <th>Practical</th>
+              <th>Internal</th>
               <th>Obtained</th>
               <th>Max</th>
               <th>%</th>
-              <th>Status</th>
+              <th>Grade</th>
             </tr>
           </thead>
           <tbody>
@@ -3706,37 +3891,34 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#0b1220; font-size:12px
               const max = parseInt(sub.max) || 0;
               const pct = max > 0 ? ((obt / max) * 100) : 0;
               const subPass = pct >= 33;
+              const isAbsent = sub.absent_type && sub.absent_type !== "Present";
               return `
                 <tr>
                   <td style="text-align:center;font-weight:700;color:#64748b;">${i + 1}</td>
                   <td class="subj-name">${esc(sub.name || "—")}</td>
-                  <td class="${subPass ? 'pass' : 'fail'}">${obt}</td>
+                  <td>${isAbsent ? '—' : (sub.theory ?? '—')}</td>
+                  <td>${isAbsent ? '—' : (sub.practical ?? '—')}</td>
+                  <td>${isAbsent ? '—' : (sub.internal ?? '—')}</td>
+                  <td class="${subPass ? 'pass' : 'fail'}">${isAbsent ? esc(sub.absent_type) : obt}</td>
                   <td>${max}</td>
-                  <td class="${subPass ? 'pass' : 'fail'}">${pct.toFixed(1)}%</td>
-                  <td class="${subPass ? 'pass' : 'fail'}">${subPass ? 'Pass' : 'Fail'}</td>
+                  <td class="${subPass ? 'pass' : 'fail'}">${isAbsent ? '—' : pct.toFixed(1) + '%'}</td>
+                  <td class="${subPass ? 'pass' : 'fail'}">${esc(sub.grade || '—')}</td>
                 </tr>
               `;
             }).join("")}
           </tbody>
           <tfoot>
             <tr class="sub-total-row">
-              <td colspan="2" style="text-align:right;">SUBJECT TOTAL</td>
-              <td>${totalSubObt}</td>
-              <td>${totalSubMax}</td>
-              <td>${subTotalPct}%</td>
-              <td>${st}</td>
+              <td colspan="5" style="text-align:right;">GRAND TOTAL</td>
+              <td>${m.obtained_marks || 0}</td>
+              <td>${m.max_marks || 0}</td>
+              <td colspan="2">${mPct}%</td>
             </tr>
           </tfoot>
         </table>
       </div>
     `;
   }).join("")}
-
-  ${marksheetsWithSubjects.map(m => m.remarks).filter(Boolean).length > 0 ? `
-    <div class="remarks-box">
-      <strong>Remarks:</strong> ${marksheetsWithSubjects.map(m => m.remarks).filter(Boolean).map(r => esc(r)).join(" | ")}
-    </div>
-  ` : ''}
 
   <div class="verify-strip">
     <div class="qr">${qr ? `<img src="${qr}">` : ''}</div>
@@ -3758,8 +3940,137 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#0b1220; font-size:12px
 </div>
 </div>
 <script>window.onload = function() { setTimeout(function() { window.print(); }, 800); };<\/script>
-</body></html>`);
-  pw.document.close();
+</body></html>`;
+}
+
+// ============================================================
+// ASSIGNED SUBJECTS
+// ============================================================
+async function loadMySubjects() {
+  if (!student || !student.student_id) return;
+
+  try {
+    const res = await fetch(
+      `${RESULTS_API}/student-subjects/${encodeURIComponent(student.student_id)}`
+    );
+    const data = await res.json();
+
+    if (!data.success || !data.data) {
+      renderNoSubjects("No subjects assigned yet");
+      return;
+    }
+
+    const subjectList = Array.isArray(data.data.subjects) ? data.data.subjects : [];
+
+    if (subjectList.length === 0) {
+      renderNoSubjects("No subjects assigned yet");
+      return;
+    }
+
+    mySubjects = subjectList;
+
+    // Update stat
+    const statEl = document.getElementById("statSubjects");
+    if (statEl) statEl.textContent = mySubjects.length;
+
+    // Update sidebar badge
+    const badge = document.getElementById("sidebarSubjectBadge");
+    if (badge) {
+      badge.textContent = mySubjects.length;
+      badge.classList.remove("hidden");
+    }
+
+    // Update dashboard card desc
+    const desc = document.getElementById("subjectsCardDesc");
+    if (desc) desc.textContent = `${mySubjects.length} subject${mySubjects.length > 1 ? "s" : ""} assigned · View details`;
+
+    // Render if section is open
+    renderSubjectsSection();
+  } catch (err) {
+    console.warn("Subjects load failed:", err.message);
+    renderNoSubjects("Unable to load subjects");
+  }
+}
+
+function renderNoSubjects(msg) {
+  const html = `
+    <div class="empty-msg">
+      <i class="fas fa-book-open"></i>
+      <h4>No Subjects Assigned</h4>
+      <p>${esc(msg)}</p>
+      <p style="margin-top:8px;font-size:11.5px;color:var(--t-lo);">
+        Subjects will appear here once assigned by the school.
+      </p>
+    </div>
+  `;
+  const sc = document.getElementById("subjectsSectionContent");
+  if (sc) sc.innerHTML = html;
+}
+
+function renderSubjectsSection() {
+  const container = document.getElementById("subjectsSectionContent");
+  const subtitle = document.getElementById("subjectsSectionSubtitle");
+  if (!container) return;
+
+  if (!mySubjects || mySubjects.length === 0) {
+    renderNoSubjects("No subjects assigned yet");
+    if (subtitle) subtitle.textContent = "No subjects assigned";
+    return;
+  }
+
+  if (subtitle) {
+    subtitle.textContent = `${mySubjects.length} subject${mySubjects.length > 1 ? "s" : ""} assigned`;
+  }
+
+  container.innerHTML = `
+    <div class="subj-grid">
+      ${mySubjects.map(sub => renderSubjectCard(sub)).join("")}
+    </div>
+  `;
+}
+
+function renderSubjectCard(sub) {
+  const data = sub.subject_data || {};
+  const isOptional = sub.is_optional === true;
+  const name = sub.subject_name || "—";
+  const code = sub.subject_code || "—";
+  const type = data.subject_type || "Core";
+  const componentType = data.component_type || "Theory";
+  const totalMax = data.total_max || 0;
+  const totalPass = data.total_pass || 0;
+
+  return `
+    <div class="subj-card ${isOptional ? 'optional' : ''}">
+      <div class="subj-hd">
+        <div class="subj-ic">
+          <i class="fas fa-book"></i>
+        </div>
+        <div class="subj-info">
+          <div class="subj-name">${esc(name)}</div>
+          <div class="subj-code">${esc(code)}</div>
+        </div>
+        <span class="subj-badge ${isOptional ? 'optional' : ''}">${isOptional ? 'Optional' : 'Core'}</span>
+      </div>
+      <div class="subj-meta">
+        <div class="subj-meta-item">
+          <span class="l">Type</span>
+          <span class="v type">${esc(type)}</span>
+        </div>
+        <div class="subj-meta-item">
+          <span class="l">Component</span>
+          <span class="v">${esc(componentType)}</span>
+        </div>
+        <div class="subj-meta-item">
+          <span class="l">Max Marks</span>
+          <span class="v">${totalMax}</span>
+        </div>
+        <div class="subj-meta-item">
+          <span class="l">Pass Marks</span>
+          <span class="v">${totalPass}</span>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 // ============================================================
@@ -3767,7 +4078,6 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#0b1220; font-size:12px
 // ============================================================
 async function loadMyQuizzes() {
   if (!student || !student.student_id) return;
-  // ✅ Restricted students ke liye quiz load mat karo
   if (isRestricted) return;
   try {
     const res = await fetch(`${QUIZ_API}/student/available`, {
@@ -3918,7 +4228,6 @@ async function checkAdmitCardStatus() {
   const card = document.getElementById("admitCardCard");
   const locked = document.getElementById("admitCardLocked");
 
-  // ✅ Restricted students ke liye hamesha locked
   if (isRestricted) {
     if (card) card.style.display = "none";
     if (locked) locked.style.display = "flex";
@@ -3968,7 +4277,6 @@ async function checkAdmitCardStatus() {
 }
 
 async function downloadAdmitCard() {
-  // ✅ Restricted students ko block
   if (isRestricted) return showRestrictedMsg("Admit Card");
   if (!student || !student.student_id) {
     return showToast("Student ID missing", "error");
@@ -4012,7 +4320,6 @@ async function checkBonafideStatus() {
   const card = document.getElementById("bonafideCard");
   const locked = document.getElementById("bonafideLocked");
 
-  // ✅ Restricted students ke liye hamesha locked
   if (isRestricted) {
     if (card) card.style.display = "none";
     if (locked) locked.style.display = "flex";
@@ -4048,7 +4355,6 @@ async function checkBonafideStatus() {
 }
 
 function downloadBonafide() {
-  // ✅ Restricted students ko block
   if (isRestricted) return showRestrictedMsg("Bonafide Certificate");
   if (!student || !student.student_id) return;
   const url = `${BONAFIDE_API}/certificate/${encodeURIComponent(student.student_id)}/pdf?v=${Date.now()}`;
@@ -4190,7 +4496,6 @@ body { font-family: 'Segoe UI', Arial, sans-serif; color:#0a0f1c; font-size:13px
 }
 
 async function downloadProvisionalForm() {
-  // ✅ Restricted students ko block
   if (isRestricted) return showRestrictedMsg("Provisional Application Form");
   if (!student) return showToast("No student data", "error");
   showToast("Generating Application Form…", "info");
@@ -4598,7 +4903,7 @@ setInterval(() => {
 }, 60000);
 
 // ============================================================
-// INIT — FAST PARALLEL LOADING
+// INIT
 // ============================================================
 document.addEventListener("DOMContentLoaded", async () => {
   let loadedStudent = null;
@@ -4615,30 +4920,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   student = loadedStudent;
   renderDashboard(student);
 
-  // ✅ RESTRICTED MODE APPLY
   applyRestrictedMode(student);
 
   showToast(`Welcome, ${student.name}!`, "success");
 
-  // ✅ Restricted students ke liye kuch API calls skip karo
   if (isRestricted) {
-    // Sirf yeh 2 calls karo
     Promise.allSettled([
       loadMyResults(),
+      loadMySubjects(),
       loadPinStatus()
     ]);
-    // Locked state dikhao
     const admitCardLocked = document.getElementById("admitCardLocked");
     const bonafideLocked = document.getElementById("bonafideLocked");
     if (admitCardLocked) admitCardLocked.style.display = "flex";
     if (bonafideLocked) bonafideLocked.style.display = "flex";
   } else {
-    // Sab API calls karo
     Promise.allSettled([
       checkAdmitCardStatus(),
       checkBonafideStatus(),
       loadMyQuizzes(),
       loadMyResults(),
+      loadMySubjects(),
       loadPinStatus()
     ]);
   }
