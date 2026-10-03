@@ -1901,6 +1901,2363 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
 
 <script>
 /* PART 2 — JAVASCRIPT WILL BE PASTED HERE */
+
+ /* ============================================================
+   RESULT MANAGEMENT — CLASS-BASED JAVASCRIPT
+   Har class ka apna enterprise view
+   ============================================================ */
+
+(function () {
+    "use strict";
+
+    // ============================================================
+    // CONFIG
+    // ============================================================
+    const API_BASE = "https://gsssshilla.onrender.com/api/results";
+    const STUDENT_API_BASE = "https://gsssshilla.onrender.com/api/students";
+
+    // ============================================================
+    // GLOBAL STATE
+    // ============================================================
+    const STATE = {
+        currentView: "dashboard",
+        currentClassTab: "subjects",
+        sessionId: null,
+        sessions: [],
+        classes: [],
+        sections: [],
+        streams: [],
+        subjects: [],
+        currentClass: null,     // {id, class_name, class_group, ...}
+        classSubjects: [],
+        classExams: [],
+        classStudents: [],
+        marksEntryStudents: [],
+        marksSubjectConfig: null
+    };
+
+    // ============================================================
+    // GLOBAL BANNER (Top error/success display)
+    // ============================================================
+    let bannerTimeout = null;
+
+    window.showGlobalBanner = function(message, type = "info", duration = 6000) {
+        const banner = document.getElementById("globalBanner");
+        const icon = document.getElementById("globalBannerIcon");
+        const text = document.getElementById("globalBannerText");
+
+        const icons = {
+            error: "fa-circle-exclamation",
+            success: "fa-circle-check",
+            warning: "fa-triangle-exclamation",
+            info: "fa-circle-info"
+        };
+
+        banner.className = `global-banner show ${type}`;
+        icon.className = `fa-solid ${icons[type] || icons.info}`;
+        text.textContent = message;
+
+        // Push main content down
+        document.getElementById("mainContent").classList.add("with-banner");
+
+        if (bannerTimeout) clearTimeout(bannerTimeout);
+        if (duration > 0) {
+            bannerTimeout = setTimeout(() => hideGlobalBanner(), duration);
+        }
+    };
+
+    window.hideGlobalBanner = function() {
+        document.getElementById("globalBanner").classList.remove("show");
+        document.getElementById("mainContent").classList.remove("with-banner");
+        if (bannerTimeout) clearTimeout(bannerTimeout);
+    };
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    function showToast(message, type = "info", duration = 3500) {
+        const icons = {
+            success: "fa-circle-check",
+            error: "fa-circle-xmark",
+            warning: "fa-triangle-exclamation",
+            info: "fa-circle-info"
+        };
+        const container = document.getElementById("toastContainer");
+        const t = document.createElement("div");
+        t.className = `toast ${type}`;
+        t.innerHTML = `
+            <i class="fa-solid ${icons[type] || icons.info} toast-icon"></i>
+            <div class="toast-message">${escapeHtml(message)}</div>
+        `;
+        container.appendChild(t);
+        setTimeout(() => {
+            t.style.opacity = "0";
+            t.style.transform = "translateX(30px)";
+            setTimeout(() => t.remove(), 260);
+        }, duration);
+    }
+
+    // ============================================================
+    // LOADING
+    // ============================================================
+    function showLoading(text = "Loading...") {
+        document.getElementById("loadingText").textContent = text;
+        document.getElementById("loadingOverlay").classList.add("active");
+    }
+    function hideLoading() {
+        document.getElementById("loadingOverlay").classList.remove("active");
+    }
+
+    // ============================================================
+    // MODAL
+    // ============================================================
+    function openModal(html) {
+        document.getElementById("modalContent").innerHTML = html;
+        document.getElementById("modalOverlay").classList.add("active");
+        document.body.style.overflow = "hidden";
+    }
+    function closeModal() {
+        document.getElementById("modalOverlay").classList.remove("active");
+        document.body.style.overflow = "";
+    }
+
+    function confirmDialog(message, title = "Confirm") {
+        return new Promise((resolve) => {
+            document.getElementById("confirmTitle").textContent = title;
+            document.getElementById("confirmMessage").textContent = message;
+            document.getElementById("confirmOverlay").classList.add("active");
+
+            const okBtn = document.getElementById("confirmOk");
+            const cancelBtn = document.getElementById("confirmCancel");
+
+            const cleanup = () => {
+                document.getElementById("confirmOverlay").classList.remove("active");
+                okBtn.removeEventListener("click", onOk);
+                cancelBtn.removeEventListener("click", onCancel);
+            };
+            const onOk = () => { cleanup(); resolve(true); };
+            const onCancel = () => { cleanup(); resolve(false); };
+
+            okBtn.addEventListener("click", onOk);
+            cancelBtn.addEventListener("click", onCancel);
+        });
+    }
+
+    // ============================================================
+    // UTILITIES
+    // ============================================================
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return "";
+        return String(str)
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function debounce(fn, wait = 400) {
+        let timer;
+        return function (...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => fn.apply(this, args), wait);
+        };
+    }
+
+    function formatDate(d) {
+        if (!d) return "—";
+        try {
+            const dt = new Date(d);
+            if (isNaN(dt.getTime())) return String(d);
+            return dt.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+        } catch { return String(d); }
+    }
+
+    function formatDateTime(d) {
+        if (!d) return "—";
+        try {
+            const dt = new Date(d);
+            if (isNaN(dt.getTime())) return String(d);
+            return dt.toLocaleString("en-IN", {
+                day: "2-digit", month: "short", year: "numeric",
+                hour: "2-digit", minute: "2-digit"
+            });
+        } catch { return String(d); }
+    }
+
+    function statusBadge(status) {
+        if (!status) return `<span class="badge badge-gray">—</span>`;
+        const map = {
+            DRAFT:       { cls: "badge-gray",    icon: "fa-pen",          label: "Draft" },
+            IN_PROGRESS: { cls: "badge-info",    icon: "fa-spinner",      label: "In Progress" },
+            SUBMITTED:   { cls: "badge-warning", icon: "fa-paper-plane",  label: "Submitted" },
+            VERIFIED:    { cls: "badge-primary", icon: "fa-circle-check", label: "Verified" },
+            FINALIZED:   { cls: "badge-success", icon: "fa-lock",         label: "Finalized" },
+            PUBLISHED:   { cls: "badge-success", icon: "fa-bullhorn",     label: "Published" },
+            UNPUBLISHED: { cls: "badge-warning", icon: "fa-eye-slash",    label: "Unpublished" },
+            ACTIVE:      { cls: "badge-success", icon: "fa-circle-check", label: "Active" },
+            INACTIVE:    { cls: "badge-gray",    icon: "fa-circle",       label: "Inactive" },
+            Pass:        { cls: "badge-success", icon: "fa-circle-check", label: "Pass" },
+            Fail:        { cls: "badge-danger",  icon: "fa-circle-xmark", label: "Fail" }
+        };
+        const m = map[status] || { cls: "badge-gray", icon: "fa-circle", label: status };
+        return `<span class="badge ${m.cls}"><i class="fa-solid ${m.icon}"></i> ${m.label}</span>`;
+    }
+
+    // ============================================================
+    // API HELPER
+    // ============================================================
+    function getToken() {
+        return localStorage.getItem("authToken") ||
+               sessionStorage.getItem("authToken") || "";
+    }
+
+    async function apiRequest(method, path, body = null) {
+        const url = API_BASE + path;
+        const headers = { "Accept": "application/json" };
+        const token = getToken();
+        if (token) headers["Authorization"] = "Bearer " + token;
+
+        const config = { method, headers };
+        if (body !== null && method !== "GET") {
+            headers["Content-Type"] = "application/json";
+            config.body = JSON.stringify(body);
+        }
+
+        try {
+            const res = await fetch(url, config);
+            const text = await res.text();
+            let json;
+            try { json = text ? JSON.parse(text) : {}; }
+            catch { json = { success: false, message: "Invalid server response" }; }
+
+            if (!res.ok) {
+                const err = new Error(json.message || `Request failed (${res.status})`);
+                err.status = res.status;
+                err.data = json;
+                throw err;
+            }
+            return json;
+        } catch (err) {
+            if (err instanceof TypeError && err.message.includes("fetch")) {
+                throw new Error("Network error — please check your internet connection and try again");
+            }
+            throw err;
+        }
+    }
+
+    const api = {
+        get: (p, params) => {
+            const qs = params ? "?" + new URLSearchParams(params).toString() : "";
+            return apiRequest("GET", p + qs);
+        },
+        post: (p, body) => apiRequest("POST", p, body || {}),
+        put: (p, body) => apiRequest("PUT", p, body || {}),
+        del: (p) => apiRequest("DELETE", p)
+    };
+
+    // ============================================================
+    // VIEW SWITCHING
+    // ============================================================
+    function showView(viewId) {
+        STATE.currentView = viewId;
+
+        // Hide all views
+        document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+
+        // Show requested
+        const panel = document.getElementById("view-" + viewId);
+        if (panel) panel.classList.add("active");
+
+        // Update sidebar active state
+        document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+        const navItem = document.querySelector(`.nav-item[data-view="${viewId}"]`);
+        if (navItem) navItem.classList.add("active");
+
+        // Clear class active state
+        document.querySelectorAll(".nav-class-item").forEach(n => n.classList.remove("active"));
+
+        // Close mobile sidebar
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("sidebarOverlay").classList.remove("active");
+
+        // Load data for view
+        switch (viewId) {
+            case "dashboard":  loadDashboard(); break;
+            case "classes":    loadClassesPage(); break;
+            case "reports":    break;
+            case "audit-logs": loadAuditLogs(); break;
+            case "settings":   loadSettingsView(); break;
+        }
+
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // ============================================================
+    // SESSIONS
+    // ============================================================
+    async function loadSessions() {
+        try {
+            const res = await api.get("/sessions");
+            STATE.sessions = res.data || [];
+
+            const sel = document.getElementById("globalSessionSelect");
+            sel.innerHTML = "";
+            STATE.sessions.forEach(s => {
+                const opt = document.createElement("option");
+                opt.value = s.id;
+                opt.textContent = s.session_code + (s.is_current ? " (Current)" : "");
+                if (s.is_current) opt.selected = true;
+                sel.appendChild(opt);
+            });
+
+            const current = STATE.sessions.find(s => s.is_current);
+            if (current) STATE.sessionId = current.id;
+            else if (STATE.sessions.length > 0) STATE.sessionId = STATE.sessions[0].id;
+
+        } catch (err) {
+            showGlobalBanner("Failed to load sessions: " + err.message, "error");
+            throw err;
+        }
+    }
+
+    // ============================================================
+    // CLASSES — Load
+    // ============================================================
+    async function loadClassesList() {
+        try {
+            const group = document.getElementById("classGroupFilter")?.value || "";
+            const res = await api.get("/classes", group ? { group } : {});
+            STATE.classes = res.data || [];
+            return STATE.classes;
+        } catch (err) {
+            showGlobalBanner("Failed to load classes: " + err.message, "error");
+            return [];
+        }
+    }
+
+    // ============================================================
+    // CLASS CARDS RENDER
+    // ============================================================
+    function getClassIconClass(group) {
+        if (!group) return "";
+        const g = String(group).toUpperCase();
+        if (g.includes("PRIMARY"))   return "primary";
+        if (g.includes("MIDDLE"))    return "middle";
+        if (g.includes("SECONDARY")) return "secondary";
+        if (g.includes("SENIOR"))    return "senior";
+        return "";
+    }
+
+    async function renderClassCards(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        if (!STATE.classes.length) {
+            container.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <i class="fa-solid fa-school"></i>
+                    <h3>No classes found</h3>
+                    <p>Please add classes first or check your backend setup.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Load stats per class (parallel)
+        const statsPromises = STATE.classes.map(async c => {
+            try {
+                const [subjectsRes, examsRes] = await Promise.all([
+                    api.get("/class-subjects", { class_id: c.id }).catch(() => ({ data: [] })),
+                    api.get("/exams", { class_id: c.id, session_id: STATE.sessionId }).catch(() => ({ data: [] }))
+                ]);
+                return {
+                    classId: c.id,
+                    subjects: (subjectsRes.data || []).length,
+                    exams: (examsRes.data || []).length
+                };
+            } catch {
+                return { classId: c.id, subjects: 0, exams: 0 };
+            }
+        });
+
+        const stats = await Promise.all(statsPromises);
+        const statsMap = {};
+        stats.forEach(s => { statsMap[s.classId] = s; });
+
+        container.innerHTML = STATE.classes.map(c => {
+            const st = statsMap[c.id] || { subjects: 0, exams: 0 };
+            const iconClass = getClassIconClass(c.class_group);
+            return `
+                <div class="class-card" onclick="openClassDetail(${c.id})">
+                    <div class="class-card-head">
+                        <div class="class-card-icon ${iconClass}">${escapeHtml(c.class_name)}</div>
+                        ${statusBadge(c.is_active ? "ACTIVE" : "INACTIVE")}
+                    </div>
+                    <div class="class-card-title">Class ${escapeHtml(c.class_name)}</div>
+                    <span class="class-card-group">${escapeHtml(c.class_group || "—")}</span>
+                    <div class="class-card-stats">
+                        <div class="class-card-stat">
+                            <div class="value">${st.subjects}</div>
+                            <div class="label">Subjects</div>
+                        </div>
+                        <div class="class-card-stat">
+                            <div class="value">${st.exams}</div>
+                            <div class="label">Exams</div>
+                        </div>
+                        <div class="class-card-stat">
+                            <div class="value">—</div>
+                            <div class="label">Students</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join("");
+    }
+
+    // ============================================================
+    // DASHBOARD
+    // ============================================================
+    async function loadDashboard() {
+        try {
+            showLoading("Loading dashboard...");
+
+            // Load classes if not loaded
+            if (!STATE.classes.length) await loadClassesList();
+
+            // Load dashboard stats from backend
+            const params = STATE.sessionId ? { session_id: STATE.sessionId } : {};
+            const res = await api.get("/dashboard/stats", params);
+            const o = res.data?.overall || {};
+
+            document.getElementById("statTotalClasses").textContent = STATE.classes.length;
+            document.getElementById("statTotalStudents").textContent = o.total_students ?? "0";
+            document.getElementById("statTotalSubjects").textContent = o.total_marks ? "—" : "—";
+            document.getElementById("statTotalExams").textContent = o.total_exams ?? "0";
+            document.getElementById("statPublished").textContent = o.published_exams ?? "0";
+            document.getElementById("statPending").textContent = o.draft_marks ?? "0";
+
+            // Render class cards
+            await renderClassCards("dashboardClassesGrid");
+
+            // Update sidebar class list
+            updateSidebarClasses();
+
+        } catch (err) {
+            showGlobalBanner("Dashboard load failed: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // ============================================================
+    // CLASSES PAGE
+    // ============================================================
+    async function loadClassesPage() {
+        try {
+            showLoading("Loading classes...");
+            await loadClassesList();
+            await renderClassCards("classesPageGrid");
+            updateSidebarClasses();
+        } catch (err) {
+            showGlobalBanner("Failed to load classes: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+    }
+
+    function updateSidebarClasses() {
+        const navSection = document.getElementById("classesNavSection");
+        const navList = document.getElementById("classNavList");
+
+        if (!STATE.classes.length) {
+            navSection.style.display = "none";
+            navList.innerHTML = "";
+            return;
+        }
+
+        navSection.style.display = "block";
+        navList.innerHTML = STATE.classes.map(c => `
+            <div class="nav-class-item" data-class-id="${c.id}" onclick="openClassDetail(${c.id})">
+                <i class="fa-solid fa-circle"></i>
+                <span>Class ${escapeHtml(c.class_name)}</span>
+            </div>
+        `).join("");
+    }
+
+    // ============================================================
+    // CLASS DETAIL (ENTERPRISE VIEW)
+    // ============================================================
+    window.openClassDetail = async function(classId) {
+        try {
+            showLoading("Loading class details...");
+
+            // Find class
+            if (!STATE.classes.length) await loadClassesList();
+            const cls = STATE.classes.find(c => c.id === classId);
+            if (!cls) {
+                showGlobalBanner("Class not found. Please refresh.", "error");
+                return;
+            }
+            STATE.currentClass = cls;
+
+            // Update breadcrumb & header
+            document.getElementById("classBreadcrumb").textContent = `Class ${cls.class_name}`;
+            document.getElementById("classDetailTitle").textContent = `Class ${cls.class_name} — Enterprise View`;
+            document.getElementById("classDetailSub").textContent =
+                `Group: ${cls.class_group || "—"} · Session: ${getCurrentSessionCode()} · Manage subjects, exams, students & results`;
+
+            // Mark sidebar item active
+            document.querySelectorAll(".nav-class-item").forEach(n => n.classList.remove("active"));
+            const navItem = document.querySelector(`.nav-class-item[data-class-id="${classId}"]`);
+            if (navItem) navItem.classList.add("active");
+
+            // Show class detail view
+            document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+            document.getElementById("view-class-detail").classList.add("active");
+            document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+            STATE.currentView = "class-detail";
+
+            // Close sidebar
+            document.getElementById("sidebar").classList.remove("open");
+            document.getElementById("sidebarOverlay").classList.remove("active");
+
+            // Default to subjects tab
+            switchClassTab("subjects");
+
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+        } catch (err) {
+            showGlobalBanner("Failed to open class: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+    };
+
+    function getCurrentSessionCode() {
+        const s = STATE.sessions.find(x => x.id === STATE.sessionId);
+        return s ? s.session_code : "—";
+    }
+
+    window.goToClasses = function() {
+        showView("classes");
+    };
+
+    // ============================================================
+    // CLASS TAB SWITCHING
+    // ============================================================
+    window.switchClassTab = function(tab) {
+        STATE.currentClassTab = tab;
+
+        // Update tabs
+        document.querySelectorAll(".class-tab").forEach(t => t.classList.remove("active"));
+        const activeTab = document.querySelector(`.class-tab[data-ctab="${tab}"]`);
+        if (activeTab) activeTab.classList.add("active");
+
+        // Update panels
+        document.querySelectorAll(".class-tab-panel").forEach(p => p.classList.remove("active"));
+        const panel = document.getElementById("ctab-" + tab);
+        if (panel) panel.classList.add("active");
+
+        // Load data for tab
+        if (!STATE.currentClass) return;
+
+        switch (tab) {
+            case "subjects": loadClassSubjects(); break;
+            case "exams":    loadClassExams(); break;
+            case "students": loadClassStudents(); break;
+            case "marks":    loadMarksEntryTab(); break;
+            case "results":  loadClassResults(); break;
+        }
+    };
+
+    // ============================================================
+    // CLASS SUBJECTS
+    // ============================================================
+    async function loadClassSubjects() {
+        const area = document.getElementById("classSubjectsArea");
+        if (!STATE.currentClass) {
+            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-school"></i><h3>No class selected</h3></div>`;
+            return;
+        }
+
+        area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><h3>Loading subjects...</h3></div>`;
+
+        try {
+            const res = await api.get("/class-subjects", { class_id: STATE.currentClass.id });
+            STATE.classSubjects = res.data || [];
+
+            document.getElementById("tabCountSubjects").textContent = STATE.classSubjects.length;
+
+            if (!STATE.classSubjects.length) {
+                area.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-book"></i>
+                        <h3>No subjects in Class ${escapeHtml(STATE.currentClass.class_name)}</h3>
+                        <p>Add subjects manually or use "Auto-Assign Core" to add all core subjects.</p>
+                        <button class="btn btn-primary" onclick="openAddSubjectToClassModal()">
+                            <i class="fa-solid fa-plus"></i> Add First Subject
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const coreSubjects = STATE.classSubjects.filter(s => !s.is_optional);
+            const optSubjects = STATE.classSubjects.filter(s => s.is_optional);
+
+            let html = "";
+
+            if (coreSubjects.length > 0) {
+                html += `
+                    <div class="form-section"><i class="fa-solid fa-lock"></i> Core Subjects (Auto-assigned to all students)</div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Subject Name</th>
+                                    <th>Type</th>
+                                    <th>Component</th>
+                                    <th style="text-align:center;">Max</th>
+                                    <th style="text-align:center;">Pass</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${coreSubjects.map(s => renderClassSubjectRow(s)).join("")}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            if (optSubjects.length > 0) {
+                html += `
+                    <div class="form-section" style="margin-top: 24px;"><i class="fa-solid fa-list-check"></i> Optional Subjects (Manually assign)</div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Subject Name</th>
+                                    <th>Type</th>
+                                    <th>Component</th>
+                                    <th style="text-align:center;">Max</th>
+                                    <th style="text-align:center;">Pass</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${optSubjects.map(s => renderClassSubjectRow(s)).join("")}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            area.innerHTML = html;
+
+        } catch (err) {
+            area.innerHTML = `
+                <div class="inline-error">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <div class="error-content">
+                        <strong>Failed to load subjects</strong>
+                        ${escapeHtml(err.message)}
+                        <div style="margin-top: 10px;">
+                            <button class="btn btn-sm btn-outline" onclick="loadClassSubjects()">
+                                <i class="fa-solid fa-rotate"></i> Retry
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    function renderClassSubjectRow(s) {
+        const sd = s.subject_data || {};
+        const totalMax = sd.total_max || 0;
+        const totalPass = sd.total_pass || 0;
+        return `
+            <tr>
+                <td><span class="badge badge-info">${escapeHtml(s.subject_code)}</span></td>
+                <td class="text-bold">${escapeHtml(s.subject_name)}</td>
+                <td>${escapeHtml(sd.subject_type || "—")}</td>
+                <td><span class="badge badge-gray">${escapeHtml((sd.component_type || "Theory").replace(/\+/g, " + "))}</span></td>
+                <td style="text-align:center;"><strong>${totalMax}</strong></td>
+                <td style="text-align:center;">${totalPass}</td>
+                <td class="text-right">
+                    <button class="btn btn-sm btn-outline btn-icon" onclick="removeSubjectFromClass(${s.id}, '${escapeHtml(s.subject_name)}')" title="Remove from class">
+                        <i class="fa-solid fa-unlink"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }
+
+    // ============================================================
+    // AUTO-ASSIGN CORE SUBJECTS
+    // ============================================================
+    window.autoAssignCoreSubjects = async function() {
+        if (!STATE.currentClass) {
+            showGlobalBanner("No class selected", "warning");
+            return;
+        }
+
+        const ok = await confirmDialog(
+            `Auto-assign all Core subjects to Class ${STATE.currentClass.class_name}?\n\nThis will add all Core subjects that are not yet mapped, and automatically assign them to every student in this class.`,
+            "Auto-Assign Core Subjects"
+        );
+        if (!ok) return;
+
+        try {
+            showLoading("Auto-assigning core subjects...");
+
+            // 1. Get all subjects
+            const allRes = await api.get("/subjects");
+            const allSubjects = allRes.data || [];
+            const coreSubjects = allSubjects.filter(s => s.subject_type === "Core" && s.is_active);
+
+            if (!coreSubjects.length) {
+                showGlobalBanner("No Core subjects found. Please create subjects first.", "warning");
+                return;
+            }
+
+            // 2. Get currently mapped subjects
+            const mappedRes = await api.get("/class-subjects", { class_id: STATE.currentClass.id });
+            const mapped = mappedRes.data || [];
+            const mappedIds = new Set(mapped.map(m => m.subject_id));
+
+            // 3. Filter out already mapped
+            const toAdd = coreSubjects.filter(s => !mappedIds.has(s.id));
+
+            if (!toAdd.length) {
+                showGlobalBanner("All Core subjects are already mapped to this class.", "info");
+                return;
+            }
+
+            // 4. Add them
+            const res = await api.post("/class-subjects", {
+                class_id: STATE.currentClass.id,
+                subject_ids: toAdd.map(s => s.id)
+            });
+
+            showGlobalBanner(
+                `✓ ${res.data?.added || toAdd.length} Core subjects added to Class ${STATE.currentClass.class_name}. Now assigning to students...`,
+                "success"
+            );
+
+            // 5. Auto-assign to all students in class
+            await autoAssignSubjectsToStudents();
+
+            await loadClassSubjects();
+
+        } catch (err) {
+            showGlobalBanner("Auto-assign failed: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+    };
+
+    async function autoAssignSubjectsToStudents() {
+        try {
+            // Get students of this class from student API
+            const className = STATE.currentClass.class_name;
+            const url = `${STUDENT_API_BASE}?class=${encodeURIComponent(className)}&limit=500`;
+            const token = getToken();
+            const headers = { "Accept": "application/json" };
+            if (token) headers["Authorization"] = "Bearer " + token;
+
+            const res = await fetch(url, { headers });
+            if (!res.ok) {
+                console.warn("Could not fetch students — skipping auto-assign");
+                return;
+            }
+            const json = await res.json();
+            const students = json.data || json.students || [];
+
+            if (!students.length) {
+                showGlobalBanner("Subjects mapped, but no students found in this class.", "warning");
+                return;
+            }
+
+            // Get all class subjects
+            const csRes = await api.get("/class-subjects", { class_id: STATE.currentClass.id });
+            const classSubjects = csRes.data || [];
+            const subjectIds = classSubjects.map(s => s.subject_id);
+
+            if (!subjectIds.length) return;
+
+            // Assign to each student (sequential to avoid overload)
+            let assigned = 0, skipped = 0;
+            for (const stu of students) {
+                try {
+                    const res = await api.post("/student-subjects/assign", {
+                        student_id: stu.student_id,
+                        session_id: STATE.sessionId,
+                        subject_ids: subjectIds
+                    });
+                    assigned += res.data?.added || 0;
+                    skipped += res.data?.skipped || 0;
+                } catch (e) {
+                    console.warn(`Failed for ${stu.student_id}:`, e.message);
+                }
+            }
+
+            showGlobalBanner(
+                `✓ Core subjects assigned to ${students.length} students (${assigned} new assignments, ${skipped} already existed)`,
+                "success"
+            );
+
+        } catch (err) {
+            console.warn("Auto-assign students failed:", err);
+        }
+    }
+
+    // ============================================================
+    // ADD SUBJECT TO CLASS MODAL
+    // ============================================================
+    window.openAddSubjectToClassModal = async function() {
+        if (!STATE.currentClass) {
+            showGlobalBanner("No class selected", "warning");
+            return;
+        }
+
+        try {
+            showLoading("Loading subjects...");
+
+            // Get all available subjects
+            const res = await api.get("/subjects");
+            const allSubjects = res.data || [];
+
+            // Get currently mapped subjects
+            const csRes = await api.get("/class-subjects", { class_id: STATE.currentClass.id });
+            const mappedIds = new Set((csRes.data || []).map(s => s.subject_id));
+
+            // Available (not yet mapped)
+            const available = allSubjects.filter(s => !mappedIds.has(s.id));
+
+            hideLoading();
+
+            if (!available.length) {
+                openModal(`
+                    <div class="modal-header">
+                        <h3>Add Subjects to Class ${escapeHtml(STATE.currentClass.class_name)}</h3>
+                        <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="inline-info">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <div>
+                                <strong>All available subjects are already mapped</strong>
+                                No new subjects to add. Create a new subject first from the Subjects master list.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline" onclick="closeModal()">Close</button>
+                    </div>
+                `);
+                return;
+            }
+
+            openModal(`
+                <div class="modal-header">
+                    <h3>Add Subjects to Class ${escapeHtml(STATE.currentClass.class_name)}</h3>
+                    <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="inline-info">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <div>
+                            <strong>Select subjects to add</strong>
+                            Core subjects will be <b>automatically assigned</b> to all students in this class.
+                            Optional subjects will need <b>manual assignment</b> per student.
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 16px;">
+                        <label>Available Subjects</label>
+                        <div class="student-check-list" id="availableSubjectsList">
+                            ${available.map(s => {
+                                const sd = s.data || {};
+                                const isCore = sd.subject_type === "Core";
+                                return `
+                                    <label class="student-check-item" style="cursor:pointer;">
+                                        <input type="checkbox" value="${s.id}" class="add-subject-checkbox"
+                                            data-is-core="${isCore ? "1" : "0"}"
+                                            data-name="${escapeHtml(s.subject_name)}"
+                                            style="width:18px; height:18px; accent-color: #059669;">
+                                        <div class="student-info">
+                                            <div class="student-name">${escapeHtml(s.subject_name)}</div>
+                                            <div class="student-meta">
+                                                <span class="badge badge-info">${escapeHtml(s.subject_code)}</span>
+                                                <span class="badge ${isCore ? 'badge-success' : 'badge-warning'}" style="margin-left:6px;">
+                                                    ${escapeHtml(sd.subject_type || "Core")}
+                                                </span>
+                                                <span style="margin-left:6px;">Max: ${sd.total_max || 100} · Pass: ${sd.total_pass || 33}</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                `;
+                            }).join("")}
+                        </div>
+                    </div>
+
+                    <div class="checkbox-label" style="margin-top: 14px;">
+                        <input type="checkbox" id="autoAssignAll" checked>
+                        <span>Auto-assign these subjects to all students in this class</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveAddSubjectsToClass()">
+                        <i class="fa-solid fa-plus"></i> Add Selected
+                    </button>
+                </div>
+            `);
+
+        } catch (err) {
+            hideLoading();
+            showGlobalBanner("Failed to load subjects: " + err.message, "error");
+        }
+    };
+
+    window.saveAddSubjectsToClass = async function() {
+        if (!STATE.currentClass) return;
+
+        const checked = Array.from(document.querySelectorAll(".add-subject-checkbox:checked"));
+        if (!checked.length) {
+            showToast("Please select at least one subject", "warning");
+            return;
+        }
+
+        const subjectIds = checked.map(c => parseInt(c.value));
+        const autoAssign = document.getElementById("autoAssignAll")?.checked ?? true;
+
+        try {
+            showLoading("Adding subjects...");
+
+            const res = await api.post("/class-subjects", {
+                class_id: STATE.currentClass.id,
+                subject_ids: subjectIds
+            });
+
+            showGlobalBanner(`✓ ${res.data?.added || subjectIds.length} subjects added to Class ${STATE.currentClass.class_name}`, "success");
+            closeModal();
+
+            // If auto-assign enabled, assign to all students
+            if (autoAssign) {
+                await autoAssignSubjectsToStudents();
+            }
+
+            await loadClassSubjects();
+
+        } catch (err) {
+            showGlobalBanner("Failed to add subjects: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+    };
+
+    // ============================================================
+    // REMOVE SUBJECT FROM CLASS
+    // ============================================================
+    window.removeSubjectFromClass = async function(mappingId, subjectName) {
+        const ok = await confirmDialog(
+            `Remove "${subjectName}" from Class ${STATE.currentClass.class_name}?\n\nThis will also remove any student assignments and cannot be undone.`,
+            "Remove Subject"
+        );
+        if (!ok) return;
+
+        try {
+            showLoading("Removing...");
+            await api.del("/class-subjects/" + mappingId);
+            showGlobalBanner(`✓ ${subjectName} removed from class`, "success");
+            await loadClassSubjects();
+        } catch (err) {
+            showGlobalBanner("Failed to remove: " + err.message, "error", 8000);
+        } finally {
+            hideLoading();
+        }
+    };
+
+    // ============================================================
+    // CLASS EXAMS
+    // ============================================================
+    async function loadClassExams() {
+        const area = document.getElementById("classExamsArea");
+        if (!STATE.currentClass) {
+            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-school"></i><h3>No class selected</h3></div>`;
+            return;
+        }
+
+        area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><h3>Loading exams...</h3></div>`;
+
+        try {
+            const res = await api.get("/exams", {
+                class_id: STATE.currentClass.id,
+                session_id: STATE.sessionId
+            });
+            STATE.classExams = res.data || [];
+
+            document.getElementById("tabCountExams").textContent = STATE.classExams.length;
+
+            if (!STATE.classExams.length) {
+                area.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-file-pen"></i>
+                        <h3>No exams created for Class ${escapeHtml(STATE.currentClass.class_name)}</h3>
+                        <p>Create the first exam for this class and session.</p>
+                        <button class="btn btn-primary" onclick="openCreateExamModal()">
+                            <i class="fa-solid fa-plus"></i> Create First Exam
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            area.innerHTML = `<div class="exam-cards-grid">${STATE.classExams.map(e => renderExamCard(e)).join("")}</div>`;
+
+        } catch (err) {
+            area.innerHTML = `
+                <div class="inline-error">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <div class="error-content">
+                        <strong>Failed to load exams</strong>
+                        ${escapeHtml(err.message)}
+                        <div style="margin-top: 10px;">
+                            <button class="btn btn-sm btn-outline" onclick="loadClassExams()">
+                                <i class="fa-solid fa-rotate"></i> Retry
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    function renderExamCard(e) {
+        const canFinalize = e.status === "VERIFIED" || e.status === "SUBMITTED" || e.status === "IN_PROGRESS";
+        const canPublish = e.status === "FINALIZED";
+        const canUnpublish = e.status === "PUBLISHED";
+        const canEdit = !e.is_locked;
+        const examSession = e.data?.exam_session || e.exam_session || "—";
+
+        return `
+            <div class="exam-card">
+                <div class="exam-card-header">
+                    <div style="flex:1; min-width:0;">
+                        <div class="exam-card-title">${escapeHtml(e.name)}</div>
+                        <div class="exam-card-sub">
+                            <i class="fa-solid fa-tag"></i> ${escapeHtml(e.exam_code || "")}
+                            <br><i class="fa-solid fa-clock"></i> ${escapeHtml(examSession)}
+                            ${e.start_date ? `<br><i class="fa-solid fa-calendar"></i> ${formatDate(e.start_date)}` : ""}
+                        </div>
+                    </div>
+                    ${statusBadge(e.status)}
+                </div>
+
+                <div class="exam-card-stats">
+                    <div class="exam-card-stat">
+                        <div class="label">Subjects</div>
+                        <div class="value">${e.subjects_count || 0}</div>
+                    </div>
+                    <div class="exam-card-stat">
+                        <div class="label">Marks</div>
+                        <div class="value">${e.marks_count || 0}</div>
+                    </div>
+                </div>
+
+                <div class="exam-card-actions">
+                    <button class="btn btn-sm btn-outline" onclick="manageExamSubjects(${e.id})" ${e.is_locked ? "disabled" : ""}>
+                        <i class="fa-solid fa-book"></i> Subjects
+                    </button>
+                    <button class="btn btn-sm btn-outline" onclick="goToMarksEntry(${e.id})">
+                        <i class="fa-solid fa-pen-to-square"></i> Marks
+                    </button>
+                    ${canFinalize ? `
+                        <button class="btn btn-sm btn-warning" onclick="finalizeExam(${e.id})">
+                            <i class="fa-solid fa-lock"></i> Finalize
+                        </button>
+                    ` : ""}
+                    ${canPublish ? `
+                        <button class="btn btn-sm btn-success" onclick="publishExam(${e.id})">
+                            <i class="fa-solid fa-bullhorn"></i> Publish
+                        </button>
+                    ` : ""}
+                    ${canUnpublish ? `
+                        <button class="btn btn-sm btn-outline" onclick="unpublishExam(${e.id})">
+                            <i class="fa-solid fa-eye-slash"></i> Unpublish
+                        </button>
+                    ` : ""}
+                    ${canEdit ? `
+                        <button class="btn btn-sm btn-outline btn-icon" onclick="deleteExam(${e.id}, '${escapeHtml(e.name)}')" title="Delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    ` : ""}
+                </div>
+            </div>
+        `;
+    }
+
+    window.openCreateExamModal = function() {
+        if (!STATE.currentClass) {
+            showGlobalBanner("No class selected", "warning");
+            return;
+        }
+
+        openModal(`
+            <div class="modal-header">
+                <h3>Create Exam for Class ${escapeHtml(STATE.currentClass.class_name)}</h3>
+                <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-section"><i class="fa-solid fa-circle-info"></i> Basic Info</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Exam Code <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="exmCode" placeholder="e.g. FA-1, SA-1">
+                    </div>
+                    <div class="form-group">
+                        <label>Exam Name <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="exmName" placeholder="e.g. First Formative Assessment">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Exam Type</label>
+                        <select class="form-control" id="exmType">
+                            <option value="Formative">Formative</option>
+                            <option value="Summative" selected>Summative</option>
+                            <option value="Half_Yearly">Half Yearly</option>
+                            <option value="Pre_Board">Pre-Board</option>
+                            <option value="Final">Final</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Exam Session</label>
+                        <input type="text" class="form-control" id="exmExamSession" placeholder="e.g. March-2027">
+                        <div class="form-help"><i class="fa-solid fa-info-circle"></i> Month-Year of exam</div>
+                    </div>
+                </div>
+
+                <div class="form-section"><i class="fa-solid fa-calendar"></i> Dates</div>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="date" class="form-control" id="exmStart">
+                    </div>
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="date" class="form-control" id="exmEnd">
+                    </div>
+                    <div class="form-group">
+                        <label>Result Date</label>
+                        <input type="date" class="form-control" id="exmResult">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveNewExam()">
+                    <i class="fa-solid fa-plus"></i> Create Exam
+                </button>
+            </div>
+        `);
+    };
+
+    window.saveNewExam = async function() {
+        if (!STATE.currentClass) return;
+
+        const code = document.getElementById("exmCode").value.trim().toUpperCase();
+        const name = document.getElementById("exmName").value.trim();
+        const type = document.getElementById("exmType").value;
+        const examSession = document.getElementById("exmExamSession").value.trim();
+        const start = document.getElementById("exmStart").value || null;
+        const end = document.getElementById("exmEnd").value || null;
+        const result = document.getElementById("exmResult").value || null;
+
+        if (!code || !name) {
+            showToast("Exam code and name are required", "warning");
+            return;
+        }
+
+        try {
+            showLoading("Creating exam...");
+
+            await api.post("/exams", {
+                session_id: STATE.sessionId,
+                class_id: STATE.currentClass.id,
+                exam_code: code,
+                exam_name: name,
+                exam_type: type,
+                exam_session: examSession || null,
+                start_date: start,
+                end_date: end,
+                result_date: result
+            });
+
+            showGlobalBanner(`✓ Exam "${name}" created successfully`, "success");
+            closeModal();
+            await loadClassExams();
+
+        } catch (err) {
+            showGlobalBanner("Failed to create exam: " + err.message, "error", 8000);
+        } finally {
+            hideLoading();
+        }
+    };
+
+    // ============================================================
+    // MANAGE EXAM SUBJECTS
+    // ============================================================
+    window.manageExamSubjects = async function(examId) {
+        try {
+            showLoading("Loading exam...");
+
+            const [examRes, subjectsRes, classSubsRes] = await Promise.all([
+                api.get("/exams/" + examId),
+                api.get("/subjects"),
+                api.get("/class-subjects", { class_id: STATE.currentClass.id })
+            ]);
+
+            const exam = examRes.data;
+            const allSubjects = subjectsRes.data || [];
+            const classSubjectIds = new Set((classSubsRes.data || []).map(s => s.subject_id));
+            const assignedIds = new Set((exam.subjects || []).map(s => s.subject_id));
+
+            // Show only subjects that are mapped to this class
+            const availableSubjects = allSubjects.filter(s => classSubjectIds.has(s.id));
+
+            hideLoading();
+
+            if (!availableSubjects.length) {
+                openModal(`
+                    <div class="modal-header">
+                        <h3>Manage Subjects — ${escapeHtml(exam.name)}</h3>
+                        <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="inline-error">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <div class="error-content">
+                                <strong>No subjects mapped to this class</strong>
+                                Please add subjects to Class ${escapeHtml(STATE.currentClass.class_name)} first (Subjects tab).
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline" onclick="closeModal()">Close</button>
+                    </div>
+                `);
+                return;
+            }
+
+            openModal(`
+                <div class="modal-header">
+                    <h3>Manage Subjects — ${escapeHtml(exam.name)}</h3>
+                    <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="inline-info">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <div>
+                            <strong>Select subjects for this exam</strong>
+                            Only subjects mapped to Class ${escapeHtml(STATE.currentClass.class_name)} are shown.
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="margin-top: 16px;">
+                        <div class="form-group">
+                            <label>Default Max Marks</label>
+                            <input type="number" class="form-control" id="esMaxMarks" value="100" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Default Pass Marks</label>
+                            <input type="number" class="form-control" id="esPassMarks" value="33" min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Subjects</label>
+                        <div class="student-check-list">
+                            ${availableSubjects.map(s => {
+                                const sd = s.data || {};
+                                return `
+                                    <label class="student-check-item" style="cursor:pointer;">
+                                        <input type="checkbox" class="es-subject-checkbox" value="${s.id}"
+                                            ${assignedIds.has(s.id) ? "checked" : ""}
+                                            style="width:18px; height:18px; accent-color: #059669;">
+                                        <div class="student-info">
+                                            <div class="student-name">${escapeHtml(s.subject_name)}</div>
+                                            <div class="student-meta">
+                                                <span class="badge badge-info">${escapeHtml(s.subject_code)}</span>
+                                                <span style="margin-left: 6px;">Max: ${sd.total_max || 100} · Pass: ${sd.total_pass || 33}</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                `;
+                            }).join("")}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveExamSubjects(${examId})">
+                        <i class="fa-solid fa-floppy-disk"></i> Save
+                    </button>
+                </div>
+            `);
+
+        } catch (err) {
+            hideLoading();
+            showGlobalBanner("Failed to load exam: " + err.message, "error");
+        }
+    };
+
+    window.saveExamSubjects = async function(examId) {
+        const checked = Array.from(document.querySelectorAll(".es-subject-checkbox:checked")).map(c => parseInt(c.value));
+
+        if (!checked.length) {
+            showToast("Select at least one subject", "warning");
+            return;
+        }
+
+        const maxMarks = parseInt(document.getElementById("esMaxMarks").value) || 100;
+        const passMarks = parseInt(document.getElementById("esPassMarks").value) || 33;
+
+        try {
+            showLoading("Saving subjects...");
+            const res = await api.post(`/exams/${examId}/subjects`, {
+                subject_ids: checked,
+                max_marks: maxMarks,
+                pass_marks: passMarks
+            });
+
+            showGlobalBanner(`✓ ${res.data?.added || checked.length} subjects added to exam`, "success");
+            closeModal();
+            await loadClassExams();
+
+        } catch (err) {
+            showGlobalBanner("Failed to save: " + err.message, "error", 8000);
+        } finally {
+            hideLoading();
+        }
+    };
+
+    // ============================================================
+    // FINALIZE / PUBLISH / UNPUBLISH / DELETE
+    // ============================================================
+    window.finalizeExam = async function(examId) {
+        const ok = await confirmDialog(
+            "Finalize this exam?\n\nIt will be LOCKED. Marks can't be edited until unlocked.",
+            "Finalize Exam"
+        );
+        if (!ok) return;
+
+        try {
+            showLoading("Finalizing exam...");
+            const res = await api.post(`/exams/${examId}/finalize`);
+            showGlobalBanner(`✓ ${res.message || "Exam finalized"}`, "success");
+            await loadClassExams();
+        } catch (err) {
+            showGlobalBanner("Finalize failed: " + err.message, "error", 8000);
+        } finally {
+            hideLoading();
+        }
+    };
+
+    window.publishExam = async function(examId) {
+        const date = prompt("Enter result declaration date (YYYY-MM-DD):", new Date().toISOString().slice(0, 10));
+        if (!date) return;
+
+        try {
+            showLoading("Publishing...");
+            await api.post(`/exams/${examId}/publish`, { result_date: date });
+            showGlobalBanner("✓ Exam published successfully. Students can now view results.", "success");
+            await loadClassExams();
+        } catch (err) {
+            showGlobalBanner("Publish failed: " + err.message, "error", 8000);
+        } finally {
+            hideLoading();
+        }
+    };
+
+    window.unpublishExam = async function(examId) {
+        const ok = await confirmDialog("Unpublish this exam? Students won't see results until republished.", "Unpublish");
+        if (!ok) return;
+
+        try {
+            showLoading("Unpublishing...");
+            await api.post(`/exams/${examId}/unpublish`);
+            showGlobalBanner("✓ Exam unpublished", "success");
+            await loadClassExams();
+        } catch (err) {
+            showGlobalBanner("Unpublish failed: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+    };
+
+    window.deleteExam = async function(examId, name) {
+        const ok = await confirmDialog(
+            `Delete exam "${name}"?\n\nThis cannot be undone.`,
+            "Delete Exam"
+        );
+        if (!ok) return;
+
+        try {
+            showLoading("Deleting...");
+            await api.del("/exams/" + examId);
+            showGlobalBanner(`✓ Exam "${name}" deleted`, "success");
+            await loadClassExams();
+        } catch (err) {
+            showGlobalBanner("Delete failed: " + err.message, "error", 8000);
+        } finally {
+            hideLoading();
+        }
+    };
+
+    // ============================================================
+    // CLASS STUDENTS
+    // ============================================================
+    async function loadClassStudents() {
+        const area = document.getElementById("classStudentsArea");
+        if (!STATE.currentClass) {
+            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-school"></i><h3>No class selected</h3></div>`;
+            return;
+        }
+
+        area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><h3>Loading students...</h3></div>`;
+
+        try {
+            const className = STATE.currentClass.class_name;
+            const url = `${STUDENT_API_BASE}?class=${encodeURIComponent(className)}&limit=500`;
+            const token = getToken();
+            const headers = { "Accept": "application/json" };
+            if (token) headers["Authorization"] = "Bearer " + token;
+
+            const res = await fetch(url, { headers });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const json = await res.json();
+            let students = json.data || json.students || [];
+
+            STATE.classStudents = students;
+            document.getElementById("tabCountStudents").textContent = students.length;
+
+            if (!students.length) {
+                area.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-user-slash"></i>
+                        <h3>No students found in Class ${escapeHtml(STATE.currentClass.class_name)}</h3>
+                        <p>Add students from the student management system first.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Render students table
+            area.innerHTML = `
+                <div class="inline-info">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <div>
+                        <strong>${students.length} students</strong>
+                        Click "Manage Subjects" to assign subjects to a student individually.
+                    </div>
+                </div>
+
+                <div class="table-wrapper" style="margin-top: 16px;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Roll</th>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Father's Name</th>
+                                <th>Section</th>
+                                <th>Stream</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${students.map(s => `
+                                <tr>
+                                    <td>${escapeHtml(s.roll_number || "—")}</td>
+                                    <td><span class="badge badge-info">${escapeHtml(s.student_id)}</span></td>
+                                    <td class="text-bold">${escapeHtml(s.name || "—")}</td>
+                                    <td>${escapeHtml(s.father_name || "—")}</td>
+                                    <td>${escapeHtml(s.section || "—")}</td>
+                                    <td>${escapeHtml(s.stream || "—")}</td>
+                                    <td class="text-right">
+                                        <button class="btn btn-sm btn-outline" onclick="manageStudentSubjects('${escapeHtml(s.student_id)}', '${escapeHtml(s.name)}')">
+                                            <i class="fa-solid fa-book"></i> Manage Subjects
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+        } catch (err) {
+            area.innerHTML = `
+                <div class="inline-error">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <div class="error-content">
+                        <strong>Failed to load students</strong>
+                        ${escapeHtml(err.message)}
+                        <div style="margin-top: 10px;">
+                            <button class="btn btn-sm btn-outline" onclick="loadClassStudents()">
+                                <i class="fa-solid fa-rotate"></i> Retry
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    // ============================================================
+    // MANAGE STUDENT SUBJECTS
+    // ============================================================
+    window.manageStudentSubjects = async function(studentId, studentName) {
+        try {
+            showLoading("Loading subjects...");
+
+            const [assignedRes, classSubsRes] = await Promise.all([
+                api.get("/student-subjects/" + studentId, { session_id: STATE.sessionId }),
+                api.get("/class-subjects", { class_id: STATE.currentClass.id })
+            ]);
+
+            const assigned = assignedRes.data?.subjects || [];
+            const assignedIds = new Set(assigned.map(a => a.subject_id));
+            const classSubjects = classSubsRes.data || [];
+
+            hideLoading();
+
+            if (!classSubjects.length) {
+                openModal(`
+                    <div class="modal-header">
+                        <h3>Manage Subjects — ${escapeHtml(studentName)}</h3>
+                        <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="inline-error">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <div class="error-content">
+                                <strong>No subjects mapped to Class ${escapeHtml(STATE.currentClass.class_name)}</strong>
+                                Add subjects to the class first (Subjects tab).
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline" onclick="closeModal()">Close</button>
+                    </div>
+                `);
+                return;
+            }
+
+            // Separate core vs optional
+            const coreSubs = classSubjects.filter(s => !s.is_optional);
+            const optSubs = classSubjects.filter(s => s.is_optional);
+
+            openModal(`
+                <div class="modal-header">
+                    <h3>Manage Subjects — ${escapeHtml(studentName)}</h3>
+                    <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="inline-info">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <div>
+                            <strong>Student ID: ${escapeHtml(studentId)}</strong>
+                            Total assigned: ${assigned.length} subjects
+                        </div>
+                    </div>
+
+                    ${coreSubs.length ? `
+                        <div class="form-section" style="margin-top: 18px;"><i class="fa-solid fa-lock"></i> Core Subjects (Recommended)</div>
+                        <div class="student-check-list">
+                            ${coreSubs.map(cs => `
+                                <label class="student-check-item" style="cursor:pointer;">
+                                    <input type="checkbox" class="ss-subject-checkbox" value="${cs.subject_id}"
+                                        data-core="1"
+                                        ${assignedIds.has(cs.subject_id) ? "checked" : ""}
+                                        style="width:18px; height:18px; accent-color: #059669;">
+                                    <div class="student-info">
+                                        <div class="student-name">${escapeHtml(cs.subject_name)}</div>
+                                        <div class="student-meta">${escapeHtml(cs.subject_code)} — Core</div>
+                                    </div>
+                                </label>
+                            `).join("")}
+                        </div>
+                    ` : ""}
+
+                    ${optSubs.length ? `
+                        <div class="form-section" style="margin-top: 18px;"><i class="fa-solid fa-list-check"></i> Optional Subjects</div>
+                        <div class="student-check-list">
+                            ${optSubs.map(cs => `
+                                <label class="student-check-item" style="cursor:pointer;">
+                                    <input type="checkbox" class="ss-subject-checkbox" value="${cs.subject_id}"
+                                        data-core="0"
+                                        ${assignedIds.has(cs.subject_id) ? "checked" : ""}
+                                        style="width:18px; height:18px; accent-color: #059669;">
+                                    <div class="student-info">
+                                        <div class="student-name">${escapeHtml(cs.subject_name)}</div>
+                                        <div class="student-meta">${escapeHtml(cs.subject_code)} — Optional</div>
+                                    </div>
+                                </label>
+                            `).join("")}
+                        </div>
+                    ` : ""}
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveStudentSubjects('${escapeHtml(studentId)}')">
+                        <i class="fa-solid fa-floppy-disk"></i> Save
+                    </button>
+                </div>
+            `);
+
+        } catch (err) {
+            hideLoading();
+            showGlobalBanner("Failed to load: " + err.message, "error");
+        }
+    };
+
+    window.saveStudentSubjects = async function(studentId) {
+        const checked = Array.from(document.querySelectorAll(".ss-subject-checkbox:checked")).map(c => parseInt(c.value));
+
+        if (!checked.length) {
+            showToast("Select at least one subject", "warning");
+            return;
+        }
+
+        try {
+            showLoading("Saving...");
+            const res = await api.post("/student-subjects/assign", {
+                student_id: studentId,
+                session_id: STATE.sessionId,
+                subject_ids: checked
+            });
+
+            showGlobalBanner(`✓ ${res.data?.added || checked.length} subjects assigned to ${studentId}`, "success");
+            closeModal();
+
+        } catch (err) {
+            showGlobalBanner("Failed: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+    };
+
+    // ============================================================
+    // MARKS ENTRY TAB
+    // ============================================================
+    async function loadMarksEntryTab() {
+        const examSel = document.getElementById("marksExamSelect");
+        const subjSel = document.getElementById("marksSubjectSelect");
+
+        // Load exams for this class
+        try {
+            const res = await api.get("/exams", {
+                class_id: STATE.currentClass.id,
+                session_id: STATE.sessionId
+            });
+            const exams = res.data || [];
+
+            examSel.innerHTML = `<option value="">Select Exam</option>` +
+                exams.map(e => `<option value="${e.id}">${escapeHtml(e.name)} — ${escapeHtml(e.status)}</option>`).join("");
+
+            subjSel.innerHTML = `<option value="">Select Subject</option>`;
+
+            document.getElementById("classMarksArea").innerHTML = `
+                <div class="empty-state">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <h3>Select exam &amp; subject above</h3>
+                </div>
+            `;
+
+        } catch (err) {
+            showGlobalBanner("Failed to load exams: " + err.message, "error");
+        }
+    }
+
+    window.loadMarksSubjects = async function() {
+        const examId = document.getElementById("marksExamSelect").value;
+        const subjSel = document.getElementById("marksSubjectSelect");
+
+        if (!examId) {
+            subjSel.innerHTML = `<option value="">Select Subject</option>`;
+            return;
+        }
+
+        try {
+            const res = await api.get("/exams/" + examId);
+            const exam = res.data;
+            const subjects = exam.subjects || [];
+
+            subjSel.innerHTML = `<option value="">Select Subject</option>` +
+                subjects.map(s => `<option value="${s.subject_id}">${escapeHtml(s.actual_subject_name || s.subject_name)}</option>`).join("");
+
+        } catch (err) {
+            showGlobalBanner("Failed to load subjects: " + err.message, "error");
+        }
+    };
+
+    window.loadMarksEntrySheet = async function() {
+        const examId = document.getElementById("marksExamSelect").value;
+        const subjectId = document.getElementById("marksSubjectSelect").value;
+        const area = document.getElementById("classMarksArea");
+
+        if (!examId || !subjectId) {
+            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-pen-to-square"></i><h3>Select exam &amp; subject</h3></div>`;
+            return;
+        }
+
+        try {
+            showLoading("Loading students...");
+            const res = await api.get(`/marks-entry/${examId}/${subjectId}`);
+            const { exam, subject_config, students } = res.data;
+
+            STATE.marksSubjectConfig = subject_config;
+            STATE.marksEntryStudents = students;
+
+            if (!students.length) {
+                area.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-user-slash"></i>
+                        <h3>No students assigned to this subject</h3>
+                        <p>Go to Students tab and assign this subject to students first.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const cfg = subject_config || {};
+            const hasTheory = (cfg.theory_max || 0) > 0;
+            const hasPractical = (cfg.practical_max || 0) > 0;
+            const hasInternal = (cfg.internal_max || 0) > 0;
+            const hasProject = (cfg.project_max || 0) > 0;
+
+            area.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+                    <div>
+                        <div style="font-weight:700; color:#0f2942; font-size:15px;">${escapeHtml(exam.exam_name)}</div>
+                        <div style="font-size:12.5px; color:#64748b; margin-top:2px;">
+                            Max: <strong>${cfg.max_marks || 100}</strong> · Pass: <strong>${cfg.pass_marks || 33}</strong> · ${students.length} students
+                        </div>
+                    </div>
+                    ${statusBadge(exam.status)}
+                </div>
+                <div class="table-wrapper">
+                    <table class="table marks-entry-table">
+                        <thead>
+                            <tr>
+                                <th>Roll</th>
+                                <th>Student</th>
+                                ${hasTheory ? '<th>Theory</th>' : ""}
+                                ${hasPractical ? '<th>Practical</th>' : ""}
+                                ${hasInternal ? '<th>Internal</th>' : ""}
+                                ${hasProject ? '<th>Project</th>' : ""}
+                                <th>Total</th>
+                                <th>Grade</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marksEntryBody">
+                            ${students.map(s => renderMarksRow(s, { hasTheory, hasPractical, hasInternal, hasProject }, cfg)).join("")}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="marks-entry-actions">
+                    <button class="btn btn-primary" onclick="saveMarksDraft()">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Draft
+                    </button>
+                    <button class="btn btn-warning" onclick="submitMarksForVerification(${examId}, ${subjectId})">
+                        <i class="fa-solid fa-paper-plane"></i> Submit for Verification
+                    </button>
+                </div>
+            `;
+
+        } catch (err) {
+            area.innerHTML = `
+                <div class="inline-error">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <div class="error-content">
+                        <strong>Failed to load marks</strong>
+                        ${escapeHtml(err.message)}
+                    </div>
+                </div>
+            `;
+        } finally {
+            hideLoading();
+        }
+    };
+
+    function renderMarksRow(s, flags, cfg) {
+        const theory = s.theory_marks ?? "";
+        const practical = s.practical_marks ?? "";
+        const internal = s.internal_marks ?? "";
+        const project = s.project_marks ?? "";
+        const total = s.total_marks ?? 0;
+        const grade = s.grade || "—";
+        const absentType = s.absent_type || "Present";
+        const remarks = s.remarks || "";
+
+        return `
+            <tr data-student="${escapeHtml(s.student_id)}">
+                <td>${escapeHtml(s.roll_number || "—")}</td>
+                <td class="text-bold">${escapeHtml(s.student_name)}</td>
+                ${flags.hasTheory ? `<td><input type="number" class="mark-input" data-field="theory" value="${theory}" min="0" max="${cfg.theory_max || 0}" step="0.5"></td>` : ""}
+                ${flags.hasPractical ? `<td><input type="number" class="mark-input" data-field="practical" value="${practical}" min="0" max="${cfg.practical_max || 0}" step="0.5"></td>` : ""}
+                ${flags.hasInternal ? `<td><input type="number" class="mark-input" data-field="internal" value="${internal}" min="0" max="${cfg.internal_max || 0}" step="0.5"></td>` : ""}
+                ${flags.hasProject ? `<td><input type="number" class="mark-input" data-field="project" value="${project}" min="0" max="${cfg.project_max || 0}" step="0.5"></td>` : ""}
+                <td><span class="mark-total">${total}</span></td>
+                <td><span class="mark-grade">${escapeHtml(grade)}</span></td>
+                <td>
+                    <select class="mark-absent">
+                        <option value="Present" ${absentType === "Present" ? "selected" : ""}>Present</option>
+                        <option value="Absent" ${absentType === "Absent" ? "selected" : ""}>Absent</option>
+                        <option value="Medical" ${absentType === "Medical" ? "selected" : ""}>Medical</option>
+                        <option value="Not_Appeared" ${absentType === "Not_Appeared" ? "selected" : ""}>Not Appeared</option>
+                        <option value="Withheld" ${absentType === "Withheld" ? "selected" : ""}>Withheld</option>
+                    </select>
+                </td>
+                <td><input type="text" class="mark-remarks" value="${escapeHtml(remarks)}" style="width:130px;"></td>
+            </tr>
+        `;
+    }
+
+    // Auto-calc on input
+    document.addEventListener("input", (e) => {
+        if (e.target.classList && e.target.classList.contains("mark-input")) {
+            const row = e.target.closest("tr");
+            if (!row) return;
+            const inputs = row.querySelectorAll(".mark-input");
+            let total = 0;
+            inputs.forEach(inp => {
+                const v = parseFloat(inp.value);
+                const max = parseFloat(inp.max || "0");
+                if (!isNaN(v)) {
+                    if (v < 0 || v > max) inp.classList.add("input-error");
+                    else inp.classList.remove("input-error");
+                    total += isNaN(v) ? 0 : v;
+                }
+            });
+            row.querySelector(".mark-total").textContent = total;
+        }
+    });
+
+    window.saveMarksDraft = async function() {
+        const examId = document.getElementById("marksExamSelect").value;
+        const subjectId = document.getElementById("marksSubjectSelect").value;
+        if (!examId || !subjectId) { showToast("Select exam & subject", "warning"); return; }
+
+        const rows = document.querySelectorAll("#marksEntryBody tr");
+        const marks = [];
+
+        for (const row of rows) {
+            const studentId = row.getAttribute("data-student");
+            const theory = row.querySelector('[data-field="theory"]')?.value;
+            const practical = row.querySelector('[data-field="practical"]')?.value;
+            const internal = row.querySelector('[data-field="internal"]')?.value;
+            const project = row.querySelector('[data-field="project"]')?.value;
+            const absentType = row.querySelector(".mark-absent").value;
+            const remarks = row.querySelector(".mark-remarks").value;
+
+            marks.push({
+                student_id: studentId,
+                theory: theory === "" ? null : parseFloat(theory),
+                practical: practical === "" ? null : parseFloat(practical),
+                internal: internal === "" ? null : parseFloat(internal),
+                project: project === "" ? null : parseFloat(project),
+                absent_type: absentType,
+                remarks
+            });
+        }
+
+        try {
+            showLoading("Saving marks...");
+            const res = await api.post("/marks/save", {
+                exam_id: parseInt(examId),
+                subject_id: parseInt(subjectId),
+                marks
+            });
+            const d = res.data || {};
+            if (d.failed_count > 0) {
+                showGlobalBanner(`Saved ${d.saved_count} marks, but ${d.failed_count} failed. Check console.`, "warning", 8000);
+                console.warn("Failed rows:", d.failed);
+            } else {
+                showGlobalBanner(`✓ ${d.saved_count} marks saved as draft`, "success");
+            }
+            await loadMarksEntrySheet();
+        } catch (err) {
+            showGlobalBanner("Failed to save marks: " + err.message, "error", 8000);
+        } finally {
+            hideLoading();
+        }
+    };
+
+    window.submitMarksForVerification = async function(examId, subjectId) {
+        const ok = await confirmDialog(
+            "Submit these marks for verification?\n\nAfter submission, you won't be able to edit until they're returned or verified.",
+            "Submit Marks"
+        );
+        if (!ok) return;
+
+        try {
+            showLoading("Submitting...");
+            const res = await api.post("/marks/submit", { exam_id: examId, subject_id: subjectId });
+            showGlobalBanner(`✓ ${res.message || "Marks submitted for verification"}`, "success");
+            await loadMarksEntrySheet();
+        } catch (err) {
+            showGlobalBanner("Failed: " + err.message, "error", 8000);
+        } finally {
+            hideLoading();
+        }
+    };
+
+    window.goToMarksEntry = function(examId) {
+        switchClassTab("marks");
+        setTimeout(() => {
+            const sel = document.getElementById("marksExamSelect");
+            if (sel) {
+                sel.value = examId;
+                loadMarksSubjects();
+            }
+        }, 300);
+    };
+
+    // ============================================================
+    // CLASS RESULTS
+    // ============================================================
+    async function loadClassResults() {
+        const area = document.getElementById("classResultsArea");
+        if (!STATE.currentClass) {
+            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-school"></i><h3>No class selected</h3></div>`;
+            return;
+        }
+
+        area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><h3>Loading results...</h3></div>`;
+
+        try {
+            const res = await api.get("/exams", {
+                class_id: STATE.currentClass.id,
+                session_id: STATE.sessionId,
+                status: "PUBLISHED"
+            });
+            const published = res.data || [];
+
+            if (!published.length) {
+                area.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-bullhorn"></i>
+                        <h3>No published results for Class ${escapeHtml(STATE.currentClass.class_name)}</h3>
+                        <p>Finalize and publish exams from the Exams tab to see results here.</p>
+                        <button class="btn btn-primary" onclick="switchClassTab('exams')">
+                            <i class="fa-solid fa-file-pen"></i> Go to Exams
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            area.innerHTML = `
+                <div class="inline-success">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div>
+                        <strong>${published.length} published exam(s)</strong>
+                        Download bulk marksheets or unpublish if needed.
+                    </div>
+                </div>
+
+                <div class="exam-cards-grid" style="margin-top: 16px;">
+                    ${published.map(e => `
+                        <div class="exam-card">
+                            <div class="exam-card-header">
+                                <div style="flex:1;">
+                                    <div class="exam-card-title">${escapeHtml(e.name)}</div>
+                                    <div class="exam-card-sub">
+                                        <i class="fa-solid fa-clock"></i> ${escapeHtml(e.data?.exam_session || "—")}
+                                    </div>
+                                </div>
+                                ${statusBadge(e.status)}
+                            </div>
+                            <div class="exam-card-actions">
+                                <button class="btn btn-sm btn-success" onclick="downloadBulkMarksheets(${e.id})">
+                                    <i class="fa-solid fa-file-pdf"></i> Download All Marksheets
+                                </button>
+                                <button class="btn btn-sm btn-outline" onclick="unpublishExam(${e.id})">
+                                    <i class="fa-solid fa-eye-slash"></i> Unpublish
+                                </button>
+                            </div>
+                        </div>
+                    `).join("")}
+                </div>
+            `;
+
+        } catch (err) {
+            area.innerHTML = `
+                <div class="inline-error">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <div class="error-content">
+                        <strong>Failed to load results</strong>
+                        ${escapeHtml(err.message)}
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    window.downloadBulkMarksheets = async function(examId) {
+        try {
+            showLoading("Preparing marksheets...");
+            const res = await api.get(`/marksheet/bulk/${examId}`);
+            const { students, exam, school } = res.data;
+
+            if (!students.length) {
+                showGlobalBanner("No students with results found", "warning");
+                return;
+            }
+
+            const win = window.open("", "_blank");
+            win.document.write(buildBulkMarksheetHTML(students, exam, school));
+            win.document.close();
+            setTimeout(() => win.print(), 800);
+
+            showGlobalBanner(`✓ Opened ${students.length} marksheets. Use browser print to save as PDF.`, "success");
+
+        } catch (err) {
+            showGlobalBanner("Marksheet generation failed: " + err.message, "error", 8000);
+        } finally {
+            hideLoading();
+        }
+    };
+
+    function buildBulkMarksheetHTML(students, exam, school) {
+        return `<!DOCTYPE html>
+<html><head>
+<title>Marksheets — ${escapeHtml(exam.name)}</title>
+<style>
+    @page { size: A4; margin: 12mm; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; font-size: 11px; background: #fff; }
+    .page { page-break-after: always; padding: 10px; border: 2px solid #0f2942; margin-bottom: 12px; }
+    .page:last-child { page-break-after: auto; }
+    .header { text-align: center; border-bottom: 3px double #0f2942; padding-bottom: 10px; margin-bottom: 12px; }
+    .header h1 { font-size: 20px; color: #0f2942; letter-spacing: 1px; }
+    .header p { font-size: 10px; color: #64748b; margin-top: 3px; }
+    .title-bar { background: #0f2942; color: #fff; padding: 8px 14px; font-weight: bold; font-size: 13px; text-align: center; margin-bottom: 12px; letter-spacing: 1px; }
+    .info { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; font-size: 11px; }
+    .info-row { display: flex; gap: 6px; padding: 4px 0; border-bottom: 1px dotted #cbd5e1; }
+    .info-row .label { font-weight: bold; color: #475569; min-width: 100px; }
+    table.marks { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+    table.marks th { background: #e0e9f5; padding: 6px; border: 1px solid #94a3b8; font-size: 10px; text-align: center; }
+    table.marks td { padding: 6px; border: 1px solid #cbd5e1; text-align: center; }
+    table.marks td.subject { text-align: left; font-weight: 600; }
+    .summary { margin-top: 12px; padding: 10px; background: #f1f5f9; border: 2px solid #0f2942; border-radius: 6px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center; }
+    .summary-item .label { font-size: 9px; color: #64748b; text-transform: uppercase; font-weight: bold; }
+    .summary-item .value { font-size: 15px; font-weight: bold; color: #0f2942; margin-top: 3px; }
+    .footer { margin-top: 24px; display: flex; justify-content: space-between; font-size: 10px; }
+    .footer .sig { text-align: center; }
+    .footer .sig-line { width: 130px; border-top: 1px solid #333; margin-top: 40px; padding-top: 4px; font-weight: bold; }
+    .result-pass { color: #059669; font-weight: bold; }
+    .result-fail { color: #dc2626; font-weight: bold; }
+    .btn-print { position: fixed; top: 10px; right: 10px; padding: 10px 20px; background: #059669; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; z-index: 100; }
+    @media print { .btn-print { display: none !important; } }
+</style>
+</head><body>
+<button class="btn-print" onclick="window.print()">🖨️ Print All</button>
+${students.map(stu => `
+    <div class="page">
+        <div class="header">
+            <h1>${escapeHtml(school?.name || "GSSS Shilla")}</h1>
+            <p>${escapeHtml(school?.address || "Shilla, Teh. Nerwa, Distt. Shimla, HP")}</p>
+        </div>
+        <div class="title-bar">${escapeHtml(exam.name)} — MARKSHEET</div>
+        <div class="info">
+            <div class="info-row"><span class="label">Name:</span> ${escapeHtml(stu.student_name)}</div>
+            <div class="info-row"><span class="label">Roll No:</span> ${escapeHtml(stu.roll_number || "—")}</div>
+            <div class="info-row"><span class="label">Father:</span> ${escapeHtml(stu.father_name || "—")}</div>
+            <div class="info-row"><span class="label">Class:</span> ${escapeHtml(stu.class_name || "—")}</div>
+            <div class="info-row"><span class="label">Section:</span> ${escapeHtml(stu.section_name || "—")}</div>
+            <div class="info-row"><span class="label">Exam Session:</span> ${escapeHtml(exam.exam_session || "—")}</div>
+        </div>
+        <table class="marks">
+            <thead>
+                <tr>
+                    <th style="width:30px;">#</th>
+                    <th>Subject</th>
+                    <th>Theory</th>
+                    <th>Practical</th>
+                    <th>Internal</th>
+                    <th>Total</th>
+                    <th>Max</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${stu.subject_wise_marks.map((m, i) => `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td class="subject">${escapeHtml(m.subject_name)}</td>
+                        <td>${m.theory_marks ?? "—"}</td>
+                        <td>${m.practical_marks ?? "—"}</td>
+                        <td>${m.internal_marks ?? "—"}</td>
+                        <td><strong>${m.total_marks ?? 0}</strong></td>
+                        <td>${m.max_marks ?? 0}</td>
+                        <td>${escapeHtml(m.grade || "—")}</td>
+                    </tr>
+                `).join("")}
+            </tbody>
+        </table>
+        <div class="summary">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="label">Total Marks</div>
+                    <div class="value">${stu.grand_total}/${stu.max_total}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">Percentage</div>
+                    <div class="value">${stu.percentage}%</div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">Grade</div>
+                    <div class="value">${escapeHtml(stu.overall_grade || "—")}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">Result</div>
+                    <div class="value ${stu.result_status === 'Pass' ? 'result-pass' : 'result-fail'}">${escapeHtml(stu.result_status)}</div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="sig">
+                <div class="sig-line">Class Teacher</div>
+            </div>
+            <div class="sig">
+                <div class="sig-line">Principal</div>
+            </div>
+        </div>
+    </div>
+`).join("")}
+</body></html>`;
+    }
+
+    // ============================================================
+    // AUDIT LOGS
+    // ============================================================
+    let auditPage = 1;
+
+    async function loadAuditLogs(page = 1) {
+        auditPage = page;
+        try {
+            showLoading("Loading logs...");
+            const params = { page, limit: 20 };
+            const action = document.getElementById("alActionFilter")?.value;
+            const studentId = document.getElementById("alStudentFilter")?.value.trim();
+            if (action) params.action = action;
+            if (studentId) params.student_id = studentId;
+
+            const res = await api.get("/audit-logs", params);
+            const logs = res.data || [];
+            const pagination = res.pagination || {};
+
+            renderAuditLogs(logs);
+            renderAuditPagination(pagination);
+        } catch (err) {
+            showGlobalBanner("Failed to load logs: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+    }
+
+    const debounceLoadAuditLogs = debounce(() => loadAuditLogs(1), 500);
+
+    function renderAuditLogs(logs) {
+        const tbody = document.querySelector("#auditLogsTable tbody");
+        if (!logs.length) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No logs found</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = logs.map(l => `
+            <tr>
+                <td>${formatDateTime(l.created_at)}</td>
+                <td><span class="badge badge-info">${escapeHtml(l.action)}</span></td>
+                <td>${escapeHtml(l.user_name || l.user_id || "—")}</td>
+                <td>${escapeHtml(l.student_id || "—")}</td>
+                <td>
+                    <details>
+                        <summary style="cursor:pointer;color:#059669;font-weight:600;">View</summary>
+                        <pre style="font-size:11px;background:#f8fafc;padding:10px;border-radius:6px;overflow-x:auto;margin-top:8px;">${escapeHtml(JSON.stringify({ old: l.old_value, new: l.new_value, reason: l.reason }, null, 2))}</pre>
+                    </details>
+                </td>
+            </tr>
+        `).join("");
+    }
+
+    function renderAuditPagination(p) {
+        const el = document.getElementById("auditPagination");
+        if (!p.totalPages || p.totalPages <= 1) { el.innerHTML = ""; return; }
+        let html = `<button ${p.page <= 1 ? "disabled" : ""} onclick="loadAuditLogs(${p.page - 1})"><i class="fa-solid fa-chevron-left"></i></button>`;
+        for (let i = 1; i <= p.totalPages; i++) {
+            if (i === p.page || Math.abs(i - p.page) <= 2 || i === 1 || i === p.totalPages) {
+                html += `<button class="${i === p.page ? "active" : ""}" onclick="loadAuditLogs(${i})">${i}</button>`;
+            }
+        }
+        html += `<button ${p.page >= p.totalPages ? "disabled" : ""} onclick="loadAuditLogs(${p.page + 1})"><i class="fa-solid fa-chevron-right"></i></button>`;
+        el.innerHTML = html;
+    }
+
+    // ============================================================
+    // SETTINGS
+    // ============================================================
+    async function loadSettingsView() {
+        loadGradingScheme();
+        loadSessionsList();
+    }
+
+    async function loadGradingScheme() {
+        const area = document.getElementById("gradingSchemeArea");
+        area.innerHTML = `
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead><tr><th>Range</th><th>Grade</th><th>Grade Point</th></tr></thead>
+                    <tbody>
+                        <tr><td>90 - 100</td><td><span class="badge badge-success">A+</span></td><td class="text-bold">10</td></tr>
+                        <tr><td>80 - 89</td><td><span class="badge badge-success">A</span></td><td class="text-bold">9</td></tr>
+                        <tr><td>70 - 79</td><td><span class="badge badge-info">B+</span></td><td class="text-bold">8</td></tr>
+                        <tr><td>60 - 69</td><td><span class="badge badge-info">B</span></td><td class="text-bold">7</td></tr>
+                        <tr><td>50 - 59</td><td><span class="badge badge-warning">C</span></td><td class="text-bold">6</td></tr>
+                        <tr><td>40 - 49</td><td><span class="badge badge-warning">D</span></td><td class="text-bold">5</td></tr>
+                        <tr><td>0 - 39</td><td><span class="badge badge-danger">E</span></td><td class="text-bold">0</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    async function loadSessionsList() {
+        const area = document.getElementById("sessionsArea");
+        if (!STATE.sessions.length) {
+            area.innerHTML = `<div class="empty-state"><i class="fa-solid fa-calendar-days"></i><h3>No sessions</h3></div>`;
+            return;
+        }
+        area.innerHTML = `
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead><tr><th>Code</th><th>Name</th><th>Start</th><th>End</th><th>Current</th></tr></thead>
+                    <tbody>
+                        ${STATE.sessions.map(s => `
+                            <tr>
+                                <td class="text-bold">${escapeHtml(s.session_code)}</td>
+                                <td>${escapeHtml(s.session_name)}</td>
+                                <td>${formatDate(s.start_date)}</td>
+                                <td>${formatDate(s.end_date)}</td>
+                                <td>${s.is_current ? '<span class="badge badge-success"><i class="fa-solid fa-star"></i> Current</span>' : "—"}</td>
+                            </tr>
+                        `).join("")}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // ============================================================
+    // GLOBAL EVENT BINDINGS
+    // ============================================================
+    function bindEvents() {
+        // Sidebar nav items
+        document.querySelectorAll(".nav-item").forEach(item => {
+            item.addEventListener("click", (e) => {
+                e.preventDefault();
+                const view = item.getAttribute("data-view");
+                if (view) showView(view);
+            });
+        });
+
+        // Mobile menu
+        document.getElementById("menuToggle").addEventListener("click", () => {
+            document.getElementById("sidebar").classList.toggle("open");
+            document.getElementById("sidebarOverlay").classList.toggle("active");
+        });
+        document.getElementById("sidebarOverlay").addEventListener("click", () => {
+            document.getElementById("sidebar").classList.remove("open");
+            document.getElementById("sidebarOverlay").classList.remove("active");
+        });
+
+        // Session change
+        document.getElementById("globalSessionSelect").addEventListener("change", (e) => {
+            STATE.sessionId = parseInt(e.target.value) || null;
+            showGlobalBanner(`Session changed to ${e.target.options[e.target.selectedIndex].text}`, "info", 3000);
+
+            // Reload current view
+            if (STATE.currentView === "dashboard") loadDashboard();
+            else if (STATE.currentView === "classes") loadClassesPage();
+            else if (STATE.currentView === "class-detail" && STATE.currentClass) {
+                switchClassTab(STATE.currentClassTab);
+            }
+        });
+
+        // Modal backdrop close
+        document.getElementById("modalOverlay").addEventListener("click", (e) => {
+            if (e.target.id === "modalOverlay") closeModal();
+        });
+
+        // Escape key to close modal
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                if (document.getElementById("modalOverlay").classList.contains("active")) closeModal();
+                if (document.getElementById("confirmOverlay").classList.contains("active")) {
+                    document.getElementById("confirmCancel").click();
+                }
+            }
+        });
+    }
+
+    // ============================================================
+    // BOOT
+    // ============================================================
+    async function init() {
+        try {
+            showLoading("Initializing...");
+
+            bindEvents();
+            await loadSessions();
+
+            showView("dashboard");
+
+            showGlobalBanner("System ready ✓ Select a class to begin", "success", 3500);
+
+        } catch (err) {
+            console.error("Init failed:", err);
+            showGlobalBanner("Failed to initialize: " + err.message + " — Please check backend connection.", "error", 0);
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // Expose needed globals
+    window.showGlobalBanner = showGlobalBanner;
+    window.hideGlobalBanner = hideGlobalBanner;
+    window.closeModal = closeModal;
+    window.openModal = openModal;
+    window.showToast = showToast;
+
+    // Start
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+
+})();  
 </script>
 </body>
 </html>
