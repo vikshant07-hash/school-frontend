@@ -49,6 +49,7 @@
   --grad-amber: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
   --grad-rose: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
   --grad-sky: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+  --grad-violet: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
 
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
   --font-display: 'Space Grotesk', sans-serif;
@@ -330,6 +331,49 @@ body {
 
 .btn-sm { padding: 8px 14px; font-size: 11.5px; border-radius: 11px; }
 
+/* TAB SYSTEM */
+.tabs-bar {
+  display: flex;
+  gap: 8px;
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 8px;
+  box-shadow: var(--press);
+  overflow-x: auto;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  padding: 12px 20px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--t-mid);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  background: var(--surface);
+  box-shadow: var(--press-xs);
+  font-family: var(--font-body);
+  border: none;
+}
+.tab-btn:hover { box-shadow: var(--press-sm); color: var(--t-hi); }
+.tab-btn.active {
+  color: #fff;
+  background: var(--grad-primary);
+  box-shadow: 3px 3px 10px var(--sd);
+}
+.tab-btn .tab-count {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 800;
+}
+.tab-btn:not(.active) .tab-count { background: var(--surface); color: var(--purple); box-shadow: var(--press-xs); }
+
 /* TABLE */
 .table-container {
   background: var(--surface);
@@ -350,7 +394,6 @@ body {
   min-width: 1500px;
 }
 
-/* Two-tier header */
 .table thead th {
   padding: 10px 10px;
   text-align: center;
@@ -372,16 +415,6 @@ body {
   border-bottom: 2px solid var(--sd);
 }
 .table thead th.left-align { text-align: left; }
-.table thead th .sub-lbl {
-  display: block;
-  font-size: 9px;
-  color: var(--t-lo);
-  opacity: 0.8;
-  font-weight: 700;
-  margin-top: 2px;
-}
-
-/* Column groups */
 .table thead th.subject-header {
   background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(124, 58, 237, 0.05));
   color: var(--purple);
@@ -417,7 +450,6 @@ body {
 .table tbody td:first-child { border-radius: 12px 0 0 12px; }
 .table tbody td:last-child { border-radius: 0 12px 12px 0; }
 
-/* Cell variants */
 .mark-cell {
   display: inline-block;
   padding: 4px 8px;
@@ -430,12 +462,7 @@ body {
   min-width: 54px;
   text-align: center;
 }
-.mark-cell .max {
-  font-size: 10px;
-  color: var(--t-lo);
-  font-weight: 700;
-  margin-left: 2px;
-}
+.mark-cell .max { font-size: 10px; color: var(--t-lo); font-weight: 700; margin-left: 2px; }
 .mark-cell.pass { color: var(--emerald); }
 .mark-cell.fail { color: var(--rose); }
 .mark-cell.absent { color: var(--amber); font-size: 10.5px; }
@@ -527,6 +554,318 @@ body {
   font-weight: 700;
 }
 .empty-state p { font-size: 12.5px; color: var(--t-lo); margin-bottom: 14px; }
+
+/* ============================================================
+   ACTIVITY LOGS — NEW SECTION
+   ============================================================ */
+
+/* Dashboard Stats for Logs */
+.logs-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+}
+.log-stat {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: var(--press-sm);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s var(--ease);
+}
+.log-stat:hover { transform: translateY(-3px); box-shadow: var(--press); }
+.log-stat::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.log-stat.c1::before { background: var(--grad-primary); }
+.log-stat.c2::before { background: var(--grad-emerald); }
+.log-stat.c3::before { background: var(--grad-amber); }
+.log-stat.c4::before { background: var(--grad-rose); }
+.log-stat.c5::before { background: var(--grad-sky); }
+.log-stat .ic {
+  width: 42px; height: 42px;
+  border-radius: 13px;
+  background: var(--surface);
+  box-shadow: var(--press-sm);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+.log-stat.c1 .ic { color: var(--purple); }
+.log-stat.c2 .ic { color: var(--emerald); }
+.log-stat.c3 .ic { color: var(--amber); }
+.log-stat.c4 .ic { color: var(--rose); }
+.log-stat.c5 .ic { color: var(--sky); }
+.log-stat .lbl {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--t-lo);
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+.log-stat .val {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--t-hi);
+}
+
+/* Exam Log Card */
+.exam-log-card {
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: var(--press);
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: all 0.35s var(--ease);
+}
+.exam-log-card:hover { box-shadow: var(--press-lg); }
+
+.exam-log-header {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  user-select: none;
+  flex-wrap: wrap;
+}
+.exam-log-header:hover { background: rgba(124, 58, 237, 0.03); }
+
+.exam-log-title {
+  flex: 1;
+  min-width: 200px;
+}
+.exam-log-title h3 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--t-hi);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.exam-log-title h3 i { color: var(--purple); }
+.exam-log-title .meta {
+  font-size: 11.5px;
+  color: var(--t-lo);
+  font-weight: 600;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.exam-log-title .meta span { display: inline-flex; align-items: center; gap: 5px; }
+.exam-log-title .meta i { color: var(--purple); font-size: 11px; }
+
+.exam-log-stats {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.exam-log-stat {
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--press-xs);
+  text-align: center;
+  min-width: 70px;
+}
+.exam-log-stat .lbl {
+  font-size: 8.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--t-lo);
+  font-weight: 800;
+  margin-bottom: 3px;
+}
+.exam-log-stat .val {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+}
+.exam-log-stat .val.verified { color: var(--emerald); }
+.exam-log-stat .val.pending { color: var(--amber); }
+.exam-log-stat .val.total { color: var(--purple); }
+
+.exam-log-chev {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--press-sm);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--purple);
+  font-size: 14px;
+  transition: all 0.35s var(--ease);
+  flex-shrink: 0;
+}
+.exam-log-card.expanded .exam-log-chev {
+  transform: rotate(180deg);
+  background: var(--grad-primary);
+  color: #fff;
+  box-shadow: var(--press);
+}
+
+.exam-log-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.6s var(--ease);
+}
+.exam-log-card.expanded .exam-log-body {
+  max-height: 5000px;
+}
+.exam-log-body-inner {
+  padding: 0 24px 24px;
+  border-top: 1px dashed var(--sd);
+  padding-top: 20px;
+}
+
+/* Timeline */
+.timeline-section-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-weight: 800;
+  color: var(--t-mid);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.timeline-section-title i { color: var(--purple); font-size: 13px; }
+
+.timeline {
+  position: relative;
+  padding-left: 30px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--purple), var(--sd-soft));
+  border-radius: 2px;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 18px;
+}
+.timeline-item:last-child { padding-bottom: 0; }
+
+.timeline-dot {
+  position: absolute;
+  left: -30px;
+  top: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #fff;
+  box-shadow: var(--press-sm);
+  z-index: 1;
+  background: var(--surface);
+  border: 2px solid var(--bg);
+}
+.timeline-dot.verified { background: var(--grad-emerald); }
+.timeline-dot.submitted { background: var(--grad-amber); }
+.timeline-dot.correction { background: var(--grad-rose); }
+.timeline-dot.finalized { background: var(--grad-primary); }
+.timeline-dot.published { background: var(--grad-sky); }
+.timeline-dot.created { background: linear-gradient(135deg, #64748b, #94a3b8); }
+
+.timeline-content {
+  background: var(--surface);
+  padding: 12px 16px;
+  border-radius: 14px;
+  box-shadow: var(--press-xs);
+  border-left: 3px solid var(--sd);
+}
+.timeline-content.verified { border-left-color: var(--emerald); }
+.timeline-content.submitted { border-left-color: var(--amber); }
+.timeline-content.correction { border-left-color: var(--rose); }
+.timeline-content.finalized { border-left-color: var(--purple); }
+.timeline-content.published { border-left-color: var(--sky); }
+.timeline-content.created { border-left-color: #64748b; }
+
+.timeline-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--t-hi);
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.timeline-title .actor {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--t-lo);
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: var(--surface);
+  box-shadow: var(--press-xs);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.timeline-meta {
+  font-size: 11px;
+  color: var(--t-mid);
+  font-weight: 600;
+  line-height: 1.6;
+  margin-bottom: 6px;
+}
+.timeline-meta strong { color: var(--t-hi); font-weight: 800; }
+.timeline-remarks {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(220, 38, 38, 0.06);
+  border-left: 3px solid var(--rose);
+  font-size: 11.5px;
+  color: var(--rose);
+  font-weight: 600;
+  font-style: italic;
+  margin-top: 8px;
+}
+.timeline-time {
+  font-size: 10px;
+  color: var(--t-lo);
+  font-weight: 700;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.timeline-time i { font-size: 9px; }
+
+.log-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--t-lo);
+}
+.log-empty i {
+  font-size: 40px;
+  opacity: 0.4;
+  margin-bottom: 10px;
+  display: block;
+}
+.log-empty p { font-size: 12.5px; font-weight: 600; }
 
 /* MODAL */
 .modal-overlay {
@@ -815,6 +1154,10 @@ textarea.form-control { resize: vertical; min-height: 100px; }
 }
 .theme-btn:hover { box-shadow: var(--press); transform: rotate(180deg); }
 
+.view-panel { display: none; flex-direction: column; gap: 16px; }
+.view-panel.active { display: flex; animation: fadeIn 0.4s var(--ease); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
 @media (max-width: 768px) {
   .main { padding: 14px; gap: 14px; }
   .welcome-banner { padding: 20px; flex-direction: column; align-items: flex-start; gap: 14px; }
@@ -829,6 +1172,8 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   .selector-bar { padding: 16px 18px; }
   .bulk-actions { padding: 12px 16px; }
   .bulk-actions .selected-info { margin-left: 0; width: 100%; text-align: center; }
+  .exam-log-header { padding: 16px 18px; }
+  .exam-log-body-inner { padding: 0 18px 18px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -851,7 +1196,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
           <i class="fas fa-clipboard-check"></i>
           Marksheet Verification
         </h3>
-        <p>Verify, finalize, and publish exam results</p>
+        <p>Verify, finalize, publish results &amp; track complete activity</p>
       </div>
       <div class="topbar-actions">
         <button class="btn btn-sm" onclick="window.location.href='result-management.html'">
@@ -876,90 +1221,151 @@ textarea.form-control { resize: vertical; min-height: 100px; }
       </div>
     </div>
 
-    <!-- SELECTOR BAR -->
-    <div class="selector-bar">
-      <label>
-        Session
-        <select id="sessionFilter" onchange="onFilterChange()">
-          <option value="">Loading sessions...</option>
-        </select>
-      </label>
-      <label>
-        Class
-        <select id="classFilter" onchange="onFilterChange()">
-          <option value="">Loading classes...</option>
-        </select>
-      </label>
-      <label>
-        Exam
-        <select id="examFilter" onchange="onFilterChange()">
-          <option value="">Select class first</option>
-        </select>
-      </label>
-      <label>
-        Stream
-        <select id="streamFilter" onchange="onFilterChange()">
-          <option value="">All Streams</option>
-        </select>
-      </label>
-      <label>
-        Section
-        <select id="sectionFilter" onchange="onFilterChange()">
-          <option value="">All Sections</option>
-        </select>
-      </label>
+    <!-- TABS -->
+    <div class="tabs-bar">
+      <button class="tab-btn active" data-tab="verify" onclick="switchTab('verify')">
+        <i class="fas fa-clipboard-check"></i> Verify Marksheets
+      </button>
+      <button class="tab-btn" data-tab="activity" onclick="switchTab('activity')">
+        <i class="fas fa-history"></i> Activity Logs
+        <span class="tab-count" id="activityTabCount">0</span>
+      </button>
     </div>
 
-    <!-- SUMMARY STRIP -->
-    <div class="summary-strip" id="summaryStrip" style="display: none;">
-      <div class="summary-item c1">
-        <div class="lbl">Total Students</div>
-        <div class="val" id="statTotal">0</div>
+    <!-- ============================================================
+         VIEW 1: VERIFY MARKSHEETS
+         ============================================================ -->
+    <div class="view-panel active" id="view-verify">
+
+      <!-- SELECTOR BAR -->
+      <div class="selector-bar">
+        <label>
+          Session
+          <select id="sessionFilter" onchange="onFilterChange()">
+            <option value="">Loading sessions...</option>
+          </select>
+        </label>
+        <label>
+          Class
+          <select id="classFilter" onchange="onFilterChange()">
+            <option value="">Loading classes...</option>
+          </select>
+        </label>
+        <label>
+          Exam
+          <select id="examFilter" onchange="onFilterChange()">
+            <option value="">Select class first</option>
+          </select>
+        </label>
+        <label>
+          Stream
+          <select id="streamFilter" onchange="onFilterChange()">
+            <option value="">All Streams</option>
+          </select>
+        </label>
+        <label>
+          Section
+          <select id="sectionFilter" onchange="onFilterChange()">
+            <option value="">All Sections</option>
+          </select>
+        </label>
       </div>
-      <div class="summary-item c2">
-        <div class="lbl">Verified</div>
-        <div class="val" id="statVerified">0</div>
+
+      <!-- SUMMARY STRIP -->
+      <div class="summary-strip" id="summaryStrip" style="display: none;">
+        <div class="summary-item c1">
+          <div class="lbl">Total Students</div>
+          <div class="val" id="statTotal">0</div>
+        </div>
+        <div class="summary-item c2">
+          <div class="lbl">Verified</div>
+          <div class="val" id="statVerified">0</div>
+        </div>
+        <div class="summary-item c3">
+          <div class="lbl">Submitted</div>
+          <div class="val" id="statSubmitted">0</div>
+        </div>
+        <div class="summary-item c4">
+          <div class="lbl">Draft</div>
+          <div class="val" id="statDraft">0</div>
+        </div>
+        <div class="summary-item c5">
+          <div class="lbl">Finalized</div>
+          <div class="val" id="statFinalized">0</div>
+        </div>
       </div>
-      <div class="summary-item c3">
-        <div class="lbl">Submitted</div>
-        <div class="val" id="statSubmitted">0</div>
+
+      <!-- BULK ACTIONS -->
+      <div class="bulk-actions" id="bulkActions" style="display: none;">
+        <button class="btn btn-sm btn-solid-success" onclick="bulkVerify()">
+          <i class="fas fa-check-double"></i> Verify Selected
+        </button>
+        <button class="btn btn-sm btn-solid-warning" onclick="bulkReturnForCorrection()">
+          <i class="fas fa-undo"></i> Send Back Selected
+        </button>
+        <button class="btn btn-sm btn-solid-rose" onclick="finalizeExam()" id="finalizeBtn">
+          <i class="fas fa-lock"></i> Finalize Exam
+        </button>
+        <button class="btn btn-sm btn-primary" onclick="publishExam()" id="publishBtn" style="display: none;">
+          <i class="fas fa-bullhorn"></i> Publish Result
+        </button>
+        <span class="selected-info">
+          <i class="fas fa-check-circle"></i> <span id="selectedCount">0</span> selected
+        </span>
       </div>
-      <div class="summary-item c4">
-        <div class="lbl">Draft</div>
-        <div class="val" id="statDraft">0</div>
-      </div>
-      <div class="summary-item c5">
-        <div class="lbl">Finalized</div>
-        <div class="val" id="statFinalized">0</div>
+
+      <!-- TABLE -->
+      <div class="table-container">
+        <div class="table-wrapper" id="tableWrapper">
+          <div class="empty-state">
+            <i class="fas fa-clipboard-check"></i>
+            <h3>Select Session, Class &amp; Exam</h3>
+            <p>Choose filters above to load student marksheets</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- BULK ACTIONS -->
-    <div class="bulk-actions" id="bulkActions" style="display: none;">
-      <button class="btn btn-sm btn-solid-success" onclick="bulkVerify()">
-        <i class="fas fa-check-double"></i> Verify Selected
-      </button>
-      <button class="btn btn-sm btn-solid-warning" onclick="bulkReturnForCorrection()">
-        <i class="fas fa-undo"></i> Send Back Selected
-      </button>
-      <button class="btn btn-sm btn-solid-rose" onclick="finalizeExam()" id="finalizeBtn">
-        <i class="fas fa-lock"></i> Finalize Exam
-      </button>
-      <button class="btn btn-sm btn-primary" onclick="publishExam()" id="publishBtn" style="display: none;">
-        <i class="fas fa-bullhorn"></i> Publish Result
-      </button>
-      <span class="selected-info">
-        <i class="fas fa-check-circle"></i> <span id="selectedCount">0</span> selected
-      </span>
-    </div>
+    <!-- ============================================================
+         VIEW 2: ACTIVITY LOGS
+         ============================================================ -->
+    <div class="view-panel" id="view-activity">
 
-    <!-- TABLE -->
-    <div class="table-container">
-      <div class="table-wrapper" id="tableWrapper">
+      <!-- DASHBOARD STATS -->
+      <div class="logs-dashboard" id="logsDashboard">
+        <div class="log-stat c1">
+          <div class="ic"><i class="fas fa-file-pen"></i></div>
+          <div class="lbl">Total Exams</div>
+          <div class="val" id="logStatTotalExams">0</div>
+        </div>
+        <div class="log-stat c2">
+          <div class="ic"><i class="fas fa-circle-check"></i></div>
+          <div class="lbl">Verified Students</div>
+          <div class="val" id="logStatVerified">0</div>
+        </div>
+        <div class="log-stat c3">
+          <div class="ic"><i class="fas fa-hourglass-half"></i></div>
+          <div class="lbl">Pending</div>
+          <div class="val" id="logStatPending">0</div>
+        </div>
+        <div class="log-stat c4">
+          <div class="ic"><i class="fas fa-undo"></i></div>
+          <div class="lbl">Corrections</div>
+          <div class="val" id="logStatCorrections">0</div>
+        </div>
+        <div class="log-stat c5">
+          <div class="ic"><i class="fas fa-bullhorn"></i></div>
+          <div class="lbl">Published</div>
+          <div class="val" id="logStatPublished">0</div>
+        </div>
+      </div>
+
+      <!-- LOGS LIST -->
+      <div id="logsArea">
         <div class="empty-state">
-          <i class="fas fa-clipboard-check"></i>
-          <h3>Select Session, Class &amp; Exam</h3>
-          <p>Choose filters above to load student marksheets</p>
+          <i class="fas fa-history"></i>
+          <h3>Loading activity logs...</h3>
+          <p>Please wait</p>
         </div>
       </div>
     </div>
@@ -1012,7 +1418,10 @@ textarea.form-control { resize: vertical; min-height: 100px; }
         subjects: [],
         allSubjectsMap: {},
         selectedStudents: new Set(),
-        examInfo: null
+        examInfo: null,
+        currentTab: "verify",
+        activityLogs: [],
+        activityLoaded: false
     };
 
     // THEME
@@ -1145,6 +1554,22 @@ textarea.form-control { resize: vertical; min-height: 100px; }
         post: (p, body) => apiRequest("POST", p, body || {})
     };
 
+    // TAB SWITCHING
+    window.switchTab = function (tab) {
+        STATE.currentTab = tab;
+        document.querySelectorAll(".tab-btn").forEach(t => t.classList.remove("active"));
+        const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+        if (btn) btn.classList.add("active");
+
+        document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+        const panel = document.getElementById("view-" + tab);
+        if (panel) panel.classList.add("active");
+
+        if (tab === "activity" && !STATE.activityLoaded) {
+            loadActivityLogs();
+        }
+    };
+
     // INIT
     async function init() {
         try {
@@ -1270,7 +1695,6 @@ textarea.form-control { resize: vertical; min-height: 100px; }
             STATE.subjects = data.subjects || [];
             STATE.examInfo = data.exam || null;
 
-            // Build subject map
             STATE.allSubjectsMap = {};
             STATE.subjects.forEach(s => { STATE.allSubjectsMap[s.id] = s; });
 
@@ -1310,9 +1734,9 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     window.reloadData = function () {
         if (STATE.examId) loadStudents();
         else hideTable();
+        STATE.activityLoaded = false;
     };
 
-    // SUMMARY
     function renderSummary() {
         const total = STATE.students.length;
         const verified = STATE.students.filter(s => s.marks_status === "VERIFIED").length;
@@ -1328,7 +1752,6 @@ textarea.form-control { resize: vertical; min-height: 100px; }
         document.getElementById("summaryStrip").style.display = "grid";
     }
 
-    // RENDER TABLE
     function renderTable() {
         const wrapper = document.getElementById("tableWrapper");
 
@@ -1343,19 +1766,9 @@ textarea.form-control { resize: vertical; min-height: 100px; }
             return;
         }
 
-        // Build subject columns (dynamic)
         const subjects = STATE.subjects;
-
-        // Determine which subjects have theory / practical / internal
-        // We'll show columns per subject with theory/practical/internal
-        // Table will have 2-tier header
-
-        // Group subjects by stream filter (but show all if no filter)
-        // Stream filter: filter students by stream
-
         const filtered = STATE.students;
 
-        // Build header rows
         const firstRowHeaders = `
             <tr>
                 <th rowspan="2" style="width: 40px;"></th>
@@ -1392,7 +1805,6 @@ textarea.form-control { resize: vertical; min-height: 100px; }
             </tr>
         `;
 
-        // Render each student row
         const rows = filtered.map((s, idx) => {
             const status = s.marks_status || "DRAFT";
             const statusClass = status.toLowerCase().replace(/_/g, "-");
@@ -1407,7 +1819,6 @@ textarea.form-control { resize: vertical; min-height: 100px; }
             };
             const sm = statusMap[status] || statusMap["DRAFT"];
 
-            // Subject marks cells
             const subjectCells = subjects.map(sub => {
                 const subjId = sub.id;
                 const mark = s.subject_marks?.[subjId] || {};
@@ -1416,10 +1827,6 @@ textarea.form-control { resize: vertical; min-height: 100px; }
                 const hasTheory = (sub.theory_max || 0) > 0;
                 const hasPractical = (sub.practical_max || 0) > 0;
                 const hasInternal = (sub.internal_max || 0) > 0;
-
-                const theoryVal = mark.theory_marks;
-                const practicalVal = mark.practical_marks;
-                const internalVal = mark.internal_marks;
 
                 const cellFor = (val, maxVal) => {
                     if (isAbsent) return `<td><span class="mark-cell absent">${escapeHtml(mark.absent_type || "AB")}</span></td>`;
@@ -1431,13 +1838,12 @@ textarea.form-control { resize: vertical; min-height: 100px; }
                 };
 
                 return (
-                    (hasTheory ? cellFor(theoryVal, sub.theory_max) : '<td><span class="mark-cell">—</span></td>') +
-                    (hasPractical ? cellFor(practicalVal, sub.practical_max) : '<td><span class="mark-cell">—</span></td>') +
-                    (hasInternal ? cellFor(internalVal, sub.internal_max) : '<td><span class="mark-cell">—</span></td>')
+                    (hasTheory ? cellFor(mark.theory_marks, sub.theory_max) : '<td><span class="mark-cell">—</span></td>') +
+                    (hasPractical ? cellFor(mark.practical_marks, sub.practical_max) : '<td><span class="mark-cell">—</span></td>') +
+                    (hasInternal ? cellFor(mark.internal_marks, sub.internal_max) : '<td><span class="mark-cell">—</span></td>')
                 );
             }).join("");
 
-            // Total & %
             const totalObtained = parseFloat(s.grand_total) || 0;
             const totalMax = parseFloat(s.max_total) || 0;
             const pct = totalMax > 0 ? ((totalObtained / totalMax) * 100) : 0;
@@ -1484,7 +1890,6 @@ textarea.form-control { resize: vertical; min-height: 100px; }
             `;
         }).join("");
 
-        // Footer totals
         const totalsBySubject = subjects.map(sub => {
             let thObt = 0, thMax = 0, prObt = 0, prMax = 0, inObt = 0, inMax = 0;
             filtered.forEach(s => {
@@ -1537,23 +1942,12 @@ textarea.form-control { resize: vertical; min-height: 100px; }
         `;
     }
 
-    // SELECTION
-    window.toggleSelectAll = function (checkbox) {
-        document.querySelectorAll(".student-checkbox").forEach(cb => {
-            cb.checked = checkbox.checked;
-            if (checkbox.checked) STATE.selectedStudents.add(cb.value);
-            else STATE.selectedStudents.delete(cb.value);
-        });
-        document.getElementById("selectedCount").textContent = STATE.selectedStudents.size;
-    };
-
     window.toggleStudentSelect = function (studentId, checked) {
         if (checked) STATE.selectedStudents.add(studentId);
         else STATE.selectedStudents.delete(studentId);
         document.getElementById("selectedCount").textContent = STATE.selectedStudents.size;
     };
 
-    // BULK ACTIONS RENDER
     function renderBulkActions() {
         const examStatus = STATE.examInfo?.status;
         const finalizeBtn = document.getElementById("finalizeBtn");
@@ -1589,6 +1983,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
             showLoading("Verifying...");
             await api.post(`/marks-verify-student/${STATE.examId}/${studentId}`);
             showToast(`✓ ${student.student_name} verified`, "success");
+            STATE.activityLoaded = false;
             await loadStudents();
         } catch (err) {
             showToast("Verify failed: " + err.message, "error");
@@ -1640,6 +2035,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
             await api.post(`/marks-return-student/${STATE.examId}/${studentId}`, { reason });
             showToast("✓ Sent back for correction", "success");
             closeModal();
+            STATE.activityLoaded = false;
             await loadStudents();
         } catch (err) {
             showToast("Failed: " + err.message, "error");
@@ -1648,7 +2044,6 @@ textarea.form-control { resize: vertical; min-height: 100px; }
         }
     };
 
-    // BULK VERIFY
     window.bulkVerify = async function () {
         const ids = Array.from(STATE.selectedStudents);
         if (!ids.length) {
@@ -1670,6 +2065,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
             }
             showToast(`✓ Verified: ${success}, Failed: ${failed}`, success > 0 ? "success" : "warning");
             STATE.selectedStudents.clear();
+            STATE.activityLoaded = false;
             await loadStudents();
         } catch (err) {
             showToast("Bulk verify failed: " + err.message, "error");
@@ -1678,7 +2074,6 @@ textarea.form-control { resize: vertical; min-height: 100px; }
         }
     };
 
-    // BULK RETURN
     window.bulkReturnForCorrection = async function () {
         const ids = Array.from(STATE.selectedStudents);
         if (!ids.length) {
@@ -1731,6 +2126,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
             showToast(`✓ Sent back: ${success}, Failed: ${failed}`, success > 0 ? "success" : "warning");
             STATE.selectedStudents.clear();
             closeModal();
+            STATE.activityLoaded = false;
             await loadStudents();
         } catch (err) {
             showToast("Bulk return failed: " + err.message, "error");
@@ -1739,7 +2135,6 @@ textarea.form-control { resize: vertical; min-height: 100px; }
         }
     };
 
-    // FINALIZE
     window.finalizeExam = async function () {
         const ok = await confirmDialog(
             `Finalize this exam?\n\nAll VERIFIED marks will be locked and results snapshotted.`,
@@ -1751,6 +2146,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
             showLoading("Finalizing exam...");
             const res = await api.post(`/exams/${STATE.examId}/finalize`);
             showToast(`✓ ${res.message || "Exam finalized"}`, "success");
+            STATE.activityLoaded = false;
             await loadStudents();
         } catch (err) {
             showToast("Finalize failed: " + err.message, "error", 6000);
@@ -1759,7 +2155,6 @@ textarea.form-control { resize: vertical; min-height: 100px; }
         }
     };
 
-    // PUBLISH
     window.publishExam = async function () {
         openModal(`
             <div class="modal-header">
@@ -1794,6 +2189,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
             await api.post(`/exams/${STATE.examId}/publish`, { result_date: date });
             showToast("✓ Result published successfully", "success");
             closeModal();
+            STATE.activityLoaded = false;
             await loadStudents();
         } catch (err) {
             showToast("Publish failed: " + err.message, "error");
@@ -1802,7 +2198,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
         }
     };
 
-    // VIEW DETAILS
+    // VIEW STUDENT DETAILS
     window.viewStudent = async function (studentId) {
         const student = STATE.students.find(s => s.student_id === studentId);
         if (!student) return;
@@ -1923,6 +2319,225 @@ textarea.form-control { resize: vertical; min-height: 100px; }
             showToast("Failed to load details: " + err.message, "error");
         }
     };
+
+    // ============================================================
+    // ACTIVITY LOGS
+    // ============================================================
+    async function loadActivityLogs() {
+        try {
+            showLoading("Loading activity logs...");
+            const area = document.getElementById("logsArea");
+            area.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <h3>Loading activity logs...</h3>
+                </div>
+            `;
+
+            const res = await api.get("/activity-logs", {
+                session_id: STATE.sessionId || "",
+                limit: 500
+            });
+
+            const data = res.data || {};
+            const logs = data.logs || [];
+            const summary = data.summary || {};
+
+            STATE.activityLogs = logs;
+            STATE.activityLoaded = true;
+
+            // Update dashboard stats
+            document.getElementById("logStatTotalExams").textContent = summary.total_exams ?? 0;
+            document.getElementById("logStatVerified").textContent = summary.total_verified ?? 0;
+            document.getElementById("logStatPending").textContent = summary.total_pending ?? 0;
+            document.getElementById("logStatCorrections").textContent = summary.total_corrections ?? 0;
+            document.getElementById("logStatPublished").textContent = summary.total_published ?? 0;
+            document.getElementById("activityTabCount").textContent = logs.length;
+
+            if (!logs.length) {
+                area.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-history"></i>
+                        <h3>No activity logs found</h3>
+                        <p>Activity logs will appear once exams are processed</p>
+                    </div>
+                `;
+                return;
+            }
+
+            renderActivityLogs(logs);
+            hideLoading();
+        } catch (err) {
+            hideLoading();
+            console.error("Load activity logs failed:", err);
+            document.getElementById("logsArea").innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <h3>Failed to load activity logs</h3>
+                    <p>${escapeHtml(err.message)}</p>
+                    <button class="btn btn-primary" onclick="reloadActivityLogs()">
+                        <i class="fas fa-rotate"></i> Retry
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    window.reloadActivityLogs = function () {
+        STATE.activityLoaded = false;
+        loadActivityLogs();
+    };
+
+    function renderActivityLogs(logs) {
+        const area = document.getElementById("logsArea");
+
+        // Group logs by exam_id
+        const grouped = {};
+        logs.forEach(log => {
+            const examId = log.exam_id || `no-exam-${log.id}`;
+            if (!grouped[examId]) {
+                grouped[examId] = {
+                    exam_id: log.exam_id,
+                    exam_name: log.exam_name || "Unknown Exam",
+                    exam_code: log.exam_code || "",
+                    class_name: log.class_name || "",
+                    session_name: log.session_name || "",
+                    events: []
+                };
+            }
+            grouped[examId].events.push(log);
+        });
+
+        // Render each exam group
+        const html = Object.values(grouped).map(group => {
+            // Compute stats
+            const verifiedCount = group.events.filter(e => e.action === "MARKS_VERIFIED_STUDENT" || e.action === "MARKS_VERIFIED").length;
+            const correctionCount = group.events.filter(e => e.action === "MARKS_RETURNED_STUDENT" || e.action === "MARKS_REJECTED").length;
+            const submittedCount = group.events.filter(e => e.action === "MARKS_SUBMITTED").length;
+            const finalizedCount = group.events.filter(e => e.action === "RESULT_FINALIZED").length;
+            const publishedCount = group.events.filter(e => e.action === "RESULT_PUBLISHED").length;
+
+            // Sort events newest first
+            group.events.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            return `
+                <div class="exam-log-card" data-exam-log-id="${group.exam_id}">
+                    <div class="exam-log-header" onclick="toggleExamLog(${group.exam_id})">
+                        <div class="exam-log-title">
+                            <h3>
+                                <i class="fas fa-file-pen"></i>
+                                ${escapeHtml(group.exam_name)}
+                                ${group.exam_code ? `<span class="badge badge-primary">${escapeHtml(group.exam_code)}</span>` : ""}
+                            </h3>
+                            <div class="meta">
+                                ${group.class_name ? `<span><i class="fas fa-school"></i> Class ${escapeHtml(group.class_name)}</span>` : ""}
+                                ${group.session_name ? `<span><i class="fas fa-calendar-days"></i> ${escapeHtml(group.session_name)}</span>` : ""}
+                                <span><i class="fas fa-list"></i> ${group.events.length} events</span>
+                            </div>
+                        </div>
+                        <div class="exam-log-stats">
+                            ${verifiedCount > 0 ? `<div class="exam-log-stat"><div class="lbl">Verified</div><div class="val verified">${verifiedCount}</div></div>` : ""}
+                            ${correctionCount > 0 ? `<div class="exam-log-stat"><div class="lbl">Corrections</div><div class="val pending">${correctionCount}</div></div>` : ""}
+                            <div class="exam-log-stat"><div class="lbl">Total</div><div class="val total">${group.events.length}</div></div>
+                        </div>
+                        <div class="exam-log-chev"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="exam-log-body">
+                        <div class="exam-log-body-inner">
+                            <div class="timeline-section-title">
+                                <i class="fas fa-timeline"></i> Activity Timeline (newest first)
+                            </div>
+                            <div class="timeline">
+                                ${group.events.map(e => renderTimelineEvent(e)).join("")}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join("");
+
+        area.innerHTML = html;
+    }
+
+    function renderTimelineEvent(e) {
+        const actionMap = {
+            "MARKS_CREATED":         { cls: "created",    icon: "fa-plus",         title: "Marks Created" },
+            "MARKS_UPDATED":         { cls: "created",    icon: "fa-pen",          title: "Marks Updated" },
+            "MARKS_SUBMITTED":       { cls: "submitted",  icon: "fa-paper-plane",  title: "Submitted for Verification" },
+            "MARKS_VERIFIED":        { cls: "verified",   icon: "fa-circle-check", title: "Marks Verified" },
+            "MARKS_VERIFIED_STUDENT":{ cls: "verified",   icon: "fa-circle-check", title: "Student Marks Verified" },
+            "MARKS_REJECTED":        { cls: "correction", icon: "fa-undo",         title: "Returned for Correction" },
+            "MARKS_RETURNED_STUDENT":{ cls: "correction", icon: "fa-undo",         title: "Student Marks Returned for Correction" },
+            "RESULT_FINALIZED":      { cls: "finalized",  icon: "fa-lock",         title: "Exam Finalized" },
+            "RESULT_PUBLISHED":      { cls: "published",  icon: "fa-bullhorn",     title: "Result Published" },
+            "RESULT_UNPUBLISHED":    { cls: "created",    icon: "fa-eye-slash",    title: "Result Unpublished" },
+            "RESULT_UNLOCKED":       { cls: "correction", icon: "fa-lock-open",    title: "Exam Unlocked" },
+            "EXAM_CREATED":          { cls: "created",    icon: "fa-plus",         title: "Exam Created" },
+            "EXAM_UPDATED":          { cls: "created",    icon: "fa-pen",          title: "Exam Updated" },
+            "STUDENT_SUBJECTS_ASSIGNED":{ cls: "created", icon: "fa-user-plus",    title: "Subjects Assigned" }
+        };
+
+        const info = actionMap[e.action] || { cls: "created", icon: "fa-circle-info", title: e.action };
+
+        // Parse values if JSON
+        const newValue = safeParseJSON(e.new_value);
+        const oldValue = safeParseJSON(e.old_value);
+        const reason = e.reason || "";
+        const studentId = e.student_id || "";
+        const userName = e.user_name || "System";
+        const userRole = e.user_role || "";
+
+        // Build meta text
+        let metaHtml = "";
+        if (studentId) {
+            metaHtml += `<div class="timeline-meta"><strong>Student:</strong> ${escapeHtml(studentId)}</div>`;
+        }
+        if (newValue && typeof newValue === "object") {
+            const keys = Object.keys(newValue).filter(k => 
+                ["verified_count", "returned_count", "submitted_count", "added", "total", "grade", "result_status"].includes(k)
+            );
+            if (keys.length > 0) {
+                metaHtml += `<div class="timeline-meta"><strong>Details:</strong> ${keys.map(k => `${k.replace(/_/g, " ")}: ${newValue[k]}`).join(" · ")}</div>`;
+            }
+        }
+
+        const remarksHtml = reason 
+            ? `<div class="timeline-remarks"><i class="fas fa-comment-dots"></i> ${escapeHtml(reason)}</div>` 
+            : "";
+
+        const dateStr = e.created_at ? new Date(e.created_at).toLocaleString("en-IN", {
+            day: "2-digit", month: "short", year: "numeric",
+            hour: "2-digit", minute: "2-digit"
+        }) : "—";
+
+        return `
+            <div class="timeline-item">
+                <div class="timeline-dot ${info.cls}"><i class="fas ${info.icon}"></i></div>
+                <div class="timeline-content ${info.cls}">
+                    <div class="timeline-title">
+                        <span>${escapeHtml(info.title)}</span>
+                        <span class="actor"><i class="fas fa-user"></i> ${escapeHtml(userName)}${userRole ? ` (${escapeHtml(userRole)})` : ""}</span>
+                    </div>
+                    ${metaHtml}
+                    ${remarksHtml}
+                    <div class="timeline-time">
+                        <i class="fas fa-clock"></i> ${dateStr}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    window.toggleExamLog = function (examId) {
+        const card = document.querySelector(`.exam-log-card[data-exam-log-id="${examId}"]`);
+        if (card) card.classList.toggle("expanded");
+    };
+
+    function safeParseJSON(raw) {
+        if (!raw) return null;
+        if (typeof raw === "object") return raw;
+        try { return JSON.parse(raw); } catch { return null; }
+    }
 
     // CLOSE
     document.getElementById("modalOverlay").addEventListener("click", (e) => {
