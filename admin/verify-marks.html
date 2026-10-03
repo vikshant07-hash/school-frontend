@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Marksheet Verification | GSSS SHILLA</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+/* ============================================================
+   MARKSHEET VERIFICATION — NEUMORPHIC THEME
+   ============================================================ */
+
+:root {
+  --bg: #e5e8f2;
+  --surface: #e5e8f2;
+  --t-hi: #0f1738;
+  --t-mid: #4d5678;
+  --t-lo: #8891b0;
+  --purple: #7c3aed;
+  --emerald: #059669;
+  --amber: #d97706;
+  --rose: #dc2626;
+  --sky: #0284c7;
+  --pink: #db2777;
+
+  --sd: rgba(120, 128, 180, 0.55);
+  --sd-soft: rgba(120, 128, 180, 0.35);
+  --sd-strong: rgba(95, 105, 160, 0.68);
+  --sd-heavy: rgba(65, 75, 130, 0.82);
+  --sl: #ffffff;
+
+  --press-xs: inset 2px 2px 5px var(--sd-soft), inset -2px -2px 5px var(--sl);
+  --press-sm: inset 4px 4px 9px var(--sd), inset -4px -4px 9px var(--sl);
+  --press: inset 6px 6px 13px var(--sd-strong), inset -6px -6px 13px var(--sl);
+  --press-lg: inset 9px 9px 20px var(--sd-heavy), inset -9px -9px 20px var(--sl);
+
+  --raise-xs: 2px 2px 5px var(--sd-soft), -2px -2px 5px var(--sl);
+  --raise-sm: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl);
+  --raise: 6px 6px 13px var(--sd), -6px -6px 13px var(--sl);
+  --raise-lg: 10px 10px 22px var(--sd-strong), -10px -10px 22px var(--sl);
+
+  --grad-primary: linear-gradient(135deg, #7c3aed 0%, #3d4db8 50%, #1e2a78 100%);
+  --grad-emerald: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  --grad-amber: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  --grad-rose: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  --grad-sky: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+}
+
+[data-theme="dark"] {
+  --bg: #0f1424;
+  --surface: #0f1424;
+  --t-hi: #e8ecf5;
+  --t-mid: #9aa4c5;
+  --t-lo: #5d678a;
+  --sd: rgba(0, 0, 0, 0.55);
+  --sd-soft: rgba(0, 0, 0, 0.4);
+  --sd-strong: rgba(0, 0, 0, 0.72);
+  --sd-heavy: rgba(0, 0, 0, 0.88);
+  --sl: rgba(255, 255, 255, 0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+*:focus { outline: none; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--t-hi);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
+  display: flex;
+  flex-direction: column;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--sd); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--sd-strong); }
+
+/* ============ LAYOUT ============ */
+.dashboard { display: flex; flex: 1; min-height: 100vh; }
+
+/* ============ MAIN CONTENT ============ */
+.main {
+  flex: 1;
+  padding: 24px 28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  min-height: 100vh;
+  max-width: 100%;
+}
+
+/* ============ TOPBAR ============ */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 14px 22px;
+  box-shadow: var(--press), var(--raise-sm);
+  flex-wrap: wrap;
+}
+.topbar-title { flex: 1; min-width: 200px; }
+.topbar-title h3 {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--t-hi);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.topbar-title h3 i { color: var(--purple); }
+.topbar-title p { font-size: 12px; color: var(--t-lo); margin-top: 2px; font-weight: 500; }
+.topbar-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* ============ WELCOME BANNER ============ */
+.welcome-banner {
+  background: var(--surface);
+  border-radius: 24px;
+  padding: 26px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  box-shadow: var(--press), var(--raise-sm);
+  position: relative;
+  overflow: hidden;
+}
+.welcome-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%; right: -10%;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.12), transparent 70%);
+  pointer-events: none;
+}
+.banner-text { position: relative; z-index: 1; }
+.banner-text h1 {
+  font-family: var(--font-display);
+  font-size: 25px;
+  font-weight: 700;
+  color: var(--t-hi);
+  letter-spacing: -0.3px;
+}
+.banner-text h1 span {
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.banner-text p { color: var(--t-mid); font-size: 13px; margin-top: 6px; font-weight: 500; }
+
+/* ============ SELECTOR BAR ============ */
+.selector-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 20px 24px;
+  box-shadow: var(--press);
+}
+.selector-bar label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--t-lo);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.selector-bar select {
+  padding: 12px 16px;
+  border: none;
+  background: var(--surface);
+  border-radius: 14px;
+  font-size: 13px;
+  color: var(--t-hi);
+  font-weight: 700;
+  box-shadow: var(--press-xs);
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+.selector-bar select:focus { box-shadow: var(--press-sm); }
+
+/* ============ SUMMARY STRIP ============ */
+.summary-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+}
+.summary-item {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: var(--press-sm);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.summary-item::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.summary-item.c1::before { background: var(--grad-primary); }
+.summary-item.c2::before { background: var(--grad-emerald); }
+.summary-item.c3::before { background: var(--grad-amber); }
+.summary-item.c4::before { background: var(--grad-sky); }
+.summary-item.c5::before { background: var(--grad-rose); }
+.summary-item .lbl {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--t-lo);
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.summary-item .val {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--t-hi);
+}
+
+/* ============ BULK ACTIONS ============ */
+.bulk-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 16px 22px;
+  box-shadow: var(--press);
+  align-items: center;
+}
+.bulk-actions .selected-info {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--t-lo);
+  font-weight: 700;
+  padding: 8px 14px;
+  background: var(--surface);
+  border-radius: 100px;
+  box-shadow: var(--press-xs);
+}
+
+/* ============ BUTTONS ============ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border: none;
+  border-radius: 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.35s var(--ease);
+  font-family: var(--font-body);
+  background: var(--surface);
+  color: var(--t-mid);
+  box-shadow: var(--press-sm);
+  white-space: nowrap;
+}
+.btn:hover { box-shadow: var(--press); transform: translateY(-2px); color: var(--t-hi); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+.btn-primary {
+  background: var(--grad-primary);
+  color: #fff;
+  box-shadow:
+    inset 2px 2px 5px rgba(20, 30, 70, 0.6),
+    inset -2px -2px 5px rgba(160, 130, 230, 0.4),
+    4px 4px 10px var(--sd);
+}
+.btn-primary:hover { color: #fff; }
+
+.btn-success { color: var(--emerald); }
+.btn-warning { color: var(--amber); }
+.btn-danger { color: var(--rose); }
+.btn-info { color: var(--sky); }
+
+.btn-solid-success {
+  background: var(--grad-emerald);
+  color: #fff;
+  box-shadow:
+    inset 2px 2px 5px rgba(6, 78, 59, 0.6),
+    inset -2px -2px 5px rgba(52, 211, 153, 0.3),
+    4px 4px 10px var(--sd);
+}
+.btn-solid-success:hover { color: #fff; }
+
+.btn-solid-warning {
+  background: var(--grad-amber);
+  color: #fff;
+  box-shadow:
+    inset 2px 2px 5px rgba(120, 53, 15, 0.6),
+    inset -2px -2px 5px rgba(252, 211, 77, 0.3),
+    4px 4px 10px var(--sd);
+}
+.btn-solid-warning:hover { color: #fff; }
+
+.btn-solid-rose {
+  background: var(--grad-rose);
+  color: #fff;
+  box-shadow:
+    inset 2px 2px 5px rgba(127, 29, 29, 0.6),
+    inset -2px -2px 5px rgba(252, 165, 165, 0.3),
+    4px 4px 10px var(--sd);
+}
+.btn-solid-rose:hover { color: #fff; }
+
+.btn-sm { padding: 8px 14px; font-size: 11.5px; border-radius: 11px; }
+.btn-xs { padding: 6px 12px; font-size: 11px; border-radius: 10px; }
+
+/* ============ TABLE ============ */
+.table-container {
+  background: var(--surface);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--press);
+}
+.table-wrapper {
+  overflow-x: auto;
+  padding: 6px 22px 22px;
+  -webkit-overflow-scrolling: touch;
+}
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 6px;
+  font-size: 13px;
+  min-width: 1200px;
+}
+.table thead th {
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-weight: 800;
+  color: var(--t-lo);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 5;
+}
+.table tbody tr {
+  background: var(--surface);
+  box-shadow: var(--press-xs);
+  transition: all 0.3s var(--ease);
+}
+.table tbody tr:hover { box-shadow: var(--press-sm); }
+.table tbody tr.status-verified { background: linear-gradient(90deg, rgba(5,150,105,0.05), transparent); }
+.table tbody tr.status-submitted { background: linear-gradient(90deg, rgba(217,119,6,0.05), transparent); }
+.table tbody tr.status-draft { background: linear-gradient(90deg, rgba(220,38,38,0.05), transparent); }
+.table tbody td {
+  padding: 12px 14px;
+  color: var(--t-mid);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.table tbody td:first-child { border-radius: 12px 0 0 12px; }
+.table tbody td:last-child { border-radius: 0 12px 12px 0; }
+
+/* Marks column grouping */
+.marks-group { display: flex; gap: 4px; align-items: center; }
+.marks-group .mark-cell {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--surface);
+  box-shadow: var(--press-xs);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--t-hi);
+  min-width: 40px;
+  text-align: center;
+}
+.marks-group .mark-cell.fail { color: var(--rose); }
+.marks-group .mark-cell.pass { color: var(--emerald); }
+
+/* ============ BADGES ============ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  font-size: 10px;
+  font-weight: 800;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: var(--press-xs);
+  background: var(--surface);
+}
+.badge i { font-size: 8px; }
+.badge-primary { color: var(--purple); }
+.badge-success { color: var(--emerald); }
+.badge-warning { color: var(--amber); }
+.badge-danger { color: var(--rose); }
+.badge-info { color: var(--sky); }
+.badge-gray { color: var(--t-lo); }
+
+/* ============ ACTION BUTTONS IN ROW ============ */
+.row-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+.row-action-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--press-xs);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.3s var(--ease);
+  color: var(--t-mid);
+}
+.row-action-btn:hover { box-shadow: var(--press-sm); transform: translateY(-2px); }
+.row-action-btn.verify { color: var(--emerald); }
+.row-action-btn.sendback { color: var(--amber); }
+.row-action-btn.view { color: var(--sky); }
+.row-action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* ============ EMPTY STATE ============ */
+.empty-state {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--t-lo);
+  font-size: 13px;
+}
+.empty-state i {
+  font-size: 54px;
+  display: block;
+  margin-bottom: 14px;
+  opacity: 0.5;
+  color: var(--purple);
+}
+.empty-state h3 {
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: var(--t-mid);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+.empty-state p { font-size: 12.5px; color: var(--t-lo); margin-bottom: 14px; }
+
+/* ============ MODAL ============ */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(10, 15, 30, 0.55);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 20px;
+  overflow-y: auto;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: var(--bg);
+  border-radius: 26px;
+  box-shadow: var(--press-lg), var(--raise-lg);
+  width: 100%;
+  max-width: 720px;
+  margin: auto;
+  animation: modalIn 0.3s var(--ease);
+  overflow: hidden;
+}
+.modal-sm { max-width: 440px; }
+.modal-lg { max-width: 1000px; }
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.94) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-header {
+  padding: 22px 26px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed var(--sd);
+}
+.modal-header h3 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--t-hi);
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 700;
+}
+.modal-header h3::before {
+  content: '';
+  width: 4px; height: 20px;
+  background: var(--grad-primary);
+  border-radius: 4px;
+}
+.modal-close {
+  width: 36px; height: 36px;
+  border-radius: 12px;
+  color: var(--t-mid);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s var(--ease);
+  background: var(--surface);
+  box-shadow: var(--press-sm);
+  border: none;
+  cursor: pointer;
+}
+.modal-close:hover { box-shadow: var(--press); color: var(--rose); }
+.modal-body { padding: 24px 26px; max-height: 72vh; overflow-y: auto; }
+.modal-footer {
+  padding: 18px 26px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: var(--surface);
+  box-shadow: inset 0 2px 6px var(--sd-soft);
+  flex-wrap: wrap;
+}
+
+/* ============ FORMS ============ */
+.form-group { margin-bottom: 18px; }
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--t-mid);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.form-group label .required { color: var(--rose); margin-left: 3px; }
+.form-control {
+  width: 100%;
+  padding: 13px 16px;
+  border: none;
+  border-radius: 14px;
+  background: var(--surface);
+  font-size: 13.5px;
+  transition: all 0.3s var(--ease);
+  color: var(--t-hi);
+  font-weight: 600;
+  font-family: var(--font-body);
+  box-shadow: var(--press-sm);
+}
+.form-control:focus { box-shadow: var(--press); }
+.form-control::placeholder { color: var(--t-lo); font-weight: 500; }
+textarea.form-control { resize: vertical; min-height: 100px; }
+
+/* ============ INFO BOX ============ */
+.info-box {
+  padding: 16px 20px;
+  border-radius: 14px;
+  font-size: 12.5px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--surface);
+  box-shadow: var(--press-sm);
+  font-weight: 600;
+  line-height: 1.6;
+}
+.info-box.info { color: var(--sky); }
+.info-box.warning { color: var(--amber); }
+.info-box.error { color: var(--rose); }
+.info-box.success { color: var(--emerald); }
+.info-box i { font-size: 16px; margin-top: 2px; flex-shrink: 0; }
+.info-box strong { display: block; margin-bottom: 4px; font-weight: 800; }
+
+/* ============ SUBJECT DETAILS ============ */
+.subject-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+.subject-card {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: var(--press-sm);
+}
+.subject-card-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--t-hi);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--sd);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.subject-marks-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 12px;
+  color: var(--t-mid);
+  font-weight: 600;
+  border-bottom: 1px dotted var(--sd-soft);
+}
+.subject-marks-row:last-child { border-bottom: none; }
+.subject-marks-row .label { color: var(--t-lo); font-weight: 700; }
+.subject-marks-row .value { color: var(--t-hi); font-weight: 800; }
+.subject-marks-row .value.pass { color: var(--emerald); }
+.subject-marks-row .value.fail { color: var(--rose); }
+.subject-marks-row .value.absent { color: var(--amber); }
+
+/* ============ TOAST ============ */
+.toast-container {
+  position: fixed;
+  top: 24px; right: 24px;
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+}
+.toast {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 14px 18px;
+  box-shadow: var(--press), var(--raise);
+  min-width: 280px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  animation: toastIn 0.3s var(--ease);
+  color: var(--t-hi);
+  font-weight: 700;
+  font-size: 12.5px;
+}
+@keyframes toastIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+.toast-icon {
+  font-size: 15px;
+  flex-shrink: 0;
+  width: 26px; height: 26px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  box-shadow: var(--press-xs);
+}
+.toast.success .toast-icon { color: var(--emerald); }
+.toast.error .toast-icon { color: var(--rose); }
+.toast.warning .toast-icon { color: var(--amber); }
+.toast.info .toast-icon { color: var(--sky); }
+.toast-message { flex: 1; }
+
+/* ============ LOADING ============ */
+.loading-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(229, 232, 242, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 4000;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+}
+[data-theme="dark"] .loading-overlay { background: rgba(15, 20, 36, 0.85); }
+.loading-overlay.active { display: flex; }
+.spinner {
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--press);
+  position: relative;
+}
+.spinner::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  border-top-color: #7c3aed;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 13px; color: var(--t-mid); font-weight: 700; }
+
+/* ============ THEME BTN ============ */
+.theme-btn {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface);
+  color: var(--purple);
+  font-size: 15px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--press-sm);
+  transition: all 0.35s var(--ease);
+}
+.theme-btn:hover { box-shadow: var(--press); transform: rotate(180deg); }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 768px) {
+  .main { padding: 14px; gap: 14px; }
+  .welcome-banner { padding: 20px; flex-direction: column; align-items: flex-start; gap: 14px; }
+  .banner-text h1 { font-size: 20px; }
+  .topbar { padding: 12px 16px; gap: 10px; }
+  .topbar-title h3 { font-size: 16px; }
+  .theme-btn { width: 38px; height: 38px; font-size: 13px; }
+  .table-wrapper { padding: 6px 14px 16px; }
+  .toast-container { top: auto; bottom: 20px; right: 16px; left: 16px; max-width: none; }
+  .modal { max-width: 100%; border-radius: 20px; }
+  .modal-body { padding: 18px; }
+  .selector-bar { padding: 16px 18px; }
+  .bulk-actions { padding: 12px 16px; }
+  .bulk-actions .selected-info { margin-left: 0; width: 100%; text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="dashboard">
+
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-title">
+        <h3>
+          <i class="fas fa-clipboard-check"></i>
+          Marksheet Verification
+        </h3>
+        <p>Verify, finalize, and publish exam results</p>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-sm" onclick="window.location.href='result-management.html'">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <button class="theme-btn" onclick="toggleTheme()" aria-label="Theme">
+          <i id="themeIcon" class="fas fa-moon"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- WELCOME BANNER -->
+    <div class="welcome-banner">
+      <div class="banner-text">
+        <h1>Verify <span>Marksheets</span></h1>
+        <p>Check student marks, verify, or send back for correction</p>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; position: relative; z-index: 1;">
+        <button class="btn" onclick="reloadData()">
+          <i class="fas fa-rotate"></i> Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- SELECTOR BAR -->
+    <div class="selector-bar">
+      <label>
+        Session
+        <select id="sessionFilter" onchange="onFilterChange()">
+          <option value="">Loading sessions...</option>
+        </select>
+      </label>
+      <label>
+        Class
+        <select id="classFilter" onchange="onFilterChange()">
+          <option value="">Loading classes...</option>
+        </select>
+      </label>
+      <label>
+        Exam
+        <select id="examFilter" onchange="onFilterChange()">
+          <option value="">Select class first</option>
+        </select>
+      </label>
+      <label>
+        Section (Optional)
+        <select id="sectionFilter" onchange="onFilterChange()">
+          <option value="">All Sections</option>
+        </select>
+      </label>
+    </div>
+
+    <!-- SUMMARY STRIP -->
+    <div class="summary-strip" id="summaryStrip" style="display: none;">
+      <div class="summary-item c1">
+        <div class="lbl">Total Students</div>
+        <div class="val" id="statTotal">0</div>
+      </div>
+      <div class="summary-item c2">
+        <div class="lbl">Verified</div>
+        <div class="val" id="statVerified">0</div>
+      </div>
+      <div class="summary-item c3">
+        <div class="lbl">Submitted</div>
+        <div class="val" id="statSubmitted">0</div>
+      </div>
+      <div class="summary-item c4">
+        <div class="lbl">Draft</div>
+        <div class="val" id="statDraft">0</div>
+      </div>
+      <div class="summary-item c5">
+        <div class="lbl">Finalized</div>
+        <div class="val" id="statFinalized">0</div>
+      </div>
+    </div>
+
+    <!-- BULK ACTIONS -->
+    <div class="bulk-actions" id="bulkActions" style="display: none;">
+      <button class="btn btn-sm btn-solid-success" onclick="bulkVerify()">
+        <i class="fas fa-check-double"></i> Verify Selected
+      </button>
+      <button class="btn btn-sm btn-solid-warning" onclick="bulkReturnForCorrection()">
+        <i class="fas fa-undo"></i> Send Back Selected
+      </button>
+      <button class="btn btn-sm btn-solid-rose" onclick="finalizeExam()" id="finalizeBtn">
+        <i class="fas fa-lock"></i> Finalize Exam
+      </button>
+      <button class="btn btn-sm btn-primary" onclick="publishExam()" id="publishBtn" style="display: none;">
+        <i class="fas fa-bullhorn"></i> Publish Result
+      </button>
+      <span class="selected-info">
+        <i class="fas fa-check-circle"></i> <span id="selectedCount">0</span> selected
+      </span>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-container">
+      <div class="table-wrapper" id="tableWrapper">
+        <div class="empty-state">
+          <i class="fas fa-clipboard-check"></i>
+          <h3>Select Session, Class &amp; Exam</h3>
+          <p>Choose filters above to load student marksheets</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<div class="modal-overlay" id="confirmOverlay">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3 id="confirmTitle">Confirm</h3>
+    </div>
+    <div class="modal-body">
+      <p id="confirmMessage" style="font-size: 13.5px; line-height: 1.6; color: var(--t-mid); font-weight: 600;">Are you sure?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="confirmCancel">Cancel</button>
+      <button class="btn btn-danger" id="confirmOk">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">Loading...</div>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    // ============================================================
+    // CONFIG
+    // ============================================================
+    const API_BASE = "https://gsssshilla.onrender.com/api/results";
+
+    const STATE = {
+        sessionId: null,
+        classId: null,
+        examId: null,
+        sectionId: null,
+        sessions: [],
+        classes: [],
+        exams: [],
+        sections: [],
+        students: [],
+        selectedStudents: new Set(),
+        examInfo: null
+    };
+
+    // ============================================================
+    // THEME
+    // ============================================================
+    function setTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        const icon = document.getElementById("themeIcon");
+        if (icon) icon.className = theme === "dark" ? "fas fa-sun" : "fas fa-moon";
+        try { localStorage.setItem("theme", theme); } catch (e) {}
+    }
+    window.toggleTheme = function () {
+        const current = document.documentElement.getAttribute("data-theme") || "light";
+        setTheme(current === "dark" ? "light" : "dark");
+    };
+    try {
+        const saved = localStorage.getItem("theme");
+        if (saved === "dark") setTheme("dark");
+    } catch (e) {}
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    function showToast(message, type = "info", duration = 3500) {
+        const icons = {
+            success: "fa-circle-check",
+            error: "fa-circle-xmark",
+            warning: "fa-triangle-exclamation",
+            info: "fa-circle-info"
+        };
+        const container = document.getElementById("toastContainer");
+        const t = document.createElement("div");
+        t.className = `toast ${type}`;
+        t.innerHTML = `
+            <i class="fas ${icons[type] || icons.info} toast-icon"></i>
+            <div class="toast-message">${escapeHtml(message)}</div>
+        `;
+        container.appendChild(t);
+        setTimeout(() => {
+            t.style.opacity = "0";
+            t.style.transform = "translateX(30px)";
+            setTimeout(() => t.remove(), 300);
+        }, duration);
+    }
+
+    function showLoading(text = "Loading...") {
+        document.getElementById("loadingText").textContent = text;
+        document.getElementById("loadingOverlay").classList.add("active");
+    }
+    function hideLoading() {
+        document.getElementById("loadingOverlay").classList.remove("active");
+    }
+
+    function openModal(html) {
+        document.getElementById("modalContent").innerHTML = html;
+        document.getElementById("modalOverlay").classList.add("active");
+        document.body.style.overflow = "hidden";
+    }
+    function closeModal() {
+        document.getElementById("modalOverlay").classList.remove("active");
+        document.body.style.overflow = "";
+    }
+
+    function confirmDialog(message, title = "Confirm") {
+        return new Promise((resolve) => {
+            document.getElementById("confirmTitle").textContent = title;
+            document.getElementById("confirmMessage").textContent = message;
+            document.getElementById("confirmOverlay").classList.add("active");
+            const okBtn = document.getElementById("confirmOk");
+            const cancelBtn = document.getElementById("confirmCancel");
+            const cleanup = () => {
+                document.getElementById("confirmOverlay").classList.remove("active");
+                okBtn.removeEventListener("click", onOk);
+                cancelBtn.removeEventListener("click", onCancel);
+            };
+            const onOk = () => { cleanup(); resolve(true); };
+            const onCancel = () => { cleanup(); resolve(false); };
+            okBtn.addEventListener("click", onOk);
+            cancelBtn.addEventListener("click", onCancel);
+        });
+    }
+
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return "";
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // ============================================================
+    // API
+    // ============================================================
+    function getToken() {
+        return localStorage.getItem("adminToken") ||
+               localStorage.getItem("authToken") ||
+               sessionStorage.getItem("authToken") || "";
+    }
+    async function apiRequest(method, path, body = null) {
+        const url = API_BASE + path;
+        const headers = { "Accept": "application/json" };
+        const token = getToken();
+        if (token) headers["Authorization"] = "Bearer " + token;
+        const config = { method, headers };
+        if (body !== null && method !== "GET") {
+            headers["Content-Type"] = "application/json";
+            config.body = JSON.stringify(body);
+        }
+        try {
+            const res = await fetch(url, config);
+            const text = await res.text();
+            let json;
+            try { json = text ? JSON.parse(text) : {}; }
+            catch { json = { success: false, message: "Invalid server response" }; }
+            if (!res.ok) {
+                const err = new Error(json.message || `Request failed (${res.status})`);
+                err.status = res.status;
+                err.data = json;
+                throw err;
+            }
+            return json;
+        } catch (err) {
+            if (err instanceof TypeError && err.message.includes("fetch")) {
+                throw new Error("Network error — please check your connection");
+            }
+            throw err;
+        }
+    }
+    const api = {
+        get: (p, params) => {
+            const qs = params ? "?" + new URLSearchParams(params).toString() : "";
+            return apiRequest("GET", p + qs);
+        },
+        post: (p, body) => apiRequest("POST", p, body || {})
+    };
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    async function init() {
+        try {
+            showLoading("Connecting...");
+            await Promise.all([loadSessions(), loadClasses()]);
+            hideLoading();
+        } catch (err) {
+            hideLoading();
+            showToast("Init failed: " + err.message, "error");
+        }
+    }
+
+    async function loadSessions() {
+        const res = await api.get("/sessions");
+        STATE.sessions = res.data || [];
+        const sel = document.getElementById("sessionFilter");
+        sel.innerHTML = "";
+        if (!STATE.sessions.length) {
+            sel.innerHTML = '<option value="">No sessions</option>';
+            return;
+        }
+        STATE.sessions.forEach(s => {
+            const opt = document.createElement("option");
+            opt.value = s.id;
+            opt.textContent = s.session_code + (s.is_current ? " ✓" : "");
+            if (s.is_current) opt.selected = true;
+            sel.appendChild(opt);
+        });
+        const current = STATE.sessions.find(s => s.is_current);
+        STATE.sessionId = current ? current.id : (STATE.sessions[0]?.id || null);
+    }
+
+    async function loadClasses() {
+        const res = await api.get("/classes");
+        STATE.classes = res.data || [];
+        const sel = document.getElementById("classFilter");
+        sel.innerHTML = `<option value="">Select Class</option>` +
+            STATE.classes.map(c => `<option value="${c.id}">Class ${escapeHtml(c.class_name)}</option>`).join("");
+    }
+
+    async function loadExamsForClass() {
+        if (!STATE.classId || !STATE.sessionId) {
+            document.getElementById("examFilter").innerHTML = '<option value="">Select class first</option>';
+            return;
+        }
+        const res = await api.get("/exams", {
+            class_id: STATE.classId,
+            session_id: STATE.sessionId
+        });
+        STATE.exams = res.data || [];
+        const sel = document.getElementById("examFilter");
+        sel.innerHTML = `<option value="">Select Exam</option>` +
+            STATE.exams.map(e => `<option value="${e.id}">${escapeHtml(e.name)} — ${escapeHtml(e.status)}</option>`).join("");
+    }
+
+    async function loadSectionsForClass() {
+        if (!STATE.classId) {
+            document.getElementById("sectionFilter").innerHTML = '<option value="">All Sections</option>';
+            return;
+        }
+        try {
+            const res = await api.get("/sections", { class_id: STATE.classId });
+            STATE.sections = res.data || [];
+            const sel = document.getElementById("sectionFilter");
+            sel.innerHTML = `<option value="">All Sections</option>` +
+                STATE.sections.map(s => `<option value="${s.id}">Section ${escapeHtml(s.section_name)}</option>`).join("");
+        } catch (e) {
+            console.warn("Sections load failed:", e.message);
+        }
+    }
+
+    window.onFilterChange = async function () {
+        const sessionId = document.getElementById("sessionFilter").value;
+        const classId = document.getElementById("classFilter").value;
+        const examId = document.getElementById("examFilter").value;
+        const sectionId = document.getElementById("sectionFilter").value;
+
+        STATE.sessionId = sessionId ? parseInt(sessionId) : null;
+        STATE.classId = classId ? parseInt(classId) : null;
+        STATE.sectionId = sectionId ? parseInt(sectionId) : null;
+
+        if (classId !== document.getElementById("classFilter").dataset.prev) {
+            document.getElementById("classFilter").dataset.prev = classId;
+            await Promise.all([loadExamsForClass(), loadSectionsForClass()]);
+        }
+
+        STATE.examId = examId ? parseInt(examId) : null;
+
+        if (STATE.sessionId && STATE.classId && STATE.examId) {
+            await loadStudents();
+        } else {
+            hideTable();
+        }
+    };
+
+    // ============================================================
+    // LOAD STUDENTS (with marks)
+    // ============================================================
+    async function loadStudents() {
+        try {
+            showLoading("Loading students...");
+
+            // Call the new backend route
+            const res = await api.get(`/marksheet-verify/${STATE.examId}`, {
+                section_id: STATE.sectionId || ""
+            });
+
+            const data = res.data || {};
+            STATE.students = data.students || [];
+            STATE.examInfo = data.exam || null;
+
+            renderSummary();
+            renderTable();
+            renderBulkActions();
+
+            hideLoading();
+        } catch (err) {
+            hideLoading();
+            console.error("Load students failed:", err);
+            document.getElementById("tableWrapper").innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <h3>Failed to load students</h3>
+                    <p>${escapeHtml(err.message)}</p>
+                    <button class="btn btn-primary" onclick="reloadData()">
+                        <i class="fas fa-rotate"></i> Retry
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    function hideTable() {
+        document.getElementById("tableWrapper").innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-clipboard-check"></i>
+                <h3>Select Session, Class &amp; Exam</h3>
+                <p>Choose filters above to load student marksheets</p>
+            </div>
+        `;
+        document.getElementById("summaryStrip").style.display = "none";
+        document.getElementById("bulkActions").style.display = "none";
+    }
+
+    window.reloadData = function () {
+        if (STATE.examId) loadStudents();
+        else hideTable();
+    };
+
+    // ============================================================
+    // RENDER SUMMARY
+    // ============================================================
+    function renderSummary() {
+        const total = STATE.students.length;
+        const verified = STATE.students.filter(s => s.marks_status === "VERIFIED").length;
+        const submitted = STATE.students.filter(s => s.marks_status === "SUBMITTED").length;
+        const draft = STATE.students.filter(s => s.marks_status === "DRAFT" || !s.marks_status).length;
+        const finalized = STATE.students.filter(s => s.marks_status === "FINALIZED" || s.marks_status === "PUBLISHED").length;
+
+        document.getElementById("statTotal").textContent = total;
+        document.getElementById("statVerified").textContent = verified;
+        document.getElementById("statSubmitted").textContent = submitted;
+        document.getElementById("statDraft").textContent = draft;
+        document.getElementById("statFinalized").textContent = finalized;
+        document.getElementById("summaryStrip").style.display = "grid";
+    }
+
+    // ============================================================
+    // RENDER TABLE
+    // ============================================================
+    function renderTable() {
+        const wrapper = document.getElementById("tableWrapper");
+
+        if (!STATE.students.length) {
+            wrapper.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-user-slash"></i>
+                    <h3>No students found</h3>
+                    <p>No marksheets available for this exam</p>
+                </div>
+            `;
+            return;
+        }
+
+        wrapper.innerHTML = `
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">
+                            <input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" style="width:16px;height:16px;accent-color:#7c3aed;">
+                        </th>
+                        <th>Sr No</th>
+                        <th>Roll No</th>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Father</th>
+                        <th>Stream</th>
+                        <th>Total</th>
+                        <th>%</th>
+                        <th>Grade</th>
+                        <th>Status</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${STATE.students.map((s, idx) => renderStudentRow(s, idx)).join("")}
+                </tbody>
+            </table>
+        `;
+    }
+
+    function renderStudentRow(s, idx) {
+        const status = s.marks_status || "DRAFT";
+        const statusClass = status.toLowerCase().replace(/_/g, "-");
+
+        // Status badge
+        const statusMap = {
+            "DRAFT":       { cls: "badge-danger",  icon: "fa-pen",           label: "Draft" },
+            "IN_PROGRESS": { cls: "badge-info",    icon: "fa-spinner",       label: "In Progress" },
+            "SUBMITTED":   { cls: "badge-warning", icon: "fa-paper-plane",   label: "Submitted" },
+            "VERIFIED":    { cls: "badge-primary", icon: "fa-circle-check",  label: "Verified" },
+            "FINALIZED":   { cls: "badge-success", icon: "fa-lock",          label: "Finalized" },
+            "PUBLISHED":   { cls: "badge-success", icon: "fa-bullhorn",      label: "Published" }
+        };
+        const sm = statusMap[status] || statusMap["DRAFT"];
+
+        // Total marks computation
+        const totalObtained = parseFloat(s.grand_total) || 0;
+        const totalMax = parseFloat(s.max_total) || 0;
+        const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(1) : "0.0";
+        const grade = s.overall_grade || "—";
+        const isFail = percentage < 33;
+
+        return `
+            <tr data-student-id="${escapeHtml(s.student_id)}" class="status-${statusClass}">
+                <td>
+                    <input type="checkbox" class="student-checkbox" value="${escapeHtml(s.student_id)}"
+                        onchange="toggleStudentSelect('${escapeHtml(s.student_id)}', this.checked)"
+                        style="width:16px;height:16px;accent-color:#7c3aed;">
+                </td>
+                <td>${idx + 1}</td>
+                <td class="text-bold">${escapeHtml(s.roll_number || "—")}</td>
+                <td><span class="badge badge-primary">${escapeHtml(s.student_id)}</span></td>
+                <td class="text-bold">${escapeHtml(s.student_name || "—")}</td>
+                <td>${escapeHtml(s.father_name || "—")}</td>
+                <td>${s.stream ? `<span class="badge badge-info">${escapeHtml(s.stream)}</span>` : "—"}</td>
+                <td class="text-bold" style="color: ${isFail ? 'var(--rose)' : 'var(--emerald)'};">
+                    ${totalObtained}/${totalMax}
+                </td>
+                <td class="text-bold" style="color: ${isFail ? 'var(--rose)' : 'var(--emerald)'};">
+                    ${percentage}%
+                </td>
+                <td><span class="badge badge-gray">${escapeHtml(grade)}</span></td>
+                <td><span class="badge ${sm.cls}"><i class="fas ${sm.icon}"></i> ${sm.label}</span></td>
+                <td class="text-right">
+                    <div class="row-actions">
+                        <button class="row-action-btn view" onclick="viewStudent('${escapeHtml(s.student_id)}')" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        ${status === "SUBMITTED" ? `
+                            <button class="row-action-btn verify" onclick="verifyStudent('${escapeHtml(s.student_id)}')" title="Verify">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="row-action-btn sendback" onclick="returnForCorrection('${escapeHtml(s.student_id)}')" title="Send Back">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                        ` : ""}
+                        ${status === "DRAFT" || status === "IN_PROGRESS" ? `
+                            <button class="row-action-btn sendback" onclick="returnForCorrection('${escapeHtml(s.student_id)}')" title="Send Back">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                        ` : ""}
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+
+    // ============================================================
+    // SELECTION HANDLING
+    // ============================================================
+    window.toggleSelectAll = function (checkbox) {
+        document.querySelectorAll(".student-checkbox").forEach(cb => {
+            cb.checked = checkbox.checked;
+            if (checkbox.checked) STATE.selectedStudents.add(cb.value);
+            else STATE.selectedStudents.delete(cb.value);
+        });
+        document.getElementById("selectedCount").textContent = STATE.selectedStudents.size;
+    };
+
+    window.toggleStudentSelect = function (studentId, checked) {
+        if (checked) STATE.selectedStudents.add(studentId);
+        else STATE.selectedStudents.delete(studentId);
+        document.getElementById("selectedCount").textContent = STATE.selectedStudents.size;
+    };
+
+    // ============================================================
+    // BULK ACTIONS RENDER
+    // ============================================================
+    function renderBulkActions() {
+        const examStatus = STATE.examInfo?.status;
+        const finalizeBtn = document.getElementById("finalizeBtn");
+        const publishBtn = document.getElementById("publishBtn");
+
+        // Finalize button visibility
+        if (examStatus === "VERIFIED" || examStatus === "SUBMITTED") {
+            finalizeBtn.style.display = "inline-flex";
+        } else {
+            finalizeBtn.style.display = "none";
+        }
+
+        // Publish button visibility
+        if (examStatus === "FINALIZED") {
+            publishBtn.style.display = "inline-flex";
+        } else {
+            publishBtn.style.display = "none";
+        }
+
+        document.getElementById("bulkActions").style.display = "flex";
+    }
+
+    // ============================================================
+    // VERIFY ACTIONS (per student)
+    // ============================================================
+    window.verifyStudent = async function (studentId) {
+        const student = STATE.students.find(s => s.student_id === studentId);
+        if (!student) return;
+
+        const ok = await confirmDialog(
+            `Verify marks for ${student.student_name}?`,
+            "Verify Student"
+        );
+        if (!ok) return;
+
+        try {
+            showLoading("Verifying...");
+            // Backend route to verify — marks/verify accepts subject_id, but here we verify per student
+            // We'll send a per-student endpoint
+            await api.post(`/marks-verify-student/${STATE.examId}/${studentId}`);
+            showToast(`✓ ${student.student_name} verified`, "success");
+            await loadStudents();
+        } catch (err) {
+            showToast("Verify failed: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+    };
+
+    window.returnForCorrection = async function (studentId) {
+        const student = STATE.students.find(s => s.student_id === studentId);
+        if (!student) return;
+
+        openModal(`
+            <div class="modal-header">
+                <h3>Send Back for Correction</h3>
+                <button class="modal-close" onclick="closeModal()"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="info-box warning">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>${escapeHtml(student.student_name)}</strong>
+                        Marks will be sent back to DRAFT status. Teacher will need to re-verify.
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Reason <span class="required">*</span></label>
+                    <textarea class="form-control" id="returnReason" placeholder="Enter reason for sending back (e.g., wrong marks in Math, absent marked incorrectly)..." rows="4"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-solid-warning" onclick="confirmReturn('${escapeHtml(studentId)}')">
+                    <i class="fas fa-undo"></i> Send Back
+                </button>
+            </div>
+        `);
+    };
+
+    window.confirmReturn = async function (studentId) {
+        const reason = document.getElementById("returnReason").value.trim();
+        if (!reason) {
+            showToast("Please enter a reason", "warning");
+            return;
+        }
+
+        try {
+            showLoading("Sending back...");
+            await api.post(`/marks-return-student/${STATE.examId}/${studentId}`, { reason });
+            showToast("✓ Sent back for correction", "success");
+            closeModal();
+            await loadStudents();
+        } catch (err) {
+            showToast("Failed: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+    };
+
+    // ============================================================
+    // BULK VERIFY
+    // ============================================================
+    window.bulkVerify = async function () {
+        const ids = Array.from(STATE.selectedStudents);
+        if (!ids.length) {
+            showToast("Select students first", "warning");
+            return;
+        }
+
+        const ok = await confirmDialog(
+            `Verify marks for ${ids.length} student(s)?`,
+            "Bulk Verify"
+        );
+        if (!ok) return;
+
+        try {
+            showLoading(`Verifying ${ids.length} students...`);
+            let success = 0, failed = 0;
+
+            for (const sid of ids) {
+                try {
+                    await api.post(`/marks-verify-student/${STATE.examId}/${sid}`);
+                    success++;
+                } catch (e) {
+                    failed++;
+                }
+            }
+
+            showToast(`✓ Verified: ${success}, Failed: ${failed}`, success > 0 ? "success" : "warning");
+            STATE.selectedStudents.clear();
+            await loadStudents();
+        } catch (err) {
+            showToast("Bulk verify failed: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+    };
+
+    // ============================================================
+    // BULK RETURN
+    // ============================================================
+    window.bulkReturnForCorrection = async function () {
+        const ids = Array.from(STATE.selectedStudents);
+        if (!ids.length) {
+            showToast("Select students first", "warning");
+            return;
+        }
+
+        openModal(`
+            <div class="modal-header">
+                <h3>Bulk Send Back for Correction</h3>
+                <button class="modal-close" onclick="closeModal()"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="info-box warning">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>${ids.length} student(s)</strong> selected.
+                        Marks will be sent back to DRAFT status.
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Reason <span class="required">*</span></label>
+                    <textarea class="form-control" id="bulkReturnReason" placeholder="Enter reason..." rows="4"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-solid-warning" onclick="confirmBulkReturn()">
+                    <i class="fas fa-undo"></i> Send Back
+                </button>
+            </div>
+        `);
+    };
+
+    window.confirmBulkReturn = async function () {
+        const reason = document.getElementById("bulkReturnReason").value.trim();
+        if (!reason) {
+            showToast("Please enter a reason", "warning");
+            return;
+        }
+
+        const ids = Array.from(STATE.selectedStudents);
+
+        try {
+            showLoading(`Sending back ${ids.length} students...`);
+            let success = 0, failed = 0;
+
+            for (const sid of ids) {
+                try {
+                    await api.post(`/marks-return-student/${STATE.examId}/${sid}`, { reason });
+                    success++;
+                } catch (e) {
+                    failed++;
+                }
+            }
+
+            showToast(`✓ Sent back: ${success}, Failed: ${failed}`, success > 0 ? "success" : "warning");
+            STATE.selectedStudents.clear();
+            closeModal();
+            await loadStudents();
+        } catch (err) {
+            showToast("Bulk return failed: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+    };
+
+    // ============================================================
+    // FINALIZE EXAM
+    // ============================================================
+    window.finalizeExam = async function () {
+        const ok = await confirmDialog(
+            `Finalize this exam?\n\nAll VERIFIED marks will be locked and results snapshotted.\n\nThis will prevent further edits until unlocked.`,
+            "Finalize Exam"
+        );
+        if (!ok) return;
+
+        try {
+            showLoading("Finalizing exam...");
+            const res = await api.post(`/exams/${STATE.examId}/finalize`);
+            showToast(`✓ ${res.message || "Exam finalized"}`, "success");
+            await loadStudents();
+        } catch (err) {
+            showToast("Finalize failed: " + err.message, "error", 6000);
+        } finally {
+            hideLoading();
+        }
+    };
+
+    // ============================================================
+    // PUBLISH EXAM
+    // ============================================================
+    window.publishExam = async function () {
+        openModal(`
+            <div class="modal-header">
+                <h3>Publish Result</h3>
+                <button class="modal-close" onclick="closeModal()"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="info-box success">
+                    <i class="fas fa-bullhorn"></i>
+                    <div>
+                        <strong>Publishing will make results visible to students</strong>
+                        Once published, students will see their marksheets on their portal.
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Result Declaration Date</label>
+                    <input type="date" class="form-control" id="publishDate" value="${new Date().toISOString().slice(0, 10)}">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmPublish()">
+                    <i class="fas fa-bullhorn"></i> Publish Result
+                </button>
+            </div>
+        `);
+    };
+
+    window.confirmPublish = async function () {
+        const date = document.getElementById("publishDate").value;
+
+        try {
+            showLoading("Publishing...");
+            await api.post(`/exams/${STATE.examId}/publish`, { result_date: date });
+            showToast("✓ Result published successfully", "success");
+            closeModal();
+            await loadStudents();
+        } catch (err) {
+            showToast("Publish failed: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+    };
+
+    // ============================================================
+    // VIEW STUDENT DETAILS
+    // ============================================================
+    window.viewStudent = async function (studentId) {
+        const student = STATE.students.find(s => s.student_id === studentId);
+        if (!student) return;
+
+        try {
+            showLoading("Loading details...");
+            const res = await api.get(`/marksheet/${studentId}/${STATE.examId}`);
+            const data = res.data || {};
+            hideLoading();
+
+            const s = data.student || {};
+            const r = data.result || {};
+            const marks = r.subject_wise_marks || [];
+
+            openModal(`
+                <div class="modal-header">
+                    <h3>Marksheet — ${escapeHtml(s.name || student.student_name)}</h3>
+                    <button class="modal-close" onclick="closeModal()"><i class="fas fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="info-box info">
+                        <i class="fas fa-circle-info"></i>
+                        <div>
+                            <strong>${escapeHtml(s.name || student.student_name)}</strong>
+                            Student ID: ${escapeHtml(s.student_id || student.student_id)} · 
+                            Roll No: ${escapeHtml(s.roll_number || "—")} · 
+                            Class: ${escapeHtml(s.class || "—")}
+                        </div>
+                    </div>
+
+                    <div class="subject-detail-grid">
+                        ${marks.map(m => {
+                            const obt = parseFloat(m.total_marks) || 0;
+                            const max = parseFloat(m.max_marks) || 0;
+                            const pct = max > 0 ? ((obt / max) * 100) : 0;
+                            const isFail = pct < 33;
+                            const isAbsent = m.is_absent === 1 || m.absent_type !== "Present";
+
+                            return `
+                                <div class="subject-card">
+                                    <div class="subject-card-title">
+                                        <span>${escapeHtml(m.subject_name || "—")}</span>
+                                        <span class="badge ${isFail ? 'badge-danger' : 'badge-success'}">
+                                            ${isAbsent ? escapeHtml(m.absent_type) : `${obt}/${max}`}
+                                        </span>
+                                    </div>
+                                    ${!isAbsent ? `
+                                        <div class="subject-marks-row">
+                                            <span class="label">Theory</span>
+                                            <span class="value">${m.theory_marks ?? "—"}</span>
+                                        </div>
+                                        <div class="subject-marks-row">
+                                            <span class="label">Practical</span>
+                                            <span class="value">${m.practical_marks ?? "—"}</span>
+                                        </div>
+                                        <div class="subject-marks-row">
+                                            <span class="label">Internal</span>
+                                            <span class="value">${m.internal_marks ?? "—"}</span>
+                                        </div>
+                                        <div class="subject-marks-row">
+                                            <span class="label">Grade</span>
+                                            <span class="value ${isFail ? 'fail' : 'pass'}">${escapeHtml(m.grade || "—")}</span>
+                                        </div>
+                                    ` : `
+                                        <div class="subject-marks-row">
+                                            <span class="label">Status</span>
+                                            <span class="value absent">${escapeHtml(m.absent_type)}</span>
+                                        </div>
+                                    `}
+                                </div>
+                            `;
+                        }).join("")}
+                    </div>
+
+                    <div class="info-box ${r.result_status === 'Pass' ? 'success' : 'error'}" style="margin-top: 20px;">
+                        <i class="fas fa-${r.result_status === 'Pass' ? 'circle-check' : 'circle-xmark'}"></i>
+                        <div>
+                            <strong>Overall: ${escapeHtml(r.result_status || "—")}</strong>
+                            Total: ${r.grand_total || 0}/${r.max_total || 0} · 
+                            Percentage: ${r.percentage || 0}% · 
+                            Grade: ${escapeHtml(r.overall_grade || "—")}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="closeModal()">Close</button>
+                </div>
+            `);
+
+        } catch (err) {
+            hideLoading();
+            showToast("Failed to load details: " + err.message, "error");
+        }
+    };
+
+    // ============================================================
+    // CLOSE MODALS
+    // ============================================================
+    document.getElementById("modalOverlay").addEventListener("click", (e) => {
+        if (e.target.id === "modalOverlay") closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
+    });
+
+    window.closeModal = closeModal;
+    window.openModal = openModal;
+    window.escapeHtml = escapeHtml;
+
+    // ============================================================
+    // BOOT
+    // ============================================================
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+
+})();
+</script>
+</body>
+</html>
