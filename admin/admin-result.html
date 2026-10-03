@@ -1412,10 +1412,44 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
             <i class="nav-icon fa-solid fa-chart-line"></i>
             <span>Dashboard</span>
         </a>
-        <a href="#" class="nav-item" data-view="classes">
-            <i class="nav-icon fa-solid fa-school"></i>
-            <span>All Classes</span>
-        </a>
+        
+       <!-- ============ VIEW: ALL CLASSES ============ -->
+<section class="tab-panel" id="view-classes">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title"><i class="fa-solid fa-school"></i> All Classes</h1>
+            <p class="page-sub">Click a class to open its workspace</p>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="openCreateClassModal()">
+                <i class="fa-solid fa-plus"></i> Create Class
+            </button>
+            <button class="btn btn-outline" onclick="loadClassesPage()">
+                <i class="fa-solid fa-rotate"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <div class="filter-bar">
+        <label>
+            <i class="fa-solid fa-filter"></i> Group:
+            <select id="classGroupFilter" onchange="loadClassesPage()">
+                <option value="">All Groups</option>
+                <option value="PRIMARY">Primary</option>
+                <option value="MIDDLE">Middle</option>
+                <option value="SECONDARY">Secondary</option>
+                <option value="SENIOR">Senior</option>
+            </select>
+        </label>
+    </div>
+
+    <div id="classesPageGrid" class="classes-grid">
+        <div class="empty-state">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <h3>Loading classes...</h3>
+        </div>
+    </div>
+</section>
 
         <div class="nav-section-title" id="classesNavSection" style="display:none;">
             <span>Class Workspaces</span>
@@ -1427,6 +1461,9 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
             <i class="nav-icon fa-solid fa-book"></i>
             <span>Subjects</span>
         </a>
+       <button class="btn btn-primary" onclick="openCreateClassModal()">
+    <i class="fa-solid fa-plus"></i> Create Class
+</button>
         <a href="#" class="nav-item" data-view="masters-streams">
             <i class="nav-icon fa-solid fa-water"></i>
             <span>Streams</span>
@@ -1540,34 +1577,22 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; letter-spacing: -0
     </section>
 
     <!-- ============ VIEW: ALL CLASSES ============ -->
-    <section class="tab-panel" id="view-classes">
-        <div class="page-header">
-            <div>
-                <h1 class="page-title"><i class="fa-solid fa-school"></i> All Classes</h1>
-                <p class="page-sub">Click a class to open its workspace</p>
-            </div>
+   <section class="tab-panel active" id="view-dashboard">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title"><i class="fa-solid fa-chart-line"></i> Global Dashboard</h1>
+            <p class="page-sub">Overview of all classes &amp; result processing</p>
         </div>
-
-        <div class="filter-bar">
-            <label>
-                <i class="fa-solid fa-filter"></i> Group:
-                <select id="classGroupFilter" onchange="loadClassesPage()">
-                    <option value="">All Groups</option>
-                    <option value="PRIMARY">Primary</option>
-                    <option value="MIDDLE">Middle</option>
-                    <option value="SECONDARY">Secondary</option>
-                    <option value="SENIOR">Senior</option>
-                </select>
-            </label>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="openCreateClassModal()">
+                <i class="fa-solid fa-plus"></i> Create Class
+            </button>
+            <button class="btn btn-outline" onclick="loadDashboard()">
+                <i class="fa-solid fa-rotate"></i> Refresh
+            </button>
         </div>
-
-        <div id="classesPageGrid" class="classes-grid">
-            <div class="empty-state">
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                <h3>Loading classes...</h3>
-            </div>
-        </div>
-    </section>
+    </div>
+    
 
     <!-- ============ VIEW: CLASS DETAIL (WORKSPACE) ============ -->
     <section class="tab-panel" id="view-class-detail">
@@ -4258,6 +4283,115 @@ ${stu.subject_wise_marks.map((m, i) => `<tr><td>${i + 1}</td><td class="subject"
             }
         });
     }
+
+   // ============================================================
+// CREATE CLASS MODAL
+// ============================================================
+window.openCreateClassModal = function() {
+    openModal(`
+        <div class="modal-header">
+            <h3>Create New Class</h3>
+            <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="inline-info">
+                <i class="fa-solid fa-circle-info"></i>
+                <div>Create a new class. After creating, you can add subjects, exams and students to it.</div>
+            </div>
+
+            <div class="form-row" style="margin-top: 16px;">
+                <div class="form-group">
+                    <label>Class Name <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="ccName" placeholder="e.g. 6, 7, 8, Nursery, LKG" autofocus>
+                    <div class="form-help"><i class="fa-solid fa-info-circle"></i> Use short name: 1, 2, ..., 12, Nursery, LKG, UKG</div>
+                </div>
+                <div class="form-group">
+                    <label>Class Group <span class="required">*</span></label>
+                    <select class="form-control" id="ccGroup">
+                        <option value="">Select Group</option>
+                        <option value="PRIMARY">Primary (Nursery - 5)</option>
+                        <option value="MIDDLE">Middle (6 - 8)</option>
+                        <option value="SECONDARY">Secondary (9 - 10)</option>
+                        <option value="SENIOR">Senior (11 - 12)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Display Order</label>
+                    <input type="number" class="form-control" id="ccOrder" placeholder="Auto (next number)">
+                    <div class="form-help"><i class="fa-solid fa-info-circle"></i> Leave blank for auto</div>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select class="form-control" id="ccStatus">
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveNewClass()">
+                <i class="fa-solid fa-floppy-disk"></i> Create Class
+            </button>
+        </div>
+    `);
+    setTimeout(() => document.getElementById("ccName")?.focus(), 100);
+};
+
+window.saveNewClass = async function() {
+    const name = document.getElementById("ccName").value.trim();
+    const group = document.getElementById("ccGroup").value;
+    const order = document.getElementById("ccOrder").value.trim();
+    const isActive = document.getElementById("ccStatus").value === "1";
+
+    if (!name) {
+        showToast("Class name is required", "warning");
+        document.getElementById("ccName")?.focus();
+        return;
+    }
+    if (!group) {
+        showToast("Please select a class group", "warning");
+        document.getElementById("ccGroup")?.focus();
+        return;
+    }
+
+    try {
+        showLoading("Creating class...");
+
+        await api.post("/classes", {
+            class_name: name,
+            class_group: group,
+            display_order: order ? parseInt(order) : undefined
+        });
+
+        // If inactive, update it (classes always created active on backend)
+        if (!isActive) {
+            // Get last class list, find this class, update it
+            const res = await api.get("/classes");
+            const created = (res.data || []).find(c => c.class_name === name);
+            if (created) {
+                await api.put("/classes/" + created.id, { is_active: false }).catch(() => {});
+            }
+        }
+
+        showGlobalBanner(`✓ Class "${name}" created successfully! Now add subjects and exams to it.`, "success", 6000);
+        closeModal();
+
+        // Reload everything
+        await loadClassesList();
+        await loadDashboard();
+        updateSidebarClasses();
+
+    } catch (err) {
+        showGlobalBanner("Failed to create class: " + err.message, "error", 8000);
+    } finally {
+        hideLoading();
+    }
+};
 
     // ============================================================
     // EXPOSE GLOBALS
