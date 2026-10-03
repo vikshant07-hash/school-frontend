@@ -3510,6 +3510,42 @@ body {
         } finally { hideLoading(); }
     };
 
+
+   async function safeDeleteExam(examId) {
+    if (!confirm("Delete this exam? This will remove all marks too.")) return;
+
+    try {
+        // Step 1: Unpublish if published
+        await fetch(`/api/admin/results/exams/${examId}/unpublish`, {
+            method: "POST"
+        });
+
+        // Step 2: Unlock if locked
+        await fetch(`/api/admin/results/exams/${examId}/unlock`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reason: "Admin deleting exam" })
+        });
+
+        // Step 3: Delete marks manually (if needed)
+        // ... ya force delete use karo
+
+        // Step 4: Delete exam
+        const res = await fetch(`/api/admin/results/exams/${examId}?force=true`, {
+            method: "DELETE"
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            alert("✅ Exam deleted");
+        } else {
+            alert("❌ " + data.message);
+        }
+    } catch (err) {
+        alert("Error: " + err.message);
+    }
+}
+
     // ============================================================
     // MANAGE EXAM SUBJECTS
     // ============================================================
