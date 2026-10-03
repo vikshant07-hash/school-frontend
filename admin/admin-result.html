@@ -4374,25 +4374,19 @@ ${stu.subject_wise_marks.map((m, i) => `<tr><td>${i + 1}</td><td class="subject"
     // BOOT
     // ============================================================
     async function init() {
-        try {
-            showLoading("Initializing...");
-            bindEvents();
-            await loadSessions();
-            showView("dashboard");
-            showGlobalBanner("System ready ✓", "success", 3500);
-        } catch (err) {
-            console.error("Init failed:", err);
-            showGlobalBanner("Init failed: " + err.message + " — Check backend.", "error", 0);
-        } finally {
-            hideLoading();
-        }
+    try {
+        showLoading("Connecting...");
+        bindEvents();
+        await loadSessions();           // ← Sirf ek baar try kare
+        showView("dashboard");
+        showGlobalBanner("System ready ✓", "success", 3500);
+    } catch (err) {
+        console.error("Init failed:", err);
+        showGlobalBanner("Connection failed: " + err.message + " — Please refresh manually", "error", 0);
+    } finally {
+        hideLoading();
     }
-
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", init);
-    } else {
-        init();
-    }
+}
 
 })();
    
