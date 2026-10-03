@@ -1316,6 +1316,55 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* ============================================================
+   MARKS ROW STATUS INDICATORS
+   ============================================================ */
+.marks-entry-table tr.row-status-submitted {
+    background: linear-gradient(90deg, rgba(217, 119, 6, 0.08), transparent);
+    border-left: 3px solid var(--amber);
+}
+.marks-entry-table tr.row-status-verified {
+    background: linear-gradient(90deg, rgba(124, 58, 237, 0.08), transparent);
+    border-left: 3px solid var(--purple);
+}
+.marks-entry-table tr.row-status-finalized,
+.marks-entry-table tr.row-status-published {
+    background: linear-gradient(90deg, rgba(5, 150, 105, 0.08), transparent);
+    border-left: 3px solid var(--emerald);
+}
+.marks-entry-table tr.row-status-draft {
+    border-left: 3px solid var(--rose);
+}
+.marks-entry-table tr.row-status-in-progress {
+    border-left: 3px solid var(--sky);
+}
+.marks-entry-table tr.row-status-correction {
+    background: linear-gradient(90deg, rgba(220, 38, 38, 0.1), transparent);
+    border-left: 3px solid var(--rose);
+    animation: pulseCorrection 2s infinite;
+}
+
+@keyframes pulseCorrection {
+    0%, 100% { background: linear-gradient(90deg, rgba(220, 38, 38, 0.1), transparent); }
+    50% { background: linear-gradient(90deg, rgba(220, 38, 38, 0.2), transparent); }
+}
+
+/* Disabled inputs — clearly show locked */
+.marks-entry-table input[disabled],
+.marks-entry-table select[disabled] {
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--t-lo);
+    cursor: not-allowed;
+    opacity: 0.75;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.marks-entry-table input[disabled]:hover {
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.08);
+}
+   
 </style>
 </head>
 <body>
@@ -3776,10 +3825,170 @@ body {
         }
     };
 
+    // ============================================================
+    // MARKS ENTRY SHEET — with lock status display
+    // ============================================================
+    window.loadMarksEntrySheet = async function () {
+        const examId = document.getElementById("marksExamSelect").value;
+        const subjectId = document.getElementById("marksSubjectSelect").value;
+        const area = document.getElementById("classMarksArea");
 
-       window.loadMarksEntrySheet = async function () {
-        // ... existing code ...
+        if (!examId || !subjectId) return;
+
+        try {
+            showLoading("Loading marks...");
+            const res = await api.get(`/marks-entry/${examId}/${subjectId}`);
+            const { exam, subject_config, students } = res.data;
+
+            STATE.marksSubjectConfig = subject_config;
+
+            if (!students.length) {
+                area.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash"></i><h3>No students assigned</h3><p>Assign subjects to students first.</p></div>`;
+                return;
+            }
+
+            const cfg = subject_config || {};
+            const hasTheory = (cfg.theory_max || 0) > 0;
+            const hasPractical = (cfg.practical_max || 0) > 0;
+            const hasInternal = (cfg.internal_max || 0) > 0;
+
+            // Check if exam itself is locked
+            const examLocked = exam.is_locked || ["FINALIZED", "PUBLISHED"].includes(exam.status);
+
+            // Count statuses for summary
+            let draftCount = 0, submittedCount = 0, verifiedCount = 0, finalizedCount = 0;
+            students.forEach(s => {
+                const st = s.marks_status || "DRAFT";
+                if (st === "DRAFT" || st === "IN_PROGRESS" || !s.marks_id) draftCount++;
+                else if (st === "SUBMITTED") submittedCount++;
+                else if (st === "VERIFIED") verifiedCount++;
+                else if (st === "FINALIZED" || st === "PUBLISHED") finalizedCount++;
+            });
+
+            area.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+                    <div>
+                        <div style="font-weight:700; color:var(--t-hi); font-family: var(--font-display); font-size:15px;">${escapeHtml(exam.exam_name)}</div>
+                        <div style="font-size:12.5px; color:var(--t-lo); margin-top:4px; font-weight: 600;">
+                            Max: <strong>${cfg.max_marks || 100}</strong> · 
+                            Pass: <strong>${cfg.pass_marks || 33}</strong> · 
+                            ${students.length} students
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        ${statusBadge(exam.status)}
+                        ${examLocked ? `<span class="badge badge-danger"><i class="fas fa-lock"></i> Exam Locked</span>` : ""}
+                    </div>
+                </div>
+
+                <div class="marks-status-summary" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:10px; margin-bottom:16px;">
+                    <div class="summary-item" style="padding:12px; border-radius:12px; background:var(--surface); box-shadow:var(--press-xs); text-align:center;">
+                        <div style="font-size:9.5px; text-transform:uppercase; font-weight:800; color:var(--t-lo); letter-spacing:1px;">Editable</div>
+                        <div style="font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--rose);">${draftCount}</div>
+                    </div>
+                    <div class="summary-item" style="padding:12px; border-radius:12px; background:var(--surface); box-shadow:var(--press-xs); text-align:center;">
+                        <div style="font-size:9.5px; text-transform:uppercase; font-weight:800; color:var(--t-lo); letter-spacing:1px;">Submitted</div>
+                        <div style="font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--amber);">${submittedCount}</div>
+                    </div>
+                    <div class="summary-item" style="padding:12px; border-radius:12px; background:var(--surface); box-shadow:var(--press-xs); text-align:center;">
+                        <div style="font-size:9.5px; text-transform:uppercase; font-weight:800; color:var(--t-lo); letter-spacing:1px;">Verified</div>
+                        <div style="font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--purple);">${verifiedCount}</div>
+                    </div>
+                    <div class="summary-item" style="padding:12px; border-radius:12px; background:var(--surface); box-shadow:var(--press-xs); text-align:center;">
+                        <div style="font-size:9.5px; text-transform:uppercase; font-weight:800; color:var(--t-lo); letter-spacing:1px;">Finalized</div>
+                        <div style="font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--emerald);">${finalizedCount}</div>
+                    </div>
+                </div>
+
+                ${examLocked ? `
+                    <div class="inline-error" style="margin-bottom: 16px;">
+                        <i class="fas fa-lock"></i>
+                        <div>
+                            <strong>Exam is ${escapeHtml(exam.status)}</strong>
+                            This exam has been ${exam.status.toLowerCase()}. Marks cannot be edited.
+                            ${exam.status === "FINALIZED" ? "Admin must unlock & return for correction first." : ""}
+                            ${exam.status === "PUBLISHED" ? "Published results are permanent." : ""}
+                        </div>
+                    </div>
+                ` : ""}
+
+                <div class="table-wrapper" style="padding: 0;">
+                    <table class="table marks-entry-table">
+                        <thead>
+                            <tr>
+                                <th>Roll</th>
+                                <th>Student</th>
+                                ${hasTheory ? '<th>Theory</th>' : ""}
+                                ${hasPractical ? '<th>Practical</th>' : ""}
+                                ${hasInternal ? '<th>Internal</th>' : ""}
+                                <th>Total</th>
+                                <th>Grade</th>
+                                <th>Status</th>
+                                <th>Absent</th>
+                                <th>Remarks</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marksEntryBody">
+                            ${students.map(s => renderMarksRow(s, cfg, hasTheory, hasPractical, hasInternal, examLocked)).join("")}
+                        </tbody>
+                    </table>
+                </div>
+
+                ${!examLocked && draftCount > 0 ? `
+                    <div class="marks-entry-actions">
+                        <button class="btn btn-primary" onclick="saveMarksDraft()"><i class="fas fa-save"></i> Save Draft</button>
+                        <button class="btn btn-warning" onclick="submitMarksForVerification(${examId}, ${subjectId})"><i class="fas fa-paper-plane"></i> Submit for Verification</button>
+                    </div>
+                ` : ""}
+                ${!examLocked && draftCount === 0 ? `
+                    <div class="inline-success" style="margin-top: 16px;">
+                        <i class="fas fa-circle-check"></i>
+                        <div>
+                            <strong>All marks submitted for verification</strong>
+                            ${submittedCount > 0 ? `${submittedCount} mark(s) waiting for admin verification. You can return them from here if needed.` : ""}
+                            ${verifiedCount > 0 ? `${verifiedCount} mark(s) already verified.` : ""}
+                        </div>
+                    </div>
+                ` : ""}
+            `;
+
+            // Re-bind input listeners
+            document.querySelectorAll("#marksEntryBody .mark-input").forEach(input => {
+                input.addEventListener("input", handleMarkInput);
+            });
+
+        } catch (err) {
+            area.innerHTML = `<div class="inline-error"><i class="fas fa-circle-exclamation"></i><div class="error-content"><strong>Failed to load marks</strong>${escapeHtml(err.message)}</div></div>`;
+        } finally { hideLoading(); }
     };
+
+
+    // ============================================================
+    // HANDLE MARK INPUT — recalculate row total
+    // ============================================================
+    function handleMarkInput(e) {
+        const inp = e.target;
+        if (!inp.classList || !inp.classList.contains("mark-input")) return;
+
+        const row = inp.closest("tr");
+        if (!row) return;
+
+        let total = 0;
+        row.querySelectorAll(".mark-input").forEach(input => {
+            const v = parseFloat(input.value);
+            const max = parseFloat(input.max || "0");
+            if (!isNaN(v)) {
+                if (v < 0 || v > max) input.classList.add("input-error");
+                else input.classList.remove("input-error");
+                total += v;
+            }
+        });
+
+        const totalEl = row.querySelector(".mark-total");
+        if (totalEl) totalEl.textContent = total;
+    }
+   
 
     // ✅✅✅ YAHAN PASTE KARO — renderMarksRow function ✅✅✅
     function renderMarksRow(s, cfg, hasTheory, hasPractical, hasInternal, examLocked) {
@@ -3790,21 +3999,30 @@ body {
         const isPublished = marksStatus === "PUBLISHED";
         const isLocked = examLocked || ["SUBMITTED", "VERIFIED", "FINALIZED", "PUBLISHED"].includes(marksStatus);
         const isEditable = !isLocked;
-
         const statusMap = {
-            "DRAFT":       { cls: "badge-gray",    icon: "fa-pen",           label: "Draft" },
-            "IN_PROGRESS": { cls: "badge-info",    icon: "fa-spinner",       label: "In Progress" },
-            "SUBMITTED":   { cls: "badge-warning", icon: "fa-paper-plane",   label: "Submitted 🔒" },
-            "VERIFIED":    { cls: "badge-primary", icon: "fa-circle-check",  label: "Verified 🔒" },
-            "FINALIZED":   { cls: "badge-success", icon: "fa-lock",          label: "Finalized 🔒" },
-            "PUBLISHED":   { cls: "badge-success", icon: "fa-bullhorn",      label: "Published 🔒" }
+            "DRAFT":       { cls: "badge-gray",    icon: "fa-pen",              label: "Draft" },
+            "IN_PROGRESS": { cls: "badge-info",    icon: "fa-spinner",          label: "In Progress" },
+            "SUBMITTED":   { cls: "badge-warning", icon: "fa-paper-plane",      label: "⏳ Awaiting Verification" },
+            "VERIFIED":    { cls: "badge-primary", icon: "fa-circle-check",     label: "✓ Verified" },
+            "FINALIZED":   { cls: "badge-success", icon: "fa-lock",             label: "🔒 Finalized" },
+            "PUBLISHED":   { cls: "badge-success", icon: "fa-bullhorn",         label: "📢 Published" },
+            "CORRECTION":  { cls: "badge-danger",  icon: "fa-triangle-exclamation", label: "⚠️ Correction Pending" }
         };
-        const sm = statusMap[marksStatus] || statusMap["DRAFT"];
 
+
+
+               // Check if marks were returned for correction (has RETURNED marker in remarks)
+        const wasReturned = s.remarks && s.remarks.includes("RETURNED:");
         const noMarksYet = !s.marks_id;
-        const displayStatus = noMarksYet ? "DRAFT" : marksStatus;
-        const disAttr = isEditable ? "" : "disabled";
+        let displayStatus = noMarksYet ? "DRAFT" : marksStatus;
 
+        // If marks are DRAFT but have RETURNED remarks, show correction pending
+        if (wasReturned && displayStatus === "DRAFT") {
+            displayStatus = "CORRECTION";
+        }
+
+        const disAttr = isEditable ? "" : "disabled";
+        
         return `
             <tr data-student="${escapeHtml(s.student_id)}"
                 data-status="${displayStatus}"
@@ -3858,10 +4076,7 @@ body {
     
             
                                 
-    document.addEventListener("input", (e) => {
-        if (e.target.classList && e.target.classList.contains("mark-input")) {
-            const row = e.target.closest("tr");
-            if (!row) return;
+    
 
             let total = 0;
             row.querySelectorAll(".mark-input").forEach(inp => {
@@ -3912,10 +4127,24 @@ body {
         } finally { hideLoading(); }
     };
 
-    
-    window.submitMarksForVerification = async function (examId, subjectId) {
+
+
+       window.submitMarksForVerification = async function (examId, subjectId) {
+        // Count how many students are editable
+        const rows = document.querySelectorAll("#marksEntryBody tr");
+        let editableCount = 0;
+        rows.forEach(r => {
+            const status = r.dataset.status || "DRAFT";
+            if (status === "DRAFT" || status === "IN_PROGRESS") editableCount++;
+        });
+
+        if (editableCount === 0) {
+            showToast("No editable marks to submit", "warning");
+            return;
+        }
+
         const ok = await confirmDialog(
-            `Submit marks for verification?\n\n` +
+            `Submit ${editableCount} student(s) marks for verification?\n\n` +
             `⚠️ After submission, marks will be LOCKED.\n` +
             `Only an admin can return them for correction.`,
             "Submit for Verification"
@@ -3931,6 +4160,7 @@ body {
             showGlobalBanner("Failed: " + err.message, "error");
         } finally { hideLoading(); }
     };
+    
 
        
 
