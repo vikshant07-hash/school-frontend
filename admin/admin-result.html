@@ -2256,7 +2256,10 @@ body {
         },
         post: (p, body) => apiRequest("POST", p, body || {}),
         put: (p, body) => apiRequest("PUT", p, body || {}),
-        del: (p) => apiRequest("DELETE", p)
+        del: (p, params) => {
+            const qs = params ? "?" + new URLSearchParams(params).toString() : "";
+            return apiRequest("DELETE", p + qs);
+        }
     };
 
     // ============================================================
@@ -2953,7 +2956,6 @@ body {
 
             document.getElementById("tabCountSubjects").textContent = STATE.classSubjects.length;
 
-            // Empty state
             if (!STATE.classSubjects.length) {
                 area.innerHTML = `
                     <div class="empty-state">
@@ -2968,11 +2970,9 @@ body {
                 return;
             }
 
-            // Separate core vs optional
             const core = STATE.classSubjects.filter(s => !s.is_optional);
             const opt = STATE.classSubjects.filter(s => s.is_optional);
 
-            // Table renderer helper
             const renderTable = (items, title, icon) => `
                 <div style="margin-bottom: 22px;">
                     <div class="form-section"><i class="fas ${icon}"></i> ${title}</div>
@@ -3051,7 +3051,6 @@ body {
         try {
             showLoading("Auto-assigning...");
 
-            // 1. Get all subjects
             const allRes = await api.get("/subjects");
             const allSubjects = allRes.data || [];
             const coreSubjects = allSubjects.filter(s => s.subject_type === "Core" && s.is_active);
@@ -3061,11 +3060,9 @@ body {
                 return;
             }
 
-            // 2. Get currently mapped subjects
             const mappedRes = await api.get("/class-subjects", { class_id: STATE.currentClass.id });
             const mappedIds = new Set((mappedRes.data || []).map(m => m.subject_id));
 
-            // 3. Filter out already mapped
             const toAdd = coreSubjects.filter(s => !mappedIds.has(s.id));
 
             if (!toAdd.length) {
@@ -3073,7 +3070,6 @@ body {
                 return;
             }
 
-            // 4. Add to class
             const res = await api.post("/class-subjects", {
                 class_id: STATE.currentClass.id,
                 subject_ids: toAdd.map(s => s.id)
@@ -3081,7 +3077,6 @@ body {
 
             showGlobalBanner(`✓ ${res.data?.added || toAdd.length} Core subjects added. Assigning to students...`, "success");
 
-            // 5. Auto-assign to all students
             await autoAssignSubjectsToStudents();
 
             await loadClassSubjects();
@@ -3111,12 +3106,10 @@ body {
             const students = json.data || json.students || [];
             if (!students.length) return;
 
-            // Get class subjects
             const csRes = await api.get("/class-subjects", { class_id: STATE.currentClass.id });
             const subjectIds = (csRes.data || []).map(s => s.subject_id);
             if (!subjectIds.length) return;
 
-            // Assign to each student (sequential to avoid overload)
             let assigned = 0;
             for (const stu of students) {
                 try {
@@ -3278,7 +3271,6 @@ body {
         const isNewTabActive = newTab.classList.contains("active");
 
         if (!isNewTabActive) {
-            // ---- ADD EXISTING ----
             const checked = Array.from(document.querySelectorAll(".add-subject-checkbox:checked"));
             if (!checked.length) { showToast("Select at least one subject", "warning"); return; }
 
@@ -3296,7 +3288,6 @@ body {
             } finally { hideLoading(); }
 
         } else {
-            // ---- CREATE NEW ----
             const code = document.getElementById("newSubCode").value.trim().toUpperCase();
             const name = document.getElementById("newSubName").value.trim();
             if (!code || !name) { showToast("Code and name required", "warning"); return; }
@@ -3306,7 +3297,6 @@ body {
             try {
                 showLoading("Creating subject...");
 
-                // 1. Create in master
                 const createRes = await api.post("/subjects", {
                     subject_code: code,
                     subject_name: name,
@@ -3323,7 +3313,6 @@ body {
                 const newSubjectId = createRes.data?.id;
                 if (!newSubjectId) throw new Error("Subject creation failed");
 
-                // 2. Map to class
                 await api.post("/class-subjects", {
                     class_id: STATE.currentClass.id,
                     subject_ids: [newSubjectId]
@@ -3331,7 +3320,6 @@ body {
 
                 showGlobalBanner(`✓ Subject "${name}" created`, "success");
 
-                // 3. Auto-assign
                 if (autoAssign) await autoAssignSubjectsToStudents();
 
                 closeModal();
@@ -3510,42 +3498,6 @@ body {
         } finally { hideLoading(); }
     };
 
-
-   async function safeDeleteExam(examId) {
-    if (!confirm("Delete this exam? This will remove all marks too.")) return;
-
-    try {
-        // Step 1: Unpublish if published
-        await fetch(`/api/admin/results/exams/${examId}/unpublish`, {
-            method: "POST"
-        });
-
-        // Step 2: Unlock if locked
-        await fetch(`/api/admin/results/exams/${examId}/unlock`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ reason: "Admin deleting exam" })
-        });
-
-        // Step 3: Delete marks manually (if needed)
-        // ... ya force delete use karo
-
-        // Step 4: Delete exam
-        const res = await fetch(`/api/admin/results/exams/${examId}?force=true`, {
-            method: "DELETE"
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            alert("✅ Exam deleted");
-        } else {
-            alert("❌ " + data.message);
-        }
-    } catch (err) {
-        alert("Error: " + err.message);
-    }
-}
-
     // ============================================================
     // MANAGE EXAM SUBJECTS
     // ============================================================
@@ -3665,17 +3617,70 @@ body {
         } finally { hideLoading(); }
     };
 
+    // ============================================================
+    // ✅ UPDATED: DELETE EXAM — Safe delete with unpublish + unlock + force
+    // ============================================================
     window.deleteExam = async function (examId, name) {
-        const ok = await confirmDialog(`Delete exam "${name}"?`, "Delete");
+        const ok = await confirmDialog(
+            `Delete exam "${name}"?\n\n` +
+            `⚠️ This will PERMANENTLY remove:\n` +
+            `• All entered marks\n` +
+            `• All result snapshots\n` +
+            `• All exam-subject mappings\n` +
+            `• The exam itself\n\n` +
+            `This action CANNOT be undone!`,
+            "Delete Exam"
+        );
         if (!ok) return;
+
         try {
-            showLoading("Deleting...");
-            await api.del("/exams/" + examId);
-            showGlobalBanner("✓ Deleted", "success");
+            showLoading("Deleting exam...");
+
+            // Step 1: Try unpublish (ignore errors if not published)
+            try {
+                await api.post(`/exams/${examId}/unpublish`);
+                console.log("✓ Exam unpublished");
+            } catch (e) {
+                console.log("⊘ Unpublish skipped:", e.message);
+            }
+
+            // Step 2: Try unlock (ignore errors if not locked)
+            try {
+                await api.post(`/exams/${examId}/unlock`, {
+                    reason: "Admin deleting exam"
+                });
+                console.log("✓ Exam unlocked");
+            } catch (e) {
+                console.log("⊘ Unlock skipped:", e.message);
+            }
+
+            // Step 3: Force delete (removes marks + results + exam subjects + exam)
+            await api.del(`/exams/${examId}`, { force: "true" });
+
+            showGlobalBanner(
+                `✓ Exam "${name}" deleted successfully`,
+                "success",
+                5000
+            );
+
+            // Refresh exams list
             await loadClassExams();
+
+            // Also refresh publish master if open
+            if (STATE.currentView === "publish-master") {
+                await loadPublishMaster();
+            }
+
         } catch (err) {
-            showGlobalBanner("Failed: " + err.message, "error", 8000);
-        } finally { hideLoading(); }
+            console.error("Delete error:", err);
+            showGlobalBanner(
+                "Delete failed: " + err.message,
+                "error",
+                8000
+            );
+        } finally {
+            hideLoading();
+        }
     };
 
     // Navigate to Marks Entry with exam selected
@@ -3864,7 +3869,6 @@ body {
         }
     }
 
-    // Load subjects for selected exam
     window.loadMarksSubjects = async function () {
         const examId = document.getElementById("marksExamSelect").value;
         const subjSel = document.getElementById("marksSubjectSelect");
@@ -3884,7 +3888,6 @@ body {
         }
     };
 
-    // Load marks entry sheet
     window.loadMarksEntrySheet = async function () {
         const examId = document.getElementById("marksExamSelect").value;
         const subjectId = document.getElementById("marksSubjectSelect").value;
@@ -3966,7 +3969,6 @@ body {
         } finally { hideLoading(); }
     };
 
-    // Auto-calculate total on input
     document.addEventListener("input", (e) => {
         if (e.target.classList && e.target.classList.contains("mark-input")) {
             const row = e.target.closest("tr");
@@ -3988,7 +3990,6 @@ body {
         }
     });
 
-    // Save marks as draft
     window.saveMarksDraft = async function () {
         const examId = document.getElementById("marksExamSelect").value;
         const subjectId = document.getElementById("marksSubjectSelect").value;
@@ -4022,7 +4023,6 @@ body {
         } finally { hideLoading(); }
     };
 
-    // Submit marks for verification
     window.submitMarksForVerification = async function (examId, subjectId) {
         const ok = await confirmDialog("Submit for verification?", "Submit");
         if (!ok) return;
@@ -4092,7 +4092,6 @@ body {
         }
     }
 
-    // Download bulk marksheets
     window.downloadBulkMarksheets = async function (examId) {
         try {
             showLoading("Preparing marksheets...");
@@ -4114,7 +4113,6 @@ body {
         } finally { hideLoading(); }
     };
 
-    // Build printable marksheet HTML
     function buildBulkMarksheetHTML(students, exam, school) {
         return `<!DOCTYPE html><html><head><title>Marksheets</title>
 <style>
@@ -4258,7 +4256,6 @@ ${stu.subject_wise_marks.map((m, i) => `<tr><td>${i + 1}</td><td class="subject"
 
     const debounceLoadMasterSubjects = debounce(loadMasterSubjects, 400);
 
-    // Create subject modal
     window.openCreateMasterSubjectModal = function () {
         openModal(`
             <div class="modal-header"><h3>Create Subject</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-xmark"></i></button></div>
@@ -4327,7 +4324,6 @@ ${stu.subject_wise_marks.map((m, i) => `<tr><td>${i + 1}</td><td class="subject"
         } finally { hideLoading(); }
     };
 
-    // Edit subject modal
     window.editMasterSubject = async function (id) {
         const s = STATE.subjects.find(x => x.id === id);
         if (!s) return;
@@ -4800,7 +4796,6 @@ ${stu.subject_wise_marks.map((m, i) => `<tr><td>${i + 1}</td><td class="subject"
             showLoading("Connecting...");
             bindEvents();
 
-            // Load sessions (ek hi baar, no retry loop)
             try {
                 await loadSessions();
                 if (STATE.sessionId) {
@@ -4817,7 +4812,6 @@ ${stu.subject_wise_marks.map((m, i) => `<tr><td>${i + 1}</td><td class="subject"
                 );
             }
 
-            // Show dashboard (even if sessions failed)
             showView("dashboard");
 
         } catch (err) {
@@ -4828,7 +4822,6 @@ ${stu.subject_wise_marks.map((m, i) => `<tr><td>${i + 1}</td><td class="subject"
         }
     }
 
-    // Auto-run when DOM ready
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", init);
     } else {
@@ -4839,4 +4832,3 @@ ${stu.subject_wise_marks.map((m, i) => `<tr><td>${i + 1}</td><td class="subject"
 </script>
 </body>
 </html>
-                       
