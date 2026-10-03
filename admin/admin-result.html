@@ -3351,6 +3351,82 @@ body {
         } finally { hideLoading(); }
     };
 
+
+
+   // ============================================================
+// DELETE SUBJECT — with force option
+// ============================================================
+window.deleteMasterSubject = async function (id, name) {
+    // First attempt: normal delete
+    const ok = await confirmDialog(
+        `Delete subject "${name}"?\n\nThis will remove it from the master list.`,
+        "Delete Subject"
+    );
+    if (!ok) return;
+
+    try {
+        showLoading("Deleting subject...");
+
+        try {
+            // Try normal delete first
+            await api.del(`/subjects/${id}`);
+            showGlobalBanner(`✓ Subject "${name}" deleted`, "success");
+            await loadMasterSubjects();
+            return;
+        } catch (err) {
+            // Check if it's a "usage" error → offer force delete
+            const errMsg = String(err.message || "");
+            const isUsageError = 
+                errMsg.includes("Cannot delete") ||
+                errMsg.includes("used in") ||
+                errMsg.includes("mapped to");
+
+            if (!isUsageError) throw err;
+
+            // Ask for force delete
+            hideLoading();
+            
+            const forceOk = await confirmDialog(
+                `⚠️ Subject "${name}" is in use!\n\n` +
+                `Force delete will PERMANENTLY remove:\n` +
+                `• Class mappings (this subject removed from all classes)\n` +
+                `• Exam entries (removed from all exams)\n` +
+                `• Student assignments\n` +
+                `• All entered marks\n` +
+                `• Result snapshots\n\n` +
+                `This action CANNOT be undone!`,
+                "Force Delete Subject"
+            );
+            
+            if (!forceOk) {
+                showGlobalBanner("Delete cancelled", "info", 3000);
+                return;
+            }
+
+            showLoading("Force deleting subject...");
+            
+            const res = await api.del(`/subjects/${id}`, { force: "true" });
+            const d = res.data || {};
+
+            showGlobalBanner(
+                `✓ Subject "${name}" force-deleted ` +
+                `(${d.deleted_marks || 0} marks, ${d.deleted_class_maps || 0} class mappings removed)`,
+                "success",
+                8000
+            );
+
+            await loadMasterSubjects();
+            return;
+        }
+
+    } catch (err) {
+        console.error("Delete subject error:", err);
+        showGlobalBanner("Delete failed: " + err.message, "error", 8000);
+    } finally {
+        hideLoading();
+    }
+};
+
     // ============================================================
     // ============================================================
     // CLASS EXAMS
