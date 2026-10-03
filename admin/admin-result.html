@@ -3776,87 +3776,88 @@ body {
         }
     };
 
-    window.loadMarksEntrySheet = async function () {
-        const examId = document.getElementById("marksExamSelect").value;
-        const subjectId = document.getElementById("marksSubjectSelect").value;
-        const area = document.getElementById("classMarksArea");
 
-        if (!examId || !subjectId) return;
-
-        try {
-            showLoading("Loading marks...");
-            const res = await api.get(`/marks-entry/${examId}/${subjectId}`);
-            const { exam, subject_config, students } = res.data;
-
-            STATE.marksSubjectConfig = subject_config;
-
-            if (!students.length) {
-                area.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash"></i><h3>No students assigned</h3><p>Assign subjects to students first.</p></div>`;
-                return;
-            }
-
-            const cfg = subject_config || {};
-            const hasTheory = (cfg.theory_max || 0) > 0;
-            const hasPractical = (cfg.practical_max || 0) > 0;
-            const hasInternal = (cfg.internal_max || 0) > 0;
-
-            area.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
-                    <div>
-                        <div style="font-weight:700; color:var(--t-hi); font-family: var(--font-display);">${escapeHtml(exam.exam_name)}</div>
-                        <div style="font-size:12.5px; color:var(--t-lo); margin-top:2px; font-weight: 600;">Max: <strong>${cfg.max_marks || 100}</strong> · Pass: <strong>${cfg.pass_marks || 33}</strong> · ${students.length} students</div>
-                    </div>
-                    ${statusBadge(exam.status)}
-                </div>
-                <div class="table-wrapper" style="padding: 0;">
-                    <table class="table marks-entry-table">
-                        <thead>
-                            <tr>
-                                <th>Roll</th>
-                                <th>Student</th>
-                                ${hasTheory ? '<th>Theory</th>' : ""}
-                                ${hasPractical ? '<th>Practical</th>' : ""}
-                                ${hasInternal ? '<th>Internal</th>' : ""}
-                                <th>Total</th>
-                                <th>Grade</th>
-                                <th>Status</th>
-                                <th>Remarks</th>
-                            </tr>
-                        </thead>
-                        <tbody id="marksEntryBody">
-                            ${students.map(s => `
-                                <tr data-student="${escapeHtml(s.student_id)}">
-                                    <td>${escapeHtml(s.roll_number || "—")}</td>
-                                    <td class="text-bold">${escapeHtml(s.student_name)}</td>
-                                    ${hasTheory ? `<td><input type="number" class="mark-input" data-field="theory" value="${s.theory_marks ?? ""}" min="0" max="${cfg.theory_max}" step="0.5"></td>` : ""}
-                                    ${hasPractical ? `<td><input type="number" class="mark-input" data-field="practical" value="${s.practical_marks ?? ""}" min="0" max="${cfg.practical_max}" step="0.5"></td>` : ""}
-                                    ${hasInternal ? `<td><input type="number" class="mark-input" data-field="internal" value="${s.internal_marks ?? ""}" min="0" max="${cfg.internal_max}" step="0.5"></td>` : ""}
-                                    <td><span class="mark-total">${s.total_marks ?? 0}</span></td>
-                                    <td><span class="mark-grade">${escapeHtml(s.grade || "—")}</span></td>
-                                    <td>
-                                        <select class="mark-absent">
-                                            <option value="Present" ${s.absent_type === "Present" ? "selected" : ""}>Present</option>
-                                            <option value="Absent" ${s.absent_type === "Absent" ? "selected" : ""}>Absent</option>
-                                            <option value="Medical" ${s.absent_type === "Medical" ? "selected" : ""}>Medical</option>
-                                            <option value="Withheld" ${s.absent_type === "Withheld" ? "selected" : ""}>Withheld</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="text" class="mark-remarks" value="${escapeHtml(s.remarks || "")}" style="width:120px;"></td>
-                                </tr>
-                            `).join("")}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="marks-entry-actions">
-                    <button class="btn btn-primary" onclick="saveMarksDraft()"><i class="fas fa-save"></i> Save Draft</button>
-                    <button class="btn btn-warning" onclick="submitMarksForVerification(${examId}, ${subjectId})"><i class="fas fa-paper-plane"></i> Submit</button>
-                </div>
-            `;
-        } catch (err) {
-            area.innerHTML = `<div class="inline-error"><i class="fas fa-circle-exclamation"></i><div class="error-content"><strong>Failed</strong>${escapeHtml(err.message)}</div></div>`;
-        } finally { hideLoading(); }
+       window.loadMarksEntrySheet = async function () {
+        // ... existing code ...
     };
 
+    // ✅✅✅ YAHAN PASTE KARO — renderMarksRow function ✅✅✅
+    function renderMarksRow(s, cfg, hasTheory, hasPractical, hasInternal, examLocked) {
+        const marksStatus = s.marks_status || "DRAFT";
+        const isSubmitted = marksStatus === "SUBMITTED";
+        const isVerified = marksStatus === "VERIFIED";
+        const isFinalized = marksStatus === "FINALIZED";
+        const isPublished = marksStatus === "PUBLISHED";
+        const isLocked = examLocked || ["SUBMITTED", "VERIFIED", "FINALIZED", "PUBLISHED"].includes(marksStatus);
+        const isEditable = !isLocked;
+
+        const statusMap = {
+            "DRAFT":       { cls: "badge-gray",    icon: "fa-pen",           label: "Draft" },
+            "IN_PROGRESS": { cls: "badge-info",    icon: "fa-spinner",       label: "In Progress" },
+            "SUBMITTED":   { cls: "badge-warning", icon: "fa-paper-plane",   label: "Submitted 🔒" },
+            "VERIFIED":    { cls: "badge-primary", icon: "fa-circle-check",  label: "Verified 🔒" },
+            "FINALIZED":   { cls: "badge-success", icon: "fa-lock",          label: "Finalized 🔒" },
+            "PUBLISHED":   { cls: "badge-success", icon: "fa-bullhorn",      label: "Published 🔒" }
+        };
+        const sm = statusMap[marksStatus] || statusMap["DRAFT"];
+
+        const noMarksYet = !s.marks_id;
+        const displayStatus = noMarksYet ? "DRAFT" : marksStatus;
+        const disAttr = isEditable ? "" : "disabled";
+
+        return `
+            <tr data-student="${escapeHtml(s.student_id)}"
+                data-status="${displayStatus}"
+                class="row-status-${displayStatus.toLowerCase()}"
+                style="${isLocked ? 'opacity: 0.85;' : ''}">
+                <td>${escapeHtml(s.roll_number || "—")}</td>
+                <td class="text-bold">${escapeHtml(s.student_name)}</td>
+                ${hasTheory ? `<td><input type="number" class="mark-input" data-field="theory" value="${s.theory_marks ?? ""}" min="0" max="${cfg.theory_max}" step="0.5" ${disAttr}></td>` : ""}
+                ${hasPractical ? `<td><input type="number" class="mark-input" data-field="practical" value="${s.practical_marks ?? ""}" min="0" max="${cfg.practical_max}" step="0.5" ${disAttr}></td>` : ""}
+                ${hasInternal ? `<td><input type="number" class="mark-input" data-field="internal" value="${s.internal_marks ?? ""}" min="0" max="${cfg.internal_max}" step="0.5" ${disAttr}></td>` : ""}
+                <td><span class="mark-total">${s.total_marks ?? 0}</span></td>
+                <td><span class="mark-grade">${escapeHtml(s.grade || "—")}</span></td>
+                <td>
+                    <span class="badge ${sm.cls}" title="${escapeHtml(marksStatus)}">
+                        <i class="fas ${sm.icon}"></i> ${sm.label}
+                    </span>
+                </td>
+                <td>
+                    <select class="mark-absent" ${disAttr}>
+                        <option value="Present" ${s.absent_type === "Present" ? "selected" : ""}>Present</option>
+                        <option value="Absent" ${s.absent_type === "Absent" ? "selected" : ""}>Absent</option>
+                        <option value="Medical" ${s.absent_type === "Medical" ? "selected" : ""}>Medical</option>
+                        <option value="Withheld" ${s.absent_type === "Withheld" ? "selected" : ""}>Withheld</option>
+                    </select>
+                </td>
+                <td><input type="text" class="mark-remarks" value="${escapeHtml(s.remarks || "")}" style="width:120px;" ${disAttr}></td>
+                <td>
+                    ${isSubmitted ? `
+                        <button class="btn btn-sm btn-warning" onclick="returnSingleStudent('${escapeHtml(s.student_id)}')" title="Send back for correction">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                    ` : ""}
+                    ${isEditable && !noMarksYet ? `
+                        <span class="badge badge-info" title="Editable">
+                            <i class="fas fa-pen"></i>
+                        </span>
+                    ` : ""}
+                    ${isLocked && !isSubmitted ? `
+                        <span class="badge badge-gray" title="Locked by ${displayStatus}">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                    ` : ""}
+                </td>
+            </tr>
+        `;
+    }
+    // ✅✅✅ YAHAN TAK — renderMarksRow function ✅✅✅
+
+    
+
+    
+            
+                                
     document.addEventListener("input", (e) => {
         if (e.target.classList && e.target.classList.contains("mark-input")) {
             const row = e.target.closest("tr");
@@ -3911,18 +3912,91 @@ body {
         } finally { hideLoading(); }
     };
 
+    
     window.submitMarksForVerification = async function (examId, subjectId) {
-        const ok = await confirmDialog("Submit for verification?", "Submit");
+        const ok = await confirmDialog(
+            `Submit marks for verification?\n\n` +
+            `⚠️ After submission, marks will be LOCKED.\n` +
+            `Only an admin can return them for correction.`,
+            "Submit for Verification"
+        );
         if (!ok) return;
+
         try {
             showLoading("Submitting...");
             const res = await api.post("/marks/submit", { exam_id: examId, subject_id: subjectId });
-            showGlobalBanner(`✓ ${res.message || "Submitted"}`, "success");
+            showGlobalBanner(`✓ ${res.message || "Submitted"} — marks are now locked`, "success");
             await loadMarksEntrySheet();
         } catch (err) {
             showGlobalBanner("Failed: " + err.message, "error");
         } finally { hideLoading(); }
     };
+
+       
+
+    // ✅✅✅ YAHAN PASTE KARO — returnSingleStudent + confirmSingleReturn ✅✅✅
+
+    // ============================================================
+    // RETURN SINGLE STUDENT for correction (from marks entry page)
+    // ============================================================
+    window.returnSingleStudent = async function (studentId) {
+        const examId = document.getElementById("marksExamSelect").value;
+        const subjectId = document.getElementById("marksSubjectSelect").value;
+
+        if (!examId || !studentId) return;
+
+        openModal(`
+            <div class="modal-header">
+                <h3>Send Back for Correction</h3>
+                <button class="modal-close" onclick="closeModal()"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="inline-warning" style="margin-bottom: 16px;">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>Student: ${escapeHtml(studentId)}</strong>
+                        Marks will be sent back to DRAFT status. Student's marks will become editable again.
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Reason <span class="required">*</span></label>
+                    <textarea class="form-control" id="returnReasonInput" placeholder="Enter reason for sending back (e.g., wrong marks in Math, absent marked incorrectly)..." rows="4"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-solid-warning" onclick="confirmSingleReturn('${escapeHtml(studentId)}', ${examId})">
+                    <i class="fas fa-undo"></i> Send Back
+                </button>
+            </div>
+        `);
+    };
+
+    window.confirmSingleReturn = async function (studentId, examId) {
+        const reason = document.getElementById("returnReasonInput").value.trim();
+        if (!reason) {
+            showToast("Please enter a reason", "warning");
+            return;
+        }
+
+        try {
+            showLoading("Sending back...");
+            await api.post(`/marks-return-student/${examId}/${studentId}`, { reason });
+            showGlobalBanner("✓ Sent back for correction — marks are now editable", "success");
+            closeModal();
+            await loadMarksEntrySheet();
+        } catch (err) {
+            showGlobalBanner("Failed: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+    };
+    // ✅✅✅ YAHAN TAK ✅✅✅
+
+    // ============================================================
+    // CLASS RESULTS
+    // ============================================================
+    
 
     // ============================================================
     // CLASS RESULTS
